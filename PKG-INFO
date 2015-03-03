@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: antlr4-python2-runtime
+Version: 4.5
+Summary: ANTLR 4.5 runtime for Python 2.7.6
+Home-page: http://www.antlr.org
+Author: Eric Vergnaud, Terence Parr, Sam Harwell
+Author-email: eric.vergnaud@wanadoo.fr
+License: BSD
+Description: UNKNOWN
+Platform: UNKNOWN
