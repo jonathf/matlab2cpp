@@ -24,7 +24,7 @@ $ python setup.py install
 The executable 'mconvert' is now available from path.
 
 Windows:
-> python.exe setup.py install
+> Python setup.py install
 
 The executable mconvert.py must be copied to project or added to
-enviromental variables manuallu.
+enviromental variables manually.
