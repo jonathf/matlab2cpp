@@ -17,11 +17,15 @@ if system == "Windows":
     os.system("python.exe setup_antlr.py " + args)
     os.system("python.exe setup_matlab2cpp.py " + args)
 
+    print "Program runnable through 'mconvert.py'"
+    print "To start:"
+    print "> python mconvert.py -h"
+
 else:
 
     os.system("python setup_antlr.py "+args)
     os.system("python setup_matlab2cpp.py " + args)
 
-    mconvert = "cp mconvert /usr/local/bin"
+    mconvert = "cp mconvert.py /usr/local/bin/mconvert"
     print mconvert
     os.system(mconvert)
