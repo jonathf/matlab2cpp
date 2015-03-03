@@ -5,9 +5,6 @@ Matlab2cpp
 Toolbox for automatically converting Matlab into C++ code.
 """
 
-__version__ = "1.0"
-__author__ = "Jonathan Feinberg, jonathan@feinberg.no"
-
 from MatlabLexer import MatlabLexer
 from MatlabParser import MatlabParser
 from MatlabListener import MatlabListener
