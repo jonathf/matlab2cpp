@@ -92,15 +92,14 @@ llist_
     ;
 
 matrix
-    : '[' matrix_ ','? ';'? ']' ;
-matrix_
-    : matrix_ (('\r'? '\n')+ | ';' ('\r'? '\n')* ) matrix_
-    | vector
-    ;
-vector
-    : vector ',' vector
-    | expr
-    ;
+    : '[' vector (';' vector)* ']' ;
+//      : '[' matrix_ ','? ';'? ']' ;
+//  matrix_
+//      : matrix_ (('\r'? '\n')+ | ';' ('\r'? '\n')* ) matrix_
+//      | vector
+//      ;
+
+vector : expr (',' expr)* ;
 
 // /Expression
 

@@ -1,6 +1,7 @@
 from arma import *
 
 Type = "imat"
+Declare = "imat %(name)s ;"
 
 def Get(node):
 

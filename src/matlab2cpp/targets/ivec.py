@@ -1,6 +1,6 @@
 from arma import *
 
-Type = "ivec"
+Declare = "ivec %(name)s ;"
 
 def Get(node):
 

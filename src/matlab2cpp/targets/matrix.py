@@ -11,97 +11,185 @@ Vector : (Column)-Vector container
     Contains: Expr, ...
 """
 
-def Matrix(node):
-    types = list(set([n.type() for n in node[:]]))
-    types.sort()
-
-    if "TYPE" in types:
-        return "[", "; ", "]"
-
-    node["decomposed"] = False
-
-    # Still  col
-    if all([t in ("float", "int") for t in types]):
-
-        if len(node)>1:
-            types += ["ivec"]
-        node.type(types)
-
-    if all([t in ("float", "int", "ivec", "fvec")
-            for t in types]):
-        if len(node)>1 or types[0] not in ("int", "float"):
-            types += ["ivec"]
-        node.type(types)
-
-    # concatenate rows
-    else:
-        if len(node)>1 or types[0] not in ("irowvec", "frowvec"):
-            types += ["imat"]
-        node.type(types)
-
-    if all(n["decomposed"] for n in node[:]):
-
-        node["decomposed"] = True
-        node.type(types)
-        if node.parent["class"] in ("Assign", "Statement"):
-            return "", "<< arma::endr <<", ""
-        return node.auxillary()
-
-    out = []
-    for vec in node[:]:
-        type = vec.type()
-        if type in ("float", "int"):
-            vec.type([type, "ivec"])
-            out.append(vec.auxillary())
-
-        elif vec["decomposed"]:
-            out.append(vec.auxillary())
-        else:
-            out.append(vec["str"])
-    return reduce(lambda a,b: ("arma::join_rows(%s, %s)" % (a,b)), out)
-
-
 
 def Vector(node):
-    types = list(set([n.type() for n in node[:]]))
+
+
+    types = list(set([n.type() for n in node]))
     types.sort()
 
-    if "TYPE" in types:
-        return "", ", ", ""
+    if len(node) == 1 or "TYPE" in types:
 
-    node["decomposed"] = False
+        node["decomposed"] = True
+        return "", ", ", ""
 
     # Decomposed row
     if all([t in ("float", "int") for t in types]):
 
         node["decomposed"] = True
-        if len(node)>1:
-            types += ["irowvec"]
-        node.type(types)
-
+        if "float" in types:
+            node.type("frowvec")
+        else:
+            node.type("irowvec")
         return "", "<<", ""
 
-    # Concatenated row
+    # Concatenate rows
     elif all([t in ("float", "int", "irowvec", "frowvec")
             for t in types]):
 
-        node.type(types)
+        node["decomposed"] = False
 
-    # Concatenate cols
-    else:
-        if len(node)>1 or types[0] not in ("ivec", "fvec"):
-            types += ["imat"]
-        node.type(types)
-
-
-    out = []
-    for n in node[:]:
-        type = n.type()
-        if type in ("float", "int"):
-            n.type([type, "irowvec"])
-            out.append(n.auxillary())
+        if "float" in types or "frowvec" in types:
+            node.type("frowvec")
         else:
-            out.append(str(n["str"]))
+            node.type("irowvec")
 
-    return reduce(lambda a,b: ("arma::join_cols(%s, %s)" % (a,b)), out)
+        nodes = []
+        for i in xrange(len(node)):
+            child = node[i]
+            type = child.type()
+            if type == "float":
+                child = child.auxillary("frowvec")
+            elif type == "int":
+                child = child.auxillary("irowvec")
 
+            nodes.append(child)
+
+    # Concatenate mats
+    else:
+
+        node["decomposed"] = False
+
+        for t in ["float", "int", "frowvec", "irowvec"]:
+            if t in types:
+                print [str(n) for n in node]
+                raise ValueError("illigal concatination of scalar and/or vector")
+
+        if "fvec" in types or "fmat" in types:
+            node.type("fmat")
+        else:
+            node.type("imat")
+
+        nodes = node
+
+    return reduce(lambda x,y: ("arma::join_cols(%s, %s)" % (x, y)), nodes)
+
+
+def Matrix(node):
+
+    types = set([n.type() for n in node])
+
+    if "TYPE" in types:
+        return "[", "; ", "]"
+
+    if len(node) == 1:
+
+        if len(node[0]) == 1:
+
+            if node.parent["class"] in ("Assign", "Statement"):
+                node.parent["backend"] = "matrix"
+                return "%(0)s"
+
+            return node.auxillary()
+
+        if any([n.type() == "frowvec" for n in node]):
+            node.type("frowvec")
+        else:
+            node.type("irowvec")
+
+        if node[0]["decomposed"]:
+
+            if node.parent["class"] in ("Assign", "Statement"):
+                node.parent["backend"] = "matrix"
+                return "%(0)s"
+
+            return node.auxillary()
+
+        return "%(0)s"
+
+    if all([n["decomposed"] for n in node]):
+
+        if len(node[0]) == 1:
+            if any([n.type() == "float" for n in node]):
+                type = node.type("fvec")
+            else:
+                type = node.type("ivec")
+        else:
+            if any([n.type() == "frowvec" for n in node]):
+                type = node.type("fmat")
+            else:
+                type = node.type("imat")
+
+
+        if node.parent["class"] in ("Assign", "Statement"):
+            node.parent["backend"] = "matrix"
+            return "", " <<arma::endr<< ", ""
+
+        return node.auxillary(type)
+
+
+    types = list(set([n.type() for n in node[:]]))
+    types.sort()
+
+
+    # Concatinate cols
+    if all([t in ("float", "int", "ivec", "fvec")
+            for t in types]):
+
+        if "float" in types or "fvec" in types:
+            node.type("fvec")
+        else:
+            node.type("ivec")
+
+        nodes = []
+        for child in node:
+            type = child.type()
+            if type == "float":
+                child = child.auxillary("fvec")
+
+            elif type == "int":
+                child = child.auxillary("ivec")
+
+            elif child["decomposed"]:
+                if type == "fvec":
+                    child.auxillary("fvec")
+                else:
+                    child.auxillary("ivec")
+
+            nodes.append(child)
+
+    # Concatenate mats
+    else:
+
+        for t in ["float", "int", "fvec", "ivec"]:
+            if t in types:
+                print [str(n) for n in node]
+                raise ValueError("illigal concatination of scalar and/or vector")
+
+        if "frowvec" in types or "fmat" in types:
+            node.type("fmat")
+        else:
+            node.type("imat")
+
+        nodes = []
+        for child in node:
+            if child["decomposed"]:
+                if child.type() == "frowvec":
+                    child = child.auxillary("frowvec")
+                else:
+                    child = child.auxillary("irowvec")
+            node.append(child)
+
+    return reduce(lambda a,b: ("arma::join_rows(%s, %s)" % (a,b)), nodes)
+
+
+
+def Assign(node):
+    node[0].suggest(node[1].type())
+    return "%(0)s << %(1)s ;"
+
+
+def Statement(node):
+    name =  "_wasteful%03d" % node.program.next_index()
+    node[0].declare(name)
+    return name + " << %(0)s ;"

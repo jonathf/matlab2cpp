@@ -3,40 +3,20 @@ from datatype import datatype
 import targets
 
 class Node(object):
+    """
+General definition of a token representation of code
+    """
 
     def __init__(self, parent, name=None):
+        """
+Parameters
+----------
+parent : Node
+    Node parent in the token tree
+name : str
+    Optional name of the node
+        """
         init(self, parent, name)
-
-    def __getitem__(self, i):
-        if isinstance(i, str):
-            out = self.prop.get(i, "")
-            if i == "type":
-                return str(out)
-            return out
-        return self.children[i]
-
-    def __setitem__(self, key, val):
-        if key == "type" and not isinstance(val, datatype):
-            self.type(val)
-        else:
-            self.prop[key] = val
-
-    def __hasitem__(self, key):
-        return key in self.prop
-
-    def __len__(self):
-        return len(self.children)
-
-    def __str__(self):
-        if not self.prop.has_key("str"):
-            return self.summary()
-        return self.prop["str"]
-
-    def __add__(self, val):
-        return str(self)+val
-
-    def __radd__(self, val):
-        return val+str(val)
 
     def summary(self):
         "Node summary"
@@ -93,7 +73,14 @@ class Node(object):
         if not isinstance(value, (unicode, str, list, tuple)):
             value = value(self)
 
-        if value is None:
+        if isinstance(value, unicode):
+            value = str(value)
+
+        elif isinstance(value, Node):
+            value._generate()
+            value = str(value)
+
+        elif value is None:
             raise ValueError("missing return in %s.%s" % backend, cls)
 
         prop = self.prop.copy()
@@ -101,7 +88,7 @@ class Node(object):
         for i in xrange(I):
             prop["%d" % i] = prop["-%d" % (I-i)] = self[i]["str"]
 
-        if not isinstance(value, (str, unicode)):
+        if not isinstance(value, str):
 
             value = list(value)
             children = ["%("+str(i)+")s" for i in xrange(len(self))]
@@ -185,9 +172,6 @@ class Node(object):
                 node.suggest(text)
             self["type"] = datatype(text)
 
-#              if text and text != "TYPE" and self["backend"] == "unknown":
-#                  self["backend"] = text
-
         else:
             if name in declares["names"]:
                 node = declares[declares["names"].index(name)]
@@ -206,7 +190,7 @@ class Node(object):
     def suggest(self, text=""):
 
         if not isinstance(text, str):
-            text = str(reduce(lambda x, y: datatype(x)+datatype(y)), text)
+            text = str(reduce(lambda x, y: datatype(x)*datatype(y)), text)
 
         if text == "TYPE":
             return "TYPE"
@@ -236,16 +220,145 @@ class Node(object):
             if str(node["suggest"]) in ("", "TYPE"):
                 node["suggest"] = datatype(text)
             else:
-                node["suggest"] = datatype(text) + node["suggest"]
+                node["suggest"] = datatype(text) * node["suggest"]
 
         return str(node["suggest"])
+
+    def propose(self):
+
+        types = [n.prop["type"] for n in self]
+        return reduce(lambda x, y: x*y, types).val
+
+
+    def replace(self, node, *args):
+        "replace node in token tree"
+
+        if not args:
+
+            index = self.parent.children.index(self)
+            self.parent.children[index] = node
+            node.parent = self.parent
+            node._generate()
+            return str(node)
+
+        else:
+
+            matrix = collection.Matrix(self.parent)
+            matrix["backend"] = "matrix"
+            vector = collection.Vector(matrix)
+            vector["backend"] = "matrix"
+
+            for arg in args:
+                v = collection.Var(vector, arg)
+                v.type(node)
+                v.backend(node)
+            self.replace(matrix)
+            if len(args)>1:
+                return self.auxillary(node)
+            return self
+
+
+    def auxillary(self, type=""):
+        """create a auxillary variable and 
+        move actual calcuations to own line."""
+
+        assert self.parent["class"] != "Assign",\
+                ".auxillary() must be triggered mid expression."
+
+        if not type:
+            type = self.type()
+
+        if self["class"] in ("Vector", "Matrix"):
+            backend = "matrix"
+        elif type == "TYPE":
+            backend = "unknown"
+        else:
+            backend = type
+
+        line = self
+        while line.parent["class"] != "Block":
+            line = line.parent
+        p = line.parent
+
+        # Create new var
+        var = "_aux%03d" % self.program.next_index()
+
+        # Create Assign
+        s = collection.Assign(p)
+        s["backend"] = backend
+        s.type(type)
+
+        # Return value
+        v0 = collection.Var(s, var)
+        v0.declare()
+        v0.type(type)
+
+        # Create aux Var
+        v1 = collection.Var(s, var)
+        v1.type(type)
+
+        # Place Assign correctly in Block
+        i = p.children.index(line)
+        p.children = p[:i] + [p[-1]] + p[i:-1]
+
+        # Swap self and Var
+        index = self.parent.children.index(self)
+        self.parent.children[index] = v1
+        v1.group = self.group
+        self.group = s
+        v1.parent = self.parent
+        self.parent = s
+        s.children[1] = self
+
+        # Generate code for new variables
+        s._generate()
+        v1._generate()
+
+        return v1
+
+
 
     def error(self, text):
         self.program.errors.add(text)
 
 
+    def __getitem__(self, i):
+        if isinstance(i, str):
+            out = self.prop.get(i, "")
+            if i == "type":
+                return str(out)
+            return out
+        return self.children[i]
 
-group_materials = [
+    def __setitem__(self, key, val):
+        if key == "type" and not isinstance(val, datatype):
+            self.type(val)
+        else:
+            self.prop[key] = val
+
+    def __hasitem__(self, key):
+        return key in self.prop
+
+    def __len__(self):
+        return len(self.children)
+
+    def __str__(self):
+        if not self.prop.has_key("str"):
+            return self.summary()
+        return self.prop["str"]
+
+    def __add__(self, val):
+        return str(self)+val
+
+    def __radd__(self, val):
+        return val+str(val)
+
+    def __iter__(self):
+        return self.children.__iter__()
+
+
+
+groupnames = [
     "Get", "Set", "Sets", "Assign", "Assigns", "Assigned",
     "Assignees", "Func", "Matrix", "For", "If", "Elif", "Else",
     "Block", "Branch", "Statement", "Program"
@@ -264,7 +377,7 @@ def init(node, parent, name=None):
 
     cls = node.__class__.__name__
     node.prop["class"] = cls
-    if cls in group_materials:
+    if cls in groupnames:
         node.isgroup = True
     else:
         node.isgroup = False
@@ -281,7 +394,7 @@ def init(node, parent, name=None):
         node.func = parent.func
     node.prop["func"] = node.func.prop["name"]
 
-    if parent["class"] in group_materials:
+    if parent["class"] in groupnames:
         node.group = parent
     else:
         node.group = parent.group
@@ -292,7 +405,7 @@ def init(node, parent, name=None):
     node["value"] = ""
 
     node["pointers"] = 0
-    node["aux"] = 0
 
-    node["stop"] = False
+    node["auxillary"] = False
+
     node["type"] = datatype("TYPE")

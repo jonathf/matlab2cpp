@@ -115,6 +115,13 @@ Transpose : Transpose
     Contains: Expr
 """
 
+def operator_suggestions(node):
+    if node.type() == "TYPE":
+        type = node.propose()
+        if type != "TYPE":
+            for child in node:
+                if child["class"] == "Var":
+                    child.suggest(type)
 
 
 Expr = "%(0)s"
@@ -123,9 +130,22 @@ Paren = "(%(0)s)"
 End = "&$"
 
 # simple operators
-Mul     = "", "*", ""
-Elmul  = "", ".*", ""
-Plus    = "", "+", ""
+def Mul(node):
+    operator_suggestions(node)
+    return "", "*", ""
+
+def Elmul(node):
+    operator_suggestions(node)
+    return "", ".*", ""
+
+def Plus(node):
+    operator_suggestions(node)
+    return "", "+", ""
+
+def Minus(node):
+    operator_suggestions(node)
+    return "", "-", ""
+
 Gt      = "", ">", ""
 Ge      = "", ">=", ""
 Lt      = "", "<", ""
@@ -136,7 +156,6 @@ Band    = "", "&&", ""
 Land    = "", "&", ""
 Bor     = "", "||", ""
 Lor     = "", "|", ""
-Minus   = "", "-", ""
 Div     = "", "/", ""
 Rdiv    = "", "\\", ""
 Elrdiv = "", ".\\", ""

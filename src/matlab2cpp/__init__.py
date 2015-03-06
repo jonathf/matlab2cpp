@@ -5,6 +5,11 @@ Matlab2cpp
 Toolbox for automatically converting Matlab into C++ code.
 """
 
+import collection
+import node
+import targets
+import snippets
+
 from MatlabLexer import MatlabLexer
 from MatlabParser import MatlabParser
 from MatlabListener import MatlabListener
@@ -17,7 +22,6 @@ import cPickle
 
 import utils
 import preproc
-
 
 def build(arg):
     """Contruct token tree from file"""
@@ -33,15 +37,15 @@ def build(arg):
     walker.walk(listener, program)
 
     program = program.program
+    program.index = 0
 
     return program
 
 
 def main(path, suggestion=False):
 
-    path = os.path.abspath(path)
-    dirname = os.path.dirname(path)
     filename = os.path.basename(path)
+    dirname = os.path.dirname(path)
     os.chdir(dirname)
 
     f = open(filename, "r")

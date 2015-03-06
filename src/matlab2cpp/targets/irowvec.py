@@ -1,6 +1,7 @@
 from arma import *
 
 Type = "irowvec"
+Declare = "irowvec %(name)s ;"
 
 def Get(node):
 

@@ -28,12 +28,13 @@ class MatlabListener(ParseTreeListener):
         params["backend"] = "func_return"
 
         declares["names"] = []
-        returns["names"] = ["ret_val"]
+        returns["names"] = ["_retval"]
         params["names"] = ["argc", "argv"]
 
-        var = col.Var(returns, "ret_val")
+        var = col.Var(returns, "_retval")
         var.type("int")
         var["backend"] = "int"
+        var.declare(var)
 
         argc = col.Var(params, "argc")
         argc.type("int")
@@ -53,7 +54,7 @@ class MatlabListener(ParseTreeListener):
 
         block = ctx.node[3]
         assign = col.Assign(block)
-        var = col.Var(assign, "ret_var")
+        var = col.Var(assign, "_retvar")
         var.type("int")
         i = col.Int(assign, "0")
         i.type("int")

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import matlab2cpp
 import optparse
 
@@ -13,10 +14,25 @@ if __name__ == "__main__":
             help="View the token tree and some of its attributes")
     parser.add_option("-s", '--suggestion', action="store_true",
             help="Use suggestions automatically")
+    parser.add_option("-r", '--recompile', action="store_true",
+            help="Force fresh recompile")
 
     opt, args = parser.parse_args()
 
-    tree = matlab2cpp.main(args[0], opt.suggestion)
+    path = os.path.abspath(args[0])
+
+    if opt.recompile:
+
+        filename = os.path.basename(path)
+        dirname = os.path.dirname(path)
+        name1 = dirname + os.sep + "." + filename + ".backup"
+        name2 = dirname + os.sep + "." + filename + ".pickle"
+        name3 = dirname + os.sep + filename + ".py"
+        for name in [name1, name2, name3]:
+            if os.path.isfile(name):
+                os.remove(name)
+
+    tree = matlab2cpp.main(path, opt.suggestion)
     if opt.tree_view:
         print tree.summary()
     else:

@@ -19,8 +19,20 @@ class datatype(object):
         assert val in types, "%s not recognized" % val
         self.val = val
 
-    def __radd__(self, other):
+    def __mul__(self, other):
+
+        if not isinstance(other, datatype):
+            other = datatype(other)
+
+        if self.val == "TYPE":
+            return other
+        elif other.val == "TYPE":
+            return self
+
         return self.__add__(other)
+
+    def __rmul__(self, other):
+        return self.__mul__(other)
 
     def __add__(self, other):
 
@@ -83,6 +95,9 @@ class datatype(object):
 
         if v == "char":
             return datatype("TYPE")
+
+    def __radd__(self, other):
+        return self.__add__(other)
 
         print v, w
         raise ValueError, "datatype problems"

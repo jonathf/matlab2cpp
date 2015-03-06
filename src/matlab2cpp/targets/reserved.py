@@ -53,7 +53,8 @@ def Get_size(node):
 
     elif type in ("fmat", "imat"):
         node.type("ivec")
-        # TODO auxillary
+        node.replace("int", node[0]+".n_rows", node[0]+".n_cols")
+
         return "{%(0)s.n_rows, %(0)s.n_cols}"
 
     elif type == "TYPE":
