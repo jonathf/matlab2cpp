@@ -345,10 +345,10 @@ class MatlabListener(ParseTreeListener):
             elif opr == "^":    node = col.Exp(pnode)
             elif opr == ".^":   node = col.Elexp(pnode)
             elif opr == "+":
-                rhs = ctx.getChild(2)
-                if hasattr(rhs, "PRE") and rhs.PRE().getText() == "-":
-                    node = col.Minus(pnode)
-                else:
+#                  rhs = ctx.getChild(2)
+#                  if hasattr(rhs, "PRE") and rhs.PRE().getText() == "-":
+#                      node = col.Minus(pnode)
+#                  else:
                     node = col.Plus(pnode)
 
             ctx.node = node

@@ -54,7 +54,6 @@ y
 Access to ancestry
 ------------------
 parent          Parent node
-group           Closes code-block element
 func            Function (local function scope)
 root            Tree root (static information)
 

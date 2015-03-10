@@ -78,8 +78,8 @@ expr_
     | STRING                        # String
     | END                           # End
     | ID '(' llist? ')'             # Get1
-    | ID '?' llist? '?'             # Get2
-    | ID '\\{' llist? '\\}'         # Get3
+    | ID '?' llist '?'             # Get2
+    | ID '\\{' llist '\\}'         # Get3
     | ID                            # Var
     ;
 

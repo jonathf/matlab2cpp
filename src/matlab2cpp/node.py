@@ -20,13 +20,14 @@ name : str
         """
         init(self, parent, name)
 
-    def summary(self, disp):
+    def summary(self, disp=False, group=None):
         "Node summary"
 
         nodes = utils.flatten(self, ordered=True)
         if disp:
             print "iterating %d nodes" % len(nodes)
 
+        indent = [self]
         out = ""
         for node in nodes:
 
@@ -38,14 +39,19 @@ name : str
             if backend == "unknown" and type != "TYPE":
                 backend = type
 
-            out += "%18s %-10s %-12s %-7s" % (name, cls, backend, type)
-            out += repr(str(node["str"])) + "\n"
+            while indent and not (node.parent is indent[-1]):
+                indent.pop()
 
+            out += " "*(len(indent)-1)
+            out += "%18s %-10s %-12s %-7s" % (name, cls, backend, type)
+            out += str(node["ret"]) + "\n"
+
+            indent.append(node)
 
         return out
 
 
-    def generate(self, disp):
+    def generate(self, disp, group=None):
         """Generate code"""
 
         nodes = utils.flatten(self)
@@ -92,6 +98,8 @@ name : str
 
             elif value is None:
                 raise ValueError("missing return in %s.%s" % backend, cls)
+
+            node["ret"] = repr(value)
 
             prop = node.prop.copy()
             I = len(node)
@@ -398,6 +406,11 @@ groupnames = [
     "Block", "Branch", "Statement", "Program"
 ]
 
+summarynames = [
+    "Assign", "Assigns", "Branch", "For", "Func", "Set", "Set2", "Set3",
+    "Statement", "Switch", "Tryblock", "While", "Program"
+]
+
 def init(node, parent, name=None):
 
     node.children = []      # node children
@@ -415,6 +428,11 @@ def init(node, parent, name=None):
         node.isgroup = True
     else:
         node.isgroup = False
+
+    if cls in summarynames:
+        node["summarygroup"] = 0
+    else:
+        node["summarygroup"] = node.program["summarygroup"]
 
     index = node.program.next_index()
     if name:
@@ -437,9 +455,7 @@ def init(node, parent, name=None):
     node["backend"] = "unknown"
     node["str"] = ""
     node["value"] = ""
-
     node["pointers"] = 0
-
     node["auxillary"] = False
-
     node["type"] = datatype("TYPE")
+
