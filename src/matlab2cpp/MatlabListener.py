@@ -17,6 +17,14 @@ class MatlabListener(ParseTreeListener):
         includes["backend"] = "program"
         includes["names"] = []
 
+        i1 = col.Include(includes, "armadillo")
+        i1["value"] = "#include <armadillo>"
+        i1["backend"] = "program"
+
+        i2 = col.Include(includes, "usingarma")
+        i2["value"] = "using namespace arma;"
+        i2["backend"] = "program"
+
         func = col.Func(ctx.program, "main")
         declares = col.Declares(func)
         returns = col.Returns(func)
@@ -313,39 +321,39 @@ class MatlabListener(ParseTreeListener):
         opr = ctx.OPR().getText()
         parent = ctx.parentCtx
         if hasattr(parent, "opr") and opr == parent.opr:
-            pnode = parent.parentCtx.node
+            ctx.node = parent.node
         else:
             pnode = parent.node
 
-        if opr == "||":     node = col.Lor(pnode)
-        elif opr == "&&":   node = col.Land(pnode)
-        elif opr == "|":    node = col.Bor(pnode)
-        elif opr == "&":    node = col.Band(pnode)
-        elif opr == "%%":   node = col.Eq(pnode)
-        elif opr == "<=":   node = col.Le(pnode)
-        elif opr == ">=":   node = col.Ge(pnode)
-        elif opr == "<":    node = col.Lt(pnode)
-        elif opr == ">":    node = col.Gt(pnode)
-        elif opr == "<>":   node = col.Ne(pnode)
-        elif opr == ":":    node = col.Colon(pnode)
-        elif opr == "/":    node = col.Div(pnode)
-        elif opr == "./":   node = col.Eldiv(pnode)
-        elif opr == "\\":   node = col.Rdiv(pnode)
-        elif opr == ".\\":  node = col.Elrdiv(pnode)
-        elif opr == "*":    node = col.Mul(pnode)
-        elif opr == ".*":   node = col.Elmul(pnode)
-        elif opr == "^":    node = col.Exp(pnode)
-        elif opr == ".^":   node = col.Elexp(pnode)
-        elif opr == "+":
-            rhs = ctx.getChild(2)
-            if hasattr(rhs, "PRE") and rhs.PRE().getText() == "-":
-                node = col.Minus(pnode)
-            else:
-                node = col.Plus(pnode)
+            if opr == "||":     node = col.Lor(pnode)
+            elif opr == "&&":   node = col.Land(pnode)
+            elif opr == "|":    node = col.Bor(pnode)
+            elif opr == "&":    node = col.Band(pnode)
+            elif opr == "%%":   node = col.Eq(pnode)
+            elif opr == "<=":   node = col.Le(pnode)
+            elif opr == ">=":   node = col.Ge(pnode)
+            elif opr == "<":    node = col.Lt(pnode)
+            elif opr == ">":    node = col.Gt(pnode)
+            elif opr == "<>":   node = col.Ne(pnode)
+            elif opr == ":":    node = col.Colon(pnode)
+            elif opr == "/":    node = col.Div(pnode)
+            elif opr == "./":   node = col.Eldiv(pnode)
+            elif opr == "\\":   node = col.Rdiv(pnode)
+            elif opr == ".\\":  node = col.Elrdiv(pnode)
+            elif opr == "*":    node = col.Mul(pnode)
+            elif opr == ".*":   node = col.Elmul(pnode)
+            elif opr == "^":    node = col.Exp(pnode)
+            elif opr == ".^":   node = col.Elexp(pnode)
+            elif opr == "+":
+                rhs = ctx.getChild(2)
+                if hasattr(rhs, "PRE") and rhs.PRE().getText() == "-":
+                    node = col.Minus(pnode)
+                else:
+                    node = col.Plus(pnode)
 
-        ctx.node = node
-        ctx.opr = opr
-        ctx.node["backend"] = "expression"
+            ctx.node = node
+            ctx.node["backend"] = "expression"
+            ctx.opr = opr
 
     def exitInfix(self, ctx):
         pass
@@ -411,7 +419,7 @@ class MatlabListener(ParseTreeListener):
                     parent.opr == "+":
                 ctx.node = pnode
             else:
-                ctx.node = ccol.Neg(pnode)
+                ctx.node = col.Neg(pnode)
         else:
             ctx.node = col.Not(pnode)
         ctx.node["backend"] = "expression"

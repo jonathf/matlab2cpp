@@ -1,6 +1,5 @@
 import snippets
 
-
 def retrieve(node, name, **kws):
 
     prms, code = snippets.__dict__.get(name)
@@ -10,6 +9,6 @@ def retrieve(node, name, **kws):
     keys = prms.keys()
     keys.sort()
     vals = [prms[key] for key in keys]
-    key = name+":"+":".join(vals)
+    key = name+"_"+"_".join(vals)
 
     return key, code

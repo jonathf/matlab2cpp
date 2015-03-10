@@ -7,8 +7,11 @@ Declare = "TYPE %(name)s ;"
 def Set(node):
     "arrays"
     type = node[1].type()
+
     if type != "TYPE":
-        return node.call(type)
+        node.type(type)
+        node[0].suggest(type)
+
     return "%(name)s(%(0)s) = %(1)s ;"
 
 def Set2(node):

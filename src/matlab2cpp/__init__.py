@@ -23,14 +23,20 @@ import cPickle
 import utils
 import preproc
 
-def build(arg):
+def build(arg, disp=False):
     """Contruct token tree from file"""
+
+    if disp:
+        print "loading Antlr..."
 
     input = antlr.FileStream(arg)
     lexer = MatlabLexer(input)
     stream = antlr.CommonTokenStream(lexer)
     parser = MatlabParser(stream)
     program = parser.program()
+
+    if disp:
+        print "running tree-walker..."
 
     listener = MatlabListener()
     walker = antlr.ParseTreeWalker()
@@ -42,19 +48,24 @@ def build(arg):
     return program
 
 
-def main(path, suggestion=False):
+def main(path, suggestion=False, disp=False):
 
     filename = os.path.basename(path)
     dirname = os.path.dirname(path)
     os.chdir(dirname)
 
+    if disp:
+        print "reading file..."
     f = open(filename, "r")
     code1 = f.read()
     f.close()
 
     # Deal with backup and pickled files
     if os.path.isfile("." + filename + ".backup")\
-        and os.path.isfile("." + filename + ".pickle"):
+            and os.path.isfile("." + filename + ".pickle"):
+
+        if disp:
+            print "reading backup..."
 
         f = open("." + filename + ".backup", "r")
         code2 = f.read()
@@ -62,39 +73,66 @@ def main(path, suggestion=False):
 
         if code1 != code2:
 
+            if disp:
+                print "code mismatch!"
+                print "running preproc..."
+
             code3, error = preproc.prefix_hack(code1)
 
             if error:
                 print error
                 sys.exit(1)
 
+            if disp:
+                print "writing preproc..."
+
             f = open("."+filename, "w")
             f.write(code3)
             f.close()
 
-            tree = build("."+filename)
+            if disp:
+                print "building token-tree..."
+
+            tree = build("."+filename, disp=disp)
+
+            if disp:
+                print "writing pickle..."
 
             f = open("." + filename + ".pickled", "w")
             cPickle.dump(tree, f)
             f.close()
 
-            f = open("." + filename, "w")
+            if disp:
+                print "writing backup..."
+
+            f = open("." + filename+".backup", "w")
             f.write(code1)
             f.close()
 
         else:
 
+            if disp:
+                print "reading pickle..."
+
             f = open("." + filename + ".pickled", "r")
             tree = cPickle.load(f)
             f.close()
 
+        if disp:
+            print "writing backup..."
+
     else:
 
+        if disp:
+            print "running preproc..."
         code3, error = preproc.prefix_hack(code1)
 
         if error:
             print error
             sys.exit(1)
+
+        if disp:
+            print "writing preproc..."
 
         f = open("."+filename, "w")
         f.write(code3)
@@ -104,18 +142,40 @@ def main(path, suggestion=False):
             print error
             sys.exit(1)
 
+        if disp:
+            print "building token-tree..."
+
         tree = build("."+filename)
+
+        if disp:
+            print "writing pickle..."
+
         f = open("."+filename+".pickled", "w")
         cPickle.dump(tree, f)
         f.close()
 
+        if disp:
+            print "writing backup..."
+
         shutil.copyfile(filename, "." + filename + ".backup")
 
     if os.path.isfile(filename + ".py"):
+
+        if disp:
+            print "cfg found!"
+            print "loading cfg..."
+
         shutil.copyfile(filename + ".py", "__cfg__.py")
         from __cfg__ import scope
+
+        if disp:
+            print "deleting temp cfg..."
+
         os.remove("__cfg__.py")
         os.remove("__cfg__.pyc")
+
+        if disp:
+            print "loading scope..."
 
         cfg, scfg = utils.get_cfg(tree)
         for name in cfg.keys():
@@ -125,21 +185,39 @@ def main(path, suggestion=False):
                         cfg[name][key] = scope[name][key]
 
     else:
+
+        if disp:
+            print "cfg missing!"
+            print "loading scope..."
+
         cfg, scfg = utils.get_cfg(tree)
 
     if suggestion:
+        print "suggestion-mode!"
         tree.generate()
         cfg, scfg = utils.get_cfg(tree)
+        i = 1
         while [s for s in scfg.values() if s]:
+            print "iteration", i
             for name in cfg.keys():
                 cfg[name].update(scfg.get(name, {}))
             utils.set_cfg(tree, cfg)
             tree.generate()
             cfg, scfg = utils.get_cfg(tree)
+            i += 1
 
     else:
+
+        if disp:
+            print "dumping scope..."
         utils.set_cfg(tree, cfg)
-        tree.generate()
+
+        if disp:
+            print "generate tree..."
+        tree.generate(disp=disp)
+
+    if disp:
+        print "creating cfg..."
 
     annotation = """# Supplement file
 #
@@ -154,6 +232,9 @@ def main(path, suggestion=False):
 # imat
 
 """ + utils.str_cfg(cfg, scfg)
+
+    if disp:
+        print "writing cfg..."
 
     f = open(filename + ".py", "w")
     f.write(annotation)

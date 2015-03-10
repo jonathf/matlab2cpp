@@ -63,4 +63,7 @@ def Program(tree):
     return text
 
 
-Includes = "#include <armadillo>\nusing namespace arma;\n"
+Includes = "", "\n\n", ""
+Include = "%(value)s"
+
+

@@ -120,6 +120,9 @@ def Get(node):
                         val0[0]+val0[1]+val0[4]+"-1, "+\
                         val0[0]+val0[3]+val0[4]+"-1, "+val1[2]+")"
 
+
+            return "%(name).col(%(1)s).rows(%(0)s)"
+
             raise NotImplementedError
 
         elif type == "fmat":

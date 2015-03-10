@@ -16,6 +16,8 @@ if __name__ == "__main__":
             help="Use suggestions automatically")
     parser.add_option("-r", '--recompile', action="store_true",
             help="Force fresh recompile")
+    parser.add_option("-d", '--display', action="store_true",
+            help="Display process output")
 
     opt, args = parser.parse_args()
 
@@ -32,8 +34,8 @@ if __name__ == "__main__":
             if os.path.isfile(name):
                 os.remove(name)
 
-    tree = matlab2cpp.main(path, opt.suggestion)
+    tree = matlab2cpp.main(path, opt.suggestion, disp=opt.display)
     if opt.tree_view:
-        print tree.summary()
+        print tree.summary(opt.display)
     else:
         print tree

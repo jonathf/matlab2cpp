@@ -1,6 +1,6 @@
 
 
-def flatten(node):
+def flatten(node, ordered=False):
     """
 Return a list of all nodes
 
@@ -8,11 +8,23 @@ Parameters
 ----------
 node : Node
     Root node to start from
+ordered : bool
+    If True, make sure the nodes are hierarcically ordered.
+    If False, nodes are sorted for easy print.
     """
 
-    def _flat(node):
-        return [node]+map(_flat, node.children)
-    return _flat(node)
+    if ordered:
+        def _f(nod):
+            out = [nod]
+            for n in nod:
+                out.extend(_f(n))
+            return out
+        return _f(node)
+
+    nodes = [node]
+    for child in nodes:
+        nodes.extend(child.children)
+    return nodes
 
 
 def set_cfg(root, cfg):

@@ -1,6 +1,8 @@
 import collection
 from datatype import datatype
 import targets
+import snippets
+import utils
 
 class Node(object):
     """
@@ -18,107 +20,118 @@ name : str
         """
         init(self, parent, name)
 
-    def summary(self):
+    def summary(self, disp):
         "Node summary"
-        return self._summary(0)
 
-    def _summary(self, indent):
-        name = self["name"]
-        cls = self["class"]
-        backend = self["backend"]
-        type = self.type()
+        nodes = utils.flatten(self, ordered=True)
+        if disp:
+            print "iterating %d nodes" % len(nodes)
 
-        if backend == "unknown" and type != "TYPE":
-            backend = type
+        out = ""
+        for node in nodes:
 
-        out = " "*indent + "%16s %-10s %-12s %-5s\n" % (name, cls, backend, type)
-        for child in self.children:
-            out += child._summary(indent+1)
+            name = node["name"]
+            cls = node["class"]
+            backend = node["backend"]
+            type = node.type()
+
+            if backend == "unknown" and type != "TYPE":
+                backend = type
+
+            out += "%18s %-10s %-12s %-7s" % (name, cls, backend, type)
+            out += repr(str(node["str"])) + "\n"
+
 
         return out
 
-    def generate(self):
+
+    def generate(self, disp):
         """Generate code"""
-        self._generate()
-        return self.prop["str"]
 
-    def _generate(self):
+        nodes = utils.flatten(self)
+        if disp:
+            print "iterating %d nodes" % len(nodes)
 
-        for node in self.children:
-            node._generate()
+        for node in nodes[::-1]:
 
-        type_ = self.type()
-        name = self["name"]
-        cls = self["class"]
-        backend = self["backend"]
+            type_ = node.type()
+            name = node["name"]
+            cls = node["class"]
+            backend = node["backend"]
 
-        if type_ == "TYPE" and self.children and \
-                cls not in ("Get", "Get2", "Get3"):
-            type_ = self.type([n.type() for n in self.children])
+            if disp:
+                print name, cls, type_, backend
 
-        if name in targets.reserved.reserved:
-            backend = "reserved"
-        elif backend == "unknown" and type_ != "TYPE":
-            backend = type_
+            if type_ == "TYPE" and node.children and \
+                    cls not in ("Get", "Get2", "Get3"):
+                type_ = node.type([n.type() for n in node.children])
 
-        target = targets.__dict__[backend]
-        if cls+"_"+name in target.__dict__:
-            value = target.__dict__[cls+"_"+name]
-        elif cls in target.__dict__:
-            value = target.__dict__[cls]
-        else:
-            print name
-            raise KeyError("no %s in %s" % (cls, backend))
+            if name in targets.reserved.reserved:
+                backend = "reserved"
+            elif backend == "unknown" and type_ != "TYPE":
+                backend = type_
 
-        if not isinstance(value, (unicode, str, list, tuple)):
-            value = value(self)
-
-        if isinstance(value, unicode):
-            value = str(value)
-
-        elif isinstance(value, Node):
-            value._generate()
-            value = str(value)
-
-        elif value is None:
-            raise ValueError("missing return in %s.%s" % backend, cls)
-
-        prop = self.prop.copy()
-        I = len(self)
-        for i in xrange(I):
-            prop["%d" % i] = prop["-%d" % (I-i)] = self[i]["str"]
-
-        if not isinstance(value, str):
-
-            value = list(value)
-            children = ["%("+str(i)+")s" for i in xrange(len(self))]
-
-            if len(value) == 2:
-                value.insert(1, "")
-
-            value = value[:-1] + [value[-2]] *\
-                (len(children)-len(value)+1) + value[-1:]
-
-            if len(children) == 0:
-                value = value[0] + value[-1]
-
-            elif len(children) == 1:
-                value = value[0] + children[0] + value[-1]
-
+            target = targets.__dict__[backend]
+            if cls+"_"+name in target.__dict__:
+                value = target.__dict__[cls+"_"+name]
+            elif cls in target.__dict__:
+                value = target.__dict__[cls]
             else:
+                print name
+                raise KeyError("no %s in %s" % (cls, backend))
 
-                out = value[0]
-                for i in xrange(len(children)):
-                    out += children[i] + value[i+1]
-                value = out
+            if not isinstance(value, (unicode, str, list, tuple)):
+                value = value(node)
 
-        try:
-            value = value % prop
-        except:
-            raise SyntaxError("interpolation in " + backend + "." + cls +
-                              " is misbehaving\n" + value + "\n"+str(prop))
+            if isinstance(value, unicode):
+                value = str(value)
 
-        self.prop["str"] = value
+            elif isinstance(value, Node):
+                value._generate()
+                value = str(value)
+
+            elif value is None:
+                raise ValueError("missing return in %s.%s" % backend, cls)
+
+            prop = node.prop.copy()
+            I = len(node)
+            for i in xrange(I):
+                prop["%d" % i] = prop["-%d" % (I-i)] = node[i]["str"]
+
+            if not isinstance(value, str):
+
+                value = list(value)
+                children = ["%("+str(i)+")s" for i in xrange(len(node))]
+
+                if len(value) == 2:
+                    value.insert(1, "")
+
+                value = value[:-1] + [value[-2]] *\
+                    (len(children)-len(value)+1) + value[-1:]
+
+                if len(children) == 0:
+                    value = value[0] + value[-1]
+
+                elif len(children) == 1:
+                    value = value[0] + children[0] + value[-1]
+
+                else:
+
+                    out = value[0]
+                    for i in xrange(len(children)):
+                        out += children[i] + value[i+1]
+                    value = out
+
+            try:
+                value = value % prop
+            except:
+                raise SyntaxError("interpolation in " + backend + "." + cls +
+                                " is misbehaving\n" + value + "\n"+str(prop))
+
+            node.prop["str"] = value
+
+        return node.prop["str"]
+
 
     def declare(self, name=""):
         "Declare a variable in the begining of a function."
@@ -235,14 +248,17 @@ name : str
 
         if not args:
 
-            index = self.parent.children.index(self)
-            self.parent.children[index] = node
-            node.parent = self.parent
-            node._generate()
+            index1 = self.parent.children.index(self)
+            index2 = node.parent.children.index(node)
+            self.parent.children[index1] = node
+            node.parent.children[index2] = self
+            node.parent, self.parent = self.parent, node.parent
+#              node._generate()
             return str(node)
 
         else:
 
+            assert node in targets.__dict__
             matrix = collection.Matrix(self.parent)
             matrix["backend"] = "matrix"
             vector = collection.Vector(matrix)
@@ -251,9 +267,9 @@ name : str
             for arg in args:
                 v = collection.Var(vector, arg)
                 v.type(node)
-                v.backend(node)
+                v["backend"] = node
             self.replace(matrix)
-            if len(args)>1:
+            if self.parent["class"] != "Assign" and len(args) > 1:
                 return self.auxillary(node)
             return self
 
@@ -299,7 +315,7 @@ name : str
 
         # Place Assign correctly in Block
         i = p.children.index(line)
-        p.children = p[:i] + [p[-1]] + p[i:-1]
+        p.children = p[:i] + p[-1:] + p[i:-1]
 
         # Swap self and Var
         index = self.parent.children.index(self)
@@ -311,11 +327,29 @@ name : str
         s.children[1] = self
 
         # Generate code for new variables
-        s._generate()
-        v1._generate()
+#          s._generate()
+#          v1._generate()
 
         return v1
 
+
+    def include(self, name, **kws):
+
+        includes = self.program[0]
+        idname, code = snippets.retrieve(self, name, **kws)
+
+        if idname in includes["names"]:
+            return idname
+
+        for val in kws.values():
+            if val == "TYPE":
+                return "FUNC"
+
+        includes["names"].append(idname)
+        include = collection.Include(includes, idname)
+        include["value"] = code
+        include["backend"] = "program"
+        return idname
 
 
     def error(self, text):
