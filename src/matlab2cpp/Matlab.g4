@@ -15,36 +15,35 @@ codeline
 
 // Branching
 branch
-    : branch_if branch_elif* branch_else? '\n}';
+    : branch_if branch_elif* branch_else? 'r'? '\n}';
 branch_if : 'if{' condition
     (','? codeline
     | ','? '\r'? '\n' codeblock)? ;
-branch_elif : '\nelseif' condition
+branch_elif : '\r'? '\nelseif' condition
     (',' codeline | ','? '\r'? '\n' codeblock)? ;
-branch_else : '\nelse' (','? codeline | ','? '\r'? '\n' codeblock)? ;
+branch_else : '\r'? '\nelse' (','? codeline | ','? '\r'? '\n' codeblock)? ;
 condition : expr ;
 
-switch_ : 'switch{' expr switch_case* switch_otherwise? '\n}';
-switch_case : '\ncase' expr ('\r'? '\n' codeblock)? ;
-switch_otherwise : '\notherwise' ('\r'? '\n' codeblock)? ;
+switch_ : 'switch{' expr switch_case* switch_otherwise? '\r'? '\n}';
+switch_case : '\r'? '\ncase' expr ('\r'? '\n' codeblock)? ;
+switch_otherwise : '\r'? '\notherwise' ('\r'? '\n' codeblock)? ;
 
 // Functions
 function : 'function{' function_returns? ID
-    '(' function_params? ')' (','|'\r'? '\n')
-    codeblock? ';'? '\n}' ;
+        '(' function_params? ')' (','|'\r'? '\n') codeblock? ';'? '\r'? '\n}' ;
 function_returns : ( '[' ID (',' ID)* ']' | ID ) '=' ;
 function_params : ID (',' ID)* ;
 
 // Looping
 loop : 'for{' ('(' ID '=' expr ')' | ID '=' expr)
-        (',' | ','? '\r'? '\n') codeblock '\n}' ;
+        (',' | ','? '\r'? '\n') codeblock '\r'? '\n}' ;
 
 wloop : 'while{' ( '(' condition ')' | condition) (','|'\r'? '\n')
-    (codeblock)? ';'? '\n}' ;
+    (codeblock)? ';'? '\r'? '\n}' ;
 
-try_ : 'try{\n' codeblock (catchid+ | catchid* catch_) '\n}' ;
-catchid : '\ncatch' ID '\r'? '\n' codeblock ;
-catch_ : '\ncatch\n' codeblock ;
+try_ : 'try{' '\r'? '\n' codeblock (catchid+ | catchid* catch_) '\r'? '\n}' ;
+catchid : '\r'? '\ncatch' ID '\r'? '\n' codeblock ;
+catch_ : '\r'? '\ncatch' '\r'? '\n' codeblock ;
 
 // Statements
 statement : expr ;

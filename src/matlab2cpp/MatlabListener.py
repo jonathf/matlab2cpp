@@ -76,30 +76,46 @@ class MatlabListener(ParseTreeListener):
         declares = col.Declares(ctx.node)
         declares["names"] = []
 
+        if ctx.function_returns() is None:
+            returns = col.Returns(ctx.node)
+            returns["names"] = []
+
+            if ctx.function_params() is None:
+                params = col.Params(ctx.node)
+                params["names"] = []
+
     def exitFunction(self, ctx):
 
-        if len(ctx.node[1]) == 1:
-            ctx.node["backend"] = "func_return"
-            ctx.node[0]["backend"] = "func_return"
-            ctx.node[1]["backend"] = "func_return"
-            ctx.node[2]["backend"] = "func_return"
-        else:
-            ctx.node["backend"] = "func_returns"
-            ctx.node[0]["backend"] = "func_returns"
-            ctx.node[1]["backend"] = "func_returns"
-            ctx.node[2]["backend"] = "func_returns"
+        node = ctx.node
 
-        for var in ctx.node[1][:]:
+        if len(node[1]) == 1:
+            node["backend"] = "func_return"
+            node[0]["backend"] = "func_return"
+            node[1]["backend"] = "func_return"
+            node[2]["backend"] = "func_return"
+        else:
+            node["backend"] = "func_returns"
+            node[0]["backend"] = "func_returns"
+            node[1]["backend"] = "func_returns"
+            node[2]["backend"] = "func_returns"
+
+        for var in node[1][:]:
             var.declare()
 
     def enterFunction_returns(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Returns(pnode)
         ctx.node["names"] = []
-        for n in xrange((ctx.getChildCount()-2)/2 or 1):
+
+        count = ctx.getChildCount()
+        for n in xrange((count-2)/2 or 1):
             name = ctx.ID(n).getText()
             col.Var(ctx.node, name)
             ctx.node["names"].append(name)
+
+        if ctx.parentCtx.function_params() is None:
+            params = col.Params(pnode)
+            params["names"] = []
 
     def exitFunction_returns(self, ctx):
         pass

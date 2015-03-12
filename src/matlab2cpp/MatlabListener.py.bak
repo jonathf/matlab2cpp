@@ -78,25 +78,49 @@ class MatlabListener(ParseTreeListener):
 
     def exitFunction(self, ctx):
 
-        if len(ctx.node[1]) == 1:
-            ctx.node["backend"] = "func_return"
-            ctx.node[0]["backend"] = "func_return"
-            ctx.node[1]["backend"] = "func_return"
-            ctx.node[2]["backend"] = "func_return"
-        else:
-            ctx.node["backend"] = "func_returns"
-            ctx.node[0]["backend"] = "func_returns"
-            ctx.node[1]["backend"] = "func_returns"
-            ctx.node[2]["backend"] = "func_returns"
+        node = ctx.node
 
-        for var in ctx.node[1][:]:
+        if len(node) == 2:
+            block = node.children.pop()
+            col.Returns(node)
+            col.Params(node)
+            node.append(block)
+
+        if len(node) == 3:
+
+            if node[1]["class"] == "Returns":
+
+                block = node.children.pop()
+                col.Params(node)
+                node.append(block)
+
+            else:
+
+                block = node.children.pop()
+                col.Returns(node)
+                node.append(block)
+
+        if len(node[1]) == 1:
+            node["backend"] = "func_return"
+            node[0]["backend"] = "func_return"
+            node[1]["backend"] = "func_return"
+            node[2]["backend"] = "func_return"
+        else:
+            node["backend"] = "func_returns"
+            node[0]["backend"] = "func_returns"
+            node[1]["backend"] = "func_returns"
+            node[2]["backend"] = "func_returns"
+
+        for var in node[1][:]:
             var.declare()
 
     def enterFunction_returns(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Returns(pnode)
         ctx.node["names"] = []
-        for n in xrange((ctx.getChildCount()-2)/2 or 1):
+
+        count = ctx.getChildCount()
+        for n in xrange((count-2)/2 or 1):
             name = ctx.ID(n).getText()
             col.Var(ctx.node, name)
             ctx.node["names"].append(name)

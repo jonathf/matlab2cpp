@@ -74,7 +74,7 @@ def Assigns_size(node):
         for n in node[0]:
             n.suggest("int")
 
-        return "%s = (%s).n_rows ;\n%s = (%s).n_cols ;" % \
+        return "%s = %s.n_rows ;\n%s = %s.n_cols ;" % \
                 (node[0][0], node[1][0], node[0][1], node[1][0])
 
     raise NotImplementedError

@@ -93,7 +93,7 @@ name : str
             elif cls in target.__dict__:
                 value = target.__dict__[cls]
             else:
-                print name
+                print node.program.summary(disp, group)
                 raise KeyError("no %s in %s" % (cls, backend))
 
             if not isinstance(value, (unicode, str, list, tuple)):
@@ -103,7 +103,6 @@ name : str
                 value = str(value)
 
             elif isinstance(value, Node):
-                value._generate()
                 value = str(value)
 
             elif value is None:
@@ -269,6 +268,7 @@ name : str
     def replace(self, node, *args):
         "replace node in token tree"
 
+        print node["class"], node["name"], "being replaced"
         if not args:
 
             index1 = self.parent.children.index(self)

@@ -47,11 +47,10 @@ def Params(node):
 def Func(node):
 
     if len(node[1]):
-        out = "void %(name)s(%(0)s, %(1)s)\n{\n"
+        out = "void %(name)s(%(1)s, %(2)s)\n{\n"
     else:
-        out = "void %(name)s(%(0)s)\n{\n"
-    out += declares(node)
-    out += "%(2)s\n}"
+        out = "void %(name)s(%(2)s)\n{\n"
+    out += "%(0)s\n%(3)s\n}"
 
     return out
 
@@ -82,3 +81,28 @@ def Assigns(node):
     args = str(node[1])
 
     return name + "("+assigness+", "+args+") ;\n"
+
+
+def Declares(node):
+    declares = {}
+    for child in node[:]:
+        type = child.type()
+        if type not in declares:
+            declares[type] = []
+        declares[type].append(child)
+
+    out = ""
+    for key, val in declares.items():
+
+        if key in ("int", "float", "ivec", "fvec", "irowvec",
+                "frowvec", "imat", "fmat", "TYPE"):
+            out = out + "\n" + key + " " + ", ".join([v["name"] for v in val]) + " ;"
+        else:
+            out = out + "\n" + "\n".join(map(str, val))
+
+    return out[1:]
+
+
+def Var(node):
+    out = "@%(name)s"
+    return out

@@ -20,6 +20,7 @@ import sys
 import shutil
 import cPickle
 import imp
+import re
 
 import utils
 import preproc
@@ -57,7 +58,7 @@ def main(path, suggestion=False, disp=False):
 
     if disp:
         print "reading file..."
-    f = open(filename, "r")
+    f = open(filename, "rb")
     code1 = f.read()
     f.close()
 
@@ -68,7 +69,7 @@ def main(path, suggestion=False, disp=False):
         if disp:
             print "reading backup..."
 
-        f = open("." + filename + ".backup", "r")
+        f = open("." + filename + ".backup", "rb")
         code2 = f.read()
         f.close()
 
@@ -87,7 +88,7 @@ def main(path, suggestion=False, disp=False):
             if disp:
                 print "writing preproc..."
 
-            f = open("."+filename, "w")
+            f = open("."+filename, "wb")
             f.write(code3)
             f.close()
 
@@ -99,14 +100,14 @@ def main(path, suggestion=False, disp=False):
             if disp:
                 print "writing pickle..."
 
-            f = open("." + filename + ".pickled", "w")
+            f = open("." + filename + ".pickled", "wb")
             cPickle.dump(tree, f)
             f.close()
 
             if disp:
                 print "writing backup..."
 
-            f = open("." + filename+".backup", "w")
+            f = open("." + filename+".backup", "wb")
             f.write(code1)
             f.close()
 
@@ -115,7 +116,7 @@ def main(path, suggestion=False, disp=False):
             if disp:
                 print "reading pickle..."
 
-            f = open("." + filename + ".pickled", "r")
+            f = open("." + filename + ".pickled", "rb")
             tree = cPickle.load(f)
             f.close()
 
@@ -135,7 +136,7 @@ def main(path, suggestion=False, disp=False):
         if disp:
             print "writing preproc..."
 
-        f = open("."+filename, "w")
+        f = open("."+filename, "wb")
         f.write(code3)
         f.close()
 
@@ -151,7 +152,7 @@ def main(path, suggestion=False, disp=False):
         if disp:
             print "writing pickle..."
 
-        f = open("."+filename+".pickled", "w")
+        f = open("."+filename+".pickled", "wb")
         cPickle.dump(tree, f)
         f.close()
 
@@ -198,7 +199,7 @@ def main(path, suggestion=False, disp=False):
 
     if suggestion:
         print "suggestion-mode!"
-        tree.generate()
+        tree.generate(disp=disp)
         cfg, scfg = utils.get_cfg(tree)
         i = 1
         while [s for s in scfg.values() if s]:
@@ -206,7 +207,7 @@ def main(path, suggestion=False, disp=False):
             for name in cfg.keys():
                 cfg[name].update(scfg.get(name, {}))
             utils.set_cfg(tree, cfg)
-            tree.generate()
+            tree.generate(disp=disp)
             cfg, scfg = utils.get_cfg(tree)
             i += 1
 
@@ -240,7 +241,7 @@ def main(path, suggestion=False, disp=False):
     if disp:
         print "writing cfg..."
 
-    f = open(filename + ".py", "w")
+    f = open(filename + ".py", "wb")
     f.write(annotation)
     f.close()
 
