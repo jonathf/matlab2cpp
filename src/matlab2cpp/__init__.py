@@ -19,6 +19,7 @@ import os
 import sys
 import shutil
 import cPickle
+import imp
 
 import utils
 import preproc
@@ -165,14 +166,17 @@ def main(path, suggestion=False, disp=False):
             print "cfg found!"
             print "loading cfg..."
 
-        shutil.copyfile(filename + ".py", "__cfg__.py")
-        from __cfg__ import scope
+        cfg = imp.load_source("cfg", filename + ".py")
+        scope = cfg.scope
 
-        if disp:
-            print "deleting temp cfg..."
-
-        os.remove("__cfg__.py")
-        os.remove("__cfg__.pyc")
+#          shutil.copyfile(filename + ".py", "__cfg__.py")
+#          from __cfg__ import scope
+#  
+#          if disp:
+#              print "deleting temp cfg..."
+#  
+#          os.remove("__cfg__.py")
+#          os.remove("__cfg__.pyc")
 
         if disp:
             print "loading scope..."
