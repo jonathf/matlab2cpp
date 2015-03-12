@@ -18,6 +18,8 @@ if __name__ == "__main__":
             help="Force fresh recompile")
     parser.add_option("-d", '--display', action="store_true",
             help="Display process output")
+    parser.add_option("-g", '--group', type="int", dest="group",
+            help="Only display fron particular group")
 
     opt, args = parser.parse_args()
 
@@ -36,6 +38,16 @@ if __name__ == "__main__":
 
     tree = matlab2cpp.main(path, opt.suggestion, disp=opt.display)
     if opt.tree_view:
-        print tree.summary(opt.display)
+        if opt.group:
+            print tree.summary(opt.display, opt.group)
+        else:
+            print tree.summary(opt.display)
+    elif opt.group:
+        nodes = matlab2cpp.utils.flatten(tree)
+        for node in nodes:
+            if node["index"] == opt.group:
+                print node.parent["str"]
+                break
+
     else:
         print tree

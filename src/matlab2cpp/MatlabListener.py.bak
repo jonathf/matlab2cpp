@@ -17,6 +17,14 @@ class MatlabListener(ParseTreeListener):
         includes["backend"] = "program"
         includes["names"] = []
 
+        i1 = col.Include(includes, "armadillo")
+        i1["value"] = "#include <armadillo>"
+        i1["backend"] = "program"
+
+        i2 = col.Include(includes, "usingarma")
+        i2["value"] = "using namespace arma;"
+        i2["backend"] = "program"
+
         func = col.Func(ctx.program, "main")
         declares = col.Declares(func)
         returns = col.Returns(func)
@@ -189,19 +197,17 @@ class MatlabListener(ParseTreeListener):
     def enterLoop(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.For(pnode)
+        col.Var(ctx.node, ctx.ID().getText()).declare()
         ctx.node["backend"] = "code_block"
 
     def exitLoop(self, ctx):
         pass
 
-    def enterLoop_range(self, ctx):
-        pnode = ctx.parentCtx.node
-        col.Var(pnode, ctx.ID().getText()).declare()
-        ctx.node = pnode
-        ctx.node["backend"] = "code_block"
-
-    def exitLoop_range(self, ctx):
-        pass
+#      def enterLoop_range(self, ctx):
+#          pnode = ctx.parentCtx.node
+#          col.Var(pnode, ctx.ID().getText()).declare()
+#          ctx.node = pnode
+#          ctx.node["backend"] = "code_block"
 
     def enterWloop(self, ctx):
         pnode = ctx.parentCtx.node
@@ -310,45 +316,249 @@ class MatlabListener(ParseTreeListener):
 
     def enterInfix(self, ctx):
 
+        print dir(ctx)
         opr = ctx.OPR().getText()
         parent = ctx.parentCtx
         if hasattr(parent, "opr") and opr == parent.opr:
-            pnode = parent.parentCtx.node
+            ctx.node = parent.node
         else:
             pnode = parent.node
 
-        if opr == "||":     node = col.Lor(pnode)
-        elif opr == "&&":   node = col.Land(pnode)
-        elif opr == "|":    node = col.Bor(pnode)
-        elif opr == "&":    node = col.Band(pnode)
-        elif opr == "%%":   node = col.Eq(pnode)
-        elif opr == "<=":   node = col.Le(pnode)
-        elif opr == ">=":   node = col.Ge(pnode)
-        elif opr == "<":    node = col.Lt(pnode)
-        elif opr == ">":    node = col.Gt(pnode)
-        elif opr == "<>":   node = col.Ne(pnode)
-        elif opr == ":":    node = col.Colon(pnode)
-        elif opr == "/":    node = col.Div(pnode)
-        elif opr == "./":   node = col.Eldiv(pnode)
-        elif opr == "\\":   node = col.Rdiv(pnode)
-        elif opr == ".\\":  node = col.Elrdiv(pnode)
-        elif opr == "*":    node = col.Mul(pnode)
-        elif opr == ".*":   node = col.Elmul(pnode)
-        elif opr == "^":    node = col.Exp(pnode)
-        elif opr == ".^":   node = col.Elexp(pnode)
-        elif opr == "+":
-            rhs = ctx.getChild(2)
-            if hasattr(rhs, "PRE") and rhs.PRE().getText() == "-":
-                node = col.Minus(pnode)
-            else:
-                node = col.Plus(pnode)
+    def enterLor(self, ctx):
+        if ctx.parentCtx.node["class"] == "Lor":
+            ctx.node = ctx.parentCtx.node
+        else:
+            ctx.node = col.Lor(ctx.parentCtx.node)
+            ctx.node["backend"] = "expression"
 
-        ctx.node = node
-        ctx.opr = opr
+    def exitLor(self, ctx):
+        pass
+
+
+    def enterLand(self, ctx):
+        if ctx.parentCtx.node["class"] == "Land":
+            ctx.node = ctx.parentCtx.node
+        else:
+            ctx.node = col.Land(ctx.parentCtx.node)
+            ctx.node["backend"] = "expression"
+
+    def exitLand(self, ctx):
+        pass
+
+
+    def enterBor(self, ctx):
+        if ctx.parentCtx.node["class"] == "Bor":
+            ctx.node = ctx.parentCtx.node
+        else:
+            ctx.node = col.Bor(ctx.parentCtx.node)
+            ctx.node["backend"] = "expression"
+
+    def exitBor(self, ctx):
+        pass
+
+
+    def enterBand(self, ctx):
+        if ctx.parentCtx.node["class"] == "Band":
+            ctx.node = ctx.parentCtx.node
+        else:
+            ctx.node = col.Band(ctx.parentCtx.node)
+            ctx.node["backend"] = "expression"
+
+    def exitBand(self, ctx):
+        pass
+
+
+    def enterEq(self, ctx):
+        if ctx.parentCtx.node["class"] == "Eq":
+            ctx.node = ctx.parentCtx.node
+        else:
+            ctx.node = col.Eq(ctx.parentCtx.node)
+            ctx.node["backend"] = "expression"
+
+    def exitEq(self, ctx):
+        pass
+
+
+    def enterLe(self, ctx):
+        if ctx.parentCtx.node["class"] == "Le":
+            ctx.node = ctx.parentCtx.node
+        else:
+            ctx.node = col.Le(ctx.parentCtx.node)
+            ctx.node["backend"] = "expression"
+
+    def exitLe(self, ctx):
+        pass
+
+
+    def enterGe(self, ctx):
+        if ctx.parentCtx.node["class"] == "Ge":
+            ctx.node = ctx.parentCtx.node
+        else:
+            ctx.node = col.Ge(ctx.parentCtx.node)
+            ctx.node["backend"] = "expression"
+
+    def exitGe(self, ctx):
+        pass
+
+
+    def enterLt(self, ctx):
+        if ctx.parentCtx.node["class"] == "Lt":
+            ctx.node = ctx.parentCtx.node
+        else:
+            ctx.node = col.Lt(ctx.parentCtx.node)
+            ctx.node["backend"] = "expression"
+
+    def exitLt(self, ctx):
+        pass
+
+
+    def enterGt(self, ctx):
+        if ctx.parentCtx.node["class"] == "Gt":
+            ctx.node = ctx.parentCtx.node
+        else:
+            ctx.node = col.Gt(ctx.parentCtx.node)
+            ctx.node["backend"] = "expression"
+
+    def exitGt(self, ctx):
+        pass
+
+
+    def enterNe(self, ctx):
+        if ctx.parentCtx.node["class"] == "Ne":
+            ctx.node = ctx.parentCtx.node
+        else:
+            ctx.node = col.Ne(ctx.parentCtx.node)
+            ctx.node["backend"] = "expression"
+
+    def exitNe(self, ctx):
+        pass
+
+
+    def enterColon(self, ctx):
+        if ctx.parentCtx.node["class"] == "Colon":
+            ctx.node = ctx.parentCtx.node
+        else:
+            ctx.node = col.Colon(ctx.parentCtx.node)
+            ctx.node["backend"] = "expression"
+
+    def exitColon(self, ctx):
+        pass
+
+
+    def enterDiv(self, ctx):
+        if ctx.parentCtx.node["class"] == "Div":
+            ctx.node = ctx.parentCtx.node
+        else:
+            ctx.node = col.Div(ctx.parentCtx.node)
+            ctx.node["backend"] = "expression"
+
+    def exitDiv(self, ctx):
+        pass
+
+
+    def enterEldiv(self, ctx):
+        if ctx.parentCtx.node["class"] == "Eldiv":
+            ctx.node = ctx.parentCtx.node
+        else:
+            ctx.node = col.Eldiv(ctx.parentCtx.node)
+            ctx.node["backend"] = "expression"
+
+    def exitEldiv(self, ctx):
+        pass
+
+
+    def enterRdiv(self, ctx):
+        if ctx.parentCtx.node["class"] == "Rdiv":
+            ctx.node = ctx.parentCtx.node
+        else:
+            ctx.node = col.Rdiv(ctx.parentCtx.node)
+            ctx.node["backend"] = "expression"
+
+    def exitRdiv(self, ctx):
+        pass
+
+
+    def enterElrdiv(self, ctx):
+        if ctx.parentCtx.node["class"] == "Elrdiv":
+            ctx.node = ctx.parentCtx.node
+        else:
+            ctx.node = col.Elrdiv(ctx.parentCtx.node)
+            ctx.node["backend"] = "expression"
+
+    def exitElrdiv(self, ctx):
+        pass
+
+
+    def enterMul(self, ctx):
+        if ctx.parentCtx.node["class"] == "Mul":
+            ctx.node = ctx.parentCtx.node
+        else:
+            ctx.node = col.Mul(ctx.parentCtx.node)
+            ctx.node["backend"] = "expression"
+
+    def exitMul(self, ctx):
+        pass
+
+
+    def enterElmul(self, ctx):
+        if ctx.parentCtx.node["class"] == "Elmul":
+            ctx.node = ctx.parentCtx.node
+        else:
+            ctx.node = col.Elmul(ctx.parentCtx.node)
+            ctx.node["backend"] = "expression"
+
+    def exitElmul(self, ctx):
+        pass
+
+
+    def enterExp(self, ctx):
+        if ctx.parentCtx.node["class"] == "Exp":
+            ctx.node = ctx.parentCtx.node
+        else:
+            ctx.node = col.Exp(ctx.parentCtx.node)
+            ctx.node["backend"] = "expression"
+
+    def exitExp(self, ctx):
+        pass
+
+
+    def enterElexp(self, ctx):
+        if ctx.parentCtx.node["class"] == "Elexp":
+            ctx.node = ctx.parentCtx.node
+        else:
+            ctx.node = col.Elexp(ctx.parentCtx.node)
+            ctx.node["backend"] = "expression"
+
+    def exitElexp(self, ctx):
+        pass
+
+
+    def enterPlus(self, ctx):
+        if ctx.parentCtx.node["class"] == "Plus":
+            ctx.node = ctx.parentCtx.node
+        else:
+            ctx.node = col.Plus(ctx.parentCtx.node)
+            ctx.node["backend"] = "expression"
+
+    def exitPlus(self, ctx):
+        pass
+
+
+    def enterMinus(self, ctx):
+        ctx.node = col.Neg(ctx.parentCtx.node)
         ctx.node["backend"] = "expression"
 
-    def exitInfix(self, ctx):
+    def exitMinus(self, ctx):
         pass
+
+
+    def enterNegate(self, ctx):
+        ctx.node = col.Not(ctx.parentCtx.node)
+        ctx.node["backend"] = "expression"
+
+    def exitNegate(self, ctx):
+        pass
+
 
     def enterIfloat(self, ctx):
         pnode = ctx.parentCtx.node
@@ -407,11 +617,11 @@ class MatlabListener(ParseTreeListener):
         parent = ctx.parentCtx
         pnode = parent.node
         if pre == "-":
-            if hasattr(parent, "opr") and \
-                    parent.opr == "+":
-                ctx.node = pnode
-            else:
-                ctx.node = ccol.Neg(pnode)
+#              if hasattr(parent, "opr") and \
+#                      parent.opr == "+":
+#                  ctx.node = pnode
+#              else:
+                ctx.node = col.Neg(pnode)
         else:
             ctx.node = col.Not(pnode)
         ctx.node["backend"] = "expression"
@@ -461,22 +671,20 @@ class MatlabListener(ParseTreeListener):
     def exitInt(self, ctx):
         pass
 
-    def enterPostfix(self, ctx):
+    def enterCtranspose(self, ctx):
         pnode = ctx.parentCtx.node
-        post = ctx.POST().getText()
-        if post == "'":
-            ctx.node = col.Ctranspose(pnode)
-        else:
-            ctx.node = col.Transpose(pnode)
+        ctx.node = col.Ctranspose(pnode)
         ctx.node["backend"] = "expression"
 
-    def exitPostfix(self, ctx):
+    def exitCtranspose(self, ctx):
         pass
 
-    def enterMatri(self, ctx):
-        ctx.node = ctx.parentCtx.node
+    def enterTranspose(self, ctx):
+        pnode = ctx.parentCtx.node
+        ctx.node = col.Transpose(pnode)
+        ctx.node["backend"] = "expression"
 
-    def exitMatri(self, ctx):
+    def exitTranspose(self, ctx):
         pass
 
     def enterLlist(self, ctx):
@@ -511,12 +719,6 @@ class MatlabListener(ParseTreeListener):
         ctx.node["backend"] = "matrix"
 
     def exitMatrix(self, ctx):
-        pass
-
-    def enterMatrix_(self, ctx):
-        ctx.node = ctx.parentCtx.node
-
-    def exitMatrix_(self, ctx):
         pass
 
     def enterVector(self, ctx):

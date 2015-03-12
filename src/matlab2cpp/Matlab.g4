@@ -36,8 +36,8 @@ function_returns : ( '[' ID (',' ID)* ']' | ID ) '=' ;
 function_params : ID (',' ID)* ;
 
 // Looping
-loop : 'for{' loop_range (',' | ','? '\n') codeblock '\n}' ;
-loop_range: ( '(' ID EQ expr ')' | ID EQ expr)  ;
+loop : 'for{' ('(' ID '=' expr ')' | ID '=' expr)
+        (',' | ','? '\n') codeblock '\n}' ;
 
 wloop : 'while{' ( '(' condition ')' | condition) (','|'\n')
     (codeblock)? ';'? '\n}' ;
@@ -58,6 +58,11 @@ assignment
     | ID '!' sets '!' expr              # Set3
     ;
 
+descriptor
+    : descriptor '.'
+    ID '(' sets ')'
+    | ID
+
 sets :
     llist_ ;
 
@@ -67,10 +72,31 @@ expr : expr_ ;
 
 expr_
     : '(' expr ')'                  # Paren
-    | expr_ POST                    # Postfix
-    | PRE expr_                     # Prefix
-    | expr_ OPR expr_               # Infix
-    | matrix                        # Matri
+    | expr_ '\''                    # Ctransposed
+    | expr_ '.\''                   # Transposed
+    | '-' expr_                     # Minus
+    | '~' expr_                     # Negate
+    | expr_ '^' expr_               # Exp
+    | expr_ '.^' expr_              # Elexp
+    | expr_ '\\' expr_              # Rdiv
+    | expr_ '.\\' expr_             # Elrdiv
+    | expr_ '/' expr_               # Div
+    | expr_ './' expr_              # Eldiv
+    | expr_ '*' expr_               # Mul
+    | expr_ '.*' expr_              # Elmul
+    | expr_ '+' expr_               # Plus
+    | expr_ ':' expr_               # Colon
+    | expr_ '<' expr_               # Lt
+    | expr_ '<=' expr_              # Le
+    | expr_ '>' expr_               # Gt
+    | expr_ '>=' expr_              # Ge
+    | expr_ '%%' expr_              # Eq
+    | expr_ '<>' expr_              # Ne
+    | expr_ '&' expr_               # Band
+    | expr_ '|' expr_               # Bor
+    | expr_ '&&' expr_              # Land
+    | expr_ '||' expr_              # Lor
+    | '[' vector (';' vector)* ']'  # Matrix
     | IINT                          # Iint
     | INT                           # Int
     | IFLOAT                        # Ifloat
@@ -78,8 +104,8 @@ expr_
     | STRING                        # String
     | END                           # End
     | ID '(' llist? ')'             # Get1
-    | ID '?' llist '?'             # Get2
-    | ID '\\{' llist '\\}'         # Get3
+    | ID '?' llist '?'              # Get2
+    | ID '\\{' llist '\\}'          # Get3
     | ID                            # Var
     ;
 
@@ -91,32 +117,11 @@ llist_
     | expr              # Listone
     ;
 
-matrix
-    : '[' vector (';' vector)* ']' ;
-//      : '[' matrix_ ','? ';'? ']' ;
-//  matrix_
-//      : matrix_ (('\r'? '\n')+ | ';' ('\r'? '\n')* ) matrix_
-//      | vector
-//      ;
-
 vector : expr (',' expr)* ;
-
-// /Expression
-
-OPR : EXP | EL_EXP | RIGHTDIV | EL_RIGHTDIV | LEFTDIV | EL_LEFTDIV | TIMES
-    | EL_TIMES | PLUS | COLON | LST | LSTE | GRT | GRTE | EQEQ | NEQ
-    | BIN_AND | BIN_OR | LOG_AND | LOG_OR ;
-PRE : MINUS | NEG ;
 
 // LEXER RULES
 
-
 ID : '@'? [a-zA-Z_][a-zA-Z0-9_.]* ;
-
-//  ID : '@'? ('a'..'z'|'A'..'Z'|'_')
-//       (('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
-//      | ('a'..'z'|'A'..'Z'|'0'..'9'|'_'|'.')
-//        ('a'..'z'|'A'..'Z'|'0'..'9'|'_')* ) ;
 
 INT    : ('0'..'9')+ ;
 FLOAT
@@ -138,43 +143,6 @@ fragment UNICODE_ESC :
     '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT ;
 
 END : '$' ;
-POST : CCT | EL_CCT ;
-
-// Operators
-LOG_OR    : '||';
-LOG_AND    : '&&';
-BIN_OR    : '|';
-BIN_AND    : '&';
-
-EQEQ    : '%%';
-LSTE    : '<=';
-GRTE    : '>=';
-NEQ    : '<>';
-LST    : '<';
-GRT    : '>';
-
-COLON    : ':';
-
-PLUS    : '+';
-MINUS    : '-';
-
-LEFTDIV    : '/';
-RIGHTDIV: '\\';
-TIMES    : '*';
-EL_LEFTDIV    : './';
-EL_RIGHTDIV    : '.\\';
-EL_TIMES    : '.*';
-
-EXP    : '^';
-EL_EXP    : '.^';
-NEG    : '~';
-EQ    : '=';
-
-CCT : '\'' ;
-EL_CCT : '.\'' ;
 
 WS : (' '|'\t') -> skip ;
-//  LINECOMMENT : '%' ~[\n\r]* -> skip;
-//  COMMENT : '%{' .*?  '%}'-> skip;
 THREEDOTS : ( '...' '\r'? '\n' ) -> skip ;
-

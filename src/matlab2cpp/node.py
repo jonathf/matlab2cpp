@@ -4,6 +4,11 @@ import targets
 import snippets
 import utils
 
+indexnames = [
+    "Assign", "Assigns", "Branch", "For", "Func", "Set", "Set2", "Set3",
+    "Statement", "Switch", "Tryblock", "While", "Program"
+]
+
 class Node(object):
     """
 General definition of a token representation of code
@@ -31,6 +36,7 @@ name : str
         out = ""
         for node in nodes:
 
+            index = node["index"]
             name = node["name"]
             cls = node["class"]
             backend = node["backend"]
@@ -42,9 +48,13 @@ name : str
             while indent and not (node.parent is indent[-1]):
                 indent.pop()
 
-            out += " "*(len(indent)-1)
-            out += "%18s %-10s %-12s %-7s" % (name, cls, backend, type)
-            out += str(node["ret"]) + "\n"
+            indices = [n["index"] for n in node.children]+[index]
+            if (group is None) or group in indices:
+
+                space = " "*(len(indent)-1)
+                out += "%3d%s%18s %-10s %-12s %-7s" % \
+                        (index, space, name, cls, backend, type)
+                out += str(node["ret"]) + "\n"
 
             indent.append(node)
 
@@ -138,7 +148,12 @@ name : str
 
             node.prop["str"] = value
 
-        return node.prop["str"]
+        if group:
+            for node in nodes:
+                if node["index"] == group:
+                    return node.parent["str"]
+
+        return self.prop["str"]
 
 
     def declare(self, name=""):
@@ -305,7 +320,7 @@ name : str
         p = line.parent
 
         # Create new var
-        var = "_aux%03d" % self.program.next_index()
+        var = "_aux_" + type
 
         # Create Assign
         s = collection.Assign(p)
@@ -399,18 +414,6 @@ name : str
         return self.children.__iter__()
 
 
-
-groupnames = [
-    "Get", "Set", "Sets", "Assign", "Assigns", "Assigned",
-    "Assignees", "Func", "Matrix", "For", "If", "Elif", "Else",
-    "Block", "Branch", "Statement", "Program"
-]
-
-summarynames = [
-    "Assign", "Assigns", "Branch", "For", "Func", "Set", "Set2", "Set3",
-    "Statement", "Switch", "Tryblock", "While", "Program"
-]
-
 def init(node, parent, name=None):
 
     node.children = []      # node children
@@ -424,38 +427,34 @@ def init(node, parent, name=None):
 
     cls = node.__class__.__name__
     node.prop["class"] = cls
-    if cls in groupnames:
-        node.isgroup = True
-    else:
-        node.isgroup = False
 
-    if cls in summarynames:
-        node["summarygroup"] = 0
-    else:
-        node["summarygroup"] = node.program["summarygroup"]
+    if cls in indexnames:
+        index = node["index"] = 0
+        node.group = node
 
-    index = node.program.next_index()
+    elif parent["index"] != 0:
+        node["index"] = parent["index"]
+        node.group = parent.group
+
+    else:
+        index = node.program["index"] + 1
+        node["index"] = index
+        node.program["index"] = index
+        node.group = parent.group
+
     if name:
         node["name"] = name
     else:
-        node["name"] = "@%06d%s" % (index, node["class"])
+        node["name"] = ""
 
     if parent.prop["class"] in ("Program", "Func"):
         node.func = parent
     else:
         node.func = parent.func
-    node.prop["func"] = node.func.prop["name"]
-
-    if parent["class"] in groupnames:
-        node.group = parent
-    else:
-        node.group = parent.group
-    node["group"] = node.group["name"]
 
     node["backend"] = "unknown"
     node["str"] = ""
     node["value"] = ""
     node["pointers"] = 0
-    node["auxillary"] = False
     node["type"] = datatype("TYPE")
 

@@ -8,14 +8,8 @@ class Program(Node):
     """Root of the tree"""
 
     def __init__(self):
-        self.index = 0
         self.program = self
         Node.__init__(self, self, "program")
-
-    def next_index(self):
-        self.index += 1
-        return self.index
-
 
 class Block(Node):
     """Code block
