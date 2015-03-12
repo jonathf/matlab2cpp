@@ -60,6 +60,9 @@ class MatlabListener(ParseTreeListener):
         cs = ctx.program.children
         ctx.program.children = cs[:1] + cs[2:] + cs[1:2]
 
+        if len(ctx.node) != 4:
+            col.Block(ctx.node)
+
         block = ctx.node[3]
         assign = col.Assign(block)
         var = col.Var(assign, "_retvar")
