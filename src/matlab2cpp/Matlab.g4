@@ -1,7 +1,7 @@
 grammar Matlab;
 
-program : '\n'? codeblock? '\n'? EOF ;
-codeblock : codeline ((';'? '\n'| ';') codeline)* ;
+program : '\r'? '\n'? codeblock? '\r'? '\n'? EOF ;
+codeblock : codeline ((';'? '\r'? '\n'| ';') codeline)* ;
 codeline
     : function
     | assignment
@@ -18,32 +18,32 @@ branch
     : branch_if branch_elif* branch_else? '\n}';
 branch_if : 'if{' condition
     (','? codeline
-    | ','? '\n' codeblock)? ;
+    | ','? '\r'? '\n' codeblock)? ;
 branch_elif : '\nelseif' condition
-    (',' codeline | ','? '\n' codeblock)? ;
-branch_else : '\nelse' (','? codeline | ','? '\n' codeblock)? ;
+    (',' codeline | ','? '\r'? '\n' codeblock)? ;
+branch_else : '\nelse' (','? codeline | ','? '\r'? '\n' codeblock)? ;
 condition : expr ;
 
 switch_ : 'switch{' expr switch_case* switch_otherwise? '\n}';
-switch_case : '\ncase' expr ('\n' codeblock)? ;
-switch_otherwise : '\notherwise' ('\n' codeblock)? ;
+switch_case : '\ncase' expr ('\r'? '\n' codeblock)? ;
+switch_otherwise : '\notherwise' ('\r'? '\n' codeblock)? ;
 
 // Functions
 function : 'function{' function_returns? ID
-    '(' function_params? ')' (','|'\n')
+    '(' function_params? ')' (','|'\r'? '\n')
     codeblock? ';'? '\n}' ;
 function_returns : ( '[' ID (',' ID)* ']' | ID ) '=' ;
 function_params : ID (',' ID)* ;
 
 // Looping
 loop : 'for{' ('(' ID '=' expr ')' | ID '=' expr)
-        (',' | ','? '\n') codeblock '\n}' ;
+        (',' | ','? '\r'? '\n') codeblock '\n}' ;
 
-wloop : 'while{' ( '(' condition ')' | condition) (','|'\n')
+wloop : 'while{' ( '(' condition ')' | condition) (','|'\r'? '\n')
     (codeblock)? ';'? '\n}' ;
 
 try_ : 'try{\n' codeblock (catchid+ | catchid* catch_) '\n}' ;
-catchid : '\ncatch' ID '\n' codeblock ;
+catchid : '\ncatch' ID '\r'? '\n' codeblock ;
 catch_ : '\ncatch\n' codeblock ;
 
 // Statements
@@ -58,10 +58,10 @@ assignment
     | ID '!' sets '!' expr              # Set3
     ;
 
-descriptor
-    : descriptor '.'
-    ID '(' sets ')'
-    | ID
+//  descriptor
+//      : descriptor '.'
+//      ID '(' sets ')'
+//      | ID
 
 sets :
     llist_ ;
