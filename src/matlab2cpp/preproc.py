@@ -7,7 +7,7 @@ errors = set([])
 
 def prefix_hack(text):
 
-#      text = re.sub(r"\r", r"", text)         # windows to posix
+    text = re.sub(r"\r", r"", text)         # windows to posix
     text = re.sub(r"\.{3,}\n *", r" ", text)    # join "..."
     text = re.sub(r"[ \t]+", " ", text)         # spaces be reduced
     text = re.sub(r"((^|\n) | \n ?)+", r"\n", text)    # indenting be gone
