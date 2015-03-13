@@ -299,6 +299,7 @@ class MatlabListener(ParseTreeListener):
     def enterSet1(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Set(pnode, ctx.ID().getText())
+        ctx.node.declare()
         ctx.node["backend"] = "unknown"
 
     def exitSet1(self, ctx):
@@ -307,6 +308,7 @@ class MatlabListener(ParseTreeListener):
     def enterSet2(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Set2(pnode, ctx.ID().getText())
+        ctx.node.declare()
         ctx.node["backend"] = "unknown"
 
     def exitSet2(self, ctx):
@@ -315,6 +317,7 @@ class MatlabListener(ParseTreeListener):
     def enterSet3(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Set3(pnode, ctx.ID().getText())
+        ctx.node.declare()
         ctx.node["backend"] = "unknown"
 
     def exitSet3(self, ctx):

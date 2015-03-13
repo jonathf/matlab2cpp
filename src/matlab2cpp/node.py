@@ -6,7 +6,7 @@ import utils
 
 indexnames = [
     "Assign", "Assigns", "Branch", "For", "Func", "Set", "Set2", "Set3",
-    "Statement", "Switch", "Tryblock", "While", "Program"
+    "Statement", "Switch", "Tryblock", "While", "Program", "Block"
 ]
 
 class Node(object):
@@ -79,7 +79,8 @@ name : str
                 print name, cls, type_, backend
 
             if type_ == "TYPE" and node.children and \
-                    cls not in ("Get", "Get2", "Get3"):
+                    cls not in ("Get", "Get2", "Get3", 
+                            "Set", "Set2", "Set3"):
                 type_ = node.type([n.type() for n in node.children])
 
             if name in targets.reserved.reserved:

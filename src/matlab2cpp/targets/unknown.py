@@ -6,11 +6,11 @@ Declare = "TYPE %(name)s ;"
 
 def Set(node):
     "arrays"
-    type = node[1].type()
-
-    if type != "TYPE":
-        node.type(type)
-        node[0].suggest(type)
+#      type = node[1].type()
+#  
+#      if type != "TYPE":
+#          node.type(type)
+#          node[0].suggest(type)
 
     return "%(name)s(%(0)s) = %(1)s ;"
 
@@ -64,8 +64,5 @@ def Assign(node):
 
     t0, t1 = node[0].type(), node[1].type()
     node.type(t1)
-
-    if t1 != "TYPE" and t0 == "TYPE":
-        node[0].suggest(t1)
 
     return "%(0)s = %(1)s ;"

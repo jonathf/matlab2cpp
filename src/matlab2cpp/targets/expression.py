@@ -175,7 +175,7 @@ def Eldiv(node):
 
 def Colon(node):
 
-    if node.group["class"] != "For":
+    if node.group["class"] in ("Statement", "Set", "Set2", "Set3"):
 
         node.include("span", target="ivec",
                 start=node[0].type(), end=node[-1].type())
