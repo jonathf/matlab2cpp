@@ -60,6 +60,10 @@ class MatlabListener(ParseTreeListener):
         cs = ctx.program.children
         ctx.program.children = cs[:1] + cs[2:] + cs[1:2]
 
+        if len(ctx.node) != 4:
+            block = col.Block(ctx.node)
+            block["backend"] = "code_block"
+
         block = ctx.node[3]
         assign = col.Assign(block)
         var = col.Var(assign, "_retvar")
@@ -76,29 +80,17 @@ class MatlabListener(ParseTreeListener):
         declares = col.Declares(ctx.node)
         declares["names"] = []
 
+        if ctx.function_returns() is None:
+            returns = col.Returns(ctx.node)
+            returns["names"] = []
+
+            if ctx.function_params() is None:
+                params = col.Params(ctx.node)
+                params["names"] = []
+
     def exitFunction(self, ctx):
 
         node = ctx.node
-
-        if len(node) == 2:
-            block = node.children.pop()
-            col.Returns(node)
-            col.Params(node)
-            node.append(block)
-
-        if len(node) == 3:
-
-            if node[1]["class"] == "Returns":
-
-                block = node.children.pop()
-                col.Params(node)
-                node.append(block)
-
-            else:
-
-                block = node.children.pop()
-                col.Returns(node)
-                node.append(block)
 
         if len(node[1]) == 1:
             node["backend"] = "func_return"
@@ -124,6 +116,10 @@ class MatlabListener(ParseTreeListener):
             name = ctx.ID(n).getText()
             col.Var(ctx.node, name)
             ctx.node["names"].append(name)
+
+        if ctx.parentCtx.function_params() is None:
+            params = col.Params(pnode)
+            params["names"] = []
 
     def exitFunction_returns(self, ctx):
         pass
@@ -303,6 +299,7 @@ class MatlabListener(ParseTreeListener):
     def enterSet1(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Set(pnode, ctx.ID().getText())
+        ctx.node.declare()
         ctx.node["backend"] = "unknown"
 
     def exitSet1(self, ctx):
@@ -311,6 +308,7 @@ class MatlabListener(ParseTreeListener):
     def enterSet2(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Set2(pnode, ctx.ID().getText())
+        ctx.node.declare()
         ctx.node["backend"] = "unknown"
 
     def exitSet2(self, ctx):
@@ -319,6 +317,7 @@ class MatlabListener(ParseTreeListener):
     def enterSet3(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Set3(pnode, ctx.ID().getText())
+        ctx.node.declare()
         ctx.node["backend"] = "unknown"
 
     def exitSet3(self, ctx):

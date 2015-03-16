@@ -71,8 +71,8 @@ expr : expr_ ;
 
 expr_
     : '(' expr ')'                  # Paren
-    | expr_ '\''                    # Ctransposed
-    | expr_ '.\''                   # Transposed
+    | expr_ '\''                    # Ctranspose
+    | expr_ '.\''                   # Transpose
     | '-' expr_                     # Minus
     | '~' expr_                     # Negate
     | expr_ '^' expr_               # Exp

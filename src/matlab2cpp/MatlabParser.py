@@ -2620,25 +2620,6 @@ class MatlabParser ( Parser ):
                 listener.exitColon(self)
 
 
-    class CtransposedContext(Expr_Context):
-
-        def __init__(self, parser, ctx): # actually a MatlabParser.Expr_Context)
-            super(MatlabParser.CtransposedContext, self).__init__(parser)
-            self.copyFrom(ctx)
-
-        def expr_(self):
-            return self.getTypedRuleContext(MatlabParser.Expr_Context,0)
-
-
-        def enterRule(self, listener):
-            if isinstance( listener, MatlabListener ):
-                listener.enterCtransposed(self)
-
-        def exitRule(self, listener):
-            if isinstance( listener, MatlabListener ):
-                listener.exitCtransposed(self)
-
-
     class LorContext(Expr_Context):
 
         def __init__(self, parser, ctx): # actually a MatlabParser.Expr_Context)
@@ -2720,10 +2701,10 @@ class MatlabParser ( Parser ):
                 listener.exitInt(self)
 
 
-    class TransposedContext(Expr_Context):
+    class CtransposeContext(Expr_Context):
 
         def __init__(self, parser, ctx): # actually a MatlabParser.Expr_Context)
-            super(MatlabParser.TransposedContext, self).__init__(parser)
+            super(MatlabParser.CtransposeContext, self).__init__(parser)
             self.copyFrom(ctx)
 
         def expr_(self):
@@ -2732,11 +2713,11 @@ class MatlabParser ( Parser ):
 
         def enterRule(self, listener):
             if isinstance( listener, MatlabListener ):
-                listener.enterTransposed(self)
+                listener.enterCtranspose(self)
 
         def exitRule(self, listener):
             if isinstance( listener, MatlabListener ):
-                listener.exitTransposed(self)
+                listener.exitCtranspose(self)
 
 
     class GeContext(Expr_Context):
@@ -2866,25 +2847,6 @@ class MatlabParser ( Parser ):
                 listener.exitPlus(self)
 
 
-    class MinusContext(Expr_Context):
-
-        def __init__(self, parser, ctx): # actually a MatlabParser.Expr_Context)
-            super(MatlabParser.MinusContext, self).__init__(parser)
-            self.copyFrom(ctx)
-
-        def expr_(self):
-            return self.getTypedRuleContext(MatlabParser.Expr_Context,0)
-
-
-        def enterRule(self, listener):
-            if isinstance( listener, MatlabListener ):
-                listener.enterMinus(self)
-
-        def exitRule(self, listener):
-            if isinstance( listener, MatlabListener ):
-                listener.exitMinus(self)
-
-
     class Get2Context(Expr_Context):
 
         def __init__(self, parser, ctx): # actually a MatlabParser.Expr_Context)
@@ -2904,6 +2866,25 @@ class MatlabParser ( Parser ):
         def exitRule(self, listener):
             if isinstance( listener, MatlabListener ):
                 listener.exitGet2(self)
+
+
+    class MinusContext(Expr_Context):
+
+        def __init__(self, parser, ctx): # actually a MatlabParser.Expr_Context)
+            super(MatlabParser.MinusContext, self).__init__(parser)
+            self.copyFrom(ctx)
+
+        def expr_(self):
+            return self.getTypedRuleContext(MatlabParser.Expr_Context,0)
+
+
+        def enterRule(self, listener):
+            if isinstance( listener, MatlabListener ):
+                listener.enterMinus(self)
+
+        def exitRule(self, listener):
+            if isinstance( listener, MatlabListener ):
+                listener.exitMinus(self)
 
 
     class Get1Context(Expr_Context):
@@ -2969,6 +2950,25 @@ class MatlabParser ( Parser ):
         def exitRule(self, listener):
             if isinstance( listener, MatlabListener ):
                 listener.exitBor(self)
+
+
+    class TransposeContext(Expr_Context):
+
+        def __init__(self, parser, ctx): # actually a MatlabParser.Expr_Context)
+            super(MatlabParser.TransposeContext, self).__init__(parser)
+            self.copyFrom(ctx)
+
+        def expr_(self):
+            return self.getTypedRuleContext(MatlabParser.Expr_Context,0)
+
+
+        def enterRule(self, listener):
+            if isinstance( listener, MatlabListener ):
+                listener.enterTranspose(self)
+
+        def exitRule(self, listener):
+            if isinstance( listener, MatlabListener ):
+                listener.exitTranspose(self)
 
 
     class ParenContext(Expr_Context):
@@ -3578,7 +3578,7 @@ class MatlabParser ( Parser ):
                         pass
 
                     elif la_ == 21:
-                        localctx = MatlabParser.CtransposedContext(self, MatlabParser.Expr_Context(self, _parentctx, _parentState))
+                        localctx = MatlabParser.CtransposeContext(self, MatlabParser.Expr_Context(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expr_)
                         self.state = 505
                         if not self.precpred(self._ctx, 35):
@@ -3589,7 +3589,7 @@ class MatlabParser ( Parser ):
                         pass
 
                     elif la_ == 22:
-                        localctx = MatlabParser.TransposedContext(self, MatlabParser.Expr_Context(self, _parentctx, _parentState))
+                        localctx = MatlabParser.TransposeContext(self, MatlabParser.Expr_Context(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expr_)
                         self.state = 507
                         if not self.precpred(self._ctx, 34):
