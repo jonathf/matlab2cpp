@@ -269,7 +269,6 @@ name : str
     def replace(self, node, *args):
         "replace node in token tree"
 
-        print node["class"], node["name"], "being replaced"
         if not args:
 
             index1 = self.parent.children.index(self)
@@ -277,7 +276,6 @@ name : str
             self.parent.children[index1] = node
             node.parent.children[index2] = self
             node.parent, self.parent = self.parent, node.parent
-#              node._generate()
             return str(node)
 
         else:
