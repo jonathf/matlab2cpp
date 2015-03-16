@@ -20,6 +20,9 @@ if __name__ == "__main__":
             help="Display process output")
     parser.add_option("-g", '--group', type="int", dest="group",
             help="Only display fron particular group")
+    parser.add_option("-o", '--output', type="str", dest="filename",
+            metavar="FNAME",
+            help="Save code to FNAME instead of piping to STDOUT")
 
     opt, args = parser.parse_args()
 
@@ -37,17 +40,30 @@ if __name__ == "__main__":
                 os.remove(name)
 
     tree = matlab2cpp.main(path, opt.suggestion, disp=opt.display)
+    out = ""
     if opt.tree_view:
         if opt.group:
-            print tree.summary(opt.display, opt.group)
+            out = tree.summary(opt.display, opt.group)
         else:
-            print tree.summary(opt.display)
+            out = tree.summary(opt.display)
     elif opt.group:
         nodes = matlab2cpp.utils.flatten(tree)
         for node in nodes:
             if node["index"] == opt.group:
-                print node.parent["str"]
+                out = node.parent["str"]
                 break
+        else:
+            out = "<group not recognized>"
 
     else:
-        print tree
+        out = tree
+
+    if opt.filename:
+
+        f = open(opt.filename, "wb")
+        f.write(str(out))
+        f.close()
+
+    else:
+
+        print out

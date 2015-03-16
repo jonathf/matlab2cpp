@@ -1,6 +1,6 @@
 
 Type = "std::complex<double>"
-Int = "%(value)s"
+Iint = "%(value)s"
 Var = "%(name)s"
 
 def Assign(node):
