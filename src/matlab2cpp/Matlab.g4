@@ -1,7 +1,7 @@
 grammar Matlab;
 
-program : '\r'? '\n'? codeblock? '\r'? '\n'? EOF ;
-codeblock : codeline ((';'? '\r'? '\n'| ';') codeline)* ;
+program : NL? codeblock? NL? EOF ;
+codeblock : codeline ((';'? NL | ';') codeline)* ;
 codeline
     : function
     | assignment
@@ -15,35 +15,35 @@ codeline
 
 // Branching
 branch
-    : branch_if branch_elif* branch_else? 'r'? '\n}';
+    : branch_if branch_elif* branch_else? NL '}';
 branch_if : 'if{' condition
     (','? codeline
-    | ','? '\r'? '\n' codeblock)? ;
-branch_elif : '\r'? '\nelseif' condition
-    (',' codeline | ','? '\r'? '\n' codeblock)? ;
-branch_else : '\r'? '\nelse' (','? codeline | ','? '\r'? '\n' codeblock)? ;
+    | ','? NL codeblock)? ;
+branch_elif : NL 'elseif' condition
+    (',' codeline | ','? NL codeblock)? ;
+branch_else : NL 'else' (','? codeline | ','? NL codeblock)? ;
 condition : expr ;
 
-switch_ : 'switch{' expr switch_case* switch_otherwise? '\r'? '\n}';
-switch_case : '\r'? '\ncase' expr ('\r'? '\n' codeblock)? ;
-switch_otherwise : '\r'? '\notherwise' ('\r'? '\n' codeblock)? ;
+switch_ : 'switch{' expr switch_case* switch_otherwise? NL '}';
+switch_case : NL 'case' expr (NL codeblock)? ;
+switch_otherwise : NL 'otherwise' (NL codeblock)? ;
 
 // Functions
 function : 'function{' function_returns? ID
-        '(' function_params? ')' (','|'\r'? '\n') codeblock? ';'? '\r'? '\n}' ;
+        '(' function_params? ')' (','| NL ) codeblock? ';'? NL '}' ;
 function_returns : ( '[' ID (',' ID)* ']' | ID ) '=' ;
 function_params : ID (',' ID)* ;
 
 // Looping
 loop : 'for{' ('(' ID '=' expr ')' | ID '=' expr)
-        (',' | ','? '\r'? '\n') codeblock '\r'? '\n}' ;
+        (',' | ','? NL ) codeblock NL '}' ;
 
-wloop : 'while{' ( '(' condition ')' | condition) (','|'\r'? '\n')
-    (codeblock)? ';'? '\r'? '\n}' ;
+wloop : 'while{' ( '(' condition ')' | condition) (','| NL)
+    (codeblock)? ';'? NL '}' ;
 
-try_ : 'try{' '\r'? '\n' codeblock (catchid+ | catchid* catch_) '\r'? '\n}' ;
-catchid : '\r'? '\ncatch' ID '\r'? '\n' codeblock ;
-catch_ : '\r'? '\ncatch' '\r'? '\n' codeblock ;
+try_ : 'try{' NL codeblock (catchid+ | catchid* catch_) NL '}' ;
+catchid : NL 'catch' ID NL codeblock ;
+catch_ : NL 'catch' NL codeblock ;
 
 // Statements
 statement : expr ;
@@ -143,5 +143,7 @@ fragment UNICODE_ESC :
 
 END : '$' ;
 
+NL : '\r'? '\n' ;
+
 WS : (' '|'\t') -> skip ;
-THREEDOTS : ( '...' '\r'? '\n' ) -> skip ;
+THREEDOTS : ( '...' NL ) -> skip ;

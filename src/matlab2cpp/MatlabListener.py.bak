@@ -66,7 +66,7 @@ class MatlabListener(ParseTreeListener):
 
         block = ctx.node[3]
         assign = col.Assign(block)
-        var = col.Var(assign, "_retvar")
+        var = col.Var(assign, "_retval")
         var.type("int")
         i = col.Int(assign, "0")
         i.type("int")
