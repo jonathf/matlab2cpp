@@ -267,7 +267,7 @@ class MatlabParser ( Parser ):
                      u"'<='", u"'>'", u"'>='", u"'%%'", u"'<>'", u"'&'", 
                      u"'|'", u"'&&'", u"'||'", u"'?'", u"'\\}'", u"'::'", 
                      u"<INVALID>", u"<INVALID>", u"<INVALID>", u"<INVALID>", 
-                     u"<INVALID>", u"<INVALID>", u"'$'" ]
+                     u"<INVALID>", u"<INVALID>", u"'$'", u"'\n'" ]
 
     symbolicNames = [ u"<INVALID>", u"<INVALID>", u"<INVALID>", u"<INVALID>", 
                       u"<INVALID>", u"<INVALID>", u"<INVALID>", u"<INVALID>", 

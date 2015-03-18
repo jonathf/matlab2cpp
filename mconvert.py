@@ -60,7 +60,7 @@ if __name__ == "__main__":
 
     if opt.filename:
 
-        f = open(opt.filename, "wb")
+        f = open(opt.filename, "w")
         f.write(str(out))
         f.close()
 

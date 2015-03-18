@@ -143,7 +143,7 @@ fragment UNICODE_ESC :
 
 END : '$' ;
 
-NL : '\r'? '\n' ;
+NL : '\n' ;
 
 WS : (' '|'\t') -> skip ;
 THREEDOTS : ( '...' NL ) -> skip ;
