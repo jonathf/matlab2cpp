@@ -116,7 +116,7 @@ llist_
     | expr              # Listone
     ;
 
-vector : expr (',' expr)* ;
+vector : expr? | expr (',' expr)+ ;
 
 // LEXER RULES
 
@@ -143,7 +143,7 @@ fragment UNICODE_ESC :
 
 END : '$' ;
 
-NL : '\n' ;
+NL : '\r'? '\n' ;
 
 WS : (' '|'\t') -> skip ;
 THREEDOTS : ( '...' NL ) -> skip ;

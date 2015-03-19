@@ -185,6 +185,8 @@ def Matrix(node):
 
 
 def Assign(node):
+    if len(node[1][0]) == 0:
+        return "%(0)s.reset() ;"
     node[0].suggest(node[1].type())
     return "%(0)s << %(1)s ;"
 
