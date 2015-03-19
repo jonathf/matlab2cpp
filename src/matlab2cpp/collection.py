@@ -488,3 +488,6 @@ class Declares(Node):
 
 class Declare(Node):
     pass
+
+class Break(Node):
+    pass

@@ -128,6 +128,7 @@ Expr = "%(0)s"
 Gets = "", ", ", ""
 Paren = "(%(0)s)"
 End = "&$"
+Break = "break"
 
 # simple operators
 def Mul(node):

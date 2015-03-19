@@ -101,7 +101,8 @@ expr_
     | IFLOAT                        # Ifloat
     | FLOAT                         # Float
     | STRING                        # String
-    | END                           # End
+    | '$'                           # End
+    | 'break'                       # Break
     | ID '(' llist? ')'             # Get1
     | ID '?' llist '?'              # Get2
     | ID '\\{' llist '\\}'          # Get3
@@ -140,8 +141,6 @@ fragment ESC_SEQ
 fragment OCTAL_ESC : '\\' ( [0-3]? [0-7] )? [0-7] ;
 fragment UNICODE_ESC :
     '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT ;
-
-END : '$' ;
 
 NL : '\r'? '\n' ;
 

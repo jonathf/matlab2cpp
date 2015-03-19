@@ -751,3 +751,10 @@ class MatlabListener(ParseTreeListener):
 
     def exitVector(self, ctx):
         pass
+
+    def enterBreak(self, ctx):
+        ctx.node = col.Break(ctx.parentCtx.node)
+        ctx.node["backend"] = "expression"
+
+    def exitBreak(self, ctx):
+        pass
