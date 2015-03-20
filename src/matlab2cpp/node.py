@@ -174,7 +174,6 @@ name : str
             return
 
         node = collection.Declare(declares, name)
-        declares["names"].append(name)
         type = self.type()
         node.type(type)
         node["suggest"] = datatype(type)
@@ -410,8 +409,16 @@ name : str
     def __iter__(self):
         return self.children.__iter__()
 
+    def append(self, node):
+        node.children.append(node)
+        node.prop["names"].append(node["name"])
 
-def init(node, parent, name=None):
+    def pop(self, index):
+        self.prop["names"].pop(index)
+        return self.children.pop(index)
+
+
+def init(node, parent, name=""):
 
     node.children = []      # node children
     node.prop = {}          # node property
@@ -421,6 +428,7 @@ def init(node, parent, name=None):
     node.program = parent.program
     if name != "program":
         parent.children.append(node)
+        parent["names"].append(name)
 
     cls = node.__class__.__name__
     node.prop["class"] = cls
@@ -444,6 +452,7 @@ def init(node, parent, name=None):
     else:
         node["name"] = ""
 
+
     if parent.prop["class"] in ("Program", "Func"):
         node.func = parent
     else:
@@ -454,4 +463,5 @@ def init(node, parent, name=None):
     node["value"] = ""
     node["pointers"] = 0
     node["type"] = datatype("TYPE")
+    node["names"] = []
 

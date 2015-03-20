@@ -28,38 +28,48 @@ Get : Function/Array retrieval
     Property: name
 """
 
-# Requires C++11
-INLINE_MODE = True
-
 def Func(node):
-    if INLINE_MODE:
-        return ""#// placeholder for %(name)s"
+    return ""#// placeholder for %(name)s"
 
 def Lambda(node):
 
-    if INLINE_MODE:
+    program = node.program
+    func = program[program["names"].index(node["name"])]
+    declares, returns, params, block = func
+    expr = block[0][1]
 
-        program = node.program
-        func = program[program["names"].index(node["name"])+1]
-        declares, returns, params, block = func
-        expr = block[0][1]
+    out = ""
 
-        return "[" + str(declares) + "] (" + str(params) +\
-                ") {" + str(expr) + "; }"
+    # Hack: add more declared variables
+    nodes = [expr]
+    for node in nodes:
+        nodes.extend(node.children)
+        if node["class"] in ["Get", "Get2", "Get3"] and\
+                node["name"] not in params["names"]+declares["names"]:
+            node.declare()
+
+    for name, declare in zip(declares["names"], declares):
+        if name != "_retval":
+            out += ", " + name
+        else:
+            node.type(declare.type())
+
+    print out
+    out = "[" + out[2:]
+    out += "] (" + str(params)
+    out += ") {" + str(expr) + " ; }"
+    return out
 
 
 def Params(node):
 
-    if INLINE_MODE:
-        return ", ".join(["%s %s" % (n.type(), n["name"]) for n in node])
+    return ", ".join(["%s %s" % (n.type(), n["name"]) for n in node])
 
 
 def Returns(node):
 
-    if INLINE_MODE:
-        return ""
+    return ""
 
 def Declares(node):
 
-    if INLINE_MODE:
-        return ", ".join(["%s" % (n["name"]) for n in node])
+    return ", ".join(["%s" % (n["name"]) for n in node])

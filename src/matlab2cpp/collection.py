@@ -87,7 +87,6 @@ var : Var
 class Declares(Node):
     def __init__(self, parent):
         Node.__init__(self, parent)
-        self["names"] = []
 
 class Declare(Node):
     pass

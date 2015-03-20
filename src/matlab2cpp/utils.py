@@ -97,7 +97,7 @@ def set_cfg(root, cfg):
     for name in cfg.keys():
         if name in root["names"]:
             cfg_ = cfg[name]
-            func = root[root["names"].index(name)+1]
+            func = root[root["names"].index(name)]
             declares, returns, params = func[0], func[1], func[2]
             for key in cfg_.keys():
                 if key in declares["names"]:

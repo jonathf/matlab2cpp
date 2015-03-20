@@ -29,9 +29,6 @@ class MatlabListener(ParseTreeListener):
         returns["backend"] = "func_return"
         params["backend"] = "func_return"
 
-        returns["names"] = ["_retval"]
-        params["names"] = ["argc", "argv"]
-
         var = col.Var(returns, "_retval")
         var.type("int")
         var.declare()
@@ -55,7 +52,7 @@ class MatlabListener(ParseTreeListener):
                 cs = cs[i:i+1] + cs[:i] + cs[i+1:]
 
         ctx.program.children = [ctx.program[0]] + cs
-        ctx.program["names"] = [n["name"] for n in cs]
+        ctx.program["names"] = [n["name"] for n in ctx.program]
 
         if len(ctx.node) != 4:
             block = col.Block(ctx.node)
@@ -97,9 +94,6 @@ class MatlabListener(ParseTreeListener):
         for var in node[1][:]:
             var.declare()
 
-        ctx.node[1]["names"] = [n["name"] for n in ctx.node[1]]
-        ctx.node[2]["names"] = [n["name"] for n in ctx.node[2]]
-
     def enterFunction_returns(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Returns(pnode)
@@ -139,13 +133,9 @@ class MatlabListener(ParseTreeListener):
         declares, returns, params, block = func
 
         func["backend"] = "func_lambda"
-        declares["backend"] = "func_lambda"
-
         returns["backend"] = "func_lambda"
-        returns["names"] = [n["name"] for n in returns]
-
         params["backend"] = "func_lambda"
-        params["names"] = [n["name"] for n in params]
+        declares["backend"] = "func_lambda"
 
         var = col.Var(returns, "_retval")
         var.declare()
