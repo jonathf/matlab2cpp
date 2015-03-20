@@ -11,6 +11,20 @@ class Program(Node):
         self.program = self
         Node.__init__(self, self, "program")
 
+        self["backend"] = "program"
+
+class Includes(Node):
+
+    def __init__(self, parent, name=""):
+        Node.__init__(self, parent, name)
+        self["backend"] = "program"
+
+class Include(Node):
+
+    def __init__(self, parent, name=""):
+        Node.__init__(self, parent, name)
+        self["backend"] = "program"
+
 class Block(Node):
     """Code block
 
@@ -20,6 +34,10 @@ line, [line, ...]
 line : For, Func, Assign, Assigns, Set, Statement, Branch
     One or more codelines
     """
+
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "code_block"
 
 class Func(Node):
     """Function
@@ -48,6 +66,8 @@ Children
 var : Var
     Zero or more return values
     """
+    def __init__(self, parent):
+        Node.__init__(self, parent)
 
 
 class Params(Node):
@@ -60,6 +80,17 @@ Children
 var : Var
     Zero or more parameter values
     """
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+
+
+class Declares(Node):
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["names"] = []
+
+class Declare(Node):
+    pass
 
 
 class For(Node):
@@ -76,6 +107,9 @@ condition : Expr
 block : Block
     One or more codelines.
     """
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "code_block"
 
 class While(Node):
     """Whlie-llop
@@ -100,6 +134,9 @@ case : Case
 otherwise : Otherwise
     Optional "Else" block
     """
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "code_block"
 
 
 class Case(Node):
@@ -114,6 +151,9 @@ condition : Cond
 block : Block
     One or more codelines to run if condition is met.
     """
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "code_block"
 
 
 class Otherwise(Node):
@@ -124,6 +164,9 @@ Children
 block : Block
     One or more codelines to run.
     """
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "code_block"
 
 
 class Branch(Node):
@@ -140,6 +183,9 @@ elif : Elif
 else : Else
     Optional "Else" block
     """
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "code_block"
 
 
 class If(Node):
@@ -154,6 +200,9 @@ condition : Cond
 block : Block
     One or more codelines to run if condition is met.
     """
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "code_block"
 
 class Elif(Node):
     """Elif Block
@@ -167,6 +216,9 @@ condition : Cond
 block : Block
     One or more codelines to run if condition is met.
     """
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "code_block"
 
 class Else(Node):
     """Else Block
@@ -176,6 +228,9 @@ Children
 block : Block
     One or more codelines to run.
     """
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "code_block"
 
 
 class Cond(Node):
@@ -186,18 +241,27 @@ Children
 expr : Expr
     Expression
     """
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "code_block"
 
 class Tryblock(Node):
-    pass
+
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "code_block"
 
 class Try(Node):
-    pass
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "code_block"
 
 class Catch(Node):
     def __init__(self, parent, name=""):
         Node.__init__(self, parent)
         if name:
             self["name"] = name
+        self["backend"] = "code_block"
 
 
 class Statement(Node):
@@ -208,17 +272,13 @@ Children
 expr : Expr
     Expression to evaluation
     """
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "code_block"
 
 
 class Var(Node):
     """Variable"""
-    def __init__(self, parent, name=""):
-        if name and name[0] == "@":
-            Node.__init__(self, parent, name[1:])
-            self["lambda"] = True
-        else:
-            Node.__init__(self, parent, name)
-            self["lambda"] = False
 
 
 class Set(Node):
@@ -241,6 +301,9 @@ class Set3(Node):
 
 class Sets(Node):
     """Values argument for the Set methods"""
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "code_block"
 
 
 class Assign(Node):
@@ -268,8 +331,15 @@ lhs : Assigns_return
 rhs : Assigns_args
     Argument in call.
     """
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "code_block"
 
-class Assigned(Node): pass
+class Assigned(Node):
+
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "code_block"
 
 class Assignees(Node): pass
 
@@ -291,6 +361,7 @@ arg : Expr
 """
     def __init__(self, parent):
         Node.__init__(self, parent)
+        self["backend"] = "expression"
 
 class Exp(Opr): pass
 class Elexp(Opr): pass
@@ -324,8 +395,9 @@ vector, [vector ...]
 vector : Vector
     One or more row vector.
     """
-    def _backend(self):
-        return self.line["backend"]
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "matrix"
 
 class Vector(Expr):
     """Vector
@@ -337,8 +409,9 @@ expr, [expr ...]
 expr : Expr
     One or more vector element.
     """
-    def _backend(self):
-        return self.line["backend"]
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "matrix"
 
 class Paren(Expr):
     """Parenthesis
@@ -407,6 +480,8 @@ value : str
         """
         Node.__init__(self, parent)
         self["value"] = value
+        self["backend"] = "int"
+        self.type("int")
 
 
 class Float(Expr):
@@ -422,6 +497,8 @@ value : str
         """
         Node.__init__(self, parent)
         self["value"] = value
+        self["backend"] = "float"
+        self.type("float")
 
 
 class Iint(Node):
@@ -437,6 +514,8 @@ value : str
         """
         Node.__init__(self, parent)
         self["value"] = value
+        self["backend"] = "iint"
+        self.type("iint")
 
 
 class Ifloat(Expr):
@@ -452,6 +531,8 @@ value : str
         """
         Node.__init__(self, parent)
         self["value"] = value
+        self["backend"] = "ifloat"
+        self.type("ifloat")
 
 class String(Expr):
     """String"""
@@ -466,28 +547,28 @@ value : str
         """
         Node.__init__(self, parent)
         self["value"] = value
+        self["backend"] = "string"
 
 
 class All(Expr):
     "Indicator for the full range in function/module calls."
-    pass
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "expression"
 
 
 class End(Expr):
     "Indicator for last element in iterable"
-    pass
-
-class Includes(Node):
-    pass
-
-class Include(Node):
-    pass
-
-class Declares(Node):
-    pass
-
-class Declare(Node):
-    pass
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "expression"
 
 class Break(Node):
-    pass
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "expression"
+
+class Lambda(Node):
+    def __init__(self, parent, name=""):
+        Node.__init__(self, parent, name)
+        self["backend"] = "func_lambda"

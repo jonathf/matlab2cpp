@@ -42,7 +42,7 @@ class MatlabListener(ParseTreeListener):
         var = col.Var(returns, "_retval")
         var.type("int")
         var["backend"] = "int"
-        var.declare(var)
+        var.declare()
 
         argc = col.Var(params, "argc")
         argc.type("int")
@@ -758,3 +758,52 @@ class MatlabListener(ParseTreeListener):
 
     def exitBreak(self, ctx):
         pass
+
+    def enterLambda(self, ctx):
+        pnode = ctx.parentCtx.node
+        program = pnode.program
+        name = "_%s_%03d" % (pnode.func["name"], len(program))
+
+        ctx.node = func = col.Func(program, name)
+        program["names"].append(name)
+
+        declares = col.Declares(func)
+        declares["names"] = []
+
+        returns = col.Returns(func)
+        returns["names"] = ["_retval"]
+
+    def exitLambda(self, ctx):
+        func = ctx.node
+        declares, returns, params, block = func
+
+        func["backend"] = "func_lambda"
+        declares["backend"] = "func_lambda"
+        returns["backend"] = "func_lambda"
+        params["backend"] = "func_lambda"
+
+        var = col.Var(returns, "_retval")
+        var.declare()
+
+        pnode = ctx.parentCtx.node
+        lamb = col.Lambda(pnode, name)
+        lamb["backend"] = "func_lambda"
+
+    def enterLambda_params(self, ctx):
+        pnode = ctx.parentCtx.node
+        params = col.Params(pnode)
+        params["names"] = []
+        for n in xrange((ctx.getChildCount()+1)/2):
+            name = ctx.ID(n).getText()
+            col.Var(params, name)
+            params["names"].append(name)
+
+        ctx.node = col.Block(pnode)
+
+        assign = col.Assign(block)
+        col.Var(assign, "_retval")
+
+
+    def exitLambda_params(self, ctx):
+        pass
+

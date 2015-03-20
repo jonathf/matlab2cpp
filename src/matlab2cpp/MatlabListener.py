@@ -10,20 +10,14 @@ class MatlabListener(ParseTreeListener):
 
     def enterProgram(self, ctx):
         ctx.program = col.Program()
-        ctx.program["backend"] = "program"
-        ctx.program["names"] = []
 
         includes = col.Includes(ctx.program)
-        includes["backend"] = "program"
-        includes["names"] = []
 
         i1 = col.Include(includes, "armadillo")
         i1["value"] = "#include <armadillo>"
-        i1["backend"] = "program"
 
         i2 = col.Include(includes, "usingarma")
         i2["value"] = "using namespace arma;"
-        i2["backend"] = "program"
 
         func = col.Func(ctx.program, "main")
         declares = col.Declares(func)
@@ -35,18 +29,15 @@ class MatlabListener(ParseTreeListener):
         returns["backend"] = "func_return"
         params["backend"] = "func_return"
 
-        declares["names"] = []
         returns["names"] = ["_retval"]
         params["names"] = ["argc", "argv"]
 
         var = col.Var(returns, "_retval")
         var.type("int")
-        var["backend"] = "int"
-        var.declare(var)
+        var.declare()
 
         argc = col.Var(params, "argc")
         argc.type("int")
-        argc["backend"] = "int"
 
         argv = col.Var(params, "argv")
         argv.type("char")
@@ -56,37 +47,37 @@ class MatlabListener(ParseTreeListener):
         ctx.node = func
 
     def exitProgram(self, ctx):
-        ctx.program["names"].append("main")
-        cs = ctx.program.children
-        ctx.program.children = cs[:1] + cs[2:] + cs[1:2]
+        cs = ctx.program.children[1:]
+
+        cs = cs[1:] + cs[:1]
+        for i in xrange(len(cs)-1):
+            if cs[i]["name"][0] == "_":
+                cs = cs[i:i+1] + cs[:i] + cs[i+1:]
+
+        ctx.program.children = [ctx.program[0]] + cs
+        ctx.program["names"] = [n["name"] for n in cs]
 
         if len(ctx.node) != 4:
             block = col.Block(ctx.node)
-            block["backend"] = "code_block"
 
         block = ctx.node[3]
         assign = col.Assign(block)
         var = col.Var(assign, "_retval")
         var.type("int")
         i = col.Int(assign, "0")
-        i.type("int")
-        i["backend"] = "int"
 
     def enterFunction(self, ctx):
         program = ctx.parentCtx.node.program
         name = ctx.ID().getText()
-        program["names"].append(name)
+
         ctx.node = col.Func(program, name)
-        declares = col.Declares(ctx.node)
-        declares["names"] = []
+        col.Declares(ctx.node)
 
         if ctx.function_returns() is None:
-            returns = col.Returns(ctx.node)
-            returns["names"] = []
+            col.Returns(ctx.node)
 
             if ctx.function_params() is None:
-                params = col.Params(ctx.node)
-                params["names"] = []
+                col.Params(ctx.node)
 
     def exitFunction(self, ctx):
 
@@ -106,20 +97,20 @@ class MatlabListener(ParseTreeListener):
         for var in node[1][:]:
             var.declare()
 
+        ctx.node[1]["names"] = [n["name"] for n in ctx.node[1]]
+        ctx.node[2]["names"] = [n["name"] for n in ctx.node[2]]
+
     def enterFunction_returns(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Returns(pnode)
-        ctx.node["names"] = []
 
         count = ctx.getChildCount()
         for n in xrange((count-2)/2 or 1):
             name = ctx.ID(n).getText()
             col.Var(ctx.node, name)
-            ctx.node["names"].append(name)
 
         if ctx.parentCtx.function_params() is None:
-            params = col.Params(pnode)
-            params["names"] = []
+            col.Params(pnode)
 
     def exitFunction_returns(self, ctx):
         pass
@@ -127,13 +118,55 @@ class MatlabListener(ParseTreeListener):
     def enterFunction_params(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Params(pnode)
-        ctx.node["names"] = []
         for n in xrange((ctx.getChildCount()+1)/2):
             name = ctx.ID(n).getText()
             col.Var(ctx.node, name)
-            ctx.node["names"].append(name)
 
     def exitFunction_params(self, ctx):
+        pass
+
+    def enterLambda(self, ctx):
+        pnode = ctx.parentCtx.node
+        program = pnode.program
+        name = "_%s_%03d" % (pnode.func["name"], len(program))
+
+        ctx.node = func = col.Func(program, name)
+        col.Declares(func)
+        col.Returns(func)
+
+    def exitLambda(self, ctx):
+        func = ctx.node.func
+        declares, returns, params, block = func
+
+        func["backend"] = "func_lambda"
+        declares["backend"] = "func_lambda"
+
+        returns["backend"] = "func_lambda"
+        returns["names"] = [n["name"] for n in returns]
+
+        params["backend"] = "func_lambda"
+        params["names"] = [n["name"] for n in params]
+
+        var = col.Var(returns, "_retval")
+        var.declare()
+
+        pnode = ctx.parentCtx.node
+        col.Lambda(pnode, func["name"])
+
+    def enterLambda_params(self, ctx):
+        func = ctx.parentCtx.node
+        params = col.Params(func)
+        for n in xrange((ctx.getChildCount()+1)/2):
+            name = ctx.ID(n).getText()
+            col.Var(params, name)
+
+        block = col.Block(func)
+
+        assign = col.Assign(block)
+        ctx.parentCtx.node = assign
+        col.Var(assign, "_retval")
+
+    def exitLambda_params(self, ctx):
         pass
 
     def enterCodeline(self, ctx):
@@ -145,7 +178,6 @@ class MatlabListener(ParseTreeListener):
     def enterCodeblock(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Block(pnode)
-        ctx.node["backend"] = "code_block"
 
     def exitCodeblock(self, ctx):
         pass
@@ -153,7 +185,6 @@ class MatlabListener(ParseTreeListener):
     def enterBranch(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Branch(pnode)
-        ctx.node["backend"] = "code_block"
 
     def exitBranch(self, ctx):
         pass
@@ -161,7 +192,6 @@ class MatlabListener(ParseTreeListener):
     def enterBranch_if(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.If(pnode)
-        ctx.node["backend"] = "code_block"
 
     def exitBranch_if(self, ctx):
         pass
@@ -169,7 +199,6 @@ class MatlabListener(ParseTreeListener):
     def enterBranch_elif(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Elif(pnode)
-        ctx.node["backend"] = "code_block"
 
     def exitBranch_elif(self, ctx):
         pass
@@ -177,7 +206,6 @@ class MatlabListener(ParseTreeListener):
     def enterBranch_else(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Else(pnode)
-        ctx.node["backend"] = "code_block"
 
     def exitBranch_else(self, ctx):
         pass
@@ -185,7 +213,6 @@ class MatlabListener(ParseTreeListener):
     def enterCondition(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Cond(pnode)
-        ctx.node["backend"] = "code_block"
 
     def exitCondition(self, ctx):
         pass
@@ -193,7 +220,6 @@ class MatlabListener(ParseTreeListener):
     def enterSwitch_(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Switch(pnode)
-        ctx.node["backend"] = "code_block"
 
     def exitSwitch_(self, ctx):
         pass
@@ -201,7 +227,6 @@ class MatlabListener(ParseTreeListener):
     def enterSwitch_case(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Case(pnode)
-        ctx.node["backend"] = "code_block"
 
     def exitSwitch_case(self, ctx):
         pass
@@ -209,7 +234,6 @@ class MatlabListener(ParseTreeListener):
     def enterSwitch_otherwise(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Otherwise(pnode)
-        ctx.node["backend"] = "code_block"
 
     def exitSwitch_otherwise(self, ctx):
         pass
@@ -218,7 +242,6 @@ class MatlabListener(ParseTreeListener):
         pnode = ctx.parentCtx.node
         ctx.node = col.For(pnode)
         col.Var(ctx.node, ctx.ID().getText()).declare()
-        ctx.node["backend"] = "code_block"
 
     def exitLoop(self, ctx):
         pass
@@ -227,12 +250,10 @@ class MatlabListener(ParseTreeListener):
 #          pnode = ctx.parentCtx.node
 #          col.Var(pnode, ctx.ID().getText()).declare()
 #          ctx.node = pnode
-#          ctx.node["backend"] = "code_block"
 
     def enterWloop(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.While(pnode)
-        ctx.node["backend"] = "code_block"
 
     def exitWloop(self, ctx):
         pass
@@ -241,7 +262,6 @@ class MatlabListener(ParseTreeListener):
         pnode = ctx.parentCtx.node
         node = col.Tryblock(pnode)
         ctx.node = col.Try(node)
-        ctx.node["backend"] = "code_block"
 
     def exitTry_(self, ctx):
         pass
@@ -249,7 +269,6 @@ class MatlabListener(ParseTreeListener):
     def enterCatchid(self, ctx):
         ppnode = ctx.parentCtx.parentCtx.node
         ctx.node = col.Catch(ppnode, ctx.ID().getText())
-        ctx.node["backend"] = "code_block"
 
     def exitCatchid(self, ctx):
         pass
@@ -257,7 +276,6 @@ class MatlabListener(ParseTreeListener):
     def enterCatch_(self, ctx):
         ppnode = ctx.parentCtx.parentCtx.node
         ctx.node = col.Catch(ppnode)
-        ctx.node["backend"] = "code_block"
 
     def exitCatch_(self, ctx):
         pass
@@ -265,7 +283,6 @@ class MatlabListener(ParseTreeListener):
     def enterStatement(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Statement(pnode)
-        ctx.node["backend"] = "code_block"
 
     def exitStatement(self, ctx):
         pass
@@ -274,7 +291,6 @@ class MatlabListener(ParseTreeListener):
         pnode = ctx.parentCtx.node
         ctx.node = col.Assign(pnode)
         col.Var(ctx.node, ctx.ID().getText()).declare()
-        ctx.node["backend"] = "unknown"
 
     def exitAssign(self, ctx):
         pass
@@ -282,10 +298,8 @@ class MatlabListener(ParseTreeListener):
     def enterAssigns(self, ctx):
         pnode = ctx.parentCtx.node
         assigns = col.Assigns(pnode)
-        assigns["backend"] = "code_block"
 
         assigned = col.Assigned(assigns)
-        assigned["backend"] = "code_block"
         for i in xrange((ctx.getChildCount()-2)/2):
             col.Var(assigned, ctx.ID(i).getText()).declare()
 
@@ -300,7 +314,6 @@ class MatlabListener(ParseTreeListener):
         pnode = ctx.parentCtx.node
         ctx.node = col.Set(pnode, ctx.ID().getText())
         ctx.node.declare()
-        ctx.node["backend"] = "unknown"
 
     def exitSet1(self, ctx):
         pass
@@ -309,7 +322,6 @@ class MatlabListener(ParseTreeListener):
         pnode = ctx.parentCtx.node
         ctx.node = col.Set2(pnode, ctx.ID().getText())
         ctx.node.declare()
-        ctx.node["backend"] = "unknown"
 
     def exitSet2(self, ctx):
         pass
@@ -318,7 +330,6 @@ class MatlabListener(ParseTreeListener):
         pnode = ctx.parentCtx.node
         ctx.node = col.Set3(pnode, ctx.ID().getText())
         ctx.node.declare()
-        ctx.node["backend"] = "unknown"
 
     def exitSet3(self, ctx):
         pass
@@ -326,7 +337,6 @@ class MatlabListener(ParseTreeListener):
     def enterSets(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Sets(pnode)
-        ctx.node["backend"] = "code_block"
 
     def exitSets(self, ctx):
         pass
@@ -337,22 +347,11 @@ class MatlabListener(ParseTreeListener):
     def exitExpr(self, ctx):
         pass
 
-    def enterInfix(self, ctx):
-
-        print dir(ctx)
-        opr = ctx.OPR().getText()
-        parent = ctx.parentCtx
-        if hasattr(parent, "opr") and opr == parent.opr:
-            ctx.node = parent.node
-        else:
-            pnode = parent.node
-
     def enterLor(self, ctx):
         if ctx.parentCtx.node["class"] == "Lor":
             ctx.node = ctx.parentCtx.node
         else:
             ctx.node = col.Lor(ctx.parentCtx.node)
-            ctx.node["backend"] = "expression"
 
     def exitLor(self, ctx):
         pass
@@ -363,7 +362,6 @@ class MatlabListener(ParseTreeListener):
             ctx.node = ctx.parentCtx.node
         else:
             ctx.node = col.Land(ctx.parentCtx.node)
-            ctx.node["backend"] = "expression"
 
     def exitLand(self, ctx):
         pass
@@ -374,7 +372,6 @@ class MatlabListener(ParseTreeListener):
             ctx.node = ctx.parentCtx.node
         else:
             ctx.node = col.Bor(ctx.parentCtx.node)
-            ctx.node["backend"] = "expression"
 
     def exitBor(self, ctx):
         pass
@@ -385,7 +382,6 @@ class MatlabListener(ParseTreeListener):
             ctx.node = ctx.parentCtx.node
         else:
             ctx.node = col.Band(ctx.parentCtx.node)
-            ctx.node["backend"] = "expression"
 
     def exitBand(self, ctx):
         pass
@@ -396,7 +392,6 @@ class MatlabListener(ParseTreeListener):
             ctx.node = ctx.parentCtx.node
         else:
             ctx.node = col.Eq(ctx.parentCtx.node)
-            ctx.node["backend"] = "expression"
 
     def exitEq(self, ctx):
         pass
@@ -407,7 +402,6 @@ class MatlabListener(ParseTreeListener):
             ctx.node = ctx.parentCtx.node
         else:
             ctx.node = col.Le(ctx.parentCtx.node)
-            ctx.node["backend"] = "expression"
 
     def exitLe(self, ctx):
         pass
@@ -418,7 +412,6 @@ class MatlabListener(ParseTreeListener):
             ctx.node = ctx.parentCtx.node
         else:
             ctx.node = col.Ge(ctx.parentCtx.node)
-            ctx.node["backend"] = "expression"
 
     def exitGe(self, ctx):
         pass
@@ -429,7 +422,6 @@ class MatlabListener(ParseTreeListener):
             ctx.node = ctx.parentCtx.node
         else:
             ctx.node = col.Lt(ctx.parentCtx.node)
-            ctx.node["backend"] = "expression"
 
     def exitLt(self, ctx):
         pass
@@ -440,7 +432,6 @@ class MatlabListener(ParseTreeListener):
             ctx.node = ctx.parentCtx.node
         else:
             ctx.node = col.Gt(ctx.parentCtx.node)
-            ctx.node["backend"] = "expression"
 
     def exitGt(self, ctx):
         pass
@@ -451,7 +442,6 @@ class MatlabListener(ParseTreeListener):
             ctx.node = ctx.parentCtx.node
         else:
             ctx.node = col.Ne(ctx.parentCtx.node)
-            ctx.node["backend"] = "expression"
 
     def exitNe(self, ctx):
         pass
@@ -462,7 +452,6 @@ class MatlabListener(ParseTreeListener):
             ctx.node = ctx.parentCtx.node
         else:
             ctx.node = col.Colon(ctx.parentCtx.node)
-            ctx.node["backend"] = "expression"
 
     def exitColon(self, ctx):
         pass
@@ -473,7 +462,6 @@ class MatlabListener(ParseTreeListener):
             ctx.node = ctx.parentCtx.node
         else:
             ctx.node = col.Div(ctx.parentCtx.node)
-            ctx.node["backend"] = "expression"
 
     def exitDiv(self, ctx):
         pass
@@ -484,7 +472,6 @@ class MatlabListener(ParseTreeListener):
             ctx.node = ctx.parentCtx.node
         else:
             ctx.node = col.Eldiv(ctx.parentCtx.node)
-            ctx.node["backend"] = "expression"
 
     def exitEldiv(self, ctx):
         pass
@@ -495,7 +482,6 @@ class MatlabListener(ParseTreeListener):
             ctx.node = ctx.parentCtx.node
         else:
             ctx.node = col.Rdiv(ctx.parentCtx.node)
-            ctx.node["backend"] = "expression"
 
     def exitRdiv(self, ctx):
         pass
@@ -506,7 +492,6 @@ class MatlabListener(ParseTreeListener):
             ctx.node = ctx.parentCtx.node
         else:
             ctx.node = col.Elrdiv(ctx.parentCtx.node)
-            ctx.node["backend"] = "expression"
 
     def exitElrdiv(self, ctx):
         pass
@@ -517,7 +502,6 @@ class MatlabListener(ParseTreeListener):
             ctx.node = ctx.parentCtx.node
         else:
             ctx.node = col.Mul(ctx.parentCtx.node)
-            ctx.node["backend"] = "expression"
 
     def exitMul(self, ctx):
         pass
@@ -528,7 +512,6 @@ class MatlabListener(ParseTreeListener):
             ctx.node = ctx.parentCtx.node
         else:
             ctx.node = col.Elmul(ctx.parentCtx.node)
-            ctx.node["backend"] = "expression"
 
     def exitElmul(self, ctx):
         pass
@@ -539,7 +522,6 @@ class MatlabListener(ParseTreeListener):
             ctx.node = ctx.parentCtx.node
         else:
             ctx.node = col.Exp(ctx.parentCtx.node)
-            ctx.node["backend"] = "expression"
 
     def exitExp(self, ctx):
         pass
@@ -550,7 +532,6 @@ class MatlabListener(ParseTreeListener):
             ctx.node = ctx.parentCtx.node
         else:
             ctx.node = col.Elexp(ctx.parentCtx.node)
-            ctx.node["backend"] = "expression"
 
     def exitElexp(self, ctx):
         pass
@@ -561,7 +542,6 @@ class MatlabListener(ParseTreeListener):
             ctx.node = ctx.parentCtx.node
         else:
             ctx.node = col.Plus(ctx.parentCtx.node)
-            ctx.node["backend"] = "expression"
 
     def exitPlus(self, ctx):
         pass
@@ -569,7 +549,6 @@ class MatlabListener(ParseTreeListener):
 
     def enterMinus(self, ctx):
         ctx.node = col.Neg(ctx.parentCtx.node)
-        ctx.node["backend"] = "expression"
 
     def exitMinus(self, ctx):
         pass
@@ -577,7 +556,6 @@ class MatlabListener(ParseTreeListener):
 
     def enterNegate(self, ctx):
         ctx.node = col.Not(ctx.parentCtx.node)
-        ctx.node["backend"] = "expression"
 
     def exitNegate(self, ctx):
         pass
@@ -586,7 +564,6 @@ class MatlabListener(ParseTreeListener):
     def enterIfloat(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Ifloat(pnode, ctx.getText())
-        ctx.node["backend"] = "ifloat"
 
     def exitIfloat(self, ctx):
         pass
@@ -594,8 +571,6 @@ class MatlabListener(ParseTreeListener):
     def enterFloat(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Float(pnode, ctx.getText())
-        ctx.node.type("float")
-        ctx.node["backend"] = "float"
 
     def exitFloat(self, ctx):
         pass
@@ -603,7 +578,6 @@ class MatlabListener(ParseTreeListener):
     def enterEnd(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.End(pnode)
-        ctx.node["backend"] = "expression"
 
     def exitEnd(self, ctx):
         pass
@@ -612,7 +586,6 @@ class MatlabListener(ParseTreeListener):
         pnode = ctx.parentCtx.node
         name = ctx.ID().getText()
         ctx.node = col.Get(pnode, name)
-        ctx.node["backend"] = "unknown"
 
     def exitGet1(self, ctx):
         pass
@@ -621,7 +594,6 @@ class MatlabListener(ParseTreeListener):
         pnode = ctx.parentCtx.node
         name = ctx.ID().getText()
         ctx.node = col.Get2(pnode, name)
-        ctx.node["backend"] = "unknown"
 
     def exitGet2(self, ctx):
         pass
@@ -630,7 +602,6 @@ class MatlabListener(ParseTreeListener):
         pnode = ctx.parentCtx.node
         name = ctx.ID().getText()
         ctx.node = col.Get3(pnode, name)
-        ctx.node["backend"] = "unknown"
 
     def exitGet3(self, ctx):
         pass
@@ -647,7 +618,6 @@ class MatlabListener(ParseTreeListener):
                 ctx.node = col.Neg(pnode)
         else:
             ctx.node = col.Not(pnode)
-        ctx.node["backend"] = "expression"
 
     def exitPrefix(self, ctx):
         pass
@@ -655,7 +625,6 @@ class MatlabListener(ParseTreeListener):
     def enterParen(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Paren(pnode)
-        ctx.node["backend"] = "expression"
 
     def exitParen(self, ctx):
         pass
@@ -663,7 +632,6 @@ class MatlabListener(ParseTreeListener):
     def enterIint(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Iint(pnode, ctx.IINT().getText())
-        ctx.node["backend"] = "iint"
 
     def exitIint(self, ctx):
         pass
@@ -671,7 +639,6 @@ class MatlabListener(ParseTreeListener):
     def enterString(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.String(pnode, ctx.STRING().getText())
-        ctx.node["backend"] = "string"
 
     def exitString(self, ctx):
         pass
@@ -680,7 +647,6 @@ class MatlabListener(ParseTreeListener):
         pnode = ctx.parentCtx.node
         ctx.node = col.Var(pnode, ctx.ID().getText())
         ctx.node.declare()
-        ctx.node["backend"] = "unknown"
 
     def exitVar(self, ctx):
         pass
@@ -688,8 +654,6 @@ class MatlabListener(ParseTreeListener):
     def enterInt(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Int(pnode, ctx.INT().getText())
-        ctx.node.type("int")
-        ctx.node["backend"] = "int"
 
     def exitInt(self, ctx):
         pass
@@ -697,7 +661,6 @@ class MatlabListener(ParseTreeListener):
     def enterCtranspose(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Ctranspose(pnode)
-        ctx.node["backend"] = "expression"
 
     def exitCtranspose(self, ctx):
         pass
@@ -705,7 +668,6 @@ class MatlabListener(ParseTreeListener):
     def enterTranspose(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Transpose(pnode)
-        ctx.node["backend"] = "expression"
 
     def exitTranspose(self, ctx):
         pass
@@ -731,7 +693,6 @@ class MatlabListener(ParseTreeListener):
     def enterListall(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.All(pnode)
-        ctx.node["backend"] = "expression"
 
     def exitListall(self, ctx):
         pass
@@ -739,7 +700,6 @@ class MatlabListener(ParseTreeListener):
     def enterMatrix(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Matrix(pnode)
-        ctx.node["backend"] = "matrix"
 
     def exitMatrix(self, ctx):
         pass
@@ -747,14 +707,12 @@ class MatlabListener(ParseTreeListener):
     def enterVector(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Vector(pnode)
-        ctx.node["backend"] = "matrix"
 
     def exitVector(self, ctx):
         pass
 
     def enterBreak(self, ctx):
         ctx.node = col.Break(ctx.parentCtx.node)
-        ctx.node["backend"] = "expression"
 
     def exitBreak(self, ctx):
         pass

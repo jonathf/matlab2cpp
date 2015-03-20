@@ -33,6 +33,7 @@ function : 'function{' function_returns? ID
         '(' function_params? ')' (','| NL ) codeblock? ';'? NL '}' ;
 function_returns : ( '[' ID (',' ID)* ']' | ID ) '=' ;
 function_params : ID (',' ID)* ;
+lambda_params : ID (',' ID)* ;
 
 // Looping
 loop : 'for{' ('(' ID '=' expr ')' | ID '=' expr)
@@ -103,6 +104,7 @@ expr_
     | STRING                        # String
     | '$'                           # End
     | 'break'                       # Break
+    | '@(' lambda_params ')' expr_  # Lambda
     | ID '(' llist? ')'             # Get1
     | ID '?' llist '?'              # Get2
     | ID '\\{' llist '\\}'          # Get3
@@ -121,7 +123,7 @@ vector : expr? | expr (',' expr)+ ;
 
 // LEXER RULES
 
-ID : '@'? [a-zA-Z_][a-zA-Z0-9_.]* ;
+ID : [a-zA-Z_][a-zA-Z0-9_]* ;
 
 INT    : ('0'..'9')+ ;
 FLOAT

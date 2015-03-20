@@ -161,11 +161,6 @@ def prefix_hack(text):
                                 line[j-1:j] in let+dig+"_)]'\"":
                             line = line[:j]+","+line[j+1:]
 
-                    elif linej == "@":
-                        name = re.findall(r"@[\w\d_.]+", line[j:])[0]
-                        errors.add(
-            "'%s'\t\tfunction handle" % name)
-
                 elif linej == C[-1]:
                     if C[0] == 1:
                         codemode = True
@@ -203,22 +198,9 @@ def prefix_hack(text):
             line = re.sub(r"([a-zA-Z0-9_)\]]) ?-", r"\1+-", line)
             if "%" in line:
                 line = line.split("%")[0]
-            if "@" in line:
-                name = re.findall(r"@[\w\d_.]*", line)[0]
-                errors.add(
-        "'%s'\t\tfunction handle" % name)
 
         elif "%" in line:
             line = line.split("%")[0]
-            if "@" in line:
-                name = re.findall(r"@[\w\d_.]+", line)[0]
-                errors.add(
-        "'%s'\t\tfunction handle" % name)
-            line = line.split("%")[0]
-        elif "@" in line:
-            name = re.findall(r"@[\w\d_.]*", line)[0]
-            errors.add(
-        "'%s'\t\tfunction handle" % name)
 
         if "." in line:
             if ".(" in line or ". (" in line:
@@ -286,7 +268,7 @@ def fix_quote(line):
                 line = line[:j] + '"' + line[j+1:]
                 codemode = False
             elif line[j_] == "@":
-                errors.add("Function handle '@a'")
+                continue
             elif line[j_] not in let+dig+"._)]":
                 raise SyntaxError("undecifierable\n" +
                                   repr(line[:j_] + "@" + line[j_] +

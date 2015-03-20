@@ -28,7 +28,7 @@ name : str
     def summary(self, disp=False, group=None):
         "Node summary"
 
-        nodes = utils.flatten(self, ordered=True)
+        nodes = utils.flatten(self, False, True, False)
         if disp:
             print "iterating %d nodes" % len(nodes)
 
@@ -64,7 +64,7 @@ name : str
     def generate(self, disp, group=None):
         """Generate code"""
 
-        nodes = utils.flatten(self)
+        nodes = utils.flatten(self, False, True, False)
         if disp:
             print "iterating %d nodes" % len(nodes)
 
@@ -107,7 +107,7 @@ name : str
                 value = str(value)
 
             elif value is None:
-                raise ValueError("missing return in %s.%s" % backend, cls)
+                raise ValueError("missing return in %s.%s" % (backend, cls))
 
             node["ret"] = repr(value)
 
@@ -399,15 +399,13 @@ name : str
         return len(self.children)
 
     def __str__(self):
-        if not self.prop.has_key("str"):
-            return self.summary()
         return self.prop["str"]
 
     def __add__(self, val):
-        return str(self)+val
+        return str(self)+str(val)
 
     def __radd__(self, val):
-        return val+str(val)
+        return str(val)+str(val)
 
     def __iter__(self):
         return self.children.__iter__()

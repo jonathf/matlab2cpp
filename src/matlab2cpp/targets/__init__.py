@@ -11,6 +11,7 @@ code_block.py   Loops, branches, statements, etc.
 expression.py   Operators used in expression
 func_return.py  Functions with single return
 func_returns.py Functions with multiple returns
+func_lambda.py  Lambda functions
 matrix.py       Matrix/Vector declaration
 program.py      Program as a whole. Includes and using namespace
 
@@ -22,6 +23,7 @@ fmat.py         Matrix of floats
 frowvec.py      Row vector of floats
 func_return.py  Functions with single return
 func_returns.py Functions with multiple returns
+func_lambda.py  Lambda functions
 fvec.py         Column vector of floats
 ifloat.py       Floats
 iint.py         Imaginary integers

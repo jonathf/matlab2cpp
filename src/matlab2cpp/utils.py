@@ -1,8 +1,27 @@
 
 
-def flatten(node, ordered=False):
-    """
+def flatten(node, ordered=False, reverse=False, inverse=False):
+    r"""
 Return a list of all nodes
+
+Tree:
+  A
+  |\
+  B C
+ /| |\
+D E F G
+
+Sorted [o]rdered, [r]everse and [i]nverse:
+
+ori :
+    : A B D E C F G
+o   : A B C D E F G
+ r  : A C G F B E D
+  i : D E B F G C A
+or  : A C B G F E D
+o i : D E F G B C A
+ ri : E D B G F C A
+ori : G F E D C B A
 
 Parameters
 ----------
@@ -11,20 +30,66 @@ node : Node
 ordered : bool
     If True, make sure the nodes are hierarcically ordered.
     If False, nodes are sorted for easy print.
+reverse : bool
+    If True, children are itterated in reverse order.
     """
 
+    o = bool(ordered)
+    r = bool(reverse)
+    i = bool(inverse)
+
+    out = []
+
+    if o:
+
+        nodes = [node]
+        for node in nodes:
+            nodes.extend(node.children[::1-2*(r^i)])
+        out.extend(nodes[::1-2*i])
+
+    else:
+
+        if i:
+            def foo(node):
+                for child in node[::1-2*r]:
+                    foo(child)
+                out.append(node)
+
+        else:
+            def foo(node):
+                out.append(node)
+                for child in node[::1-2*r]:
+                    foo(child)
+
+        foo(node)
+
+    return out
+
+
+
+
     if ordered:
+
         def _f(nod):
             out = [nod]
-            for n in nod:
-                out.extend(_f(n))
+            for n in nod[::1-2*(reverse)]:
+                if inverse:
+                    out = out + _f(n)
+                else:
+                    out = _f(n) + out
             return out
         return _f(node)
 
     nodes = [node]
+    out = [node]
     for child in nodes:
-        nodes.extend(child.children)
-    return nodes
+        nodes = nodes + child.children[::1-2*reverse]
+        if inverse:
+            out = child.children[::1-2*reverse] + out
+        else:
+            out = out + child.children[::1-2*reverse]
+
+    return out
 
 
 def set_cfg(root, cfg):

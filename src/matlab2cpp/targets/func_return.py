@@ -13,6 +13,11 @@ Returns : Function return variables
 Params : Function parameter variables
     Contains: Var, ...
 
+Declares : Declarations in the beginning of function
+    Contains: Var, ...
+    Rule: func_return.py (if one variable return)
+          func_returns.py (if multiple return)
+
 Get : Function/Array retrieval
     Example: "y(4)"
     Contains: Gets
