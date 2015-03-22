@@ -135,7 +135,7 @@ FLOAT
 IINT : INT ('i'|'j') ;
 IFLOAT : FLOAT ('i'|'j') ;
 STRING : '"' ( ESC_SEQ | ~'"' )* '"' ;
-fragment EXPONENT : [eE][+-]?[0-9]+ ;
+fragment EXPONENT : [eEdD][+-]?[0-9]+ ;
 fragment HEX_DIGIT : [0-9a-fA-F] ;
 fragment ESC_SEQ
     : '\\' ('b'|'t'|'n'|'f'|'r'|'\"'|'\''|'\\')
