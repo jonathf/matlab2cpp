@@ -209,12 +209,12 @@ Statement : Stand-alone codeline without assignment etc.
 
 Set : Module/Array assignment
     Example: "y(2) = 4"
-    Contains: Sets (rhs), Expr (lhs)
+    Contains: Sets (lhs), Expr (rhs)
     Rule: <type specific>
 
 Set2 : Tuple assignment
     Example: "y.(2) = 4"
-    Contains: Sets (rhs), Expr (lhs)
+    Contains: Sets (lhs), Expr (rhs)
     Rule: <type specific>
 
 Set3 : Field assignment

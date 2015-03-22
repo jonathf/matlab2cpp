@@ -5,8 +5,9 @@ import snippets
 import utils
 
 indexnames = [
-    "Assign", "Assigns", "Branch", "For", "Func", "Set", "Set2", "Set3",
-    "Statement", "Switch", "Tryblock", "While", "Program", "Block"
+    "Assign", "Assigns", "Branch", "For", "Func", "Set", "Set2",
+    "Set3", "Sets", "Statement", "Switch", "Tryblock", "While",
+    "Program", "Block",
 ]
 
 class Node(object):

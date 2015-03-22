@@ -185,4 +185,5 @@ def Colon(node):
             return "span(", ", ", ")"
         return "span(", ", 1, ", ")"
 
+    node.type("ivec")
     return "&:", "&:", "&:"
