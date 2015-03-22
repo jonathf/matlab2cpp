@@ -220,7 +220,7 @@ def prefix_hack(text):
 
     # post process
     text = re.sub(r"\bend\b", r"$", text)
-    text = re.sub(r"(\d\.?e)\+(-\d)", r"\1\2", text)
+    text = re.sub(r"(\d\.?[eEdD])\+(-\d)", r"\1\2", text)
     text = re.sub(r"[,;]* ?\n+", r"\n", text)
 
     # temporary hacks

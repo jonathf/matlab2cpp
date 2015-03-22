@@ -558,14 +558,22 @@ class MatlabListener(ParseTreeListener):
 
     def enterIfloat(self, ctx):
         pnode = ctx.parentCtx.node
-        ctx.node = col.Ifloat(pnode, ctx.getText())
+        val = ctx.IFLOAT().getText()
+        if "d" in val: val = val.replace("d", "e")
+        if "D" in val: val = val.replace("D", "e")
+        if "E" in val: val = val.replace("E", "e")
+        ctx.node = col.Ifloat(pnode, val)
 
     def exitIfloat(self, ctx):
         pass
 
     def enterFloat(self, ctx):
         pnode = ctx.parentCtx.node
-        ctx.node = col.Float(pnode, ctx.getText())
+        val = ctx.FLOAT().getText()
+        if "d" in val: val = val.replace("d", "e")
+        if "D" in val: val = val.replace("D", "e")
+        if "E" in val: val = val.replace("E", "e")
+        ctx.node = col.Float(pnode, val)
 
     def exitFloat(self, ctx):
         pass
@@ -626,7 +634,11 @@ class MatlabListener(ParseTreeListener):
 
     def enterIint(self, ctx):
         pnode = ctx.parentCtx.node
-        ctx.node = col.Iint(pnode, ctx.IINT().getText())
+        val = ctx.IINT().getText()
+        if "d" in val: val = val.replace("d", "e")
+        if "D" in val: val = val.replace("D", "e")
+        if "E" in val: val = val.replace("E", "e")
+        ctx.node = col.Iint(pnode, val)
 
     def exitIint(self, ctx):
         pass
@@ -648,7 +660,11 @@ class MatlabListener(ParseTreeListener):
 
     def enterInt(self, ctx):
         pnode = ctx.parentCtx.node
-        ctx.node = col.Int(pnode, ctx.INT().getText())
+        val = ctx.INT().getText()
+        if "d" in val: val = val.replace("d", "e")
+        if "D" in val: val = val.replace("D", "e")
+        if "E" in val: val = val.replace("E", "e")
+        ctx.node = col.Int(pnode, val)
 
     def exitInt(self, ctx):
         pass

@@ -398,7 +398,7 @@ vector : Vector
         Node.__init__(self, parent)
         self["backend"] = "matrix"
 
-class Vector(Expr):
+class Vector(Node):
     """Vector
 
 Children
@@ -412,7 +412,7 @@ expr : Expr
         Node.__init__(self, parent)
         self["backend"] = "matrix"
 
-class Paren(Expr):
+class Paren(Node):
     """Parenthesis
 
 Children
@@ -442,7 +442,7 @@ class Get3(Var):
 
 class Gets(Node): pass
 
-class Neg(Expr):
+class Neg(Node):
     """Negative prefix
 
 Children
@@ -450,8 +450,11 @@ Children
 expr : Expr
     Grouped expression.
     """
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "expression"
 
-class Not(Expr):
+class Not(Node):
     """Negative prefix
 
 Children
@@ -459,12 +462,19 @@ Children
 expr : Expr
     Grouped expression.
     """
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "expression"
 
-class Ctranspose(Expr):
-    pass
+class Ctranspose(Node):
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "expression"
 
-class Transpose(Expr):
-    pass
+class Transpose(Node):
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "expression"
 
 class Int(Node):
     """Integer """
@@ -483,7 +493,7 @@ value : str
         self.type("int")
 
 
-class Float(Expr):
+class Float(Node):
     """Float """
     def __init__(self, parent, value):
         """
@@ -517,7 +527,7 @@ value : str
         self.type("iint")
 
 
-class Ifloat(Expr):
+class Ifloat(Node):
     """Imaginary float """
     def __init__(self, parent, value):
         """
@@ -533,7 +543,7 @@ value : str
         self["backend"] = "ifloat"
         self.type("ifloat")
 
-class String(Expr):
+class String(Node):
     """String"""
     def __init__(self, parent, value):
         """
@@ -549,14 +559,14 @@ value : str
         self["backend"] = "string"
 
 
-class All(Expr):
+class All(Node):
     "Indicator for the full range in function/module calls."
     def __init__(self, parent):
         Node.__init__(self, parent)
         self["backend"] = "expression"
 
 
-class End(Expr):
+class End(Node):
     "Indicator for last element in iterable"
     def __init__(self, parent):
         Node.__init__(self, parent)
