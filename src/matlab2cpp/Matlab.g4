@@ -4,6 +4,7 @@ program : NL? codeblock? NL? EOF ;
 codeblock : codeline ((';'? NL | ';') codeline)* ;
 codeline
     : function
+    | lambda_func
     | assignment
     | loop
     | wloop
@@ -33,6 +34,8 @@ function : 'function{' function_returns? ID
         '(' function_params? ')' (','| NL ) codeblock? ';'? NL '}' ;
 function_returns : ( '[' ID (',' ID)* ']' | ID ) '=' ;
 function_params : ID (',' ID)* ;
+
+lambda_func : ID '=@(' lambda_params ')' expr_ ;
 lambda_params : ID (',' ID)* ;
 
 // Looping
@@ -104,7 +107,6 @@ expr_
     | STRING                        # String
     | '$'                           # End
     | 'break'                       # Break
-    | '@(' lambda_params ')' expr_  # Lambda
     | ID '(' llist? ')'             # Get1
     | ID '?' llist '?'              # Get2
     | ID '\\{' llist '\\}'          # Get3

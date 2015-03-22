@@ -1,11 +1,47 @@
 
+
+#  num_all = { "int", "float", "double", "ivec", "fvec",
+#  "irowvec", "frowvec", "imat", "fmat"}
+#  
+#  num_scalar = {"int", "float", "double"}
+#  num_vec = {"ivec", "fvec"}
+#  num_rowvec = {"irowvec", "frowvec"}
+#  num_mat = {"imat", "fmat"}
+#  
+#  num_i = {"int", "ivec", "irowvec", "imat"}
+#  num_f = {"float", "fvec", "frowvec", "fmat"}
+#  
+#  string = {"string", "char"}
+#  
+#  unknown = {"TYPE"}
+#  
+#  imutables = {"std::function"}
+#  
+#  
+#  #  def datatype(val):
+#  #  
+#  #      if val not in num_all
+#  
+#  
+#  
+#  
+
+
+
+
+
+
+
+
+
+
 types = [
     "char",
     "int", "float",
     "irowvec", "frowvec",
     "ivec", "fvec",
     "imat", "fmat",
-    "TYPE"]
+    "TYPE", "func_lambda"]
 
 class datatype(object):
 
@@ -93,14 +129,10 @@ class datatype(object):
         if v == "fmat":
             return self
 
-        if v == "char":
-            return datatype("TYPE")
+        return datatype("TYPE")
 
     def __radd__(self, other):
         return self.__add__(other)
-
-        print v, w
-        raise ValueError, "datatype problems"
 
     def __eq__(self, other):
         if isinstance(other, datatype):

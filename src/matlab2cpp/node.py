@@ -159,11 +159,15 @@ name : str
     def declare(self, name=""):
         "Declare a variable in the begining of a function."
 
+        if hasattr(self, "reference"):
+            return
+
         func = self.func
         name = name or self["name"]
         declares = func[0]
         params = func[2]
         if name in params["names"]:
+            self.reference = params[params["names"].index(name)]
             return
 
         if name in declares["names"]:
@@ -171,12 +175,14 @@ name : str
             type = self.type()
             if type != "TYPE":
                 node.type(type)
+            self.reference = node
             return
 
         node = collection.Declare(declares, name)
         type = self.type()
         node.type(type)
         node["suggest"] = datatype(type)
+        self.reference = node
 
     def type(self, text=""):
         "Get/Set datatype"

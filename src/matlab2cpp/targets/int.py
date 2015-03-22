@@ -1,6 +1,6 @@
 
 Declare = "int %(name)s ;"
-Type = "int"
+#  Type = "int"
 Int = "%(value)s"
 Var = "%(name)s"
 

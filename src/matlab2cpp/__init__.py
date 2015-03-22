@@ -235,6 +235,8 @@ def main(path, suggestion=False, disp=False):
 # irowvec
 # fmat
 # imat
+#
+# func_lambda
 
 """ + utils.str_cfg(cfg, scfg)
 

@@ -119,7 +119,7 @@ class MatlabListener(ParseTreeListener):
     def exitFunction_params(self, ctx):
         pass
 
-    def enterLambda(self, ctx):
+    def enterLambda_func(self, ctx):
         pnode = ctx.parentCtx.node
         program = pnode.program
         name = "_%s_%03d" % (pnode.func["name"], len(program))
@@ -128,7 +128,7 @@ class MatlabListener(ParseTreeListener):
         col.Declares(func)
         col.Returns(func)
 
-    def exitLambda(self, ctx):
+    def exitLambda_func(self, ctx):
         func = ctx.node.func
         declares, returns, params, block = func
 
@@ -140,8 +140,13 @@ class MatlabListener(ParseTreeListener):
         var = col.Var(returns, "_retval")
         var.declare()
 
+        name = ctx.ID().getText()
         pnode = ctx.parentCtx.node
-        col.Lambda(pnode, func["name"])
+
+        lamb = col.Lambda(pnode, name)
+        lamb.type("func_lambda")
+        lamb.declare()
+        lamb.reference.reference = func
 
     def enterLambda_params(self, ctx):
         func = ctx.parentCtx.node
@@ -207,11 +212,11 @@ class MatlabListener(ParseTreeListener):
     def exitCondition(self, ctx):
         pass
 
-    def enterSwitch_(self, ctx):
+    def enterSwitch(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Switch(pnode)
 
-    def exitSwitch_(self, ctx):
+    def exitSwitch(self, ctx):
         pass
 
     def enterSwitch_case(self, ctx):
@@ -248,12 +253,12 @@ class MatlabListener(ParseTreeListener):
     def exitWloop(self, ctx):
         pass
 
-    def enterTry_(self, ctx):
+    def enterTry(self, ctx):
         pnode = ctx.parentCtx.node
         node = col.Tryblock(pnode)
         ctx.node = col.Try(node)
 
-    def exitTry_(self, ctx):
+    def exitTry(self, ctx):
         pass
 
     def enterCatchid(self, ctx):
