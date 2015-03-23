@@ -50,7 +50,7 @@ def Get(node):
 def Params(node):
     out = ""
     for child in node[:]:
-        out += ", " + child.type() + "*"*child["pointers"] + " " + str(child)
+        out += ", " + child.type() + child.pointer() + " " + str(child)
     return out[2:]
 
 

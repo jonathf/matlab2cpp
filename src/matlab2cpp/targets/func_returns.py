@@ -22,11 +22,8 @@ Get : Function/Array retrieval
 def Returns(node):
     out = ""
     for child in node[:]:
-        if child["pointers"] == 0:
-            poi = "&"
-        else:
-            poi = "*"*(child["pointers"]-1)
-        out += ", " + child.type() + poi + " " + str(child)
+        child.prop["pointer"] -= 1
+        out += ", " + child.type() + child.pointer() + " " + str(child)
     return out[2:]
 
 
@@ -40,7 +37,7 @@ def Get(node):
 def Params(node):
     out = ""
     for child in node[:]:
-        out += ", " + child.type() + "*"*child["pointers"] + " " + str(child)
+        out += ", " + child.type() + child.pointer() + " " + str(child)
     return out[2:]
 
 

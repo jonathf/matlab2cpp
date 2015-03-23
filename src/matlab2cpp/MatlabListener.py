@@ -39,7 +39,7 @@ class MatlabListener(ParseTreeListener):
         argv = col.Var(params, "argv")
         argv.type("char")
         argv["backend"] = "char"
-        argv["pointer"] = 2
+        argv.pointer(2)
 
         ctx.node = func
 

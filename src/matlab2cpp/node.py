@@ -354,10 +354,6 @@ name : str
         self.parent = s
         s.children[1] = self
 
-        # Generate code for new variables
-#          s._generate()
-#          v1._generate()
-
         return v1
 
 
@@ -379,6 +375,19 @@ name : str
         include["backend"] = "program"
         return idname
 
+
+    def pointer(self, num=None):
+        if num is None:
+            num = self.prop["pointer"]
+        else:
+            num = int(num)
+            self.prop["pointer"] = num
+
+        if num>0:
+            return num*"*"
+        elif num<0:
+            return (-num)*"&"
+        return ""
 
     def error(self, text):
         self.program.errors.add(text)
@@ -468,7 +477,7 @@ def init(node, parent, name=""):
     node["backend"] = "unknown"
     node["str"] = ""
     node["value"] = ""
-    node["pointers"] = 0
+    node["pointer"] = 0
     node["type"] = datatype("TYPE")
     node["names"] = []
 
