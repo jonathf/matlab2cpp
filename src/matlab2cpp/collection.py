@@ -420,6 +420,9 @@ Children
 expr : Expr
     Grouped expression.
     """
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "expression"
 
 class Get(Var):
     """Function/Module call
@@ -573,6 +576,11 @@ class End(Node):
         self["backend"] = "expression"
 
 class Break(Node):
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "expression"
+
+class Return(Node):
     def __init__(self, parent):
         Node.__init__(self, parent)
         self["backend"] = "expression"

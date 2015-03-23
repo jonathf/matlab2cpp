@@ -2,21 +2,26 @@ grammar Matlab;
 
 program : NL? codeblock? NL? EOF ;
 codeblock : codeline ((';'? NL | ';') codeline)* ;
+
 codeline
-    : function
-    | lambda_func
-    | assignment
-    | loop
-    | wloop
-    | branch
-    | switch_
-    | try_
-    | statement
+    : 'function{' function_returns? ID
+        '(' function_params? ')'
+        (','| NL ) codeblock? ';'? NL '}'       # Function
+    | ID '=@(' lambda_params ')' expr           # Lambda_func
+    | assignment_                               # Assignment
+    | 'for{' ('(' ID '=' expr ')' | ID '=' expr)
+        (',' | ','? NL ) codeblock NL '}'       # Loop
+    | 'while{' ( '(' condition ')' | condition)
+        (','| NL) (codeblock)? ';'? NL '}'      # Wloop
+    | branch_if branch_elif* branch_else? NL '}'# Branch
+    | 'switch{' expr switch_case*
+        switch_otherwise? NL '}'                # Switch_
+    | 'try{' NL codeblock
+        (catchid+ | catchid* catch_) NL '}'     # Try
+    | expr                                      # Statement
     ;
 
 // Branching
-branch
-    : branch_if branch_elif* branch_else? NL '}';
 branch_if : 'if{' condition
     (','? codeline
     | ','? NL codeblock)? ;
@@ -25,35 +30,21 @@ branch_elif : NL 'elseif' condition
 branch_else : NL 'else' (','? codeline | ','? NL codeblock)? ;
 condition : expr ;
 
-switch_ : 'switch{' expr switch_case* switch_otherwise? NL '}';
 switch_case : NL 'case' expr (NL codeblock)? ;
 switch_otherwise : NL 'otherwise' (NL codeblock)? ;
 
 // Functions
-function : 'function{' function_returns? ID
-        '(' function_params? ')' (','| NL ) codeblock? ';'? NL '}' ;
 function_returns : ( '[' ID (',' ID)* ']' | ID ) '=' ;
 function_params : ID (',' ID)* ;
 
-lambda_func : ID '=@(' lambda_params ')' expr_ ;
 lambda_params : ID (',' ID)* ;
 
-// Looping
-loop : 'for{' ('(' ID '=' expr ')' | ID '=' expr)
-        (',' | ','? NL ) codeblock NL '}' ;
 
-wloop : 'while{' ( '(' condition ')' | condition) (','| NL)
-    (codeblock)? ';'? NL '}' ;
-
-try_ : 'try{' NL codeblock (catchid+ | catchid* catch_) NL '}' ;
 catchid : NL 'catch' ID NL codeblock ;
 catch_ : NL 'catch' NL codeblock ;
 
-// Statements
-statement : expr ;
-
 // Assignments
-assignment
+assignment_
     : ('[' ID ']' | ID) '=' expr        # Assign
     | '[' ID (',' ID)+ ']=' expr        # Assigns
     | ID '(' sets ')=' expr             # Set1
@@ -67,38 +58,36 @@ assignment
 //      | ID
 
 sets :
-    llist_ ;
+    llist ;
 
 
 // Expression
-expr : expr_ ;
-
-expr_
+expr
     : '(' expr ')'                  # Paren
-    | expr_ '\''                    # Ctranspose
-    | expr_ '.\''                   # Transpose
-    | '-' expr_                     # Minus
-    | '~' expr_                     # Negate
-    | expr_ '^' expr_               # Exp
-    | expr_ '.^' expr_              # Elexp
-    | expr_ '\\' expr_              # Rdiv
-    | expr_ '.\\' expr_             # Elrdiv
-    | expr_ '/' expr_               # Div
-    | expr_ './' expr_              # Eldiv
-    | expr_ '*' expr_               # Mul
-    | expr_ '.*' expr_              # Elmul
-    | expr_ '+' expr_               # Plus
-    | expr_ ':' expr_               # Colon
-    | expr_ '<' expr_               # Lt
-    | expr_ '<=' expr_              # Le
-    | expr_ '>' expr_               # Gt
-    | expr_ '>=' expr_              # Ge
-    | expr_ '%%' expr_              # Eq
-    | expr_ '<>' expr_              # Ne
-    | expr_ '&' expr_               # Band
-    | expr_ '|' expr_               # Bor
-    | expr_ '&&' expr_              # Land
-    | expr_ '||' expr_              # Lor
+    | expr '\''                     # Ctranspose
+    | expr '.\''                    # Transpose
+    | '-' expr                      # Minus
+    | '~' expr                      # Negate
+    | expr '^' expr                 # Exp
+    | expr '.^' expr                # Elexp
+    | expr '\\' expr                # Rdiv
+    | expr '.\\' expr               # Elrdiv
+    | expr '/' expr                 # Div
+    | expr './' expr                # Eldiv
+    | expr '*' expr                 # Mul
+    | expr '.*' expr                # Elmul
+    | expr '+' expr                 # Plus
+    | expr ':' expr                 # Colon
+    | expr '<' expr                 # Lt
+    | expr '<=' expr                # Le
+    | expr '>' expr                 # Gt
+    | expr '>=' expr                # Ge
+    | expr '%%' expr                # Eq
+    | expr '~=' expr                # Ne
+    | expr '&' expr                 # Band
+    | expr '|' expr                 # Bor
+    | expr '&&' expr                # Land
+    | expr '||' expr                # Lor
     | '[' vector (';' vector)* ']'  # Matrix
     | IINT                          # Iint
     | INT                           # Int
@@ -107,16 +96,15 @@ expr_
     | STRING                        # String
     | '$'                           # End
     | 'break'                       # Break
+    | 'return'                      # Return
     | ID '(' llist? ')'             # Get1
     | ID '?' llist '?'              # Get2
     | ID '\\{' llist '\\}'          # Get3
     | ID                            # Var
     ;
 
-llist : llist_ ;
-
-llist_
-    : llist_ ',' llist_ # Listmore
+llist
+    : llist ',' llist   # Listmore
     | '::'              # Listall
     | expr              # Listone
     ;
@@ -146,7 +134,7 @@ fragment OCTAL_ESC : '\\' ( [0-3]? [0-7] )? [0-7] ;
 fragment UNICODE_ESC :
     '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT ;
 
-NL : '\r'? '\n' ;
+NL : ('\r'? '\n')+ ;
 
 WS : (' '|'\t') -> skip ;
 THREEDOTS : ( '...' NL ) -> skip ;

@@ -113,6 +113,12 @@ Rdiv : Right devision
 Transpose : Transpose
     Example: "y.'"
     Contains: Expr
+
+Break : Break
+    Example: "break"
+
+Return : Return
+    Example: "return"
 """
 
 def operator_suggestions(node):
@@ -129,6 +135,17 @@ Gets = "", ", ", ""
 Paren = "(%(0)s)"
 End = "&$"
 Break = "break"
+
+def Return(node):
+    func = node.func
+    if func["backend"] == "func_returns":
+        return "return"
+    if func["backend"] == "func_lambda":
+        return "return _retval"
+
+    return "return " + func[1][0]["name"]
+
+
 
 # simple operators
 def Mul(node):
@@ -182,8 +199,10 @@ def Colon(node):
                 start=node[0].type(), end=node[-1].type())
         node.type([n.type() for n in node[:]] + ["ivec"])
         if len(node) == 3:
-            return "span(", ", ", ")"
-        return "span(", ", 1, ", ")"
+            return "span(%(0)s, %(1)s, %(2)s)"
+        return "span(%(0)s, 1, %(1)s)"
 
     node.type("ivec")
+    for child in node:
+        child.suggest("int")
     return "&:", "&:", "&:"

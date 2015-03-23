@@ -20,7 +20,6 @@ import sys
 import shutil
 import cPickle
 import imp
-import re
 
 import utils
 import preproc
@@ -167,17 +166,7 @@ def main(path, suggestion=False, disp=False):
             print "cfg found!"
             print "loading cfg..."
 
-        cfg = imp.load_source("cfg", filename + ".py")
-        scope = cfg.scope
-
-#          shutil.copyfile(filename + ".py", "__cfg__.py")
-#          from __cfg__ import scope
-#  
-#          if disp:
-#              print "deleting temp cfg..."
-#  
-#          os.remove("__cfg__.py")
-#          os.remove("__cfg__.pyc")
+        scope = imp.load_source("cfg", filename + ".py").scope
 
         if disp:
             print "loading scope..."
@@ -198,12 +187,20 @@ def main(path, suggestion=False, disp=False):
         cfg, scfg = utils.get_cfg(tree)
 
     if suggestion:
-        print "suggestion-mode!"
+
+        if disp:
+            print "suggestion-mode!"
+
+        utils.set_cfg(tree, cfg)
         tree.generate(disp=disp)
         cfg, scfg = utils.get_cfg(tree)
+
         i = 1
         while [s for s in scfg.values() if s]:
-            print "iteration", i
+
+            if disp:
+                print "iteration", i
+
             for name in cfg.keys():
                 cfg[name].update(scfg.get(name, {}))
             utils.set_cfg(tree, cfg)

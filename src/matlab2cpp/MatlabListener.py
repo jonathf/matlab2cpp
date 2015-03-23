@@ -282,6 +282,12 @@ class MatlabListener(ParseTreeListener):
     def exitStatement(self, ctx):
         pass
 
+    def enterAssignment(self, ctx):
+        ctx.node = ctx.parentCtx.node
+
+    def exitAssignment(self, ctx):
+        pass
+
     def enterAssign(self, ctx):
         pnode = ctx.parentCtx.node
         ctx.node = col.Assign(pnode)
@@ -726,4 +732,10 @@ class MatlabListener(ParseTreeListener):
         ctx.node = col.Break(ctx.parentCtx.node)
 
     def exitBreak(self, ctx):
+        pass
+
+    def enterReturn(self, ctx):
+        ctx.node = col.Return(ctx.parentCtx.node)
+
+    def exitReturn(self, ctx):
         pass

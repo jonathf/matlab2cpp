@@ -4,7 +4,7 @@ Functions with single return
 Nodes
 -----
 Func : Function
-    Contains: Returns, Params, Block
+    Contains: Declares, Returns, Params, Block
     Property: name
 
 Returns : Function return variables
@@ -57,7 +57,7 @@ def Params(node):
 
 def Func(node):
     type = node[1][0].type()
-    return type + " %(name)s(%(2)s)\n{\n%(0)s\n%(3)s\nreturn %(1)s\n}"
+    return type + " %(name)s(%(2)s)\n{\n%(0)s\n%(3)s\nreturn %(1)s ;\n}"
 
 def Declares(node):
     declares = {}

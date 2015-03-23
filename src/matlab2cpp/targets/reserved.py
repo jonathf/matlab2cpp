@@ -8,8 +8,10 @@ exists before finding the generic "<class>" name.
 # List of function names that should be handled by reserved.py:
 reserved = [
 "eye", "flipud", "length", "max", "min", "size", "transpose",
-"zeros", "round", "return", "rand",
+"zeros", "round", "return", "rand", "floor",
 ]
+
+# Common attribute
 
 def Var_return(node):
     if node.func["backend"] == "func_returns":
@@ -22,6 +24,10 @@ def Return(node):
 def Assignees(node):
     node.parent["backend"] = "reserved"
     return "", ", ", ""
+
+def Declare(node):
+    raise ValueError("Declaring '%s' not possible\n"
+    "It is reserved as a matlab-function." % node["name"])
 
 
 
@@ -39,13 +45,6 @@ def Get_size(node):
             return var+".n_cols"
         if arg2 == "3":
             return var+".n_slice"
-
-        if arg1 in ("fvec", "ivec"):
-            return var+".n_rows"
-
-#          if arg1 in ("fmat", "imat"):
-#              return "((2-%(1)s)*%(0)s.n_rows+(%(1)s-1)*%(0)s.n_cols)"
-
 
     elif type in ("ivec", "fvec", "irowvec", "frowvec"):
         node.type("int")
@@ -253,3 +252,13 @@ def Get_rand(node):
         return "arma::randu<TYPE>(", ", ", ")"
 
     raise NotImplementedError
+
+def Get_floor(node):
+
+    type = node[0].type()
+    if type == "float":     node.type("int")
+    elif type == "fvec":    node.type("ivec")
+    elif type == "frowvec": node.type("irowvec")
+    elif type == "fmat":    node.type("imat")
+
+    return "arma::floor(%(0)s)"

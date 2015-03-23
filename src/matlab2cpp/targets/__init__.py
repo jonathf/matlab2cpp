@@ -441,6 +441,12 @@ Var : Var
 All : All elements in array
     Example: "y(:)"
     Rule: expression.py
+
+Break : Break
+    Example: "break"
+
+Return : Return
+    Example: "return"
 """
 import glob
 import os
