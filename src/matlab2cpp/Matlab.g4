@@ -52,10 +52,15 @@ assignment_
     | ID '!' sets '!' expr              # Set3
     ;
 
-//  descriptor
-//      : descriptor '.'
-//      ID '(' sets ')'
-//      | ID
+//  variable
+//      : ID extention*                     # Var
+//      | ID extention* '(' llist ')'       # Call
+//      ;
+//  
+//  extension
+//      : '{' llist '}'                     # Cell
+//      | '.' ID                            # Fieldref
+//      | '.(' ( variable | STRING ) ')'    # Fieldname
 
 sets :
     llist ;
@@ -134,7 +139,7 @@ fragment OCTAL_ESC : '\\' ( [0-3]? [0-7] )? [0-7] ;
 fragment UNICODE_ESC :
     '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT ;
 
-NL : ('\r'? '\n')+ ;
+NL : ('\r'? '\n' | ';')+ ;
 
 WS : (' '|'\t') -> skip ;
 THREEDOTS : ( '...' NL ) -> skip ;

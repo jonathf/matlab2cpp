@@ -1,6 +1,5 @@
 
-Type = "char"
-String = '"%(value)s"'
+String = '%(value)s'
 Var = "%(name)s"
 
 def Assign(node):

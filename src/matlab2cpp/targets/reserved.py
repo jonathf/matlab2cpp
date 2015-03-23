@@ -8,15 +8,10 @@ exists before finding the generic "<class>" name.
 # List of function names that should be handled by reserved.py:
 reserved = [
 "eye", "flipud", "length", "max", "min", "size", "transpose",
-"zeros", "round", "return", "rand", "floor",
+"zeros", "round", "return", "rand", "floor", "pi",
 ]
 
 # Common attribute
-
-def Var_return(node):
-    if node.func["backend"] == "func_returns":
-        return "%(name)s"
-    return "%(name)s " + str(node.func[0])
 
 def Return(node):
     raise NotImplementedError("'return' is not a function")
@@ -26,10 +21,17 @@ def Assignees(node):
     return "", ", ", ""
 
 def Declare(node):
+    return ""
     raise ValueError("Declaring '%s' not possible\n"
     "It is reserved as a matlab-function." % node["name"])
 
+def Var_pi(node):
+    return "datum::pi"
 
+def Var_return(node):
+    if node.func["backend"] == "func_returns":
+        return "%(name)s"
+    return "%(name)s " + str(node.func[0])
 
 def Get_size(node):
 

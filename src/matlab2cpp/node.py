@@ -163,8 +163,11 @@ name : str
         if hasattr(self, "reference"):
             return
 
-        func = self.func
         name = name or self["name"]
+        if name in targets.reserved.reserved:
+            return
+
+        func = self.func
         declares = func[0]
         params = func[2]
         if name in params["names"]:

@@ -39,7 +39,7 @@ class MatlabListener(ParseTreeListener):
         argv = col.Var(params, "argv")
         argv.type("char")
         argv["backend"] = "char"
-        argv["pointer"] = 2
+        argv.pointer(2)
 
         ctx.node = func
 
@@ -732,4 +732,10 @@ class MatlabListener(ParseTreeListener):
         ctx.node = col.Break(ctx.parentCtx.node)
 
     def exitBreak(self, ctx):
+        pass
+
+    def enterReturn(self, ctx):
+        ctx.node = col.Return(ctx.parentCtx.node)
+
+    def exitReturn(self, ctx):
         pass
