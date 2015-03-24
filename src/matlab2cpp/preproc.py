@@ -153,12 +153,12 @@ def prefix_hack(text):
                         C = [1, "(", ")"]
 
                     elif linej == "'":
-                        line_ = line[max(j-2, 0):j+1]
-                        line_ = fix_quote(line_)
-                        if line_[-1] == '"':
-                            line = line[:j] + '"' + line[j+1:]
-                            codemode = False
-                            C = [1, "'", "'"]
+#                          line_ = line[max(j-2, 0):j+1]
+#                          line_ = fix_quote(line_)
+#                          if line_[-1] == '"':
+                        line = line[:j] + '"' + line[j+1:]
+                        codemode = False
+                        C = [1, "'", "'"]
 
                     elif linej == " ":
                         if line[j+1:j+2] in let+dig+"_(['\"" and\
@@ -186,7 +186,8 @@ def prefix_hack(text):
                                 string.letters+string.digits+"_)]":
                             line = line[:j] + "+" + line[j:]
 
-                elif C[-1] == "'" and linej == '\\':
+                elif C[-1] == "'" and linej == '\\'\
+                        and line[j-1] != '\\':
                     line = line[:j] + r"\\" + line[j+1:]
                 elif C[-1] == "'" and linej in '"':
                     line = line[:j] + line[j+1:]
@@ -210,13 +211,13 @@ def prefix_hack(text):
 
         if "." in line:
             if ".(" in line or ". (" in line:
-                code = re.findall(r"[\w\d.]+\. ?\(.*?\)", line)[0]
+#                  code = re.findall(r"[\w\d.]+\. ?\(.*?\)", line)[0]
 #                  errors.add("'%s'\t\tfield assignment" % code)
                 line = re.sub(r"\. ?\((.+?)\) ?=", r"!\1!", line)
                 line = re.sub(r"([a-zA-Z][a-zA-Z0-9_]*)"+\
                         " ?\. ?\(([a-zA-Z].*)\)(;|\n)",
                         r"\1?\2?\3", line)
-            code = re.findall(r"[a-zA-Z][a-zA-Z0-9_]* ?\. ?[a-zA-Z]", line)
+#              code = re.findall(r"[a-zA-Z][a-zA-Z0-9_]* ?\. ?[a-zA-Z]", line)
 #              if code:
 #                  errors.add("'%s'\t\tdot-assignment/-retrieval" % code[0])
 
@@ -285,9 +286,9 @@ def fix_quote(line):
                 line = line[:j] + '(' + line[j+1:]
             elif line[j] == "}":
                 line = line[:j] + ')' + line[j+1:]
-            if line[j] == '"':
+            elif line[j] == '"':
                 line = line[:j] + line[j+1:]
-            if line[j] == '\\' and line[j-1] != "\\":
+            elif line[j] == '\\' and line[j-1] != "\\":
                 line = line[:j] + "\\\\" + line[j+1:]
             elif line[j] == "'":
                 line = line[:j] + '"' + line[j+1:]
