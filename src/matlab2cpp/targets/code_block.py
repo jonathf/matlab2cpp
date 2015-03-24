@@ -86,7 +86,12 @@ While = "while(%(0)s)\n{\n%(1)s\n}"
 Cond = "", ",", ""
 
 Branch = "", "\n", ""
-If = "if (%(0)s)\n{\n%(1)s\n}"
+
+def If(node):
+    if len(node) == 1:
+        return "if (%(0)s)\n{\n// Empty block\n}"
+    return "if (%(0)s)\n{\n%(1)s\n}"
+
 Elif = "else if (%(0)s)\n{\n%(1)s\n}"
 Else = "else\n{\n%(0)s\n}"
 

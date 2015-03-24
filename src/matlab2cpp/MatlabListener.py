@@ -739,3 +739,80 @@ class MatlabListener(ParseTreeListener):
 
     def exitReturn(self, ctx):
         pass
+
+
+
+
+    def enterAssign_alt(self, ctx):
+        pnode = ctx.parentCtx.node
+        assign = col.Assign_alt(pnode)
+        col.Assigned_alt(assign)
+        ctx.node = col.Assignees_alt(assign)
+
+
+    def exitAssign_alt(self, ctx):
+        name = ctx.node["name"]
+        if name:
+            ctx.node.parent["name"] = name
+
+
+    def enterVar_alt(self, ctx):
+        pnode = ctx.parentCtx.node
+        if pnode["class"] == "Assignees_alt" and len(pnode.parent[0]):
+            pnode = pnode.parent[0]
+        name = ctx.ID().getText()
+        ctx.node = col.Var_alt(pnode, name)
+        ctx.node.declare()
+
+    def exitVar_alt(self, ctx):
+        pass
+
+    def enterCall_alt(self, ctx):
+        pnode = ctx.parentCtx.node
+        if pnode["class"] == "Assignees_alt" and len(pnode.parent[0]):
+            pnode = pnode.parent[0]
+        name = ctx.ID().getText()
+        ctx.node = col.Var_alt(pnode, name)
+        ctx.node.declare()
+
+    def exitCall_alt(self, ctx):
+        pass
+
+    def enterField1_alt(self, ctx):
+        pnode = ctx.parentCtx.node
+        name = ctx.ID().getText()
+        ctx.node = col.Field1_alt(pnode, name)
+
+    def exitField1_alt(self, ctx):
+        pass
+
+    def enterField2_alt(self, ctx):
+        pnode = ctx.parentCtx.node
+        name = ctx.ID().getText()
+        ctx.node = col.Field2_alt(pnode, name)
+
+    def exitField2_alt(self, ctx):
+        pass
+
+    def enterField3_alt(self, ctx):
+        pnode = ctx.parentCtx.node
+        name = ctx.ID().getText()
+        ctx.node = col.Field3_alt(pnode, name)
+
+    def exitField3_alt(self, ctx):
+        pass
+
+    def enterGet_alt(self, ctx):
+        pnode = ctx.parentCtx.node
+        ctx.node = col.Get_alt(pnode)
+
+    def exitGet_alt(self, ctx):
+        pass
+
+    def enterCell_alt(self, ctx):
+        pnode = ctx.parentCtx.node
+        ctx.node = col.Cell_alt(pnode)
+
+    def exitCell_alt(self, ctx):
+        pass
+

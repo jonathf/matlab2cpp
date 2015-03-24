@@ -120,6 +120,9 @@ condtion : Expr
 block : Block
     One or more codelines.
     """
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "code_block"
 
 class Switch(Node):
     """Switch branch
@@ -589,3 +592,58 @@ class Lambda(Node):
     def __init__(self, parent, name=""):
         Node.__init__(self, parent, name)
         self["backend"] = "func_lambda"
+
+
+
+
+class Assign_alt(Node):
+    def __init__(self, parent, name=""):
+        Node.__init__(self, parent, name)
+        self["backend"] = "sandbox"
+
+class Var_alt(Node):
+    def __init__(self, parent, name=""):
+        Node.__init__(self, parent, name)
+        self["backend"] = "sandbox"
+
+class Call_alt(Node):
+    def __init__(self, parent, name=""):
+        Node.__init__(self, parent, name)
+        self["backend"] = "sandbox"
+
+class Field1_alt(Node):
+    def __init__(self, parent, name=""):
+        Node.__init__(self, parent, name)
+        self["backend"] = "sandbox"
+
+class Field2_alt(Node):
+    def __init__(self, parent, name=""):
+        Node.__init__(self, parent, name)
+        self["backend"] = "sandbox"
+
+class Field3_alt(Node):
+    def __init__(self, parent, name=""):
+        Node.__init__(self, parent, name)
+        self["backend"] = "sandbox"
+
+class Assigned_alt(Node):
+
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "sandbox"
+
+class Assignees_alt(Node):
+
+    def __init__(self, parent, name=""):
+        Node.__init__(self, parent, name)
+        self["backend"] = "sandbox"
+
+class Get_alt(Node):
+    def __init__(self, parent, name=""):
+        Node.__init__(self, parent, name)
+        self["backend"] = "sandbox"
+
+class Cell_alt(Node):
+    def __init__(self, parent, name=""):
+        Node.__init__(self, parent, name)
+        self["backend"] = "sandbox"

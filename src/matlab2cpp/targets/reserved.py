@@ -13,17 +13,18 @@ reserved = [
 
 # Common attribute
 
-def Return(node):
-    raise NotImplementedError("'return' is not a function")
-
 def Assignees(node):
     node.parent["backend"] = "reserved"
     return "", ", ", ""
 
 def Declare(node):
-    return ""
-    raise ValueError("Declaring '%s' not possible\n"
-    "It is reserved as a matlab-function." % node["name"])
+    raise ValueError("Variable name '%s' is reserved."%node["name"]\
+            +"\nPlease rename variable.")
+
+def Var(node):
+    raise ValueError("Variable name '%s' is reserved."%node["name"]\
+            +"\nPlease rename variable.")
+
 
 def Var_pi(node):
     return "datum::pi"
@@ -77,6 +78,17 @@ def Assigns_size(node):
 
         return "%s = %s.n_rows ;\n%s = %s.n_cols ;" % \
                 (node[0][0], node[1][0], node[0][1], node[1][0])
+
+    if len(node[0])==3:
+
+        for n in node[0]:
+            n.suggest("int")
+
+        val = str(node[1][0])
+        rows, cols, slices = map(str, node[0])
+        return  rows+" = "+val+".n_rows ;\n"+\
+                cols+" = "+val+".n_cols ;\n"+\
+                slices+" = "+val+".n_slice ;"
 
     raise NotImplementedError
 
@@ -204,7 +216,6 @@ def Get_zeros(node):
         node.type("fmat")
         return "arma::zeros<fmat>(%(0)s, %(1)s)"
     if len(node) == 3:
-        node.type("cube")
         return "arma::zeros<fcube>(%(0)s, %(1)s, %(2)s)"
 
     raise NotImplementedError

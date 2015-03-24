@@ -5,7 +5,7 @@ codeblock : codeline ((';'? NL | ';') codeline)* ;
 
 codeline
     : 'function{' function_returns? ID
-        '(' function_params? ')'
+        ('(' function_params? ')')?
         (','| NL ) codeblock? ';'? NL '}'       # Function
     | ID '=@(' lambda_params ')' expr           # Lambda_func
     | assignment_                               # Assignment
@@ -48,19 +48,22 @@ assignment_
     : ('[' ID ']' | ID) '=' expr        # Assign
     | '[' ID (',' ID)+ ']=' expr        # Assigns
     | ID '(' sets ')=' expr             # Set1
-    | ID '\\{' sets '\\}=' expr         # Set2
+//      | ID '\\{' sets '\\}=' expr         # Set2
     | ID '!' sets '!' expr              # Set3
+    | (variable | '[' variable (',' variable)* ']') '=' expr # Assign_alt
     ;
 
-//  variable
-//      : ID extention*                     # Var
-//      | ID extention* '(' llist ')'       # Call
-//      ;
-//  
-//  extension
-//      : '{' llist '}'                     # Cell
-//      | '.' ID                            # Fieldref
-//      | '.(' ( variable | STRING ) ')'    # Fieldname
+variable
+    : ID extension*                     # Var_alt
+    | ID extension* '(' llist ')'       # Call_alt
+    ;
+
+extension
+    : '\\{' llist '\\}'                 # Cell_alt
+    | '.' ID                            # Field1_alt
+    | '(' variable ').' ID              # Field2_alt
+    | '.(' ( variable | STRING ) ')'    # Field3_alt
+    ;
 
 sets :
     llist ;
@@ -74,13 +77,13 @@ expr
     | '-' expr                      # Minus
     | '~' expr                      # Negate
     | expr '^' expr                 # Exp
-    | expr '.^' expr                # Elexp
+    | expr '\\.^' expr                # Elexp
     | expr '\\' expr                # Rdiv
-    | expr '.\\' expr               # Elrdiv
+    | expr '\\.\\' expr               # Elrdiv
     | expr '/' expr                 # Div
-    | expr './' expr                # Eldiv
+    | expr '\\./' expr                # Eldiv
     | expr '*' expr                 # Mul
-    | expr '.*' expr                # Elmul
+    | expr '\\.*' expr              # Elmul
     | expr '+' expr                 # Plus
     | expr ':' expr                 # Colon
     | expr '<' expr                 # Lt
@@ -106,6 +109,7 @@ expr
     | ID '?' llist '?'              # Get2
     | ID '\\{' llist '\\}'          # Get3
     | ID                            # Var
+    | variable                      # Get_alt
     ;
 
 llist

@@ -11,15 +11,17 @@ def prefix_hack(text):
 
     text = re.sub(r"\.{3,}\n *", r" ", text)    # join "..."
     text = re.sub(r"[ \t]+", " ", text)         # spaces be reduced
-    text = re.sub(r"((^|\n) ';'?| (\n|;) ?)+", r"\n", text)    # indenting be gone
     text = re.sub(r"(, ?;|; ?,)", ";", text)
     text = re.sub(r"{", r"\\{", text)
     text = re.sub(r"}", r"\\}", text)
     text = re.sub(r":(,|\))", r"::\1", text)
+    text = re.sub(r"((^|\n) | (\n|;) ?)+", r"\n", text)    # indenting be gone
 
-    text = re.sub(r"(hold|axis|more|box|clear) (\w+( \w+)*)", r"\1('\2')", text)
+    text = re.sub(r"(hold|axis|more|box|clear|shading) (\w+( \w+)*)", r"\1('\2')", text)
 
     text = re.sub(r"(^|\n)\%.*", "", text)      # no pure comment
+
+    text = re.sub(r"(\.[*^/\\])", r"\\\1", text)
 
     lines = (text+"\n").split("\n")
 
@@ -76,12 +78,12 @@ def prefix_hack(text):
             brace_count -= 1
 
         if line[:1] == "[":
-            code = re.findall(r"^\[[^\]]*[().{}:][^\]]*\] ?=", line)
-            if code:
-                errors.add("'%s'\t\tmultiple set assignments" % code[0])
-                line = re.sub(r"^\[([^\]]*[().{}:][^\]]*)\] ?=",
-                            r"__multi_assign_error_", line)
-
+#              code = re.findall(r"^\[[^\]]*[().{}:][^\]]*\] ?=", line)
+#              if code:
+#                  errors.add("'%s'\t\tmultiple set assignments" % code[0])
+#                  line = re.sub(r"^\[([^\]]*[().{}:][^\]]*)\] ?=",
+#                              r"__multi_assign_error_", line)
+#  
             line = re.sub(r"^\[ ?([\w\d._]+) ?\] ?=", r"\1 =", line)
 
         if "[" in line:
@@ -184,6 +186,8 @@ def prefix_hack(text):
                                 string.letters+string.digits+"_)]":
                             line = line[:j] + "+" + line[j:]
 
+                elif C[-1] == "'" and linej == '\\':
+                    line = line[:j] + r"\\" + line[j+1:]
                 elif C[-1] == "'" and linej in '"':
                     line = line[:j] + line[j+1:]
                 elif C[-1] == "'" and linej in '{':
@@ -191,30 +195,30 @@ def prefix_hack(text):
                 elif C[-1] == "'" and linej in '}':
                     line = line[:j] + ")" + line[j+1:]
 
-        elif "'" in line:
+        if "'" in line:
             line = fix_quote(line)
             if "-" in line:
-                line = re.sub(r"([a-zA-Z0-9_)\]]) ?-", r"\1+-", line)
+                line = re.sub(r"([a-zA-Z0-9_)\]])\.? ?-", r"\1+-", line)
 
-        elif "-" in line:
-            line = re.sub(r"([a-zA-Z0-9_)\]]) ?-", r"\1+-", line)
+        if "-" in line:
+            line = re.sub(r"([a-zA-Z0-9_)\]])\.? ?-", r"\1+-", line)
             if "%" in line:
                 line = line.split("%")[0]
 
-        elif "%" in line:
+        if "%" in line:
             line = line.split("%")[0]
 
         if "." in line:
             if ".(" in line or ". (" in line:
                 code = re.findall(r"[\w\d.]+\. ?\(.*?\)", line)[0]
-                errors.add("'%s'\t\tfield assignment" % code)
+#                  errors.add("'%s'\t\tfield assignment" % code)
                 line = re.sub(r"\. ?\((.+?)\) ?=", r"!\1!", line)
                 line = re.sub(r"([a-zA-Z][a-zA-Z0-9_]*)"+\
                         " ?\. ?\(([a-zA-Z].*)\)(;|\n)",
                         r"\1?\2?\3", line)
             code = re.findall(r"[a-zA-Z][a-zA-Z0-9_]* ?\. ?[a-zA-Z]", line)
-            if code:
-                errors.add("'%s'\t\tdot-assignment/-retrieval" % code[0])
+#              if code:
+#                  errors.add("'%s'\t\tdot-assignment/-retrieval" % code[0])
 
         lines[i] = prefix + line + postfix
 
@@ -283,7 +287,12 @@ def fix_quote(line):
                 line = line[:j] + ')' + line[j+1:]
             if line[j] == '"':
                 line = line[:j] + line[j+1:]
+            if line[j] == '\\' and line[j-1] != "\\":
+                line = line[:j] + "\\\\" + line[j+1:]
             elif line[j] == "'":
                 line = line[:j] + '"' + line[j+1:]
                 codemode = True
+
+    if not codemode:
+        line = line[::-1].replace("'", '"', 1)[::-1]
     return prefix+line
