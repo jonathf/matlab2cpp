@@ -76,15 +76,23 @@ def Assigns_size(node):
         for n in node[0]:
             n.suggest("int")
 
+        if len(node[1]) == 0:
+            val = str(node[1])
+        else:
+            val = str(node[1][0])
+
         return "%s = %s.n_rows ;\n%s = %s.n_cols ;" % \
-                (node[0][0], node[1][0], node[0][1], node[1][0])
+                (node[0][0], val, node[0][1], val)
 
     if len(node[0])==3:
 
         for n in node[0]:
             n.suggest("int")
 
-        val = str(node[1][0])
+        if len(node[1]) == 0:
+            val = str(node[1])
+        else:
+            val = str(node[1][0])
         rows, cols, slices = map(str, node[0])
         return  rows+" = "+val+".n_rows ;\n"+\
                 cols+" = "+val+".n_cols ;\n"+\

@@ -177,7 +177,12 @@ Lor     = "", "|", ""
 Div     = "", "/", ""
 Rdiv    = "", "\\", ""
 Elrdiv = "", ".\\", ""
-Exp     = "", "^", ""
+def Exp(node):
+#      out = ""
+#      for child in node:
+#          out = "pow("
+#  
+    return "", "^", ""
 Elexp  = "", ".^", ""
 
 All = "&="
