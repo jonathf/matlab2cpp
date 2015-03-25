@@ -178,11 +178,10 @@ Div     = "", "/", ""
 Rdiv    = "", "\\", ""
 Elrdiv = "", ".\\", ""
 def Exp(node):
-#      out = ""
-#      for child in node:
-#          out = "pow("
-#  
-    return "", "^", ""
+    out = str(node[0])
+    for child in node[1:]:
+        out = "pow(" + str(out) + "," + str(child) + ")"
+    return out
 Elexp  = "", ".^", ""
 
 All = "&="
