@@ -182,7 +182,11 @@ def Exp(node):
     for child in node[1:]:
         out = "pow(" + str(out) + "," + str(child) + ")"
     return out
-Elexp  = "", ".^", ""
+def Elexp(node):
+    out = str(node[0])
+    for child in node[1:]:
+        out = "pow(" + str(out) + "," + str(child) + ")"
+    return out
 
 All = "&="
 Neg = "-(", "", ")"
