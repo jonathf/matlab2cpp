@@ -62,7 +62,10 @@ def Get3(node):
 
 def Assign(node):
 
-    t0, t1 = node[0].type(), node[1].type()
-    node.type(t1)
+    t0 = node[0].type()
+    t1 = node[1].type()
+
+    if t0 == "TYPE" and t1 != "TYPE":
+        node[0].suggest(t1)
 
     return "%(0)s = %(1)s ;"

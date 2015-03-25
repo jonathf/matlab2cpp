@@ -13,9 +13,9 @@ reserved = [
 
 # Common attribute
 
-def Assignees(node):
-    node.parent["backend"] = "reserved"
-    return "", ", ", ""
+#  def Assignees(node):
+#      node.parent["backend"] = "reserved"
+#      return "", ", ", ""
 
 def Declare(node):
     raise ValueError("Variable name '%s' is reserved."%node["name"]\
@@ -55,7 +55,7 @@ def Get_size(node):
 
     elif type in ("fmat", "imat"):
         node.type("ivec")
-        node.replace("int", node[0]+".n_rows", node[0]+".n_cols")
+#          node.replace("int", node[0]+".n_rows", node[0]+".n_cols")
 
         return "{%(0)s.n_rows, %(0)s.n_cols}"
 
@@ -250,21 +250,19 @@ def Var_rand(node):
 def Get_rand(node):
 
     type = node[0].type()
-    if type == "int":
-        if len(node) == 1:
-            node.type("fvec")
-            return "arma::randu<fvec>(%(0)s)"
-
-        elif len(node) == 2:
-            node.type("fmat")
-            return "arma::randu<fmat>(%(0)s, %(1)s)"
-        else:
-            raise NotImplementedError
-
     if type == "TYPE":
+        for c in node: c.suggest("int")
         return "arma::randu<TYPE>(", ", ", ")"
 
-    raise NotImplementedError
+    if len(node) == 1:
+        node.type("fvec")
+        return "arma::randu<fvec>(%(0)s)"
+
+    elif len(node) == 2:
+        node.type("fmat")
+        return "arma::randu<fmat>(%(0)s, %(1)s)"
+    else:
+        raise NotImplementedError
 
 def Get_floor(node):
 

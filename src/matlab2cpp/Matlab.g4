@@ -50,20 +50,20 @@ assignment_
     | ID '(' sets ')=' expr             # Set1
 //      | ID '\\{' sets '\\}=' expr         # Set2
     | ID '!' sets '!' expr              # Set3
-//      | (variable | '[' variable (',' variable)* ']') '=' expr # Assign_alt
+    | (variable | '[' variable (',' variable)* ']') '=' expr # Assign_alt
     ;
 
-//  variable
-//      : ID extension*                     # Var_alt
-//      | ID extension* '(' llist ')'       # Call_alt
-//      ;
-//  
-//  extension
-//      : '\\{' llist '\\}'                 # Cell_alt
-//      | '.' ID                            # Field1_alt
-//      | '(' variable ').' ID              # Field2_alt
-//      | '.(' ( variable | STRING ) ')'    # Field3_alt
-//      ;
+variable
+    : ID extension*                     # Var_alt
+    | ID extension* '(' llist ')'       # Call_alt
+    ;
+
+extension
+    : '\\{' llist '\\}'                 # Cell_alt
+    | '.' ID                            # Field1_alt
+    | '(' variable ').' ID              # Field2_alt
+    | '.(' ( variable | STRING ) ')'    # Field3_alt
+    ;
 
 sets :
     llist ;

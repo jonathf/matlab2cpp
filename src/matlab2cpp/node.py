@@ -29,7 +29,7 @@ name : str
     def summary(self, disp=False, group=None):
         "Node summary"
 
-        nodes = utils.flatten(self, False, True, False)
+        nodes = utils.flatten(self, False, False, False)
         if disp:
             print "iterating %d nodes" % len(nodes)
 

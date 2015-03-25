@@ -35,7 +35,8 @@ if __name__ == "__main__":
         name1 = dirname + os.sep + "." + filename + ".backup"
         name2 = dirname + os.sep + "." + filename + ".pickle"
         name3 = dirname + os.sep + filename + ".py"
-        for name in [name1, name2, name3]:
+        name4 = dirname + os.sep + filename + ".pyc"
+        for name in [name1, name2, name3, name4]:
             if os.path.isfile(name):
                 os.remove(name)
 

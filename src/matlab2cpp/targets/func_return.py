@@ -31,7 +31,7 @@ def Get(node):
 
     name = node["name"]
     names = node.program["names"]
-    func = node.program[names.index(name)+1]
+    func = node.program[names.index(name)]
     ret_val = func[1][0]
     node.type(ret_val.type())
 

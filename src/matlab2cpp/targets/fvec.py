@@ -1,6 +1,5 @@
 from arma import *
 
-Type = "fvec"
 Declare = "fvec %(name)s ;"
 
 def Get(node):
