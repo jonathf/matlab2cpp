@@ -281,6 +281,10 @@ expr : Expr
 
 class Var(Node):
     """Variable"""
+    def __init__(self, parent, name):
+        if name[:1] == "@":
+            name = name[1:]
+        Node.__init__(self, parent, name)
 
 
 class Set(Node):
