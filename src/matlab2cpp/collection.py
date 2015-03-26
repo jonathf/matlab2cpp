@@ -516,12 +516,12 @@ value : str
         """
         Node.__init__(self, parent)
         self["value"] = value
-        self["backend"] = "float"
-        self.type("float")
+        self["backend"] = "double"
+        self.type("double")
 
 
-class Iint(Node):
-    """Imaginary integer """
+class Imag(Node):
+    """Imaginary number"""
     def __init__(self, parent, value):
         """
 Parameters
@@ -533,25 +533,9 @@ value : str
         """
         Node.__init__(self, parent)
         self["value"] = value
-        self["backend"] = "iint"
-        self.type("iint")
+        self["backend"] = "complex"
+        self.type("complex")
 
-
-class Ifloat(Node):
-    """Imaginary float """
-    def __init__(self, parent, value):
-        """
-Parameters
-----------
-parent : Node
-    Parent node
-value : str
-    Text representation of the float value.
-        """
-        Node.__init__(self, parent)
-        self["value"] = value
-        self["backend"] = "ifloat"
-        self.type("ifloat")
 
 class String(Node):
     """String"""

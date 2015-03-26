@@ -1,144 +1,105 @@
+dim0 = {"int", "float", "double", "uint", "complex"}
+dim1 = {"ivec", "fvec", "uvec", "vec", "cx_vec"}
+dim2 = {"irowvec", "frowvec", "urowvec", "rowvec", "cx_rowvec"}
+dim3 = {"imat", "fmat", "umat", "mat", "cx_mat"}
+dim4 = {"icube", "fcube", "ucube", "cube", "cx_cube"}
 
+dims = [dim0, dim1, dim2, dim3, dim4]
 
-#  num_all = { "int", "float", "double", "ivec", "fvec",
-#  "irowvec", "frowvec", "imat", "fmat"}
-#  
-#  num_scalar = {"int", "float", "double"}
-#  num_vec = {"ivec", "fvec"}
-#  num_rowvec = {"irowvec", "frowvec"}
-#  num_mat = {"imat", "fmat"}
-#  
-#  num_i = {"int", "ivec", "irowvec", "imat"}
-#  num_f = {"float", "fvec", "frowvec", "fmat"}
-#  
-#  string = {"string", "char"}
-#  
-#  unknown = {"TYPE"}
-#  
-#  imutables = {"std::function"}
-#  
-#  
-#  #  def datatype(val):
-#  #  
-#  #      if val not in num_all
-#  
-#  
-#  
-#  
+type0 = {"uint", "uvec", "urowvec", "umat", "ucube"}
+type1 = {"int", "ivec", "irowvec", "imat", "icube"}
+type2 = {"float", "fvec", "frowvec", "fmat", "fcube"}
+type3 = {"complex", "cx_vec", "cx_rowvec", "cx_mat", "cx_cube"}
 
+types = [type0, type1, type2, type3]
 
-
-
-
-
-
-
-
-
-types = [
-    "char",
-    "int", "float",
-    "irowvec", "frowvec",
-    "ivec", "fvec",
-    "imat", "fmat",
-    "TYPE", "func_lambda"]
+others = {"char", "TYPE", "func_lambda"}
 
 class datatype(object):
 
     def __init__(self, val):
 
         if not isinstance(val, str):
-            vals = map(datatype, val)
-            assert len(vals)>0
-            val = reduce(lambda x,y:x+y, vals).val
+            if isinstance(val[0], int):
+                val = dims[val[0]].intersection(types[val[1]]).pop()
+            else:
+                vals = map(datatype, val)
+                assert len(vals)>0
+                val = reduce(lambda x,y:x+y, vals).val
 
-        assert val in types, "%s not recognized" % val
         self.val = val
 
+        if val in dim0:     self.dim = 0
+        elif val in dim1:   self.dim = 1
+        elif val in dim2:   self.dim = 2
+        elif val in dim3:   self.dim = 3
+        elif val in dim4:   self.dim = 4
+        elif val in others: self.dim = None
+        else:
+            raise ValueError("%s not recognized" % val)
+
+        if val in type0:    self.type = 0
+        elif val in type1:    self.type = 1
+        elif val in type2:    self.type = 2
+        elif val in type3:    self.type = 3
+        else: self.type = None
+
+        if val in others:   self.numeric = False
+        else:               self.numeric = True
+
+
+    def __add__(self, other):
+
+        if self.val == other.val:
+            return self
+
+        if self.val == "TYPE":
+            return datatype("TYPE")
+        elif other.val == "TYPE":
+            return datatype("TYPE")
+
+        if not self.numeric:
+            return datatype("TYPE")
+        elif not other.numeric:
+            return datatype("TYPE")
+
+        dim = max(self.dim, other.dim)
+        if dim == 2 and 1 in (self.dim, other.dim):
+            return datatype("TYPE")
+
+        type = max(self.type, other.type)
+
+        newval = dims[dim].intersection(types[type]).pop()
+        return datatype(newval)
+
+
     def __mul__(self, other):
-
-        if not isinstance(other, datatype):
-            other = datatype(other)
-
         if self.val == "TYPE":
             return other
         elif other.val == "TYPE":
             return self
 
-        return self.__add__(other)
-
-    def __rmul__(self, other):
-        return self.__mul__(other)
-
-    def __add__(self, other):
-
-        if not other:
+        if not self.numeric:
+            if not other.numeric:
+                if self.val == other.val:
+                    return self
+            return other
+        elif not other.numeric:
             return self
 
-        if not isinstance(other, datatype):
-            other = datatype(other)
+        dim = max(self.dim, other.dim)
+        if dim == 2 and 1 in (self.dim, other.dim):
+            dim = 3
 
-        v, w = self.val, other.val
+        type = max(self.type, other.type)
 
-        if v == w:
-            return self
-        if "TYPE" in (v, w):
-            return datatype("TYPE")
+        newval = dims[dim].intersection(types[type]).pop()
+        return datatype(newval)
 
-        if v == "int":
-            return other
-
-        if v == "float":
-            if w == "int":
-                return self
-            return other
-
-        if v == "ivec":
-            if w == "int":
-                return self
-            if w == "float":
-                return datatype("fvec")
-            return other
-
-        if v == "fvec":
-            if w in ("int", "float", "ivec"):
-                return self
-            return other
-
-        if v == "irowvec":
-            if w == "int":
-                return self
-            if w in ("ivec", "fvec"):
-                return datatype("TYPE")
-            return other
-
-        if v == "frowvec":
-            if w in ("int", "float", "irowvec"):
-                return self
-            if w in ("ivec", "fvec"):
-                return datatype("TYPE")
-            return other
-
-        if v == "imat":
-            if w in ("int", "ivec", "irowvec"):
-                return self
-            if w in ("float", "fvec", "frowvec"):
-                return datatype("fmat")
-            return other
-
-        if v == "fmat":
-            return self
-
-        return datatype("TYPE")
-
-    def __radd__(self, other):
-        return self.__add__(other)
 
     def __eq__(self, other):
         if isinstance(other, datatype):
             return self.val == other.val
-        elif isinstance(other, str):
-            return self.val == other
         return NotImplemented
 
     def __req__(self, other):
@@ -149,3 +110,6 @@ class datatype(object):
 
     def __str__(self):
         return self.val
+
+    def __repr__(self):
+        return 'datatype("' + self.val + '")'

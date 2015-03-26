@@ -568,7 +568,7 @@ class MatlabListener(ParseTreeListener):
         if "d" in val: val = val.replace("d", "e")
         if "D" in val: val = val.replace("D", "e")
         if "E" in val: val = val.replace("E", "e")
-        ctx.node = col.Ifloat(pnode, val)
+        ctx.node = col.Imag(pnode, val)
 
     def exitIfloat(self, ctx):
         pass
@@ -644,7 +644,7 @@ class MatlabListener(ParseTreeListener):
         if "d" in val: val = val.replace("d", "e")
         if "D" in val: val = val.replace("D", "e")
         if "E" in val: val = val.replace("E", "e")
-        ctx.node = col.Iint(pnode, val)
+        ctx.node = col.Imag(pnode, val)
 
     def exitIint(self, ctx):
         pass

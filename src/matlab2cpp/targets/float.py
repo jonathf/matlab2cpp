@@ -1,6 +1,4 @@
-
 Declare = "float %(name)s ;"
-Type = "float"
 Float = "%(value)s"
 Var = "%(name)s"
 

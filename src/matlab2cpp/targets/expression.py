@@ -201,16 +201,26 @@ def Eldiv(node):
 
 def Colon(node):
 
-    if node.group["class"] in ("Statement", "Set", "Set2", "Set3"):
-
-        node.include("span", target="ivec",
-                start=node[0].type(), end=node[-1].type())
-        node.type([n.type() for n in node[:]] + ["ivec"])
-        if len(node) == 3:
-            return "span(%(0)s, %(1)s, %(2)s)"
-        return "span(%(0)s, 1, %(1)s)"
-
-    node.type("ivec")
     for child in node:
         child.suggest("int")
-    return "&:", "&:", "&:"
+
+    if node.group["class"] in ("Get", "Get2", "Get3") and\
+            node.group.type(retd=True).numeric:
+        node.type("uvec")
+        name = "uspan"
+    elif node.group["class"] == "Sets" and\
+            node.group.parent.type(retd=True).numeric:
+        node.type("uvec")
+        name = "uspan"
+    elif node.group["class"] == "Assign" and\
+            node.group[0].type(retd=True).type == 0:
+        node.type("uvec")
+        name = "uspan"
+    else:
+        node.type("ivec")
+        name = "span"
+
+    if len(node) == 3:
+        return name+"(%(0)s, %(1)s, %(2)s)"
+
+    return name+"(%(0)s, 1, %(1)s)"

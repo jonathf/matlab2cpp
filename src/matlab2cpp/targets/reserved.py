@@ -8,7 +8,7 @@ exists before finding the generic "<class>" name.
 # List of function names that should be handled by reserved.py:
 reserved = [
 "eye", "flipud", "length", "max", "min", "size", "transpose",
-"zeros", "round", "return", "rand", "floor", "pi",
+"zeros", "round", "return", "rand", "floor", "pi", "conv_to",
 ]
 
 # Common attribute
@@ -281,3 +281,8 @@ def Get_floor(node):
     elif type == "fmat":    node.type("imat")
 
     return "arma::floor(%(0)s)"
+
+
+def Get_conv_to(node):
+    return "conv_to<%(type)s>::from(%(0)s)"
+

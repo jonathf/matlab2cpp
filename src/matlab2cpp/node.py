@@ -7,7 +7,7 @@ import utils
 indexnames = [
     "Assign", "Assigns", "Branch", "For", "Func", "Set", "Set2",
     "Set3", "Sets", "Statement", "Switch", "Tryblock", "While",
-    "Program", "Block",
+    "Program", "Block", "Get", "Get2", "Get3",
 ]
 
 class Node(object):
@@ -83,6 +83,7 @@ name : str
                     cls not in ("Get", "Get2", "Get3", 
                             "Set", "Set2", "Set3"):
                 type_ = node.type([n.type() for n in node.children])
+                node.type(type_)
 
             if name in targets.reserved.reserved:
                 backend = "reserved"
@@ -148,6 +149,7 @@ name : str
                                 " is misbehaving\n" + value + "\n"+str(prop))
 
             node.prop["str"] = value
+            node.prop["backend"] = backend
 
         if group:
             for node in nodes:
@@ -188,16 +190,24 @@ name : str
         node["suggest"] = datatype(type)
         self.reference = node
 
-    def type(self, text=""):
+    def type(self, text="", retd=False):
         "Get/Set datatype"
 
         if not isinstance(text, str):
-            text = map(datatype, text)
-            text = str(sum(text))
+            if isinstance(text[0], str):
+                text = map(datatype, text)
+                text = str(reduce(lambda x,y:x+y, text))
+            elif isinstance(text[0], int):
+                text = datatype(text).val
+            else:
+                text = map(datatype, text)
+                text = str(sum(text))
 
         if self["class"] == "Func":
             func = self
         elif self["class"] in ("Program", "Include", "Includes"):
+            if retd:
+                return datatype("TYPE")
             return "TYPE"
         else:
             func = self.func
@@ -220,17 +230,23 @@ name : str
         else:
             if name in declares["names"]:
                 node = declares[declares["names"].index(name)]
-                type = str(node["type"])
+                type = node["type"]
                 if type != "TYPE":
+                    if retd:
+                        return node.prop["type"]
                     return type
 
             elif name in params["names"]:
                 node = params[params["names"].index(name)]
-                type = str(node["type"])
+                type = node["type"]
                 if type != "TYPE":
+                    if retd:
+                        return node.prop["type"]
                     return type
 
-        return str(self["type"])
+        if retd:
+            return self.prop["type"]
+        return self["type"]
 
     def suggest(self, text=""):
 
@@ -305,12 +321,14 @@ name : str
             return self
 
 
-    def auxillary(self, type=""):
-        """create a auxillary variable and 
+    def auxillary(self, type="", convert=False):
+        """create a auxillary variablele and 
         move actual calcuations to own line."""
 
         assert self.parent["class"] != "Assign",\
                 ".auxillary() must be triggered mid expression."
+        assert not self.parent.prop["aux"]
+        self.parent.prop["aux"] = "1"
 
         if not type:
             type = self.type()
@@ -325,37 +343,48 @@ name : str
         line = self
         while line.parent["class"] != "Block":
             line = line.parent
-        p = line.parent
+        block = line.parent
 
         # Create new var
         var = "_aux_" + type
 
         # Create Assign
-        s = collection.Assign(p)
+        s = collection.Assign(block)
         s["backend"] = backend
         s.type(type)
 
         # Return value
         v0 = collection.Var(s, var)
-        v0.declare()
         v0.type(type)
+        v0["backend"] = backend
+        v0.declare()
 
         # Create aux Var
-        v1 = collection.Var(s, var)
+        if convert:
+            get = collection.Get(s, "conv_to")
+            get.type(type)
+            v1 = collection.Var(get, var)
+        else:
+            v1 = collection.Var(s, var)
+
         v1.type(type)
+        v1["backend"] = backend
 
         # Place Assign correctly in Block
-        i = p.children.index(line)
-        p.children = p[:i] + p[-1:] + p[i:-1]
+        i = block.children.index(line)
+        block.children = block[:i] + block[-1:] + block[i:-1]
 
         # Swap self and Var
         index = self.parent.children.index(self)
         self.parent.children[index] = v1
-        v1.group = self.group
-        self.group = s
-        v1.parent = self.parent
-        self.parent = s
-        s.children[1] = self
+
+        v1.group, self.group = self.group, v1.group
+        v1.parent, self.parent = self.parent, v1.parent
+
+        if convert:
+            get.children[-1] = self
+        else:
+            s.children[-1] = self
 
         return v1
 
@@ -483,4 +512,5 @@ def init(node, parent, name=""):
     node["pointer"] = 0
     node["type"] = datatype("TYPE")
     node["names"] = []
+    node["aux"] = ""
 
