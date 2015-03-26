@@ -218,16 +218,15 @@ def main(path, suggestion=False, disp=False):
     annotation = """# Supplement file
 #
 # Valid inputs:
-# float
-# int
-# fvec
-# ivec
-# frowvec
-# irowvec
-# fmat
-# imat
+#
+# uint    int     float   double complex
+# uvec    ivec    fvec    vec    cx_vec
+# urowvec irowvec frowvec rowvec cx_rowvec
+# umat    imat    fmat    mat    cx_mat
+# ucube   icube   fcube   cube   cx_cube
 #
 # func_lambda
+# char
 
 """ + utils.str_cfg(cfg, scfg)
 
