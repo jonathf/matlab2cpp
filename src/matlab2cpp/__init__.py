@@ -119,9 +119,6 @@ def main(path, suggestion=False, disp=False):
             tree = cPickle.load(f)
             f.close()
 
-        if disp:
-            print "writing backup..."
-
     else:
 
         if disp:
@@ -201,6 +198,9 @@ def main(path, suggestion=False, disp=False):
             tree.generate(disp=False)
             cfg, scfg = utils.get_cfg(tree)
             i += 1
+
+        utils.set_cfg(tree, cfg)
+        tree.generate(disp=False)
 
     else:
 

@@ -16,6 +16,8 @@ if __name__ == "__main__":
             help="Use suggestions automatically")
     parser.add_option("-r", '--recompile', action="store_true",
             help="Force fresh recompile")
+    parser.add_option("-R", '--reset', action="store_true",
+            help="Force reset cfg and recompile")
     parser.add_option("-d", '--display', action="store_true",
             help="Display process output")
     parser.add_option("-g", '--group', type="int", dest="group",
@@ -28,7 +30,7 @@ if __name__ == "__main__":
 
     path = os.path.abspath(args[0])
 
-    if opt.recompile:
+    if opt.recompile or opt.reset:
 
         filename = os.path.basename(path)
         dirname = os.path.dirname(path)
@@ -36,7 +38,13 @@ if __name__ == "__main__":
         name2 = dirname + os.sep + "." + filename + ".pickle"
         name3 = dirname + os.sep + filename + ".py"
         name4 = dirname + os.sep + filename + ".pyc"
-        for name in [name1, name2, name3, name4]:
+
+        if opt.reset:
+            names = [name1, name2, name3, name4]
+        else:
+            names = [name1, name2, name4]
+
+        for name in names:
             if os.path.isfile(name):
                 os.remove(name)
 
