@@ -63,7 +63,7 @@ def main(path, suggestion=False, disp=False):
 
     # Deal with backup and pickled files
     if os.path.isfile("." + filename + ".backup")\
-            and os.path.isfile("." + filename + ".pickle"):
+            and os.path.isfile("." + filename + ".pickled"):
 
         if disp:
             print "reading backup..."
@@ -115,7 +115,7 @@ def main(path, suggestion=False, disp=False):
             if disp:
                 print "reading pickle..."
 
-            f = open("." + filename + ".pickled", "rU")
+            f = open("." + filename + ".pickled", "r")
             tree = cPickle.load(f)
             f.close()
 
@@ -148,12 +148,6 @@ def main(path, suggestion=False, disp=False):
 
         tree = build("."+filename)
 
-        if disp:
-            print "writing pickle..."
-
-        f = open("."+filename+".pickled", "w")
-        cPickle.dump(tree, f)
-        f.close()
 
         if disp:
             print "writing backup..."
@@ -192,7 +186,7 @@ def main(path, suggestion=False, disp=False):
             print "suggestion-mode!"
 
         utils.set_cfg(tree, cfg)
-        tree.generate(disp=disp)
+        tree.generate(disp=False)
         cfg, scfg = utils.get_cfg(tree)
 
         i = 1
@@ -204,7 +198,7 @@ def main(path, suggestion=False, disp=False):
             for name in cfg.keys():
                 cfg[name].update(scfg.get(name, {}))
             utils.set_cfg(tree, cfg)
-            tree.generate(disp=disp)
+            tree.generate(disp=False)
             cfg, scfg = utils.get_cfg(tree)
             i += 1
 
@@ -216,7 +210,7 @@ def main(path, suggestion=False, disp=False):
 
         if disp:
             print "generate tree..."
-        tree.generate(disp=disp)
+        tree.generate(disp=False)
 
     if disp:
         print "creating cfg..."
@@ -242,6 +236,13 @@ def main(path, suggestion=False, disp=False):
 
     f = open(filename + ".py", "w")
     f.write(annotation)
+    f.close()
+
+    if disp:
+        print "writing pickle..."
+
+    f = open("."+filename+".pickled", "w")
+    cPickle.dump(tree, f)
     f.close()
 
     return tree
