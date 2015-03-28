@@ -286,6 +286,8 @@ def fix_quote(line):
                 line = line[:j] + '(' + line[j+1:]
             elif line[j] == "}":
                 line = line[:j] + ')' + line[j+1:]
+            elif line[j] == "%":
+                line = line[:j] + '_' + line[j+1:]
             elif line[j] == '"':
                 line = line[:j] + line[j+1:]
             elif line[j] == '\\' and line[j-1] != "\\":
@@ -296,4 +298,5 @@ def fix_quote(line):
 
     if not codemode:
         line = line[::-1].replace("'", '"', 1)[::-1]
+
     return prefix+line
