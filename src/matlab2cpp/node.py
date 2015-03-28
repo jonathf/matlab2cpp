@@ -1,5 +1,5 @@
 import collection
-import datatype
+from datatype import datatype
 import targets
 import snippets
 import utils
@@ -201,7 +201,7 @@ name : str
         node["suggest"] = datatype(type)
         self.reference = node
 
-    def set_gtype(self, val=""):
+    def type(self, val="", retd=False):
         """Get/Set global datatype
 
 Parameters
@@ -494,19 +494,19 @@ matlab2cpp.datatype
         self.prop["names"].pop(index)
         return self.children.pop(index)
 
-    dim = datatype.Dim()
-    type = datatype.Type()
-    numeric = datatype.Numeric()
-    typename = datatype.Name()
+#      dim = datatype.Dim()
+#      type = datatype.Type()
+#      numeric = datatype.Numeric()
+#      typename = datatype.Name()
 
 
 
 def init(node, parent, name=""):
 
-    node.dim.node = node
-    node.type.node = node
-    node.numeric.node = node
-    node.tname.node = node
+#      node.dim.node = node
+#      node.type.node = node
+#      node.numeric.node = node
+#      node.tname.node = node
 
     node.children = []      # node children
     node.prop = {}          # node property
@@ -552,5 +552,5 @@ def init(node, parent, name=""):
     node["pointer"] = 0
     node["names"] = []
 
-    node._datatype = "TYPE"
+    node["type"] = datatype("TYPE")
 

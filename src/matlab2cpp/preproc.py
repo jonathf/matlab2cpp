@@ -68,7 +68,7 @@ def prefix_hack(text):
             def ender(s):
                 b[0] += 1
                 return "\n"
-            line = re.sub(r"(\nend ?;?|; ?end ?)", ender, line)
+            line = re.sub(r"(\nend ?;?|(,|;) ?end ?)", ender, line)
             postfix = "\n}"*b[0] + postfix
             brace_count -= b[0]
 
