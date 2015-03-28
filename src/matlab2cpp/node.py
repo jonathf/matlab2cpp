@@ -1,5 +1,5 @@
 import collection
-from datatype import datatype
+import datatype
 import targets
 import snippets
 import utils
@@ -9,6 +9,17 @@ indexnames = [
     "Set3", "Sets", "Statement", "Switch", "Tryblock", "While",
     "Program", "Block", "Get", "Get2", "Get3",
 ]
+
+
+class Attr(object):
+    def __init__(self, name):
+        self.name = name
+    def __get__(self, instance, owner):
+        return instance.prop.get(self.name)
+    def __set__(self, instance, value):
+        instance.prop[self.name] = value
+
+
 
 class Node(object):
     """
@@ -190,18 +201,30 @@ name : str
         node["suggest"] = datatype(type)
         self.reference = node
 
-    def type(self, text="", retd=False):
-        "Get/Set datatype"
+    def set_gtype(self, val=""):
+        """Get/Set global datatype
 
-        if not isinstance(text, str):
-            if isinstance(text[0], str):
-                text = map(datatype, text)
-                text = str(reduce(lambda x,y:x+y, text))
-            elif isinstance(text[0], int):
-                text = datatype(text).val
+Parameters
+----------
+val : str, tuple, iterable
+    If str, name datatype
+    If tuple, `val==(dim, type)` where dim is axis dimensions and
+    type is datatype.
+
+Also See
+--------
+matlab2cpp.datatype
+        """
+
+        if not isinstance(val, str):
+            if isinstance(val[0], str):
+                val = map(datatype, val)
+                val = str(reduce(lambda x,y:x+y, val))
+            elif isinstance(val[0], int):
+                val = datatype(val).val
             else:
-                text = map(datatype, text)
-                text = str(sum(text))
+                val = map(datatype, val)
+                val = str(sum(val))
 
         if self["class"] == "Func":
             func = self
@@ -216,16 +239,16 @@ name : str
         params = func[2]
         name = self["name"]
 
-        if text:
+        if val:
             if name in declares["names"]:
                 node = declares[declares["names"].index(name)]
-                node.suggest(text)
+                node.suggest(val)
 
             elif name in params["names"]:
                 node = params[params["names"].index(name)]
 
-                node.suggest(text)
-            self["type"] = datatype(text)
+                node.suggest(val)
+            self["type"] = datatype(val)
 
         else:
             if name in declares["names"]:
@@ -327,11 +350,12 @@ name : str
 
         assert self.parent["class"] != "Assign",\
                 ".auxillary() must be triggered mid expression."
-        assert not self.parent.prop["aux"]
-        self.parent.prop["aux"] = "1"
 
         if not type:
             type = self.type()
+
+        if not isinstance(type, str):
+            type = datatype(type).val
 
         if self["class"] in ("Vector", "Matrix"):
             backend = "matrix"
@@ -346,7 +370,12 @@ name : str
         block = line.parent
 
         # Create new var
-        var = "_aux_" + type
+        var = "_aux_" + type + "_"
+        if not line[var]:
+            line.prop[var] = 1
+        else:
+            line.prop[var] += 1
+        var = var + str(line[var])
 
         # Create Assign
         s = collection.Assign(block)
@@ -465,8 +494,19 @@ name : str
         self.prop["names"].pop(index)
         return self.children.pop(index)
 
+    dim = datatype.Dim()
+    type = datatype.Type()
+    numeric = datatype.Numeric()
+    typename = datatype.Name()
+
+
 
 def init(node, parent, name=""):
+
+    node.dim.node = node
+    node.type.node = node
+    node.numeric.node = node
+    node.tname.node = node
 
     node.children = []      # node children
     node.prop = {}          # node property
@@ -510,7 +550,7 @@ def init(node, parent, name=""):
     node["str"] = ""
     node["value"] = ""
     node["pointer"] = 0
-    node["type"] = datatype("TYPE")
     node["names"] = []
-    node["aux"] = ""
+
+    node._datatype = "TYPE"
 

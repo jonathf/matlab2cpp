@@ -133,7 +133,29 @@ def operator_suggestions(node):
 Expr = "%(0)s"
 Gets = "", ", ", ""
 Paren = "(%(0)s)"
-End = "&$"
+
+def End(node):
+
+    pnode = node
+    while pnode.parent["index"] != 0: pnode = pnode.parent
+
+    if pnode.parent["class"] in ("Get", "Get2", "Get3", "Sets"):
+
+        index = pnode.parent.children.index(pnode)
+
+        if pnode.parent["class"] == "Sets":
+            pnode = pnode.parent
+        name = pnode = pnode.parent["name"]
+
+        if index == 0:
+            return name + ".n_rows"
+        elif index == 1:
+            return name + ".n_cols"
+        elif index == 2:
+            return name + ".n_slices"
+
+    return "&$"
+
 Break = "break"
 
 def Return(node):
