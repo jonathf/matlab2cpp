@@ -27,10 +27,6 @@ def Returns(node):
     return out[2:]
 
 
-#  def Get(node):
-#      raise NotImplementedError(
-#          "illigal multi-return call for %s" % node["name"])
-
 def Get(node):
     return "", ", ", ""
 
@@ -90,12 +86,7 @@ def Declares(node):
 
     out = ""
     for key, val in declares.items():
-
-        if key in ("int", "float", "ivec", "fvec", "irowvec",
-                "frowvec", "imat", "fmat", "TYPE"):
-            out = out + "\n" + key + " " + ", ".join([v["name"] for v in val]) + " ;"
-        else:
-            out = out + "\n" + "\n".join(map(str, val))
+        out = out + "\n" + key + " " + ", ".join([v["name"] for v in val]) + " ;"
 
     return out[1:]
 

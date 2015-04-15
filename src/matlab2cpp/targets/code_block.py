@@ -127,7 +127,7 @@ def For(node):
 
     var, range = node[:2]
     if range["class"] == "Colon":
-        var.suggest("int")
+#          var.suggest("int")
         if len(range) == 2:
             start, stop = range
             step = "1"

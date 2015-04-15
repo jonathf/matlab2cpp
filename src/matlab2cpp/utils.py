@@ -1,5 +1,4 @@
 
-
 def flatten(node, ordered=False, reverse=False, inverse=False):
     r"""
 Return a list of all nodes
@@ -66,32 +65,6 @@ reverse : bool
     return out
 
 
-
-
-    if ordered:
-
-        def _f(nod):
-            out = [nod]
-            for n in nod[::1-2*(reverse)]:
-                if inverse:
-                    out = out + _f(n)
-                else:
-                    out = _f(n) + out
-            return out
-        return _f(node)
-
-    nodes = [node]
-    out = [node]
-    for child in nodes:
-        nodes = nodes + child.children[::1-2*reverse]
-        if inverse:
-            out = child.children[::1-2*reverse] + out
-        else:
-            out = out + child.children[::1-2*reverse]
-
-    return out
-
-
 def set_cfg(root, cfg):
 
     for name in cfg.keys():
@@ -102,13 +75,13 @@ def set_cfg(root, cfg):
             for key in cfg_.keys():
                 if key in declares["names"]:
                     var = declares[declares["names"].index(key)]
-                    var.type(cfg_[key])
+                    var.type = cfg_[key]
                 if key in params["names"]:
                     var = params[params["names"].index(key)]
-                    var.type(cfg_[key])
+                    var.type = cfg_[key]
                 if key in returns["names"]:
                     var = returns[returns["names"].index(key)]
-                    var.type(cfg_[key])
+                    var.type = cfg_[key]
 
 
 def get_cfg(root):
@@ -122,12 +95,14 @@ def get_cfg(root):
 
         declares, params = func[0], func[2]
         for var in declares[:]+params[:]:
-            type = var.type()
+            type = var.type
             if type == "TYPE":
                 type = ""
             cfg_[var["name"]] = type
+
             if not type:
-                type = var.suggest()
+
+                type = var["suggest"]
                 if type == "TYPE":
                     type = ""
                 if type:

@@ -121,15 +121,6 @@ Return : Return
     Example: "return"
 """
 
-def operator_suggestions(node):
-    if node.type() == "TYPE":
-        type = node.propose()
-        if type != "TYPE":
-            for child in node:
-                if child["class"] == "Var":
-                    child.suggest(type)
-
-
 Expr = "%(0)s"
 Gets = "", ", ", ""
 Paren = "(%(0)s)"
@@ -171,19 +162,15 @@ def Return(node):
 
 # simple operators
 def Mul(node):
-    operator_suggestions(node)
     return "", "*", ""
 
 def Elmul(node):
-    operator_suggestions(node)
     return "", ".*", ""
 
 def Plus(node):
-    operator_suggestions(node)
     return "", "+", ""
 
 def Minus(node):
-    operator_suggestions(node)
     return "", "-", ""
 
 Gt      = "", ">", ""
@@ -197,8 +184,24 @@ Land    = "", "&", ""
 Bor     = "", "||", ""
 Lor     = "", "|", ""
 Div     = "", "/", ""
-Rdiv    = "", "\\", ""
-Elrdiv = "", ".\\", ""
+
+def Elrdiv(node):
+    out = ""
+    for child in node[::-1]:
+        out = out + "/" + child
+    return out[1:]
+
+def Rdiv(node):
+    if {n.dim for n in node} == {0}:
+        return Elrdiv(node)
+    out = ""
+    for child in node[::-1]:
+        if child.dim == 3:
+            out = out + "*" + str(child) + ".i()"
+        else:
+            out = out + "/" + str(child)
+    return out[1:]
+
 def Exp(node):
     out = str(node[0])
     for child in node[1:]:
@@ -210,7 +213,7 @@ def Elexp(node):
         out = "pow(" + str(out) + "," + str(child) + ")"
     return out
 
-All = "&="
+All = "span::all"
 Neg = "-(", "", ")"
 Not = "not ", "", ""
 
@@ -223,26 +226,38 @@ def Eldiv(node):
 
 def Colon(node):
 
-    for child in node:
-        child.suggest("int")
+    group = node.group
 
-    if node.group["class"] in ("Get", "Get2", "Get3") and\
-            node.group.type(retd=True).numeric:
-        node.type("uvec")
-        name = "uspan"
-    elif node.group["class"] == "Sets" and\
-            node.group.parent.type(retd=True).numeric:
-        node.type("uvec")
-        name = "uspan"
-    elif node.group["class"] == "Assign" and\
-            node.group[0].type(retd=True).type == 0:
-        node.type("uvec")
-        name = "uspan"
-    else:
-        node.type("ivec")
-        name = "span"
+    if len(node) == 2:
+        if group["class"] in ("Get", "Get2", "Get3") and group.num:
+            node.type = "uvec"
+            name = "span"
+        elif group["class"] == "Sets" and group.parent.num:
+            node.type = "uvec"
+            name = "span"
+        elif node.group["class"] == "Assign" and not group.mem:
+            node.type = "uvec"
+            name = "span"
+        else:
+            node.type = "ivec"
+            name = "ispan"
+        return name+"(%(0)s, %(1)s)"
+
 
     if len(node) == 3:
+        if group["class"] in ("Get", "Get2", "Get3") and group.num:
+            node.type = "uvec"
+            name = "uspan"
+        elif group["class"] == "Sets" and group.parent.num:
+            node.type = "uvec"
+            name = "uspan"
+        elif node.group["class"] == "Assign" and not group.mem:
+            node.type = "uvec"
+            name = "uspan"
+        else:
+            node.type = "ivec"
+            name = "ispan"
         return name+"(%(0)s, %(1)s, %(2)s)"
 
-    return name+"(%(0)s, 1, %(1)s)"
+
+    return "", ":", ""

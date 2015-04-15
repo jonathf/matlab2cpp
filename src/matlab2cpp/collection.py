@@ -500,7 +500,7 @@ value : str
         Node.__init__(self, parent)
         self["value"] = value
         self["backend"] = "int"
-        self.type("int")
+        self.type = "int"
 
 
 class Float(Node):
@@ -517,7 +517,7 @@ value : str
         Node.__init__(self, parent)
         self["value"] = value
         self["backend"] = "double"
-        self.type("double")
+        self.type = "double"
 
 
 class Imag(Node):
@@ -534,7 +534,7 @@ value : str
         Node.__init__(self, parent)
         self["value"] = value
         self["backend"] = "complex"
-        self.type("complex")
+        self.type = "complex"
 
 
 class String(Node):

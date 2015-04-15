@@ -22,20 +22,6 @@ def Program(tree):
             indent -= 1
         line = "  "*indent + line
 
-#          # line breaks
-#          line_ = ""
-#          while len(line) > 70:
-#              for c in [",", " ", "<<", "*", "/", "("]:
-#                  if c in line[50:69]:
-#                      index = line.rfind(c, 50, 69) + len(c)
-#                      line_ += line[:index] + "\n"+"  "*(indent+2)
-#                      line = line[index:]
-#                      break
-#              else:
-#                  line_ += line
-#                  line = ""
-#          line = line_ + line
-
         if line and line[-1] == "{":
             indent += 1
         lines[i] = line

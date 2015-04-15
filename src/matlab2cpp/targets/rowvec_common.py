@@ -13,7 +13,7 @@ def Assign(node):
 def Get(node):
 
     assert len(node) == 1
-    node.type = "uvec"
+    node.type = "urowvec"
     arg = node[0]
 
     if arg["class"] == "All":
@@ -46,21 +46,20 @@ def Set(node):
 
     sets, expr = node
     assert len(sets) == 1
-    node.type = "uvec"
     arg = sets[0]
 
-    if expr.dim == 2:
-        rhs = "(" + str(expr) + ").t()"
+    if expr.dim == 1:
+        rhs = str(expr) + ".t()"
     else:
         rhs = str(expr)
 
-    if arg.dim == 0: # constant
-        out = str(arg)+"-1"
-
-    elif arg["class"] == "All":
+    if arg["class"] == "All":
         if expr.dim == 0:
             return "%(name)s.fill(" + rhs + ") ;"
         return "%(name)s = " + rhs + " ;"
+
+    elif arg.dim == 0: # constant
+        out = str(arg)+"-1"
 
     elif not arg.num:
         return "%(name)s(%(0)s) = " + rhs + " ;"

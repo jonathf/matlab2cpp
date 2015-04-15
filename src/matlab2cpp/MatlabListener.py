@@ -30,14 +30,14 @@ class MatlabListener(ParseTreeListener):
         params["backend"] = "func_return"
 
         var = col.Var(returns, "_retval")
-        var.type("int")
+        var.type = "int"
         var.declare()
 
         argc = col.Var(params, "argc")
-        argc.type("int")
+        argc.type = "int"
 
         argv = col.Var(params, "argv")
-        argv.type("char")
+        argv.type = "char"
         argv["backend"] = "char"
         argv.pointer(2)
 
@@ -60,7 +60,7 @@ class MatlabListener(ParseTreeListener):
         block = ctx.node[3]
         assign = col.Assign(block)
         var = col.Var(assign, "_retval")
-        var.type("int")
+        var.type = "int"
         i = col.Int(assign, "0")
 
     def enterFunction(self, ctx):
@@ -144,7 +144,7 @@ class MatlabListener(ParseTreeListener):
         pnode = ctx.parentCtx.node
 
         lamb = col.Lambda(pnode, name)
-        lamb.type("func_lambda")
+        lamb.type = "func_lambda"
         lamb.declare()
         lamb.reference.reference = func
 
@@ -564,7 +564,7 @@ class MatlabListener(ParseTreeListener):
 
     def enterIfloat(self, ctx):
         pnode = ctx.parentCtx.node
-        val = ctx.IFLOAT().getText()
+        val = ctx.IFLOAT().getText()[:-1]
         if "d" in val: val = val.replace("d", "e")
         if "D" in val: val = val.replace("D", "e")
         if "E" in val: val = val.replace("E", "e")
@@ -640,7 +640,7 @@ class MatlabListener(ParseTreeListener):
 
     def enterIint(self, ctx):
         pnode = ctx.parentCtx.node
-        val = ctx.IINT().getText()
+        val = ctx.IINT().getText()[::-1]
         if "d" in val: val = val.replace("d", "e")
         if "D" in val: val = val.replace("D", "e")
         if "E" in val: val = val.replace("E", "e")

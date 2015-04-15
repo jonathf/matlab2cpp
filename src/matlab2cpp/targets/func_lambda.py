@@ -58,6 +58,7 @@ def Lambda(node):
                     type = params[params["names"].index(name)].type()
                     node_.type(type)
                     node_.declare()
+
                 elif name in declares["names"]:
                     type = declares[declares["names"].index(name)].type()
                     node_.type(type)
@@ -98,7 +99,6 @@ def Var(node):
     return "%(name)s"
 
 def Assign(node):
-    node[0].suggest("function")
     return "%(0)s = %(1)s ;"
 
 def Get(node):

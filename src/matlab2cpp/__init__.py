@@ -168,6 +168,7 @@ def main(path, suggestion=False, disp=False):
                 for key in cfg[name].keys():
                     if key in scope[name]:
                         cfg[name][key] = scope[name][key]
+        utils.set_cfg(tree, cfg)
 
     else:
 
@@ -175,42 +176,52 @@ def main(path, suggestion=False, disp=False):
             print "cfg missing!"
             print "loading scope..."
 
-        cfg, scfg = utils.get_cfg(tree)
+#          cfg, scfg = utils.get_cfg(tree)
 
-    if suggestion:
+    tree.configure(suggestion=suggestion, disp=disp)
+    tree.generate(disp=disp)
+    tree.generate(disp=disp)
+    cfg, scfg = utils.get_cfg(tree)
 
-        if disp:
-            print "suggestion-mode!"
 
-        utils.set_cfg(tree, cfg)
-        tree.generate(disp=False)
-        cfg, scfg = utils.get_cfg(tree)
-
-        i = 1
-        while [s for s in scfg.values() if s]:
-
-            if disp:
-                print "iteration", i
-
-            for name in cfg.keys():
-                cfg[name].update(scfg.get(name, {}))
-            utils.set_cfg(tree, cfg)
-            tree.generate(disp=False)
-            cfg, scfg = utils.get_cfg(tree)
-            i += 1
-
-        utils.set_cfg(tree, cfg)
-        tree.generate(disp=False)
-
-    else:
-
-        if disp:
-            print "dumping scope..."
-        utils.set_cfg(tree, cfg)
-
-        if disp:
-            print "generate tree..."
-        tree.generate(disp=False)
+#      if suggestion:
+#  
+#          if disp:
+#              print "suggestion-mode!"
+#  
+#          utils.set_cfg(tree, cfg)
+#          tree.generate(disp=False)
+#          cfg, scfg = utils.get_cfg(tree)
+#  
+#          i = 1
+#          while [s for s in scfg.values() if s]:
+#  
+#              print
+#              print cfg
+#              print scfg
+#  
+#              if disp:
+#                  print "iteration", i
+#  
+#              for name in cfg.keys():
+#                  cfg[name].update(scfg.get(name, {}))
+#              utils.set_cfg(tree, cfg)
+#              tree.generate(disp=False)
+#              cfg, scfg = utils.get_cfg(tree)
+#              i += 1
+#  
+#          utils.set_cfg(tree, cfg)
+#          tree.generate(disp=False)
+#  
+#      else:
+#  
+#          if disp:
+#              print "dumping scope..."
+#          utils.set_cfg(tree, cfg)
+#  
+#          if disp:
+#              print "generate tree..."
+#          tree.generate(disp=False)
 
     if disp:
         print "creating cfg..."
