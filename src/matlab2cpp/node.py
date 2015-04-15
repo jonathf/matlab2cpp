@@ -1,5 +1,5 @@
 import collection
-import _datatype as dt
+import datatype as dt
 import targets
 import snippets
 import utils
@@ -551,5 +551,5 @@ def init(node, parent, name=""):
     node["names"] = []
 
     node["suggest"] = "TYPE"
-    node._datatype = "TYPE"
+    node["type"] = "TYPE"
 
