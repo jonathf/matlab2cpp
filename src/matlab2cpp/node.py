@@ -7,8 +7,49 @@ import utils
 indexnames = [
     "Assign", "Assigns", "Branch", "For", "Func", "Set", "Set2",
     "Set3", "Sets", "Statement", "Switch", "Tryblock", "While",
-    "Program", "Block", "Get", "Get2", "Get3",
+    "Program", "Block", "Get", "Get2", "Get3", "Node",
 ]
+
+class Prop(object):
+    "general property node"
+
+    def __init__(self, name):
+        self.name = name
+    def __get__(self, instance, owner):
+        return instance.prop[self.name]
+    def __set__(self, instance, value):
+        instance.prop[self.name] = value
+
+class Rprop(object):
+    "recursive property node"
+
+    def __init__(self, name):
+        self.name = name
+
+    def __get__(self, instance, owner):
+
+        a = instance.prop[self.name]
+        if not (a is None):
+            return a
+
+        instances = [instance]
+        while True:
+            instance = instance.parent
+            a = instance.prop[self.name]
+            instances.append(instance)
+            if a is None:
+                assert instance["class"] not in ("Program", "Node")
+            else:
+                break
+
+        for instance in instances[:-1]:
+            instance.prop[self.name] = a
+
+        return a
+
+    def __set__(self, instance, value):
+        instance.prop[self.name] = value
+
 
 
 
@@ -23,7 +64,17 @@ General definition of a token representation of code
     num = dt.Num()
     type = dt.Type()
 
-    def __init__(self, parent, name=None):
+    backend = Prop("backend")
+    str = Prop("str")
+    value = Prop("value")
+    pointer = Prop("pointer")
+
+    end = Prop("end")
+    line = Rprop("line")
+    cur = Rprop("cur")
+    code = Rprop("code")
+
+    def __init__(self, parent=None, name=None):
         """
 Parameters
 ----------
@@ -32,6 +83,11 @@ parent : Node
 name : str
     Optional name of the node
         """
+        if parent is None:
+            parent = self
+            self.program = self
+            name = "program"
+
         init(self, parent, name)
 
     def summary(self, disp=False, group=None):
@@ -45,7 +101,9 @@ name : str
         out = ""
         for node in nodes:
 
-            index = node["index"]
+            line = node.line
+            cur = node.cur
+
             name = node["name"]
             cls = node["class"]
             backend = node["backend"]
@@ -57,13 +115,10 @@ name : str
             while indent and not (node.parent is indent[-1]):
                 indent.pop()
 
-            indices = [n["index"] for n in node.children]+[index]
-            if (group is None) or group in indices:
-
-                space = " "*(len(indent)-1)
-                out += "%3d%s%18s %-10s %-12s %-7s" % \
-                        (index, space, name, cls, backend, type)
-                out += str(node["ret"]) + "\n"
+            space = "| "*(len(indent)-1)
+            out += "%3d %3d %s%-10s %-12s %-7s %-18s" % \
+                    (line, cur, space, cls, backend, type, name)
+            out += str(node["ret"]) + "\n"
 
             indent.append(node)
 
@@ -183,8 +238,19 @@ name : str
 
                 # Assign some hereditary types
                 if type == "TYPE" and node.children and cls not in\
-                        ("Set", "Set2", "Set3", "Get", "Get2", "Get3"):
+                        ("Set", "Cset", "Fset", "Nset",
+                        "Get", "Cget", "Fget", "Nget"):
                     node.type = [n.type for n in node]
+
+                elif cls == "Get":
+
+                    names = node.program["names"]
+                    if node["name"] in names:
+                        func = node.program[names.index(node["name"])]
+                        if len(func[1]) == 1:
+                            node["backend"] = "func_return"
+                        else:
+                            node["backend"] = "func_returns"
 
                 if cls in ("Div", "Eldiv", "Rdiv", "Elrdiv"):
                     if node.num and node.mem < 2:
@@ -213,8 +279,7 @@ name : str
                     var, range = node[:2]
                     var.suggest("int")
 
-                elif cls in ("Var", "Get", "Get2", "Get3",
-                        "Assigns", "Vector", "Matrix", "Colon"):
+                elif cls == "Get":
 
                     if backend == "func_return":
                         names = node.program["names"]
@@ -246,6 +311,10 @@ name : str
 
                     else:
                         node.generate(False, None)
+
+                elif cls in ("Var", "Fvar", "Cget", "Fget", "Nget",
+                        "Assigns", "Vector", "Matrix", "Colon"):
+                    node.generate(False, None)
 
                 elif cls == "Neg" and node[0].mem == 0:
                     node.mem = 1
@@ -504,7 +573,7 @@ name : str
 
 
 
-def init(node, parent, name=""):
+def init(node, parent, name):
 
     node.children = []      # node children
     node.prop = {}          # node property
@@ -538,9 +607,8 @@ def init(node, parent, name=""):
     else:
         node["name"] = ""
 
-
-    if parent.prop["class"] in ("Program", "Func"):
-        node.func = parent
+    if cls in ("Program", "Func", "Node"):
+        node.func = node
     else:
         node.func = parent.func
 
@@ -552,4 +620,9 @@ def init(node, parent, name=""):
 
     node["suggest"] = "TYPE"
     node["type"] = "TYPE"
+
+    node["end"] = 0
+    node["cur"] = None
+    node["line"] = None
+    node["code"] = None
 

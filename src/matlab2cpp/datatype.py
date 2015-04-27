@@ -138,6 +138,7 @@ def get_name(dim, mem):
 
 def get_type(instance):
 
+#      print instance.prop
     val = instance.prop["type"]
     if val != "TYPE":
         return val
