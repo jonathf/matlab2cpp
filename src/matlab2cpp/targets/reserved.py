@@ -263,7 +263,7 @@ def Get_rand(node):
 
 def Get_floor(node):
 
-    if node[0].mom > 1:
+    if node[0].mem > 1:
         node.type = (node[0].dim, 1)
 
     return "arma::floor(%(0)s)"

@@ -1,14 +1,4 @@
-
-Var = "%(name)s"
-
-def Assign(node):
-
-    if node[1]["decomposed"]:
-        return "%(0)s << %(1)s ;"
-
-    return "%(0)s = %(1)s ;"
-
-
+from variables import *
 
 def Get(node):
 
@@ -42,40 +32,53 @@ def Get(node):
     return out
 
 
-def Set(node):
+def Assign(node):
+
+    if node[1]["decomposed"]:
+        return "%(0)s << %(1)s ;"
+
+    if node[0].cls == "Var":
+        return "%(0)s = %(1)s ;"
 
     sets, expr = node
-    assert len(sets) == 1
-    arg = sets[0]
 
     if expr.dim == 1:
-        rhs = str(expr) + ".t()"
+        rhs = "(%(1)s).t()"
     else:
-        rhs = str(expr)
+        rhs = "%(1)s"
 
-    if arg["class"] == "All":
-        if expr.dim == 0:
-            return "%(name)s.fill(" + rhs + ") ;"
-        return "%(name)s = " + rhs + " ;"
 
-    elif arg.dim == 0: # constant
-        out = str(arg)+"-1"
-
-    elif not arg.num:
-        return "%(name)s(%(0)s) = " + rhs + " ;"
-
-    elif arg.mem != 0:
-        out = str(arg.auxillary((arg.dim, 0), convert=True))
-
-    else:
-        out = str(arg)
-
-    if arg.dim == 2:
-        out = out + ".t()"
-    elif arg.dim > 2:
-        out = "vectorise(" + out + ")"
-
-    out = "%(name)s(" + out + ") = " + rhs + " ;"
+    out = "%(0)s = " + rhs + " ;"
 
     return out
 
+
+def Set(node):
+
+    assert len(node) == 1
+
+    arg = node[0]
+
+    if arg["class"] == "All":
+        return "%(name)s"
+
+    elif arg.dim == 0: # constant
+        out = "%(0)s-1"
+        node.dim = 0
+
+    elif not arg.num:
+        return "%(name)s(%(0)s)"
+
+    elif arg.mem != 0:
+        arg.auxillary((arg.dim, 0), convert=True)
+        out = "%(0)s"
+
+    else:
+        out = "%(0)s"
+
+    if arg.dim == 2:
+        out = "(" + out + ").t()"
+    elif arg.dim > 2:
+        out = "vectorise(" + out + ")"
+
+    return "%(name)s(" + out + ")"

@@ -130,12 +130,11 @@ def End(node):
     pnode = node
     while pnode.parent["index"] != 0: pnode = pnode.parent
 
-    if pnode.parent["class"] in ("Get", "Get2", "Get3", "Sets"):
+    if pnode.parent["class"] in ("Get", "Cget", "Nget", "Fget",
+            "Set", "Cset", "Nset", "Fset"):
 
         index = pnode.parent.children.index(pnode)
 
-        if pnode.parent["class"] == "Sets":
-            pnode = pnode.parent
         name = pnode = pnode.parent["name"]
 
         if index == 0:
@@ -229,10 +228,10 @@ def Colon(node):
     group = node.group
 
     if len(node) == 2:
-        if group["class"] in ("Get", "Get2", "Get3") and group.num:
+        if group["class"] in ("Get", "Cget", "Nget", "Fget") and group.num:
             node.type = "uvec"
             name = "span"
-        elif group["class"] == "Sets" and group.parent.num:
+        elif group["class"] in ("Set", "Cset", "Nset", "Fset") and group.num:
             node.type = "uvec"
             name = "span"
         elif node.group["class"] == "Assign" and not group.mem:
@@ -245,10 +244,10 @@ def Colon(node):
 
 
     if len(node) == 3:
-        if group["class"] in ("Get", "Get2", "Get3") and group.num:
+        if group["class"] in ("Get", "Cget", "Nget", "Fget") and group.num:
             node.type = "uvec"
             name = "uspan"
-        elif group["class"] == "Sets" and group.parent.num:
+        elif group["class"] in ("Set", "Cset", "Nset", "Fset") and group.num:
             node.type = "uvec"
             name = "uspan"
         elif node.group["class"] == "Assign" and not group.mem:

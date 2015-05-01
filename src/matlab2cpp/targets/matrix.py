@@ -68,13 +68,13 @@ def Matrix(node):
 
     dims = {n.dim for n in node}
 
+    if None in dims:
+        return "[", "; ", "]"
+
     if len(node) == 1 and len(node[0]) == 0:
         if node.parent["class"] in ("Assign", "Statement"):
             node.parent["backend"] = "matrix"
         return ""
-
-    elif [n for n in node if not n.num]:
-        return "[", "; ", "]"
 
     elif all([n["decomposed"] for n in node]):
 
@@ -97,7 +97,7 @@ def Matrix(node):
             return ""
         return str(node.auxillary())
 
-    elif dims == {0,1}:
+    elif dims in ({0,1}, {1}):
         node.dim = 1
 
         nodes = []
@@ -124,6 +124,9 @@ def Matrix(node):
             else:
                 nodes.append(str(node[i]))
 
+    else:
+        return "[", "; ", "]"
+
 
     return reduce(lambda a,b: ("arma::join_rows(%s, %s)" % (a,b)), nodes)
 
@@ -140,3 +143,4 @@ def Statement(node):
     node[0].declare(name)
     return name + " << %(0)s ;"
 
+Var = "%(name)s"

@@ -23,11 +23,14 @@ codeline
 
 // Branching
 branch_if : 'if{' condition
-    (','? codeline
-    | ','? NL codeblock)? ;
+//      (','? codeline (';' codeline)* | 
+    ','? NL? codeblock? ;
 branch_elif : NL 'elseif' condition
-    (',' codeline | ','? NL codeblock)? ;
-branch_else : NL 'else' (','? codeline | ','? NL codeblock)? ;
+        ','? NL? codeblock? ;
+//      (',' codeline | ','? NL codeblock)? ;
+branch_else : NL 'else'
+//  (','? (codeline (';' codeline)* ) | ','? NL codeblock)? ;
+        ','? NL? codeblock? ;
 condition : expr ;
 
 switch_case : NL 'case' expr (NL codeblock)? ;
@@ -77,11 +80,11 @@ expr
     | '-' expr                      # Minus
     | '~' expr                      # Negate
     | expr '^' expr                 # Exp
-    | expr '\\.^' expr                # Elexp
+    | expr '\\.^' expr              # Elexp
     | expr '\\' expr                # Rdiv
-    | expr '\\.\\' expr               # Elrdiv
+    | expr '\\.\\' expr             # Elrdiv
     | expr '/' expr                 # Div
-    | expr '\\./' expr                # Eldiv
+    | expr '\\./' expr              # Eldiv
     | expr '*' expr                 # Mul
     | expr '\\.*' expr              # Elmul
     | expr '+' expr                 # Plus

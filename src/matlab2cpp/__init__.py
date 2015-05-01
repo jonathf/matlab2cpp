@@ -145,9 +145,8 @@ def main(path, suggestion=False, disp=False):
             print "cfg missing!"
             print "loading scope..."
 
-    tree.configure(suggestion=suggestion, disp=False)
-    tree.generate(disp=False)
-    tree.generate(disp=False)
+    tree.configure(suggestion=suggestion, disp=disp)
+    tree.generate(disp=disp)
     cfg, scfg = utils.get_cfg(tree)
 
 

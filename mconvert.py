@@ -58,7 +58,7 @@ if __name__ == "__main__":
     elif opt.group:
         nodes = matlab2cpp.utils.flatten(tree)
         for node in nodes:
-            if node["index"] == opt.group:
+            if node.line == opt.group:
                 out = node.parent["str"]
                 break
         else:
@@ -66,6 +66,9 @@ if __name__ == "__main__":
 
     else:
         out = tree
+
+    out = str(out)
+    out = out.replace("__percent__", "%")
 
     if opt.filename:
 

@@ -23,6 +23,7 @@ Get : Function/Array retrieval
     Contains: Gets
     Property: name
 """
+from variables import *
 
 def Returns(node):
     return "%(0)s"
@@ -43,6 +44,9 @@ def Func(node):
     type = node[1][0].type
     return type + " %(name)s(%(2)s)\n{\n%(0)s\n%(3)s\nreturn %(1)s ;\n}"
 
+adjusts = {"func_lambda": "std::function",
+        "uint": "unsigned int"}
+
 def Declares(node):
     declares = {}
     for child in node[:]:
@@ -50,6 +54,10 @@ def Declares(node):
         if type not in declares:
             declares[type] = []
         declares[type].append(child)
+
+    for key,val in adjusts.items():
+        if key in declares:
+            declares[val] = declares.pop(key)
 
     out = ""
     for key, val in declares.items():

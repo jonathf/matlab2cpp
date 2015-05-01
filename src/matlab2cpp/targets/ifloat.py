@@ -1,8 +1,4 @@
+from variables import *
 
-Type = "std::complex<double>"
+Declare = "std::complex<double> %(name)s ;"
 Ifloat = "%(value)s"
-Var = "%(name)s"
-
-def Assign(node):
-    node.suggest("complex")
-    return "%(0)s(0., %(1)s) ;"

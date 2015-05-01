@@ -95,14 +95,14 @@ def get_cfg(root):
 
         declares, params = func[0], func[2]
         for var in declares[:]+params[:]:
-            type = var.type
+            type = var.prop["type"]
             if type == "TYPE":
                 type = ""
             cfg_[var["name"]] = type
 
             if not type:
 
-                type = var["suggest"]
+                type = var.prop["suggest"]
                 if type == "TYPE":
                     type = ""
                 if type:

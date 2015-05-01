@@ -8,8 +8,7 @@ class Program(Node):
     """Root of the tree"""
 
     def __init__(self):
-        self.program = self
-        Node.__init__(self, self, "program")
+        Node.__init__(self, name="program")
 
         self["backend"] = "program"
 
@@ -279,37 +278,6 @@ expr : Expr
         self["backend"] = "code_block"
 
 
-class Var(Node):
-    """Variable"""
-    def __init__(self, parent, name):
-        if name[:1] == "@":
-            name = name[1:]
-        Node.__init__(self, parent, name)
-
-
-class Set(Node):
-    """Set a module/array value
-
-Children
---------
-rhs, lhs
-arg : Expr, All
-    One or more arguments.
-rhs : Expr
-    Right hand side expression.
-    """
-
-class Set2(Node):
-    """Set a tuple element"""
-
-class Set3(Node):
-    """Set a field element"""
-
-class Sets(Node):
-    """Values argument for the Set methods"""
-    def __init__(self, parent):
-        Node.__init__(self, parent)
-        self["backend"] = "code_block"
 
 
 class Assign(Node):
@@ -341,13 +309,6 @@ rhs : Assigns_args
         Node.__init__(self, parent)
         self["backend"] = "code_block"
 
-class Assigned(Node):
-
-    def __init__(self, parent):
-        Node.__init__(self, parent)
-        self["backend"] = "code_block"
-
-class Assignees(Node): pass
 
 class Expr(Node):
     """Expression
@@ -431,26 +392,6 @@ expr : Expr
         Node.__init__(self, parent)
         self["backend"] = "expression"
 
-class Get(Var):
-    """Function/Module call
-
-func(arg1, arg2, ..)
-
-Children
---------
-arg, [arg ...]
-
-arg : Expr
-    One or more argument in the function/module call.
-    """
-
-class Get2(Var):
-    "Fieldname retrival"
-
-class Get3(Var):
-    "Tuple retrival"
-
-class Gets(Node): pass
 
 class Neg(Node):
     """Negative prefix
@@ -549,6 +490,7 @@ value : str
     Text representation of the string value.
         """
         Node.__init__(self, parent)
+        value = value.replace("%", "__percent__")
         self["value"] = value
         self["backend"] = "string"
 
@@ -582,56 +524,82 @@ class Lambda(Node):
         self["backend"] = "func_lambda"
 
 
-
-
-class Assign_alt(Node):
-    def __init__(self, parent, name=""):
-        Node.__init__(self, parent, name)
-        self["backend"] = "sandbox"
-
-class Var_alt(Node):
-    def __init__(self, parent, name=""):
-        Node.__init__(self, parent, name)
-        self["backend"] = "sandbox"
-
-class Call_alt(Node):
-    def __init__(self, parent, name=""):
-        Node.__init__(self, parent, name)
-        self["backend"] = "sandbox"
-
-class Field1_alt(Node):
-    def __init__(self, parent, name=""):
-        Node.__init__(self, parent, name)
-        self["backend"] = "sandbox"
-
-class Field2_alt(Node):
-    def __init__(self, parent, name=""):
-        Node.__init__(self, parent, name)
-        self["backend"] = "sandbox"
-
-class Field3_alt(Node):
-    def __init__(self, parent, name=""):
-        Node.__init__(self, parent, name)
-        self["backend"] = "sandbox"
-
-class Assigned_alt(Node):
-
-    def __init__(self, parent):
+class Lcomment(Node):
+    def __init__(self, parent, value=""):
         Node.__init__(self, parent)
-        self["backend"] = "sandbox"
+        value = value.replace("%", "__percent__")
+        self["value"] = value
+        self["backend"] = "code_block"
 
-class Assignees_alt(Node):
+class Bcomment(Node):
+    def __init__(self, parent, value=""):
+        Node.__init__(self, parent)
+        value = value.replace("%", "__percent__")
+        self["value"] = value
+        self["backend"] = "code_block"
 
+
+class Var(Node):
+    """Variable"""
+    def __init__(self, parent, name):
+        Node.__init__(self, parent, name)
+
+class Get(Var):
+    """Function/Module call
+
+func(arg1, arg2, ..)
+
+Children
+--------
+arg, [arg ...]
+
+arg : Expr
+    One or more argument in the function/module call.
+    """
+
+class Set(Node):
+    """Set a module/array value
+
+Children
+--------
+rhs, lhs
+arg : Expr, All
+    One or more arguments.
+rhs : Expr
+    Right hand side expression.
+    """
+
+class Fvar(Node):
+    def __init__(self, parent, name, sname):
+        Node.__init__(self, parent, name)
+        self["sname"] = sname
+
+class Cvar(Node):
+    def __init__(self, parent, name):
+        Node.__init__(self, parent, name)
+
+class Cget(Node):
+    def __init__(self, parent, name):
+        Node.__init__(self, parent, name)
+
+class Fget(Node):
+    def __init__(self, parent, name, sname):
+        Node.__init__(self, parent, name)
+        self["sname"] = sname
+
+class Nget(Node):
     def __init__(self, parent, name=""):
         Node.__init__(self, parent, name)
-        self["backend"] = "sandbox"
 
-class Get_alt(Node):
+class Cset(Node):
     def __init__(self, parent, name=""):
         Node.__init__(self, parent, name)
-        self["backend"] = "sandbox"
 
-class Cell_alt(Node):
+class Fset(Node):
+    def __init__(self, parent, name, sname):
+        Node.__init__(self, parent, name)
+        self["sname"] = sname
+
+class Nset(Node):
     def __init__(self, parent, name=""):
         Node.__init__(self, parent, name)
-        self["backend"] = "sandbox"

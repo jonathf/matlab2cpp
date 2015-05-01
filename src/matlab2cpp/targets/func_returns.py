@@ -18,12 +18,13 @@ Get : Function/Array retrieval
     Contains: Gets
     Property: name
 """
+from variables import *
 
 def Returns(node):
     out = ""
     for child in node[:]:
         child.prop["pointer"] -= 1
-        out += ", " + child.type() + child.pointer() + " " + str(child)
+        out += ", " + child.type + child.pointer() + " " + str(child)
     return out[2:]
 
 
@@ -33,7 +34,7 @@ def Get(node):
 def Params(node):
     out = ""
     for child in node[:]:
-        out += ", " + child.type() + child.pointer() + " " + str(child)
+        out += ", " + child.type + child.pointer() + " " + str(child)
     return out[2:]
 
 
@@ -48,21 +49,6 @@ def Func(node):
     return out
 
 
-#  def declares(node):
-#  
-#      declared = node.declares.copy()
-#  
-#      params = node.get_property_all(
-#          "func", node["name"])
-#      params = set([p["name"] for p in params
-#                    if p.parent["class"] in ("Params", "Returns")])
-#  
-#      out = ""
-#      for key, val in declared.items():
-#          if key not in params:
-#              out += val
-#  
-#      return out
 
 def Assignees(node):
     return "*", ", *", ""
@@ -79,7 +65,7 @@ def Assigns(node):
 def Declares(node):
     declares = {}
     for child in node[:]:
-        type = child.type()
+        type = child.type
         if type not in declares:
             declares[type] = []
         declares[type].append(child)

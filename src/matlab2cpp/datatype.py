@@ -159,10 +159,10 @@ def get_type(instance):
 
     for declare in declares:
         if declare["name"] == name:
-            return declare.type
+            return declare.prop["type"]
     for param in params:
         if param["name"] == name:
-            return param.type
+            return param.prop["type"]
 
     return "TYPE"
 

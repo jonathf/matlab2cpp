@@ -65,22 +65,7 @@ Assigned : Lhs in Assigns
     Rule : code_block.py
 """
 
-Assigned =  "*", ", *", " "
 
-def Assigns(node):
-
-    assigned, expression = node[:]
-    if expression["class"] == "Var":
-        out = ""
-        for i in xrange(len(assigned)):
-            var = assigned[i]
-            out += var + " = " + expression + "(%d) ;\n" % i
-        out = out[:-1]
-        return out + " ;"
-
-    return "%(name)s(%(0)s, %(1)s) ;"
-
-Sets = "", ", ", ""
 Statement = "%(0)s ;"
 While = "while(%(0)s)\n{\n%(1)s\n}"
 Cond = "", ",", ""
@@ -95,18 +80,19 @@ def If(node):
 Elif = "else if (%(0)s)\n{\n%(1)s\n}"
 Else = "else\n{\n%(0)s\n}"
 
-#  sw = [""]
-#  def Switch(node):
-#      sw[0], _ = "", sw[0]
-#      return "_case_"+_+" = ", " ;\n", "\nelse", ""
-#  
-#  def Case(node):
-#      if not sw[0]:
-#          sw[0] = node[0].type()
-#      return "if (_case_"+sw[0]+" == %(0)s)\n{\n%(1)s\n}"
-#  
-#  def Otherwise(node):
-#      return "\n{\n%(0)s\n}"
+def Switch(node):
+    if node[0].cls != "Var" and node[0].type != "TYPE":
+        node[0].auxillary()
+
+    if node[-1].cls == "Otherwise":
+        return ["if (", " == "] +\
+                ["\n}\nelse if (%(0)s == "]*(len(node)-3) +\
+                ["\n}\nelse\n{\n", "\n}"]
+    else:
+        return "if (%(0)s == ", "\n}\nelse if (%(0)s == ", "\n}"
+
+Case = "%(0)s)\n{\n%(1)s"
+Otherwise = "%(0)s"
 
 def Tryblock(node):
     return "", "\n", ""
@@ -122,12 +108,27 @@ def Catch(node):
 def Block(node):
     return "", "\n", ""
 
+def Assigns(node):
+
+    assigned, expression = node[:-1], node[-1]
+
+    if expression["class"] != "Var":
+        expression = expression.auxillary()
+
+    out = ""
+    for i in xrange(len(assigned)):
+        var = assigned[i]
+        out += var + " = " + expression + "(%d) ;\n" % i
+    out = out[:-1]
+    return out + " ;"
+
+
 
 def For(node):
 
     var, range = node[:2]
+
     if range["class"] == "Colon":
-#          var.suggest("int")
         if len(range) == 2:
             start, stop = range
             step = "1"
@@ -148,3 +149,6 @@ def For(node):
 {
 %(2)s
 }"""
+
+Bcomment = "/*%(value)s*/"
+Lcomment = "//%(value)s"

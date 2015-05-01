@@ -5,9 +5,11 @@ import snippets
 import utils
 
 indexnames = [
-    "Assign", "Assigns", "Branch", "For", "Func", "Set", "Set2",
-    "Set3", "Sets", "Statement", "Switch", "Tryblock", "While",
-    "Program", "Block", "Get", "Get2", "Get3", "Node",
+    "Assign", "Assigns", "Branch", "For", "Func",
+    "Set", "Cset", "Fset", "Nset",
+    "Get", "Cget", "Fget", "Nget",
+    "Statement", "Switch", "Tryblock",
+    "While", "Program", "Block", "Node",
 ]
 
 class Prop(object):
@@ -68,6 +70,7 @@ General definition of a token representation of code
     str = Prop("str")
     value = Prop("value")
     pointer = Prop("pointer")
+    cls = Prop("class")
 
     end = Prop("end")
     line = Rprop("line")
@@ -125,7 +128,7 @@ name : str
         return out
 
 
-    def generate(self, disp, group=None):
+    def generate(self, disp=False, group=None):
         """Generate code"""
 
         nodes = utils.flatten(self, False, True, False)
@@ -134,19 +137,15 @@ name : str
 
         for node in nodes[::-1]:
 
-            type_ = node.type
+            type_ = node.get_global_type()
+            if type == "TYPE":
+                type_ = node.type
             name = node["name"]
             cls = node["class"]
             backend = node["backend"]
 
-            if disp:
-                print name, cls, type_, backend
-
-            if type_ == "TYPE" and node.children and \
-                    cls not in ("Get", "Get2", "Get3", 
-                            "Set", "Set2", "Set3"):
-                node.type = [n.type for n in node]
-                type_ = node.type
+#              if disp:
+#                  print name, cls, type_, backend
 
             if name in targets.reserved.reserved:
                 backend = "reserved"
@@ -239,7 +238,7 @@ name : str
                 # Assign some hereditary types
                 if type == "TYPE" and node.children and cls not in\
                         ("Set", "Cset", "Fset", "Nset",
-                        "Get", "Cget", "Fget", "Nget"):
+                        "Get", "Cget", "Fget", "Nget", "Assign"):
                     node.type = [n.type for n in node]
 
                 elif cls == "Get":
@@ -252,30 +251,23 @@ name : str
                         else:
                             node["backend"] = "func_returns"
 
-                if cls in ("Div", "Eldiv", "Rdiv", "Elrdiv"):
+                elif type == "TYPE" and cls == "Assign":
+                    node.type = node[0].type
+
+                elif cls in ("Div", "Eldiv", "Rdiv", "Elrdiv"):
                     if node.num and node.mem < 2:
                         node.mem = 2
 
                 backend = node["backend"]
 
-                if backend != "unknown":
-                    pass
-
-                elif name in targets.reserved.reserved:
+                if backend == "unknown" and name in targets.reserved.reserved:
                     node["backend"] = "reserved"
 
-
-                if backend in "unknown" and type != "TYPE":
+                elif backend == "unknown" and type != "TYPE":
                     node["backend"] = type
 
                 # Assign suggestion
-                if not suggestion or type != "TYPE":
-                    pass
-
-                elif cls == "Assign":
-                    node[0].suggest(node[1].type)
-
-                elif cls == "For":
+                if cls == "For":
                     var, range = node[:2]
                     var.suggest("int")
 
@@ -287,30 +279,34 @@ name : str
                         ret_val = func[1][0]
                         node.set_global_type(ret_val.type)
                         params = func[2]
+#                          print repr(params.code)
+#                          print repr(node.code)
+#                          print params["class"]
+#                          print len(node)
                         for i in xrange(len(node)):
                             params[i].suggest(node[i].type)
 
                     if backend == "func_returns":
                         names = node.program["names"]
                         func = node.program[names.index(name)]
-                        returns = func[1]
                         params = func[2]
-                        for i in xrange(len(returns)):
-                            returns[i].suggest(node[i].type)
                         for j in xrange(len(params)):
-                            params[j].suggest(node[i+j+1].type)
+                            params[j].suggest(node[j].type)
 
-                    if backend == "func_lambda":
-                        names = node.program["names"]
-                        func = node.program[names.index(name)]
-                        ret_val = func[1][0]
-                        node.set_global_type(ret_val.type)
-                        params = func[2]
-                        for i in xrange(len(node)):
-                            params[i].suggest(node[i].type)
+#                      if backend == "func_lambda":
+#                          names = node.program["names"]
+#                          func = node.program[names.index(name)]
+#                          ret_val = func[1][0]
+#                          node.set_global_type(ret_val.type)
+#                          params = func[2]
+#                          for i in xrange(len(node)):
+#                              params[i].suggest(node[i].type)
 
                     else:
                         node.generate(False, None)
+
+                elif cls == "Assign":
+                    node[0].suggest(node[1].type)
 
                 elif cls in ("Var", "Fvar", "Cget", "Fget", "Nget",
                         "Assigns", "Vector", "Matrix", "Colon"):
@@ -334,9 +330,6 @@ name : str
     def declare(self, name=""):
         "Declare a variable in the begining of a function."
 
-        if hasattr(self, "reference"):
-            return
-
         name = name or self["name"]
         if name in targets.reserved.reserved:
             return
@@ -345,7 +338,6 @@ name : str
         declares = func[0]
         params = func[2]
         if name in params["names"]:
-            self.reference = params[params["names"].index(name)]
             return
 
         if name in declares["names"]:
@@ -353,7 +345,6 @@ name : str
             type = self.type
             if type != "TYPE":
                 node.type = type
-            self.reference = node
             return
 
         node = collection.Declare(declares, name)
@@ -363,8 +354,6 @@ name : str
         self.reference = node
 
     def set_global_type(self, text):
-
-        self.type = text
 
         if self["class"] == "Func":
             func = self
@@ -390,6 +379,34 @@ name : str
                 return
 
         node.type = text
+
+    def get_global_type(self):
+
+        if self["class"] == "Func":
+            func = self
+        elif self["class"] in ("Program", "Include", "Includes"):
+            return "TYPE"
+        else:
+            func = self.func
+
+        declares = func[0]
+        params = func[2]
+        name = self["name"]
+
+        for declare in declares:
+            if declare["name"] == name:
+                node = declare
+                break
+        else:
+            for param in params:
+                if param["name"] == name:
+                    node = param
+                    break
+            else:
+                return "TYPE"
+
+        return node.prop["type"]
+
 
 
     def suggest(self, text):
@@ -473,7 +490,7 @@ name : str
         # Create aux Var
         if convert:
             get = collection.Get(s, "conv_to")
-            get.set_global_type(type)
+            get.type = type
             v1 = collection.Var(get, var)
         else:
             v1 = collection.Var(s, var)
@@ -497,6 +514,10 @@ name : str
         else:
             s.children[-1] = self
 
+        # generate code
+        s.generate(False)
+        v1.generate(False)
+
         return v1
 
 
@@ -518,7 +539,6 @@ name : str
         include["backend"] = "program"
         return idname
 
-
     def pointer(self, num=None):
         if num is None:
             num = self.prop["pointer"]
@@ -533,7 +553,28 @@ name : str
         return ""
 
     def error(self, text):
-        self.program.errors.add(text)
+
+        code = self.program.code
+        cur = self.cur
+        end = cur+len(self.code)+1
+
+        start = cur
+        count = 2
+        while count:
+            if code[start] == "\n":
+                count -= 1
+            start -= 1
+
+        finish = end
+        count = 2
+        while count:
+            if code[finish] == "\n":
+                count -= 1
+            finish += 1
+
+        return """Error at line %(line)s:
+""" + code[start:cur] + '"' + code[cur:end] + '"' + code[end:finish]
+
 
 
     def __getitem__(self, i):
@@ -621,7 +662,6 @@ def init(node, parent, name):
     node["suggest"] = "TYPE"
     node["type"] = "TYPE"
 
-    node["end"] = 0
     node["cur"] = None
     node["line"] = None
     node["code"] = None
