@@ -67,7 +67,7 @@ Assigned : Lhs in Assigns
 
 
 Statement = "%(0)s ;"
-While = "while(%(0)s)\n{\n%(1)s\n}"
+While = "while (%(0)s)\n{\n%(1)s\n}"
 Cond = "", ",", ""
 
 Branch = "", "\n", ""
@@ -77,36 +77,62 @@ def If(node):
         return "if (%(0)s)\n{\n// Empty block\n}"
     return "if (%(0)s)\n{\n%(1)s\n}"
 
-Elif = "else if (%(0)s)\n{\n%(1)s\n}"
+def Elif(node):
+    if len(node) == 1:
+        return "else if (%(0)s)\n{\n// Empty block\n}"
+    return "else if (%(0)s)\n{\n%(1)s\n}"
 Else = "else\n{\n%(0)s\n}"
 
 def Switch(node):
     if node[0].cls != "Var" and node[0].type != "TYPE":
         node[0].auxillary()
+    return "\n".join(map(str, node[1:]))
+#      return "", "\n", ""
+#  
+#      if node[-1].cls == "Otherwise":
+#          return ["if (", " == "] +\
+#                  ["\n}\nelse if (%(0)s == "]*(len(node)-3) +\
+#                  ["\n}\nelse\n{\n", "\n}"]
+#      else:
+#          return "if (%(0)s == ", "\n}\nelse if (%(0)s == ", "\n}"
 
-    if node[-1].cls == "Otherwise":
-        return ["if (", " == "] +\
-                ["\n}\nelse if (%(0)s == "]*(len(node)-3) +\
-                ["\n}\nelse\n{\n", "\n}"]
-    else:
-        return "if (%(0)s == ", "\n}\nelse if (%(0)s == ", "\n}"
+def Case(node):
+    var = node.parent[0]
 
-Case = "%(0)s)\n{\n%(1)s"
-Otherwise = "%(0)s"
+    if node is node.parent[1]:
+        if var.cls != "Var" and var.type != "TYPE":
+            var.auxillary()
+
+        return "if (%(0)s == " + str(var)+")\n{\n%(1)s\n}"
+
+    return "else if (%(0)s == " + str(var) + ")\n{\n%(1)s\n}"
+
+def Otherwise(node):
+    return "else\n{\n%(0)s\n}"
 
 def Tryblock(node):
     return "", "\n", ""
 Try = "try\n{\n", "", "\n}"
 def Catch(node):
     name = node["name"]
+    if not name:
+        return "catch (...)\n{\n", "", "\n}"
     if name[0] != "@":
         return "catch ("+node.type()+" "+name+")\n{\n", "", "\n}"
     return "catch (...)\n{\n", "", "\n}"
 
-
-
 def Block(node):
-    return "", "\n", ""
+    if not len(node):
+        return ""
+
+    out = str(node[0])
+    for child in node[1:]:
+        if child.cls == "Ecomment":
+            out = out + " " + str(child)
+        else:
+            out = out + "\n" + str(child)
+
+    return out
 
 def Assigns(node):
 
@@ -121,8 +147,6 @@ def Assigns(node):
         out += var + " = " + expression + "(%d) ;\n" % i
     out = out[:-1]
     return out + " ;"
-
-
 
 def For(node):
 
@@ -152,3 +176,4 @@ def For(node):
 
 Bcomment = "/*%(value)s*/"
 Lcomment = "//%(value)s"
+Ecomment = "//%(value)s"

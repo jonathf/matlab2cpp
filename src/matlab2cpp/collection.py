@@ -525,6 +525,11 @@ class Lambda(Node):
 
 
 class Lcomment(Node):
+    """Line comment
+
+Example:
+% This is a line comment
+"""
     def __init__(self, parent, value=""):
         Node.__init__(self, parent)
         value = value.replace("%", "__percent__")
@@ -532,16 +537,35 @@ class Lcomment(Node):
         self["backend"] = "code_block"
 
 class Bcomment(Node):
+    """Block comment
+
+Example:
+%{
+This is a block comment
+%}
+"""
     def __init__(self, parent, value=""):
         Node.__init__(self, parent)
         value = value.replace("%", "__percent__")
         self["value"] = value
         self["backend"] = "code_block"
 
+class Ecomment(Node):
+    """End comment
+
+Example:
+a = 14 % This is an end comment
+"""
+    def __init__(self, parent, value=""):
+        Node.__init__(self, parent)
+        value = value.replace("%", "__percent__")
+        self["value"] = value
+        self["backend"] = "code_block"
 
 class Var(Node):
     """Variable"""
     def __init__(self, parent, name):
+        assert "\n" not in name
         Node.__init__(self, parent, name)
 
 class Get(Var):

@@ -4,6 +4,9 @@ import targets
 import snippets
 import utils
 
+import time
+from datetime import datetime as date
+
 indexnames = [
     "Assign", "Assigns", "Branch", "For", "Func",
     "Set", "Cset", "Fset", "Nset",
@@ -100,6 +103,11 @@ name : str
         if disp:
             print "iterating %d nodes" % len(nodes)
 
+        if not (group is None):
+            for node in nodes:
+                if node.cls != "Block" and node.line == group:
+                    return node.summary(disp, None)
+
         indent = [self]
         out = ""
         for node in nodes:
@@ -144,9 +152,6 @@ name : str
             cls = node["class"]
             backend = node["backend"]
 
-#              if disp:
-#                  print name, cls, type_, backend
-
             if name in targets.reserved.reserved:
                 backend = "reserved"
             elif backend == "unknown" and type_ != "TYPE":
@@ -171,7 +176,8 @@ name : str
                 value = str(value)
 
             elif value is None:
-                raise ValueError("missing return in %s.%s" % (backend, cls))
+                raise ValueError(
+        "missing return in function %s in file %s" % (cls, backend))
 
             node["ret"] = repr(value)
 
@@ -212,11 +218,6 @@ name : str
                                 " is misbehaving\n" + value + "\n"+str(prop))
 
             node.prop["str"] = value
-
-        if group:
-            for node in nodes:
-                if node["index"] == group:
-                    return node.parent["str"]
 
         return self.prop["str"]
 
@@ -552,29 +553,84 @@ name : str
             return (-num)*"&"
         return ""
 
-    def error(self, text):
+    def error_log(self):
+
+        ts = time.time()
+        log = "Translated on " +\
+                date.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S\n\n')
+
+        for node in utils.flatten(self):
+
+            cls = node.cls
+
+            if cls == "Assign":
+                n0, n1 = node
+                t0, t1 = n0.type, n1.type
+                if "TYPE" in (t0, t1):
+                    continue
+
+                elif n0.num != n1.num:
+                    msg = "Incompatible types (%s) and (%s)" % (t0, t1)
+                    log = log + node.message(msg, "Error")
+
+                elif n0.dim == n1.dim and n0.mem != n1.mem:
+                    msg = "Type conversion (%s) and (%s)" % (t0, t1)
+                    log = log + node.message(msg, "Warning")
+
+                elif n0.dim != n1.dim:
+                    msg = "Incompatible dimensions (%s) and (%s)" % (t0, t1)
+                    log = log + node.message(msg, "Error")
+
+#              elif cls == "Var":
+#                  if node.type == "TYPE":
+#                      msg = "Undefined variable (%s)" % node["name"]
+#                      log = log + node.message(msg, "Error")
+#  
+#              elif cls == "Get":
+#                  if node.type == "TYPE":
+#                      msg = "Undefined function/array (%s)" % node["name"]
+#                      log = log + node.message(msg, "Error")
+
+            elif cls in ("Fvar", "Fget", "Fset", "Nget", "Nset"):
+                msg = "Fieldnames is currently not supported"
+                log = log + node.message(msg, "Error")
+
+
+            elif cls in ("Cvar", "Cget", "Cset"):
+                msg = "Cell-structures currently not supported"
+                log = log + node.message(msg, "Error")
+
+            elif cls == "Try":
+                msg = "Try-catch currently not supported"
+
+            elif cls == "While":
+                msg = "While-loops currently not supported"
+
+        return log
+
+
+    def message(self, msg, typ="Error"):
 
         code = self.program.code
         cur = self.cur
-        end = cur+len(self.code)+1
+        end = cur+len(self.code)
 
         start = cur
-        count = 2
-        while count:
-            if code[start] == "\n":
-                count -= 1
+        while code[start] != "\n":
             start -= 1
 
         finish = end
-        count = 2
-        while count:
-            if code[finish] == "\n":
-                count -= 1
+        while code[finish] != "\n":
             finish += 1
 
-        return """Error at line %(line)s:
-""" + code[start:cur] + '"' + code[cur:end] + '"' + code[end:finish]
+        pos = cur-start
 
+        error = "%d %d" % (self.line, pos) + " " + typ + " in " +\
+                self.cls + ": " + msg + "\n"
+        error = error + '"' + code[start+1:finish] + '"'
+        error = error + "\n\n"
+
+        return error
 
 
     def __getitem__(self, i):

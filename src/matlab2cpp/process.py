@@ -10,6 +10,8 @@ expression_end = "%])},;\n"
 list_start = "[({"
 list_end = "]})"
 
+key_end = " \t(,;\n%"
+
 prefixes = "-+~"
 postfix1 = "'"
 postfix2 = ".'"
@@ -18,6 +20,8 @@ operator2 = (
     ".^", ".\\", "./", ".*",
     "<=", ">=", "==", "~=",
     "&&", "||")
+
+string_prefix = " \t\n=><"
 
 def process(text, disp=True):
     """Process raw Matlab-code and create a token tree
@@ -72,13 +76,12 @@ tree : Node
         # Start processing
 
         mainblock = None
-        line = 0
+        line = 1
         cur = 0
 
         while True:
 
             if A[cur] == "\n":
-
                 line += 1
 
             elif A[cur] in " \t;":
@@ -98,7 +101,7 @@ tree : Node
                         print "%4d %4d Function (main)" %\
                             (cur, line)
 
-                    mainblock = create_main(program, cur, line)
+                    mainblock = create_main(program, 0, 0)
 
                 cur, line = fill_codeblock(mainblock, cur, line)
 
@@ -151,7 +154,7 @@ tree : Node
     def create_function(program, cur, line):
 
         assert A[cur:cur+8] == "function"
-        assert A[cur+8] in " (["
+        assert A[cur+8] in key_end+"["
 
         START = cur
         k = cur + 8
@@ -184,9 +187,19 @@ tree : Node
             while A[l+1] in letters+digits+"_":
                 l += 1
 
+            m = l+1
+
+            while A[m] in " \t":
+                m += 1
+
+            if A[m] == "(":
+                m = findend_paren(m)
+            else:
+                m = l
+
             if disp:
                 print "%4d %4d Function       " % (cur, line),
-                print repr(A[START:l+1])
+                print repr(A[START:m+1])
 
             name = A[k:l+1]
             func = col.Func(program, name)
@@ -202,17 +215,16 @@ tree : Node
                 end = START
                 for array in L:
                     for s,e in array:
-#                          assert all([a in letters+digits+"_@" \
-#                                  for a in A[s:e+1]])
-
                         line += A.count("\n", end, s)
                         end = s
 
                         if disp:
                             print "%4d %4d   Return       " % (cur, line),
                             print repr(A[s:e+1])
+                        assert all([a in letters+digits+"_@" \
+                                for a in A[s:e+1]])
 
-                        var = col.Var(returns, A[start:end+1])
+                        var = col.Var(returns, A[s:e+1])
                         var.cur = start
                         var.line = line
                         var.code = A[s:e+1]
@@ -238,9 +250,16 @@ tree : Node
         # No returns
         else:
 
+            m = k
+            if A[m] == "(":
+                m = findend_paren(m)
+            else:
+                m = end
+
+
             if disp:
                 print "%4d %4d Function       " % (cur, line),
-                print repr(A[START:end+1])
+                print repr(A[START:m+1])
 
             end = start+1
             while A[end] in letters+"_":
@@ -256,7 +275,6 @@ tree : Node
 
             cur = end
 
-
         params = col.Params(func)
 
         if A[cur] == "(":
@@ -265,18 +283,18 @@ tree : Node
             params.cur = cur
             params.code = A[cur:end+1]
 
-            L = iterate_list(cur)
+            L = iterate_comma_list(cur)
             for array in L:
-                for start,end in array:
+                for s,e in array:
 
                     if disp:
                         print "%4d %4d   Param        " % (cur, line),
-                        print repr(A[start:end+1])
+                        print repr(A[s:e+1])
 
-                    var = col.Var(params, A[start:end+1])
-                    var.cur = start
+                    var = col.Var(params, A[s:e+1])
+                    var.cur = s
                     var.line = line
-                    var.code = A[start:end+1]
+                    var.code = A[s:e+1]
 
             cur = end
 
@@ -327,7 +345,6 @@ tree : Node
                     return cur, line
 
             elif A[cur] == "%":
-
                 cur, line = create_comment(block, cur, line)
 
             elif A[cur] == "[":
@@ -350,7 +367,7 @@ tree : Node
 
                     end = findend_expression(cur)
                     if disp:
-                        print "%4d %4d   Statement" % (cur, line),
+                        print "%4d %4d   Statement    " % (cur, line),
                         print repr(A[cur:end+1])
 
                     statement.code = A[cur:end+1]
@@ -363,7 +380,7 @@ tree : Node
 
                 end = findend_string(cur)
                 if disp:
-                    print "%4d %4d   Statement" % (cur, line),
+                    print "%4d %4d   Statement    " % (cur, line),
                     print repr(A[cur:end+1])
 
                 statement = col.Statement(block)
@@ -373,38 +390,39 @@ tree : Node
 
                 cur, line = create_string(statement, cur, line)
 
-            elif A[cur:cur+2] == "if" and A[cur+2] in " (":
-
-                cur, line = create_if(block, cur, line)
-
-            elif A[cur:cur+4] == "else" and A[cur+4] in " \t(,;\n":
+            elif A[cur:cur+4] == "case" and A[cur+4] in key_end:
                 return cur, line
 
-            elif A[cur:cur+4] == "case" and A[cur+4] in " \t(,;\n":
+            elif A[cur:cur+5] == "catch" and A[cur+5] in key_end:
                 return cur, line
 
-            elif A[cur:cur+9] == "otherwise" and A[cur+9] in " \t(,;\n":
-                return cur, line
-
-            elif A[cur:cur+3] == "for" and A[cur+3] in " (":
-
-                cur, line = create_for(block, cur, line)
-
-            elif A[cur:cur+5] == "while" and A[cur+5] in " (":
-
-                cur, line = create_while(block, cur, line)
-
-            elif A[cur:cur+6] == "switch" and A[cur+6] in " (":
-                cur, line = create_switch(block, cur, line)
-
-            elif A[cur:cur+3] == "try" and A[cur+3] in " (\n":
-                cur, line = create_try(block, cur+3, line)
-
-            elif A[cur:cur+3] == "end" and A[cur+3] in " ;\n\t,":
+            elif A[cur:cur+3] == "end" and A[cur+3] in key_end:
                 return cur+3, line
 
-            elif A[cur:cur+8] == "function" and A[cur+8] in " ([":
+            elif A[cur:cur+4] == "else" and A[cur+4] in key_end:
+                return cur, line
+
+            elif A[cur:cur+3] == "for" and A[cur+3] in key_end:
+                cur, line = create_for(block, cur, line)
+
+            elif A[cur:cur+8] == "function" and\
+                    A[cur+8] in key_end + "[":
                 return cur-1, line
+
+            elif A[cur:cur+2] == "if" and A[cur+2] in key_end:
+                cur, line = create_if(block, cur, line)
+
+            elif A[cur:cur+9] == "otherwise" and A[cur+9] in key_end:
+                return cur, line
+
+            elif A[cur:cur+6] == "switch" and A[cur+6] in key_end:
+                cur, line = create_switch(block, cur, line)
+
+            elif A[cur:cur+3] == "try" and A[cur+3] in key_end:
+                cur, line = create_try(block, cur, line)
+
+            elif A[cur:cur+5] == "while" and A[cur+5] in key_end:
+                cur, line = create_while(block, cur, line)
 
             elif A[cur] in expression_start:
                 j = findend_expression(cur)
@@ -414,7 +432,7 @@ tree : Node
                     j += 1
                 eq_loc = j
 
-                if A[eq_loc] == "=" and A[eq_loc+1] != "=":
+                if A[eq_loc] == "=": # and A[eq_loc+1] != "=":
 
                     j = eq_loc +1
                     while A[j] in " \t":
@@ -427,7 +445,7 @@ tree : Node
                 else:
                     end = findend_expression(cur)
                     if disp:
-                        print "%4d %4d   Statement" % (cur, line),
+                        print "%4d %4d   Statement    " % (cur, line),
                         print repr(A[cur:end+1])
 
                     statement = col.Statement(block)
@@ -505,7 +523,6 @@ tree : Node
         assign.line = line
         assign.code = A[cur:end+1]
 
-        k = cur
         cur, line = create_assign_variable(assign, cur, line, eq_loc)
 
         cur += 1
@@ -557,7 +574,7 @@ tree : Node
                 node.code = A[cur:end+1]
 
                 if disp:
-                    print "%4d %4d     Cget  " % (cur, line),
+                    print "%4d %4d     Cset       " % (cur, line),
                     print repr(A[cur:end+1])
 
                 n_fields = 0
@@ -666,7 +683,7 @@ tree : Node
             elif A[k] in letters:
 
                 j = k+1
-                while A[j] in letters+digits+"_":
+                while A[j] in letters+digits+"_.":
                     j += 1
 
                 sname = A[k:j]
@@ -680,7 +697,7 @@ tree : Node
 
                     end = findend_paren(j)
                     if disp:
-                        print "%4d %4d     Fset     " % (cur, line),
+                        print "%4d %4d     Fset       " % (cur, line),
                         print repr(A[cur:end+1])
 
                     node = col.Fset(node, name, sname)
@@ -688,8 +705,9 @@ tree : Node
                     node.line = line
                     node.code = A[cur:end+1]
 
-                    cur, line = create_expression(node, j+1, line,
-                            end=end)
+                    cur, line = create_list(node, j, line)
+#                      cur, line = create_expression(node, j+1, line,
+#                              end=end)
 
                 # Fieldname of type "a.b = ..."
                 else:
@@ -758,8 +776,11 @@ tree : Node
         inter = -1
         for array in L:
 
-            start = array[0][0]
-            end = array[-1][-1]
+            if array:
+                start = array[0][0]
+                end = array[-1][-1]
+            else:
+                start = cur
 
             vector = col.Vector(matrix)
             vector.cur = start
@@ -867,6 +888,11 @@ tree : Node
         branch.line = line
 
         node = col.If(branch)
+
+        if A[k] == "(":
+            k += 1
+            while A[k] in " \t":
+                k += 1
         end, line = create_expression(node, k, line)
 
         node.code = A[cur:end+1]
@@ -880,7 +906,7 @@ tree : Node
         block.code = A[cur:end+1]
         cur = end
 
-        while A[cur:cur+4] == "else" and A[cur+4] in " \t(,;\n":
+        while A[cur:cur+4] == "else" and A[cur+4] in key_end:
 
             node.code = A[start:cur]
 
@@ -888,7 +914,7 @@ tree : Node
             while A[k] in " \t":
                 k += 1
 
-            if A[k:k+2] == "if" and A[k+2] in " \t(,;\n":
+            if A[k:k+2] == "if" and A[k+2] in key_end:
 
                 cur = k
                 k = k+2
@@ -899,19 +925,24 @@ tree : Node
                 node.cur = cur
                 node.line = line
 
+                if A[k] == "(":
+                    k += 1
+                    while A[k] in " \t":
+                        k += 1
+
                 end = findend_expression(k)
                 if disp:
                     print "%4d %4d   Else if      " % (cur, line),
                     print repr(A[cur:end+1])
 
 
-                cur, line = create_expression(node, k, line, end)
+                cur, line = create_expression(node, k, line)
                 cur += 1
 
             else:
 
                 if disp:
-                    print "%4d %4d   Else if      " % (cur, line),
+                    print "%4d %4d   Else         " % (cur, line),
                     print repr(A[cur:cur+5])
 
                 node = col.Else(branch)
@@ -935,7 +966,7 @@ tree : Node
 
     def create_while(parent, cur, line):
 
-        assert A[cur:cur+5] == "while" and A[cur+5] in " \t("
+        assert A[cur:cur+5] == "while" and A[cur+5] in key_end
         start = cur
 
         k = cur+5
@@ -952,7 +983,12 @@ tree : Node
         while_.cur = cur
         while_.line = line
 
-        cur, line = create_expression(while_, cur, line, end)
+        if A[k] == "(":
+            k += 1
+            while A[k] in " \t":
+                k += 1
+
+        cur, line = create_expression(while_, k, line)
         cur += 1
 
         cur += 1
@@ -994,6 +1030,8 @@ tree : Node
         k = end+1
 
         while A[k] in " \t\n;,":
+            if A[k] == "\n":
+                line += 1
             k += 1
 
         while A[k:k+4] == "case" and A[k+4] in " \t(":
@@ -1032,17 +1070,19 @@ tree : Node
 
             cur = k
 
-            k += 10
-            while A[k] in " \t\n;,":
-                if A[k] == "\n":
-                    line += 1
-                k += 1
-
             if disp:
                 print "%4d %4d   Otherwise    " % (cur, line),
                 print repr(A[cur:cur+10])
 
             otherwise = col.Otherwise(switch)
+            otherwise.cur = cur
+            otherwise.line = line
+
+            k += 9
+            while A[k] in " \t\n;,":
+                if A[k] == "\n":
+                    line += 1
+                k += 1
 
             block = col.Block(otherwise)
             block.cur = k
@@ -1055,9 +1095,57 @@ tree : Node
 
 
     def create_try(parent, cur, line):
-        raise NotImplementedError
+        assert A[cur:cur+3] == "try" and A[cur+3] in key_end
+
         if disp:
-            print "%4d %4d   Try" % (cur, line)
+            print "%4d %4d   Try          " % (cur, line),
+            print repr(A[cur:cur+3])
+
+        start = cur
+
+        tryblock = col.Tryblock(parent)
+        tryblock.cur = cur
+        tryblock.line = line
+
+        try_ = col.Try(tryblock)
+
+        cur += 3
+        while A[cur] in " \t\n,;":
+            if A[cur] == "\n":
+                line += 1
+            cur += 1
+
+        block = col.Block(try_)
+        block.cur = cur
+        block.line = line
+        cur, line = fill_codeblock(block, cur, line)
+
+        try_.code = A[start:cur]
+
+        assert A[cur:cur+5] == "catch" and A[cur+5] in key_end
+
+        catch_ = col.Catch(tryblock)
+        catch_.cur = cur
+        catch_.line = line
+
+        start_ = cur
+        cur += 5
+        while A[cur] in " \t\n,;":
+            if A[cur] == "\n":
+                line += 1
+            cur += 1
+
+        block = col.Block(catch_)
+        block.cur = cur
+        block.line = line
+        cur, line = fill_codeblock(block, cur, line)
+
+        catch_.code = A[start_:cur]
+        tryblock.code = A[start:cur]
+
+        return cur, line
+
+
 
     def create_cell(parent, cur, line):
         raise NotImplementedError
@@ -1097,7 +1185,7 @@ tree : Node
                 node.code = A[cur:end+1]
 
                 if disp:
-                    print "%4d %4d     Cget  " % (cur, line),
+                    print "%4d %4d     Cget       " % (cur, line),
                     print repr(A[cur:end+1])
 
                 n_fields = 0
@@ -1264,7 +1352,13 @@ tree : Node
         if A[cur+1] == "{":
             comment = col.Bcomment(parent, A[cur+2:end-1])
         else:
-            comment = col.Lcomment(parent, A[cur+1:end])
+            k = cur-1
+            while A[k] in " \t":
+                k -= 1
+            if A[k] == "\n":
+                comment = col.Lcomment(parent, A[cur+1:end])
+            else:
+                comment = col.Ecomment(parent, A[cur+1:end])
 
         comment.cur = cur
         comment.line = line
@@ -1692,7 +1786,7 @@ tree : Node
 
         # Rest
         elif A[start] == "'":
-            assert is_string(start)
+#              assert is_string(start)
             assert A[end] == "'"
             assert "\n" not in A[start:end]
 
@@ -1743,18 +1837,25 @@ tree : Node
         elif opr == "||":   return col.Lor
 
 
-    def iterate_list(start):
+    def is_space_delimited(start):
+        assert A[start] == "["
 
-        assert A[start] in list_start
+        k = start+1
 
         k = start+1
         while A[k] in " \t":
             k += 1
 
-        if A[k] == "]":
-            return []
+        if A[k] in list_end:
+            return False
 
         assert A[k] in expression_start
+
+        if A[k] == "'":
+            k = findend_string(k)+1
+
+            while A[k] in " \t":
+                k += 1
 
         while True:
 
@@ -1764,20 +1865,28 @@ tree : Node
             elif A[k] == "[":
                 k = findend_matrix(k)
 
-            elif A[k] == "'" and is_string(k):
-                k = findend_string(k)
+            elif A[k] == "'":
+                if A[k-1] in string_prefix:
+                    return True
 
             elif A[k:k+3] == "...":
                 k = findend_dots(k)
 
             elif A[k] in expression_end:
                 if A[k] in ",;":
-                    return iterate_comma_list(start)
+                    return False
                 else:
-                    return iterate_space_list(start)
+                    return True
 
 
             k += 1
+
+    def iterate_list(start):
+
+        if is_space_delimited(start):
+            return iterate_space_list(start)
+        return iterate_comma_list(start)
+
 
     def iterate_comma_list(start):
 
@@ -1787,50 +1896,40 @@ tree : Node
         while A[k] in " \t":
             k += 1
 
-        starts = [[k]]
+        if A[k] == "]":
+            return [[]]
+
+        starts = [[]]
         ends = [[]]
+        count = False
 
         while True:
 
-            if A[k] == "(":
-                k = findend_paren(k)
-
-            elif A[k] == "[":
-                k = findend_matrix(k)
-
-            elif A[k] == "{":
-                k = findend_cell(k)
-
-            elif A[k] == "'" and is_string(k):
-                k = findend_string(k)
-
-            elif A[k:k+3] == "...":
+            if A[k:k+3] == "...":
                 k = findend_dots(k)
 
-            elif A[k] in expression_end:
+            elif A[k] in expression_start:
+                assert not count
+                count = True
+                end = findend_expression(k)
+                starts[-1].append(k)
+                ends[-1].append(end)
 
-                j = k-1
-                while A[j] in " \t":
-                    j -= 1
-                ends[-1].append(j)
+                k = end
 
-                if A[k] == ",":
+            elif A[k] == ",":
+                assert count
+                count = False
 
-                    while A[k+1] in " \t":
-                        k += 1
-                    starts[-1].append(k+1)
+            elif A[k] == ";":
+                assert count
+                starts.append([])
+                ends.append([])
+                count = False
 
-                elif A[k] == ";":
-
-                    while A[k+1] in " \t":
-                        k += 1
-                    starts.append([k+1])
-                    ends.append([])
-
-                else:
-                    out = [zip(starts[i], ends[i])\
-                            for i in xrange(len(ends))]
-                    return out
+            elif A[k] in list_end:
+                return [zip(starts[i], ends[i])\
+                        for i in xrange(len(ends))]
 
             k += 1
 
@@ -1840,20 +1939,37 @@ tree : Node
 
         k = start+1
 
+        last = start
+
+        # Address first string occurence
+        while A[k] in " \t":
+            k += 1
+
         starts = [[k]]
         ends = [[]]
-        last = start
+
+        if A[k] == "'":
+            end = findend_string(k)
+            ends[-1].append(end)
+            k = end+1
+
+            while A[k] in " \t":
+                k += 1
+
+            starts[-1].append(k)
 
         while True:
 
             if A[k] == "(":
-                k = last =findend_paren(k)
+                k = last = findend_paren(k)
 
             elif A[k] == "[":
                 k = last = findend_matrix(k)
 
             elif A[k] == "'":
-                k = last = findend_string(k)
+                if A[k-1] in string_prefix:
+                    k = findend_string(k)
+                last = k
 
             elif A[k:k+3] == "...":
                 k = findend_dots(k)
@@ -1872,7 +1988,6 @@ tree : Node
                         ends[-1].append(last)
                         starts[-1].append(k)
 
-
                     elif A[k+1] in " \t":
                         while A[k+1] in " \t":
                             k += 1
@@ -1884,6 +1999,7 @@ tree : Node
                 else:
                     ends[-1].append(last)
                     starts[-1].append(k)
+                continue
 
             elif A[k] == "\n":
 
@@ -1972,39 +2088,60 @@ tree : Node
         "find index to end of matrix"
 
         assert A[start] == "["
-        bracecount = 1
         k = start+1
 
-        while True:
+        if is_space_delimited(start):
 
-            if A[k] == "[":
-                bracecount += 1
+            # Ignore first string occurence
+            while A[k] in " \t":
+                k += 1
+            if A[k] == "'":
+                k = findend_string(k)+1
 
-            elif A[k] == "]":
-                bracecount -= 1
-                if not bracecount:
+            while True:
+
+                if A[k] == "[":
+                    k = findend_matrix(k)
+
+                elif A[k] == "]":
                     return k
 
-            elif A[k] == "%":
-                k = findend_comment(k)
+                elif A[k] == "%":
+                    k = findend_comment(k)
 
-            elif A[k] == "'" and is_string(k):
-                k = findend_string(k)
+                elif A[k] == "'" and A[k-1] in string_prefix:
+                    k = findend_string(k)
 
-            k += 1
+                k += 1
+
+        else:
+            while True:
+
+                if A[k] == "[":
+                    k = findend_matrix(k)
+
+                elif A[k] == "]":
+                    return k
+
+                elif A[k] == "%":
+                    k = findend_comment(k)
+
+                elif A[k] == "'" and is_string(k):
+                    k = findend_string(k)
+
+                k += 1
 
     def findend_string(start):
         "find index to end of string"
 
         assert A[start] == "'"
-        assert is_string(start)
 
         k = A.find("'", start+1)
         assert k != -1
 
-        while A[k-1] == "\\":
-            k = A.find("'", k+1)
-            assert k != -1
+#          while A[k-1] == "\\" and A[k-2] != "\\":
+#              k = A.find("'", k+1)
+#              assert k != -1
 
         assert A.find("\n", start, k) == -1
         return k
@@ -2041,10 +2178,17 @@ tree : Node
 
             if A[k] == "%":
                 assert False
+
             elif A[k] == "'" and is_string(k):
-                k = findend_string(k)
+                k_ = findend_string(k)
+                k = k_
+
+            elif A[k] == "[":
+                k = findend_matrix(k)
+
             elif A[k] == "(":
                 k = findend_paren(k)
+
             elif A[k] == ")":
                 return k
 

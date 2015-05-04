@@ -18,12 +18,15 @@ def Program(tree):
         line = lines[i]
 
         # Fix indentation and linesplit
-        if line == "}":
+        if line and line[0] == "}":
             indent -= 1
-        line = "  "*indent + line
+            line = "  "*indent + line
 
-        if line and line[-1] == "{":
+        elif line and line[0] == "{":
+            line = "  "*indent + line
             indent += 1
+        else:
+            line = "  "*indent + line
         lines[i] = line
 
     text = "\n".join(lines)
@@ -31,9 +34,7 @@ def Program(tree):
     # Cosmetic fix
     for p0,p1,p2 in set(re.findall(r"(([ ,(])(-?\d+)-1)", text)):
         val = int(p2)-1
-        if val:     val = p1+str(val)
-        else:       val = p1+"0"
-
+        val = p1+str(val)
         text = val.join(text.split(p0))
 
     for p0,p1,p2 in \

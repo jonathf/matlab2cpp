@@ -62,63 +62,63 @@ def main(path, suggestion=False, disp=False):
     code1 = f.read()
     f.close()
 
-    # Deal with backup and pickled files
-    if os.path.isfile("." + filename + ".backup")\
-            and os.path.isfile("." + filename + ".pickled"):
-
-        if disp:
-            print "reading backup..."
-
-        f = open("." + filename + ".backup", "rU")
-        code2 = f.read()
-        f.close()
-
-        if code1 != code2:
-
-            if disp:
-                print "code mismatch!"
-
-            if disp:
-                print "building token-tree..."
-
-            tree = process.process(code1, disp=disp)
-
-            if disp:
-                print "writing pickle..."
-
-            f = open("." + filename + ".pickled", "w")
-            cPickle.dump(tree, f)
-            f.close()
-
-            if disp:
-                print "writing backup..."
-
-            f = open("." + filename+".backup", "w")
-            f.write(code1)
-            f.close()
-
-        else:
-
-            if disp:
-                print "reading pickle..."
-
-            f = open("." + filename + ".pickled", "r")
-            tree = cPickle.load(f)
-            f.close()
-
-    else:
-
-
-        if disp:
-            print "building token-tree..."
-
-        tree = process.process(code1, disp=disp)
+#      # Deal with backup and pickled files
+#      if os.path.isfile("." + filename + ".backup")\
+#              and os.path.isfile("." + filename + ".pickled"):
+#  
+#          if disp:
+#              print "reading backup..."
+#  
+#          f = open("." + filename + ".backup", "rU")
+#          code2 = f.read()
+#          f.close()
+#  
+#          if code1 != code2:
+#  
+#              if disp:
+#                  print "code mismatch!"
+#  
+#              if disp:
+#                  print "building token-tree..."
+#  
+#              tree = process.process(code1, disp=disp)
+#  
+#              if disp:
+#                  print "writing pickle..."
+#  
+#              f = open("." + filename + ".pickled", "w")
+#              cPickle.dump(tree, f)
+#              f.close()
+#  
+#              if disp:
+#                  print "writing backup..."
+#  
+#              f = open("." + filename+".backup", "w")
+#              f.write(code1)
+#              f.close()
+#  
+#          else:
+#  
+#              if disp:
+#                  print "reading pickle..."
+#  
+#              f = open("." + filename + ".pickled", "r")
+#              tree = cPickle.load(f)
+#              f.close()
+#  
+#      else:
 
 
-        if disp:
-            print "writing backup..."
+    if disp:
+        print "building token-tree..."
 
-        shutil.copyfile(filename, "." + filename + ".backup")
+    tree = process.process(code1, disp=disp)
+
+
+#          if disp:
+#              print "writing backup..."
+#  
+#          shutil.copyfile(filename, "." + filename + ".backup")
 
     if os.path.isfile(filename + ".py"):
 
@@ -148,7 +148,7 @@ def main(path, suggestion=False, disp=False):
     tree.configure(suggestion=suggestion, disp=disp)
     tree.generate(disp=disp)
     cfg, scfg = utils.get_cfg(tree)
-
+    tree["str"] = tree["str"].replace("__percent__", "%")
 
     if disp:
         print "creating cfg..."
@@ -175,21 +175,30 @@ def main(path, suggestion=False, disp=False):
     f.write(annotation)
     f.close()
 
-    if disp:
-        print "writing pickle..."
+#      if disp:
+#          print "writing pickle..."
+#  
+#      f = open("."+filename+".pickled", "w")
+#      cPickle.dump(tree, f)
+#      f.close()
 
-    f = open("."+filename+".pickled", "w")
-    cPickle.dump(tree, f)
+    if disp:
+        print "creating error-log..."
+
+    errorlog = tree.error_log()
+
+    if disp:
+        print "writing error-log..."
+
+    f = open(filename + ".log", "w")
+    f.write(errorlog)
+    f.close()
+
+    if disp:
+        print "writing translation..."
+
+    f = open(filename + ".cpp", "w")
+    f.write(str(tree))
     f.close()
 
     return tree
-
-#      if tree.errors:
-#          print "Problems while compiling."
-#          print "The following unsupported structures was identified:"
-#          print
-#          print "* " + "\n* ".join(list(tree.errors))
-#          print
-#          print "Please remove these features to make the script compileable."
-#          print
-#  
