@@ -402,6 +402,9 @@ tree : Node
             elif A[cur:cur+4] == "else" and A[cur+4] in key_end:
                 return cur, line
 
+            elif A[cur:cur+6] == "elseif" and A[cur+6] in key_end:
+                return cur, line
+
             elif A[cur:cur+3] == "for" and A[cur+3] in key_end:
                 cur, line = create_for(block, cur, line)
 
@@ -867,33 +870,36 @@ tree : Node
 
         return end, line
 
-    def create_if(parent, cur, line):
+    def create_if(parent, start, line):
 
-        assert A[cur:cur+2] == "if" and A[cur+2] in " \t("
-
-        k = cur+2
-        while A[k] in " \t":
-            k += 1
-
-        assert A[k] in expression_start
-        start = cur
-        end = findend_expression(k)
-
-        if disp:
-            print "%4d %4d   If           " % (cur, line),
-            print repr(A[cur:end+1])
+        assert A[start:start+2] == "if" and A[start+2] in key_end
 
         branch = col.Branch(parent)
-        branch.cur = cur
+        branch.cur = start
         branch.line = line
 
-        node = col.If(branch)
+        cur = start
 
-        if A[k] == "(":
-            k += 1
-            while A[k] in " \t":
-                k += 1
-        end, line = create_expression(node, k, line)
+        cur += 2
+        while A[cur] in " \t":
+            cur += 1
+
+        assert A[cur] in expression_start
+        end = findend_expression(cur)
+
+        if disp:
+            print "%4d %4d   If           " % (start, line),
+            print repr(A[start:end+1])
+
+        node = col.If(branch)
+        branch.cur = start
+        branch.line = line
+
+        if A[cur] == "(":
+            cur += 1
+            while A[cur] in " \t":
+                cur += 1
+        _, line = create_expression(node, cur, line)
 
         node.code = A[cur:end+1]
 
@@ -906,62 +912,68 @@ tree : Node
         block.code = A[cur:end+1]
         cur = end
 
-        while A[cur:cur+4] == "else" and A[cur+4] in key_end:
+        while A[cur:cur+6] == "elseif" and A[cur+6] in key_end:
 
             node.code = A[start:cur]
+            start = cur
 
-            k = cur+4
-            while A[k] in " \t":
-                k += 1
-
-            if A[k:k+2] == "if" and A[k+2] in key_end:
-
-                cur = k
-                k = k+2
-                while A[k] in " \t":
-                    k += 1
-
-                node = col.Elif(branch)
-                node.cur = cur
-                node.line = line
-
-                if A[k] == "(":
-                    k += 1
-                    while A[k] in " \t":
-                        k += 1
-
-                end = findend_expression(k)
-                if disp:
-                    print "%4d %4d   Else if      " % (cur, line),
-                    print repr(A[cur:end+1])
-
-
-                cur, line = create_expression(node, k, line)
+            cur += 6
+            while A[cur] in " \t":
                 cur += 1
 
-            else:
+            end = findend_expression(cur)
 
-                if disp:
-                    print "%4d %4d   Else         " % (cur, line),
-                    print repr(A[cur:cur+5])
+            if disp:
+                print "%4d %4d   Else if      " % (start, line),
+                print repr(A[start:end+1])
 
-                node = col.Else(branch)
-                node.cur = cur
-                node.line = line
+            node = col.Elif(branch)
+            node.cur = start
+            node.line = line
 
-                cur = k
+            if A[cur] == "(":
+                cur += 1
+                while A[cur] in " \t":
+                    cur += 1
+
+            _, line = create_expression(node, cur, line)
+            cur = end+1
 
             block = col.Block(node)
             block.cur = cur
+            block.line = line
 
             end, line = fill_codeblock(block, cur, line)
             block.code = A[cur:end+1]
             cur = end
 
+        node.code = A[start:cur]
+
+        if A[cur:cur+4] == "else" and A[cur+4] in key_end:
+
+            start = cur
+
+            cur += 4
+
+            if disp:
+                print "%4d %4d   Else         " % (start, line),
+                print repr(A[start:start+5])
+
+            node = col.Else(branch)
+            node.cur = start
+            node.line = line
+
+            block = col.Block(node)
+            block.cur = cur
+            block.line = line
+
+            end, line = fill_codeblock(block, cur, line)
+            node.code = A[start:end+1]
+            block.code = A[cur:end+1]
 
         branch.code = A[start:end+1]
 
-        return cur, line
+        return end, line
 
 
     def create_while(parent, cur, line):
@@ -2248,10 +2260,29 @@ tree : Node
 if __name__ == "__main__":
 
     test_code = """
-    while  (MERIT2 > MATL2) & (MERIT > MATL) ...
-            & numFunEvals < options.maxFunEvals & ~OPT_STOP
-            a
-    end
+if A
+   x = a
+else
+   if B
+      x = b
+   else
+       if C
+          x = c
+       else
+          x = d
+       end
+   end
+end
+
+if A
+    x = a
+elseif B
+    x = b
+elseif C
+    x = c
+else
+    x = d
+end
             """
     tree = process(test_code)
 
