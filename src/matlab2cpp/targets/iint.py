@@ -1,4 +1,6 @@
 from variables import *
 
-Declare = "std::complex<double>"
-Iint = "%(value)s"
+Declare = "cx_double"
+def Iint(node):
+    node.include("complex")
+    return "%(value)s*sqrt(-1)"

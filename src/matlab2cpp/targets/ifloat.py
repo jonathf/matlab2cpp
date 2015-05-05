@@ -1,4 +1,6 @@
 from variables import *
 
-Declare = "std::complex<double> %(name)s ;"
-Ifloat = "%(value)s"
+Declare = "cx_double %(name)s ;"
+def Ifloat(node):
+    node.include("complex")
+    return "%(value)s*sqrt(-1)"

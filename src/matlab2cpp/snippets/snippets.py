@@ -1,3 +1,10 @@
+complex = ({}, """#include <complex>
+#include <cmath>""")
+
+armadillo = ({}, """#include <armadillo>
+using namespace arma ;""")
+
+# depricated (I think)
 span = ({"target":"ivec", "start":"int","end":"int"},
 """inline %(target)s span( %(start)s start, int step, %(end)s end)
 {

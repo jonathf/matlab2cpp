@@ -65,13 +65,15 @@ tree : Node
 
         includes = col.Includes(program)
 
-        inc1 = col.Include(includes, "armadillo")
-        inc1.value = "#include <armadillo>"
-        inc1.code = ""
+#          inc1 = col.Include(includes, "armadillo")
+#          inc1.value = "#include <armadillo>"
+#          inc1.code = ""
+#  
+#          inc2 = col.Include(includes, "usingarma")
+#          inc2.value = "using namespace arma ;"
+#          inc2.code = ""
 
-        inc2 = col.Include(includes, "usingarma")
-        inc2.value = "using namespace arma ;"
-        inc2.code = ""
+        includes.include("armadillo")
 
         # Start processing
 
@@ -2289,7 +2291,7 @@ end
 #      print
 #      tree.generate(False)
 #      tree.configure()
-    print tree.summary()
-#      print tree.generate(False)
+#      print tree.summary()
+    print tree.generate(False)
 #      print test_code
 

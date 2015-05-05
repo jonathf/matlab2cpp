@@ -1,4 +1,4 @@
 from variables import *
 
-Declare = "double complex %(name)s ;"
+Declare = "cx_double %(name)s ;"
 Imag = "%(value)s*I"
