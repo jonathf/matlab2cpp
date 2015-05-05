@@ -6,16 +6,14 @@ exists before finding the generic "<class>" name.
 """
 
 # List of function names that should be handled by reserved.py:
-reserved = [
+reserved = {
+"and", "or", "not", "all", "any",
+"false", "true", "pi", "inf", "Inf", "nan", "NaN",
 "eye", "flipud", "length", "max", "min", "size", "transpose",
-"zeros", "round", "return", "rand", "floor", "pi", "conv_to",
-]
+"zeros", "round", "return", "rand", "floor", "conv_to",
+}
 
 # Common attribute
-
-#  def Assignees(node):
-#      node.parent["backend"] = "reserved"
-#      return "", ", ", ""
 
 def Declare(node):
     raise ValueError("Variable name '%s' is reserved."%node["name"]\
@@ -26,8 +24,78 @@ def Var(node):
             +"\nPlease rename variable.")
 
 
-def Var_pi(node):
-    return "datum::pi"
+Var_pi = "datum::pi"
+Var_true = "1"
+Var_false = "0"
+Var_inf = "datum::inf"
+Var_Inf = "datum::inf"
+Var_nan = "datum::nan"
+Var_NaN = "datum::nan"
+
+def Get_and(node):
+    return "(", "*", ")"
+
+def Get_or(node):
+    return "("+"+".join(["%(" + i +")s*%(" + i + ")s" \
+            for i in xrange(len(node))])+")"
+
+def Get_not(node):
+    assert len(node) == 1
+    if not node[0].num:
+        return "not(%(0)s)"
+    return "(%(0)s == 0)"
+
+def Get_any(node):
+    if not node[0].num:
+        return "any(", ", ", ")"
+
+    node.type = node[0].type
+
+    if node[0].dim == 0:
+        return "%(0)s"
+
+    if node.dim == 2:
+        node.dim = 0
+    elif node.dim == 3:
+        if len(node) == 2:
+            val = node[1]["value"]
+            if val == "0":
+                node.dim = 2
+            elif val == "1":
+                node.dim = 1
+            else:
+                node.num = False
+
+    else:
+        node.dim = node[0].dim-1
+
+    return "any(", ", ", ")"
+
+def Get_all(node):
+    if not node[0].num:
+        return "all(", ", ", ")"
+
+    node.type = node[0].type
+
+    if node[0].dim == 0:
+        return "%(0)s"
+
+    if node.dim == 2:
+        node.dim = 0
+    elif node.dim == 3:
+        if len(node) == 2:
+            val = node[1]["value"]
+            if val == "0":
+                node.dim = 2
+            elif val == "1":
+                node.dim = 1
+            else:
+                node.num = False
+
+    else:
+        node.dim = node[0].dim-1
+
+    return "all(", ", ", ")"
 
 def Var_return(node):
     if node.func["backend"] == "func_returns":
