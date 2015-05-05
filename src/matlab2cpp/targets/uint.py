@@ -1,3 +1,3 @@
 from variables import *
 
-Declare = "unsigned int %(name)s ;"
+Declare = "uword %(name)s ;"

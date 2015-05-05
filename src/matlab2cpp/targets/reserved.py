@@ -137,9 +137,9 @@ def Get_size(node):
 def Assigns_size(node):
 
     if len(node[0])==2:
+        node[0].suggest("int")
+        node[1].suggest("int")
 
-        node[0][0].suggest("int")
-        node[0][1].suggest("int")
         if len(node[1]) == 0:
             val = str(node[1])
         else:
@@ -150,9 +150,10 @@ def Assigns_size(node):
 
     if len(node[0])==3:
 
-        node[0][0].suggest("int")
-        node[0][1].suggest("int")
-        node[0][2].suggest("int")
+        node[0].suggest("int")
+        node[1].suggest("int")
+        node[2].suggest("int")
+
         if len(node[1]) == 0:
             val = str(node[1])
         else:
@@ -166,83 +167,93 @@ def Assigns_size(node):
 
 def Get_length(node):
     node.type = "int"
-    return "%(0)s.n_elem"
+    return "length(%(0)s)"
 
 
 def Get_min(node):
 
+    if not all([n.num for n in node]):
+        return "min(", ", ", ")"
+
+    if all([(not n.mem) for n in node]):
+        return "std::min(", ", ", ")"
+
+    node.type = node[0].type
+
     if len(node) == 1:
 
-        if node[0].dim == 3:
-            node.type = "ivec"
-        elif node[0].dim in (1, 2):
-            node.type = "int"
+        if node.dim == 2:
+            node.dim = 0
+        else:
+            node.dim = node.dim-1
 
         return "arma::min(%(0)s)"
 
     if len(node) == 2:
-
-        if node[0].dim == node[1].dim == 0:
-            return "(%(0)s<%(1)s?%(0)s:%(1)s)"
         return "arma::min(%(0)s, %(1)s)"
 
     if len(node) == 3:
-
         if node[2].dim == 0:
 
             val = node[2]["value"]
             if val == "1":
-                node.type = "irowvec"
+                node.dim = 2
+                return "arma::min(%(0)s, 1)"
             elif val == "2":
-                node.type = "ivec"
-            else:
-                raise NotImplementedError
+                node.dim = 1
+                return "arma::min(%(0)s, 0)"
 
+            node.num = False
             return "arma::min(%(0)s, %(2)s-1)"
 
-def Assigns_min(node):
-    m_val = node[0][0]["name"]
-    m_ind = node[0][1]["name"]
-    return m_val + " = %(1)s.min("+m_ind+") ;\n"
+    assert False
 
+def Assigns_min(node):
+    assert len(node) == 3
+    return "%(0)s = " + str(node[2][0]) + ".min(%(1)s) ;"
 
 def Get_max(node):
 
+    if not all([n.num for n in node]):
+        return "max(", ", ", ")"
+
+    if all([(not n.mem) for n in node]):
+        return "std::max(", ", ", ")"
+
+    node.type = node[0].type
+
     if len(node) == 1:
 
-        if node[0].dim == 3:
-            node.type = "ivec"
-        elif node[0].dim in (1,2):
-            node.type = "int"
+        if node.dim == 2:
+            node.dim = 0
+        else:
+            node.dim = node.dim-1
 
         return "arma::max(%(0)s)"
 
     if len(node) == 2:
-        if node[0].dim == node[1].dim == 0:
-            return "(%(0)s<%(1)s?%(1)s:%(0)s)"
         return "arma::max(%(0)s, %(1)s)"
 
     if len(node) == 3:
-
         if node[2].dim == 0:
 
             val = node[2]["value"]
             if val == "1":
-                node.type = "irowvec"
+                node.dim = 2
+                return "arma::max(%(0)s, 1)"
             elif val == "2":
-                node.type = "ivec"
-            else:
-                raise NotImplementedError
+                node.dim = 1
+                return "arma::max(%(0)s, 0)"
 
+            node.num = False
             return "arma::max(%(0)s, %(2)s-1)"
 
-    raise NotImplementedError
+    assert False
 
 def Assigns_max(node):
-    m_val = node[0][0]["name"]
-    m_ind = node[0][1]["name"]
+    assert len(node) == 3
+    return "%(0)s = " + str(node[2][0]) + ".max(%(1)s) ;"
 
-    return m_val + " = %(1)s.min("+m_ind+") ;\n"
 
 Var_eye = "1"
 def Get_eye(node):

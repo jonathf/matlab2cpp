@@ -352,7 +352,7 @@ tree : Node
             elif A[cur] == "[":
 
                 # Divide beween statement and assignment
-                eq_loc = findend_matrix(cur)
+                eq_loc = findend_matrix(cur)+1
 
                 while A[eq_loc] in " \t":
                     eq_loc += 1
@@ -505,6 +505,8 @@ tree : Node
 
         cur_, line =  create_expression(assigns, cur, line)
 
+        assigns["name"] = assigns[-1]["name"]
+
         return cur_, line
 
 
@@ -641,23 +643,6 @@ tree : Node
             last, line = create_list(node, k, line)
             cur = last
 
-        # Simple variable assignment
-        elif A[k] == "=":
-
-            if disp:
-                print "%4d %4d     Var        " % (cur, line),
-                print repr(A[cur:last])
-
-
-            node = col.Var(node, name)
-            node.cur = cur
-            node.line = line
-            node.code = A[cur:last]
-
-            node.declare()
-
-            cur = last-1
-
         elif A[k] == ".":
 
             k += 1
@@ -730,8 +715,21 @@ tree : Node
 
                     cur = last
 
+        # Simple variable assignment
         else:
-            assert False, A[cur:k+10]
+            if disp:
+                print "%4d %4d     Var        " % (cur, line),
+                print repr(A[cur:last])
+
+
+            node = col.Var(node, name)
+            node.cur = cur
+            node.line = line
+            node.code = A[cur:last]
+
+            node.declare()
+
+            cur = last-1
 
         return cur, line
 
@@ -1401,7 +1399,7 @@ tree : Node
 
         assert A[cur] == "("
 
-        end = cur+1
+        end = cur
         for vector in iterate_comma_list(cur):
             for start,end in vector:
                 _, line = create_expression(parent, start, line, end)
@@ -2262,36 +2260,15 @@ tree : Node
 if __name__ == "__main__":
 
     test_code = """
-if A
-   x = a
-else
-   if B
-      x = b
-   else
-       if C
-          x = c
-       else
-          x = d
-       end
-   end
-end
-
-if A
-    x = a
-elseif B
-    x = b
-elseif C
-    x = c
-else
-    x = d
-end
+[a(1), b(1)] = c
+[a(2), b(2)] = d()
             """
     tree = process(test_code)
 
 #      print
 #      tree.generate(False)
-#      tree.configure()
-#      print tree.summary()
+    tree.configure(True)
+    print tree.summary()
     print tree.generate(False)
-#      print test_code
+    print test_code
 

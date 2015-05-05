@@ -136,17 +136,16 @@ def Block(node):
 
 def Assigns(node):
 
-    assigned, expression = node[:-1], node[-1]
-
-    if expression["class"] != "Var":
-        expression = expression.auxillary()
+    if node[-1]["class"] != "Var":
+        node[-1].auxillary()
 
     out = ""
-    for i in xrange(len(assigned)):
-        var = assigned[i]
-        out += var + " = " + expression + "(%d) ;\n" % i
+    n = str(len(node)-1)
+    for i in xrange(len(node[:-1])):
+        i = str(i)
+        out += "%(" +i+ ")s = %(" +n+ ")s(" +i+ ") ;\n"
     out = out[:-1]
-    return out + " ;"
+    return out
 
 def For(node):
 

@@ -14,8 +14,9 @@ Vector : (Column)-Vector container
 
 def Vector(node):
 
-
     dims = {n.dim for n in node}
+    if None in dims:
+        return "", ", ", ""
 
     if [n for n in node if not n.num]:
         node["decomposed"] = False
@@ -133,6 +134,10 @@ def Matrix(node):
 
 
 def Assign(node):
+
+
+    if not node.num:
+        return "%(0)s = %(1)s ;"
 
     if len(node[1][0]) == 0:
         return "%(0)s.reset() ;"
