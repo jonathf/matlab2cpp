@@ -70,7 +70,7 @@ def Matrix(node):
     dims = {n.dim for n in node}
 
     if None in dims:
-        return "[", ", ", "]"
+        return "{", ", ", "}"
 
     if len(node) == 1 and len(node[0]) == 0:
         if node.parent["class"] in ("Assign", "Statement"):
@@ -88,7 +88,7 @@ def Matrix(node):
 
         if node.parent["class"] in ("Assign", "Statement"):
             node.parent["backend"] = "matrix"
-            return "[", ", ", "]"
+            return "{", ", ", "}"
         return str(node.auxillary())
 
     elif dims == {0}:
@@ -126,7 +126,7 @@ def Matrix(node):
                 nodes.append(str(node[i]))
 
     else:
-        return "[", ", ", "]"
+        return "{", ", ", "}"
 
 
     return reduce(lambda a,b: ("arma::join_rows(%s, %s)" % (a,b)), nodes)
@@ -135,37 +135,47 @@ def Matrix(node):
 
 def Assign(node):
 
+    if node[1].cls == "Matrix":
 
-    if not node.num:
-        return "%(0)s = %(1)s ;"
+        if not node.num:
+            return "%(0)s = %(1)s ;"
 
-    if len(node[1][0]) == 0:
-        return "%(0)s.reset() ;"
+        if len(node[1][0]) == 0:
+            return "%(0)s.reset() ;"
 
-    node.type = node["ctype"] = node[0].type
-    dim = node.dim
-    node.dim = 0
+        node.type = node["ctype"] = node[0].type
+        dim = node.dim
+        node.dim = 0
 
-    if dim == 1: #vec
-        node["rows"] = len(node[1])
-        return "%(type)s _%(0)s [] = %(1)s ;\n"+\
-                "%(0)s = %(ctype)s(_%(0)s, %(rows)s, false) ;"
+        if dim == 1: #vec
+            node["rows"] = len(node[1])
+            return "%(type)s _%(0)s [] = %(1)s ;\n"+\
+                    "%(0)s = %(ctype)s(_%(0)s, %(rows)s, false) ;"
 
-    elif dim == 2: #rowvec
-        node["cols"] = len(node[1][0])
-        return "%(type)s _%(0)s [] = %(1)s ;\n"+\
-                "%(0)s = %(ctype)s(_%(0)s, %(cols)s, false) ;"
+        elif dim == 2: #rowvec
+            node["cols"] = len(node[1][0])
+            return "%(type)s _%(0)s [] = %(1)s ;\n"+\
+                    "%(0)s = %(ctype)s(_%(0)s, %(cols)s, false) ;"
 
-    elif dim == 3: #mat
-        node["rows"] = len(node[1])
-        node["cols"] = len(node[1][0])
-        return "%(type)s _%(0)s [] = %(1)s ;\n"+\
-    "%(0)s = %(ctype)s(_%(0)s, %(rows)s, %(cols)s, false) ;"
+        elif dim == 3: #mat
+            node["rows"] = len(node[1])
+            node["cols"] = len(node[1][0])
+            return "%(type)s _%(0)s [] = %(1)s ;\n"+\
+        "%(0)s = %(ctype)s(_%(0)s, %(rows)s, %(cols)s, false) ;"
+
+    elif node[1].cls == "Cell":
+        assert False
 
     assert False
-
 
 def Statement(node):
     return "// " + node.code[:-1]
 
 Var = "%(name)s"
+
+def Cell(node):
+
+    if node.parent.cls not in ("Assign", "Assigns"):
+        node.auxillary()
+
+    return "{", ", ", "}"
