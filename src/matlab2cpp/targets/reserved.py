@@ -142,32 +142,27 @@ def Assigns_size(node):
 
     assert node[1].cls == "Get"
 
-    val = node[1][0]
+    val = node[-1][0]
     if val.cls != "Var":
         val = val.auxillary()
     val = str(val)
 
-    if len(node[0])==2:
+    if len(node)==3:
         node[0].suggest("int")
         node[1].suggest("int")
 
-        return "%s = %s.n_rows ;\n%s = %s.n_cols ;" % \
-                (node[0][0], val, node[0][1], val)
+        return "%(0)s = " +val+ ".n_rows ;\n%(1)s = " +val+ ".n_cols ;"
 
-    if len(node[0])==3:
+    if len(node)==4:
 
         node[0].suggest("int")
         node[1].suggest("int")
         node[2].suggest("int")
 
-        if len(node[1]) == 0:
-            val = str(node[1])
-        else:
-            val = str(node[1][0])
         rows, cols, slices = map(str, node[0])
-        return  rows+" = "+val+".n_rows ;\n"+\
-                cols+" = "+val+".n_cols ;\n"+\
-                slices+" = "+val+".n_slice ;"
+        return  "%(0)s = "+val+".n_rows ;\n"+\
+                "%(1)s = "+val+".n_cols ;\n"+\
+                "%(2)s = "+val+".n_slice ;"
 
     raise NotImplementedError
 
