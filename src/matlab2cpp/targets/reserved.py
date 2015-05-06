@@ -107,11 +107,15 @@ def Get_size(node):
     if node[0].type == "TYPE":
         return "size(%(0)s)"
 
-    elif len(node) > 1:
+    var = node[0]
+    if var.cls != "Var":
+        var = var.auxillary()
+    var = str(var)
+
+    if len(node) > 1:
 
         node.type = "int"
         arg2 = node[1]["value"]
-        var = node[0]
         if arg2 == "1":
             return var+".n_rows"
         if arg2 == "2":
@@ -121,7 +125,7 @@ def Get_size(node):
 
     elif node[0].dim in (1,2):
         node.type = "int"
-        return node[0]+".n_elem"
+        return var+".n_elem"
 
     elif node[0].dim == 3:
         node.type = "ivec"
@@ -136,14 +140,16 @@ def Get_size(node):
 
 def Assigns_size(node):
 
+    assert node[1].cls == "Get"
+
+    val = node[1][0]
+    if val.cls != "Var":
+        val = val.auxillary()
+    val = str(val)
+
     if len(node[0])==2:
         node[0].suggest("int")
         node[1].suggest("int")
-
-        if len(node[1]) == 0:
-            val = str(node[1])
-        else:
-            val = str(node[1][0])
 
         return "%s = %s.n_rows ;\n%s = %s.n_cols ;" % \
                 (node[0][0], val, node[0][1], val)
@@ -210,7 +216,13 @@ def Get_min(node):
 
 def Assigns_min(node):
     assert len(node) == 3
-    return "%(0)s = " + str(node[2][0]) + ".min(%(1)s) ;"
+
+    var = node[2][0]
+    if var.cls != "Var":
+        var = var.auxillary()
+    var = str(var)
+
+    return "%(0)s = " + var + ".min(%(1)s) ;"
 
 def Get_max(node):
 
@@ -252,7 +264,12 @@ def Get_max(node):
 
 def Assigns_max(node):
     assert len(node) == 3
-    return "%(0)s = " + str(node[2][0]) + ".max(%(1)s) ;"
+    var = node[2][0]
+    if var.cls != "Var":
+        var = var.auxillary()
+    var = str(var)
+
+    return "%(0)s = " + var + ".max(%(1)s) ;"
 
 
 Var_eye = "1"
