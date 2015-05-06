@@ -95,6 +95,10 @@ def get_cfg(root):
 
         declares, params = func[0], func[2]
         for var in declares[:]+params[:]:
+
+            if var["name"][:4] == "_aux":
+                continue
+
             type = var.prop["type"]
             if type == "TYPE":
                 type = ""
