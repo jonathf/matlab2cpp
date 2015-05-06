@@ -2260,8 +2260,13 @@ tree : Node
 if __name__ == "__main__":
 
     test_code = """
-[a(1), b(1)] = c
-[a(2), b(2)] = d()
+    function y=f(x)
+        y = x+4
+    end
+    function g()
+        x = [1,2,3]
+        y = f(x)
+    end
             """
     tree = process(test_code)
 
