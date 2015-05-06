@@ -366,6 +366,20 @@ vector : Vector
         Node.__init__(self, parent)
         self["backend"] = "matrix"
 
+class Cell(Node):
+    """Cell
+
+Children
+--------
+expr, [expr ...]
+
+expr : Expr
+    One or more cell element.
+    """
+    def __init__(self, parent):
+        Node.__init__(self, parent)
+        self["backend"] = "matrix"
+
 class Vector(Node):
     """Vector
 

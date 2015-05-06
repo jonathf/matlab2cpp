@@ -4,7 +4,7 @@ import collection as col
 letters = string.letters
 digits = string.digits
 
-expression_start = letters + digits + "[(~-+:@.'"
+expression_start = letters + digits + "[({~-+:@.'"
 expression_end = "%])},;\n"
 
 list_start = "[({"
@@ -1159,8 +1159,40 @@ tree : Node
 
 
 
-    def create_cell(parent, cur, line):
-        raise NotImplementedError
+    def create_cell(node, cur, line):
+        assert A[cur] == "{"
+
+        end = findend_cell(cur)
+        if disp:
+            print "%4s %4s     Cell       " % (cur, line),
+            print repr(A[cur:end+1])
+
+        L = iterate_list(cur)
+        cell = col.Cell(node)
+        cell.cur = cur
+        cell.line = line
+        cell.code = A[cur:end+1]
+
+        inter = -1
+        for array in L:
+
+            if array:
+                start = array[0][0]
+                end = array[-1][-1]
+            else:
+                start = cur
+
+            for start,end in array:
+
+                create_expression(cell, start, line, end)
+
+                if inter != -1:
+                    line += A.count("\n", inter, start)
+
+                inter = end-1
+
+        return findend_cell(cur), line
+
 
     def create_variable(parent, cur, line):
 
@@ -1397,7 +1429,7 @@ tree : Node
 
     def create_list(parent, cur, line):
 
-        assert A[cur] == "("
+        assert A[cur] in "({"
 
         end = cur
         for vector in iterate_comma_list(cur):
@@ -1408,7 +1440,7 @@ tree : Node
         while A[end] in " \t":
             end += 1
 
-        assert A[end] == ")"
+        assert A[end] in ")}"
 
         return end, line
 
@@ -1665,6 +1697,9 @@ tree : Node
                 elif A[k] == "[":
                     k = last = findend_matrix(k)
 
+                elif A[k] == "{":
+                    k = last = findend_cell(k)
+
                 elif A[k] == "'" and is_string(k):
                     k = last = findend_string(k)
 
@@ -1850,7 +1885,7 @@ tree : Node
 
 
     def is_space_delimited(start):
-        assert A[start] == "["
+        assert A[start] in "[{"
 
         k = start+1
 
@@ -1876,6 +1911,9 @@ tree : Node
 
             elif A[k] == "[":
                 k = findend_matrix(k)
+
+            elif A[k] == "{":
+                k = findend_cell(k)
 
             elif A[k] == "'":
                 if A[k-1] in string_prefix:
@@ -1908,7 +1946,7 @@ tree : Node
         while A[k] in " \t":
             k += 1
 
-        if A[k] == "]":
+        if A[k] in "]}":
             return [[]]
 
         starts = [[]]
@@ -1977,6 +2015,9 @@ tree : Node
 
             elif A[k] == "[":
                 k = last = findend_matrix(k)
+
+            elif A[k] == "{":
+                k = last = findend_cell(k)
 
             elif A[k] == "'":
                 if A[k-1] in string_prefix:
@@ -2260,13 +2301,7 @@ tree : Node
 if __name__ == "__main__":
 
     test_code = """
-    function y=f(x)
-        y = x+4
-    end
-    function g()
-        x = [1,2,3]
-        y = f(x)
-    end
+[m,n] = size(x);
             """
     tree = process(test_code)
 

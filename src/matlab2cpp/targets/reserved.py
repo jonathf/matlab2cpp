@@ -140,7 +140,7 @@ def Get_size(node):
 
 def Assigns_size(node):
 
-    assert node[1].cls == "Get"
+    assert node[-1].cls == "Get"
 
     val = node[-1][0]
     if val.cls != "Var":
