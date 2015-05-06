@@ -216,8 +216,8 @@ All = "span::all"
 Neg = "-(", "", ")"
 Not = "not ", "", ""
 
-Ctranspose = "arma::ctranspose(", "", ")"
-Transpose = "arma::transpose(", "", ")"
+Ctranspose = "arma::strans(", "", ")"
+Transpose = "arma::trans(", "", ")"
 
 def Eldiv(node):
     children = map(str, node[:])[::-1]
