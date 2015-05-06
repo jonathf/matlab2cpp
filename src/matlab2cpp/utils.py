@@ -88,7 +88,7 @@ def get_cfg(root):
     "Retrieve datatype and suggestions from tokentree"
     cfg = {}
     scfg = {}
-    for func in root[1:]:
+    for func in root[2:]:
 
         cfg[func["name"]] = cfg_ = {}
         scfg[func["name"]] = scfg_ = {}

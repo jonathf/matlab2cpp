@@ -61,11 +61,22 @@ def Assigns(node):
 
     return name + "("+assigness+", "+args+") ;\n"
 
+def Var(node):
+    out = "@%(name)s"
+    return out
 
 def Declares(node):
     declares = {}
     for child in node[:]:
+
         type = child.type
+
+        if type == "func_lambda":
+            type == "std::function"
+
+        if child.cls in ("Fvar", "Fget", "Fset", "Nget", "Nset"):
+            type = child["name"].capitalize()
+
         if type not in declares:
             declares[type] = []
         declares[type].append(child)
@@ -75,8 +86,3 @@ def Declares(node):
         out = out + "\n" + key + " " + ", ".join([v["name"] for v in val]) + " ;"
 
     return out[1:]
-
-
-def Var(node):
-    out = "@%(name)s"
-    return out

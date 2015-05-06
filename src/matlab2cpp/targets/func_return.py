@@ -44,20 +44,21 @@ def Func(node):
     type = node[1][0].type
     return type + " %(name)s(%(2)s)\n{\n%(0)s\n%(3)s\nreturn %(1)s ;\n}"
 
-adjusts = {"func_lambda": "std::function",
-        "uint": "unsigned int"}
-
 def Declares(node):
     declares = {}
     for child in node[:]:
+
         type = child.type
+
+        if type == "func_lambda":
+            type == "std::function"
+
+        if child.cls in ("Fvar", "Fget", "Fset", "Nget", "Nset"):
+            type = child["name"].capitalize()
+
         if type not in declares:
             declares[type] = []
         declares[type].append(child)
-
-    for key,val in adjusts.items():
-        if key in declares:
-            declares[val] = declares.pop(key)
 
     out = ""
     for key, val in declares.items():

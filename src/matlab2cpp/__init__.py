@@ -163,8 +163,7 @@ def main(path, suggestion=False, disp=False):
 # umat    imat    fmat    mat    cx_mat
 # ucube   icube   fcube   cube   cx_cube
 #
-# func_lambda
-# char
+# char    struct  func_lambda
 
 """ + utils.str_cfg(cfg, scfg)
 

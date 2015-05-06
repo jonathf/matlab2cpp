@@ -19,10 +19,21 @@ class Includes(Node):
         self["backend"] = "program"
 
 class Include(Node):
-
     def __init__(self, parent, name=""):
         Node.__init__(self, parent, name)
         self["backend"] = "program"
+
+class Structs(Node):
+
+    def __init__(self, parent, name=""):
+        Node.__init__(self, parent, name)
+        self["backend"] = "struct"
+
+class Struct(Node):
+    def __init__(self, parent, name=""):
+        Node.__init__(self, parent, name)
+        self["backend"] = "struct"
+
 
 class Block(Node):
     """Code block

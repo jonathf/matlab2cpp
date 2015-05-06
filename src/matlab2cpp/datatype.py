@@ -14,7 +14,7 @@ mem4 = {"complex", "cx_vec", "cx_rowvec", "cx_mat", "cx_cube"}
 
 mems = [mem0, mem1, mem2, mem3, mem4]
 
-others = {"char", "TYPE", "func_lambda"}
+others = {"char", "TYPE", "func_lambda", "struct"}
 
 
 def common_loose(vals):
@@ -138,33 +138,59 @@ def get_name(dim, mem):
 
 def get_type(instance):
 
-#      print instance.prop
+    name = instance["name"]
     val = instance.prop["type"]
     if val != "TYPE":
         return val
 
-    if instance.parent["class"] in ("Params", "Declares"):
+    if instance.parent["class"] in ("Params", "Declares", "Struct"):
         return val
 
-    if instance["class"] == "Func":
-        func = instance
-    elif instance["class"] in ("Program", "Include", "Includes"):
+    if instance["class"] in ("Program", "Include", "Includes"):
         return "TYPE"
+
+    elif instance.cls in ("Fvar", "Fget", "Fset", "Nget", "Nset"):
+        if instance.cls in ("Nget", "Nset"):
+            if instance[0].cls == "String":
+                sname = instance[0]["value"]
+            else:
+                return
+        else:
+            sname = instance["sname"]
+
+        structs = instance.program[1]
+        if name not in structs["names"]:
+            return
+
+        struct = structs[structs["names"].index(name)]
+
+        if sname not in struct["names"]:
+            return
+
+        node = struct[struct["names"].index(sname)]
+
     else:
-        func = instance.func
+        if instance["class"] == "Func":
+            func = instance
+        else:
+            func = instance.func
 
-    declares = func[0]
-    params = func[2]
+        declares = func[0]
+        params = func[2]
+
+        if name in declares["names"]:
+            node = declares[declares["names"].index(name)]
+        elif name in params["names"]:
+            node = params[params["names"].index(name)]
+        else:
+            return "TYPE"
+
+    return node.prop["TYPE"]
+
     name = instance["name"]
-
-    for declare in declares:
-        if declare["name"] == name:
-            return declare.prop["type"]
-    for param in params:
-        if param["name"] == name:
-            return param.prop["type"]
-
-    return "TYPE"
+    if instance["class"] in ("Program", "Include", "Includes",
+            "Struct", "Structs"):
+        return
 
 
 class Dim(object):

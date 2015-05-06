@@ -259,6 +259,10 @@ name : str
                     if node.num and node.mem < 2:
                         node.mem = 2
 
+                elif cls == "Fvar":
+                    if type != "TYPE":
+                        node.set_global_type(type)
+
                 backend = node["backend"]
 
                 if backend == "unknown" and name in targets.reserved.reserved:
@@ -335,47 +339,100 @@ name : str
         if name in targets.reserved.reserved:
             return
 
+        if self.cls in ("Fvar", "Fset", "Fget", "Nset", "Nget"):
+            structs = self.program[1]
+
+            if name not in structs["names"]:
+                struct = collection.Struct(structs, name)
+            else:
+                struct = structs[structs["names"].index(name)]
+
+            if self.cls in ("Nget", "Nset"):
+
+                assert self[0].type in ("TYPE", "char")
+
+                if self[0].cls == "String":
+                    sname = self[0]["value"]
+                else:
+                    sname = ""
+
+            else:
+                sname = self["sname"]
+
+            if sname:
+                if sname in struct["names"]:
+                    node = struct[struct["names"].index(name)]
+                    if self.type != "TYPE":
+                        node.type = self.type
+
+                else:
+                    node = collection.Declare(struct, sname)
+                    node.type = self.type
+                    node["suggestion"] = self.type
+
+            type = "struct"
+
+        else:
+            type = self.type
+
         func = self.func
         declares = func[0]
         params = func[2]
+
         if name in params["names"]:
             return
 
         if name in declares["names"]:
             node = declares[declares["names"].index(name)]
-            type = self.type
             if type != "TYPE":
                 node.type = type
             return
 
         node = collection.Declare(declares, name)
-        type = self.type
         node.type = type
         node["suggest"] = type
-        self.reference = node
+
 
     def set_global_type(self, text):
 
-        if self["class"] == "Func":
-            func = self
-        elif self["class"] in ("Program", "Include", "Includes"):
-            return
-        else:
-            func = self.func
-
-        declares = func[0]
-        params = func[2]
         name = self["name"]
+        if self["class"] in ("Program", "Include", "Includes",
+                "Struct", "Structs"):
+            return
 
-        for declare in declares:
-            if declare["name"] == name:
-                node = declare
-                break
+        elif self.cls in ("Fvar", "Fget", "Fset", "Nget", "Nset"):
+            if self.cls in ("Nget", "Nset"):
+                if self[0].cls == "String":
+                    sname = self[0]["value"]
+                else:
+                    return
+            else:
+                sname = self["sname"]
+
+            structs = self.program[1]
+            if name not in structs["names"]:
+                return
+
+            struct = structs[structs["names"].index(name)]
+
+            if sname not in struct["names"]:
+                return
+
+            node = struct[struct["names"].index(sname)]
+
         else:
-            for param in params:
-                if param["name"] == name:
-                    node = param
-                    break
+            if self["class"] == "Func":
+                func = self
+            else:
+                func = self.func
+
+            declares = func[0]
+            params = func[2]
+
+            if name in declares["names"]:
+                node = declares[declares["names"].index(name)]
+            elif name in params["names"]:
+                node = params[params["names"].index(name)]
             else:
                 return
 
@@ -383,31 +440,48 @@ name : str
 
     def get_global_type(self):
 
-        if self["class"] == "Func":
-            func = self
-        elif self["class"] in ("Program", "Include", "Includes"):
-            return "TYPE"
-        else:
-            func = self.func
-
-        declares = func[0]
-        params = func[2]
         name = self["name"]
+        if self["class"] in ("Program", "Include", "Includes",
+                "Struct", "Structs"):
+            return
 
-        for declare in declares:
-            if declare["name"] == name:
-                node = declare
-                break
+        elif self.cls in ("Fvar", "Fget", "Fset", "Nget", "Nset"):
+            if self.cls in ("Nget", "Nset"):
+                if self[0].cls == "String":
+                    sname = self[0]["value"]
+                else:
+                    return "TYPE"
+            else:
+                sname = self["sname"]
+
+            structs = self.program[1]
+            if name not in structs["names"]:
+                return "TYPE"
+
+            struct = structs[structs["names"].index(name)]
+
+            if sname not in struct["names"]:
+                return "TYPE"
+
+            node = struct[struct["names"].index(sname)]
+
         else:
-            for param in params:
-                if param["name"] == name:
-                    node = param
-                    break
+            if self["class"] == "Func":
+                func = self
+            else:
+                func = self.func
+
+            declares = func[0]
+            params = func[2]
+
+            if name in declares["names"]:
+                node = declares[declares["names"].index(name)]
+            elif name in params["names"]:
+                node = params[params["names"].index(name)]
             else:
                 return "TYPE"
 
         return node.prop["type"]
-
 
 
     def suggest(self, text):
@@ -415,31 +489,51 @@ name : str
         if text == "TYPE" or self.type != "TYPE":
             return
 
-        if self["class"] == "Func":
-            func = self
-        elif self["class"] in ("Program", "Include", "Includes"):
-            return
-        else:
-            func = self.func
-
-        declares = func[0]
-        params = func[2]
         name = self["name"]
 
-        for declare in declares:
-            if declare["name"] == name:
-                node = declare
-                break
+
+        if self["class"] in ("Program", "Include", "Includes"):
+            return
+
+        elif self.cls in ("Fvar", "Fget", "Fset", "Nget", "Nset"):
+            if self.cls in ("Nget", "Nset"):
+                if self[0].cls == "String":
+                    sname = self[0]["value"]
+                else:
+                    return
+            else:
+                sname = self["sname"]
+
+            structs = self.program[1]
+            if name not in structs["names"]:
+                return
+
+            struct = structs[structs["names"].index(name)]
+
+            if sname not in struct["names"]:
+                return
+
+            node = struct[struct["names"].index(sname)]
+
         else:
-            for param in params:
-                if param["name"] == name:
-                    node = param
-                    break
+            if self["class"] == "Func":
+                func = self
+            else:
+                func = self.func
+
+            declares = func[0]
+            params = func[2]
+
+            if name in declares["names"]:
+                node = declares[declares["names"].index(name)]
+            elif name in params["names"]:
+                node = params[params["names"].index(name)]
             else:
                 return
 
         if isinstance(text, str):
             text = [text]
+
         text = list(text)
         node["suggest"] = dt.common_loose(text + [node["suggest"]])
 
@@ -553,6 +647,7 @@ name : str
             return (-num)*"&"
         return ""
 
+
     def error_log(self):
 
         ts = time.time()
@@ -573,7 +668,7 @@ name : str
                     msg = "Incompatible types (%s) and (%s)" % (t0, t1)
                     log = log + node.message(msg, "Error")
 
-                elif n0.dim == n1.dim and n0.mem != n1.mem:
+                elif n0.dim == n1.dim and n0.mem < n1.mem:
                     msg = "Type conversion (%s) and (%s)" % (t0, t1)
                     log = log + node.message(msg, "Warning")
 

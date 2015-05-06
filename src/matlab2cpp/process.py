@@ -64,16 +64,9 @@ tree : Node
         program.code = A
 
         includes = col.Includes(program)
-
-#          inc1 = col.Include(includes, "armadillo")
-#          inc1.value = "#include <armadillo>"
-#          inc1.code = ""
-#  
-#          inc2 = col.Include(includes, "usingarma")
-#          inc2.value = "using namespace arma ;"
-#          inc2.code = ""
-
         includes.include("armadillo")
+
+        col.Structs(program)
 
         # Start processing
 
@@ -711,8 +704,6 @@ tree : Node
                     node.line = line
                     node.code = A[cur:last+1]
 
-                    node.declare()
-
                     cur = last
 
         # Simple variable assignment
@@ -727,10 +718,9 @@ tree : Node
             node.line = line
             node.code = A[cur:last]
 
-            node.declare()
-
             cur = last-1
 
+        node.declare()
         return cur, line
 
 
@@ -1314,6 +1304,8 @@ tree : Node
 
                 cur, line = create_expression(node, k, line)
 
+                node.declare()
+
 
             elif A[k] in letters:
 
@@ -1347,6 +1339,8 @@ tree : Node
 
                     cur, line = create_expression(node, j, line)
 
+                    node.declare()
+
                 # Fieldname of type "a.b"
                 else:
 
@@ -1360,6 +1354,8 @@ tree : Node
                     node.code = A[cur:last]
 
                     cur = last-1
+
+                    node.declare()
 
 
         # Simple variable
@@ -2301,7 +2297,8 @@ tree : Node
 if __name__ == "__main__":
 
     test_code = """
-t1 = (j-1)*(windowlen-windowlen2) + 1 + ncoef2
+    x = [1,2,3]
+    [i,n] = min(x+4)
             """
     tree = process(test_code)
 
