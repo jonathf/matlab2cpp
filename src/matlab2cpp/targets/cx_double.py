@@ -1,4 +1,4 @@
 from variables import *
 
 Declare = "cx_double %(name)s ;"
-Imag = "%(value)s*I"
+Imag = "cx_double(0, %(value)s)"

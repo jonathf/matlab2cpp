@@ -2,5 +2,4 @@ from variables import *
 
 Declare = "cx_double %(name)s ;"
 def Ifloat(node):
-    node.include("complex")
-    return "%(value)s*sqrt(-1)"
+    return "cx_double(0, %(value)s)"
