@@ -1679,7 +1679,6 @@ tree : Node
             operators = operators[operators.index(start_opr)+1:]
 
         for opr in operators:
-
             # Pre-screen
             if opr not in A[start:end+1]:
                 continue
@@ -1707,8 +1706,9 @@ tree : Node
 
                     # no prefixes and no (scientific) numbers
                     if opr in "+-" and\
-                            (A[k-1] not in letters+digits+")]}" or\
-                             A[k-1] in "dDeE" and A[k+1] in digits):
+                            (A[last] not in letters+digits+")]}" or\
+                             A[k-1] in "dDeE" and A[k-2] in digits+"." and\
+                                     A[k+1] in digits):
                         k += 1
                         continue
 
@@ -2301,7 +2301,7 @@ tree : Node
 if __name__ == "__main__":
 
     test_code = """
-[m,n] = size(x);
+t1 = (j-1)*(windowlen-windowlen2) + 1 + ncoef2
             """
     tree = process(test_code)
 
