@@ -622,6 +622,7 @@ class Fvar(Node):
     def __init__(self, parent, name, sname):
         Node.__init__(self, parent, name)
         self["sname"] = sname
+        self.backend = "struct"
 
 class Cvar(Node):
     def __init__(self, parent, name):
@@ -635,10 +636,12 @@ class Fget(Node):
     def __init__(self, parent, name, sname):
         Node.__init__(self, parent, name)
         self["sname"] = sname
+        self.backend = "struct"
 
 class Nget(Node):
     def __init__(self, parent, name=""):
         Node.__init__(self, parent, name)
+        self.backend = "struct"
 
 class Cset(Node):
     def __init__(self, parent, name=""):
@@ -648,7 +651,9 @@ class Fset(Node):
     def __init__(self, parent, name, sname):
         Node.__init__(self, parent, name)
         self["sname"] = sname
+        self.backend = "struct"
 
 class Nset(Node):
     def __init__(self, parent, name=""):
         Node.__init__(self, parent, name)
+        self.backend = "struct"

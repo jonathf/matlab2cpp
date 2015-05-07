@@ -154,18 +154,18 @@ def get_type(instance):
             if instance[0].cls == "String":
                 sname = instance[0]["value"]
             else:
-                return
+                return "TYPE"
         else:
             sname = instance["sname"]
 
         structs = instance.program[1]
         if name not in structs["names"]:
-            return
+            return "TYPE"
 
         struct = structs[structs["names"].index(name)]
 
         if sname not in struct["names"]:
-            return
+            return "TYPE"
 
         node = struct[struct["names"].index(sname)]
 

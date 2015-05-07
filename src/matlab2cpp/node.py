@@ -237,12 +237,7 @@ name : str
                 type = node.type
 
                 # Assign some hereditary types
-                if type == "TYPE" and node.children and cls not in\
-                        ("Set", "Cset", "Fset", "Nset",
-                        "Get", "Cget", "Fget", "Nget", "Assign"):
-                    node.type = [n.type for n in node]
-
-                elif cls == "Get":
+                if cls == "Get":
 
                     names = node.program["names"]
                     if node["name"] in names:
@@ -252,15 +247,21 @@ name : str
                         else:
                             node["backend"] = "func_returns"
 
-                elif type == "TYPE" and cls == "Assign":
-                    node.type = node[0].type
+                elif type == "TYPE":
+                    if cls == "Assign":
+                        node.type = node[0].type
 
-                elif cls in ("Div", "Eldiv", "Rdiv", "Elrdiv"):
-                    if node.num and node.mem < 2:
-                        node.mem = 2
+                    elif node.children and cls not in\
+                            ("Set", "Cset", "Fset", "Nset",
+                            "Cget", "Fget", "Nget", "Assign"):
+                        node.type = [n.type for n in node]
 
-                elif cls == "Fvar":
-                    if type != "TYPE":
+
+                    elif cls in ("Div", "Eldiv", "Rdiv", "Elrdiv"):
+                        if node.num and node.mem < 2:
+                            node.mem = 2
+
+                    elif cls == "Fvar":
                         node.set_global_type(type)
 
                 backend = node["backend"]
@@ -349,8 +350,6 @@ name : str
 
             if self.cls in ("Nget", "Nset"):
 
-                assert self[0].type in ("TYPE", "char")
-
                 if self[0].cls == "String":
                     sname = self[0]["value"]
                 else:
@@ -361,7 +360,7 @@ name : str
 
             if sname:
                 if sname in struct["names"]:
-                    node = struct[struct["names"].index(name)]
+                    node = struct[struct["names"].index(sname)]
                     if self.type != "TYPE":
                         node.type = self.type
 
