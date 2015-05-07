@@ -761,6 +761,7 @@ tree : Node
             print repr(A[cur:end+1])
 
         L = iterate_list(cur)
+        print L
         matrix = col.Matrix(node)
         matrix.cur = cur
         matrix.line = line
@@ -1881,7 +1882,7 @@ tree : Node
 
 
     def is_space_delimited(start):
-        assert A[start] in "[{"
+        assert A[start] in list_start
 
         k = start+1
 
@@ -1919,11 +1920,10 @@ tree : Node
                 k = findend_dots(k)
 
             elif A[k] in expression_end:
-                if A[k] in ",;":
+                if A[k] == ",":
                     return False
-                else:
+                elif A[k] != ";":
                     return True
-
 
             k += 1
 
@@ -1945,8 +1945,7 @@ tree : Node
         if A[k] in "]}":
             return [[]]
 
-        starts = [[]]
-        ends = [[]]
+        out = [[]]
         count = False
 
         while True:
@@ -1958,8 +1957,7 @@ tree : Node
                 assert not count
                 count = True
                 end = findend_expression(k)
-                starts[-1].append(k)
-                ends[-1].append(end)
+                out[-1].append((k, end))
 
                 k = end
 
@@ -1968,123 +1966,51 @@ tree : Node
                 count = False
 
             elif A[k] == ";":
+
                 assert count
-                starts.append([])
-                ends.append([])
                 count = False
+                out.append([])
 
             elif A[k] in list_end:
-                return [zip(starts[i], ends[i])\
-                        for i in xrange(len(ends))]
+                return out
 
             k += 1
+
 
     def iterate_space_list(start):
 
         assert A[start] in list_start
 
         k = start+1
-
-        last = start
-
-        # Address first string occurence
         while A[k] in " \t":
             k += 1
 
-        starts = [[k]]
-        ends = [[]]
-
-        if A[k] == "'":
-            end = findend_string(k)
-            ends[-1].append(end)
-            k = end+1
-
-            while A[k] in " \t":
-                k += 1
-
-            starts[-1].append(k)
+        out = [[]]
+        count = False
 
         while True:
 
-            if A[k] == "(":
-                k = last = findend_paren(k)
-
-            elif A[k] == "[":
-                k = last = findend_matrix(k)
-
-            elif A[k] == "{":
-                k = last = findend_cell(k)
-
-            elif A[k] == "'":
-                if A[k-1] in string_prefix:
-                    k = findend_string(k)
-                last = k
-
-            elif A[k:k+3] == "...":
+            if A[k:k+3] == "...":
                 k = findend_dots(k)
 
+            elif A[k] in ";\n":
+                out.append([])
+
+            elif A[k] in expression_start:
+                assert not count
+                count = True
+
+                end = findend_expression_space(k)
+                out[-1].append((k, end))
+                k = end
+
+            elif A[k] in list_end:
+                return out
+
             elif A[k] in " \t":
-
-                while A[k] in " \t":
-                    k += 1
-
-                if A[k:k+2] in operator2:
-                    k += 1
-
-                elif A[k] in "+-":
-
-                    if A[k+1] in expression_start:
-                        ends[-1].append(last)
-                        starts[-1].append(k)
-
-                    elif A[k+1] in " \t":
-                        while A[k+1] in " \t":
-                            k += 1
-
-                elif A[k] in operator1:
-                    while A[k+1] in " \t":
-                        k += 1
-
-                else:
-                    ends[-1].append(last)
-                    starts[-1].append(k)
-                continue
-
-            elif A[k] == "\n":
-
-                ends[-1].append(k-1)
-                while A[k+1] in " \t":
-                    k += 1
-                starts.append([k+1])
-                ends.append([])
-
-
-            elif A[k] in expression_end:
-
-                ends[-1].append(last)
-                if A[k] == ",":
-
-                    while A[k+1] in " \t":
-                        k += 1
-                    starts[-1].append(k+1)
-
-                elif A[k] == ";":
-
-                    while A[k+1] in " \t":
-                        k += 1
-                    ends.append([])
-                    starts.append([k+1])
-
-                else:
-                    out = [zip(starts[i], ends[i])\
-                            for i in xrange(len(ends))]
-                    return out
-
-            else:
-                last = k
+                count = False
 
             k += 1
-
 
 
     def findend_expression(start):
@@ -2105,6 +2031,9 @@ tree : Node
 
             elif A[k] == "{":
                 k = findend_cell(k)
+
+            elif A[k:k+3] == "...":
+                k = findend_dots(k)
 
             elif A[k] == "=":
 
@@ -2131,6 +2060,92 @@ tree : Node
             k -= 1
 
         return k
+
+    def findend_expression_space(start):
+
+        assert A[start] in expression_start
+        k = last = start
+
+        while True:
+
+            if A[k] == "(":
+                k = last = findend_paren(k)
+
+            elif A[k] == "[":
+                k = last = findend_matrix(k)
+
+            elif A[k] == "'" and (A[k-1] != "." or k-1 != last):
+                k = last = findend_string(k)
+
+            elif A[k] == "{":
+                k = last = findend_cell(k)
+
+            elif A[k:k+3] == "...":
+                k = findend_dots(k)
+
+            elif A[k] == ";":
+                return last
+
+            elif A[k] == "=":
+
+                if A[k+1] == "=":
+                    k += 1
+                else:
+                    return last
+
+            elif A[k] in "><~":
+
+                if A[k+1] == "=":
+                    k += 1
+
+            elif A[k] in "+-":
+                while A[k+1] in " \t":
+                    k += 1
+
+            elif A[k] in " \t":
+
+                if is_space_delimiter(k):
+                    return last
+                while A[k+1] in " \t+-~":
+                    k += 1
+
+            elif A[k] in expression_end:
+                return last
+
+            elif A[k] in letters + digits + "_@":
+                while A[k+1] in letters + digits + "_@":
+                    k += 1
+                last = k
+
+            k += 1
+
+    def is_space_delimiter(start):
+
+        assert A[start] in " \t"
+        k = start
+
+        while True:
+
+            if A[k:k+3] == "...":
+                return False
+
+            elif A[k] in " \t":
+                pass
+
+            elif A[k] in "+-~":
+                if A[k] in " \t":
+                    return False
+
+            elif A[k:k+2] in operator2:
+                return False
+
+            elif A[k] in operator1:
+                return False
+
+            else:
+                return True
+
+            k += 1
 
 
     def findend_matrix(start):
@@ -2297,8 +2312,8 @@ tree : Node
 if __name__ == "__main__":
 
     test_code = """
-    x = [1,2,3]
-    [i,n] = min(x+4)
+table_c0 = [  -1.7258747e+000  2.6218840e-001 ;...
+5.5763308e+002  6.3573259e+002 ];
             """
     tree = process(test_code)
 

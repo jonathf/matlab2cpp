@@ -185,7 +185,7 @@ def get_type(instance):
         else:
             return "TYPE"
 
-    return node.prop["TYPE"]
+    return node.prop["type"]
 
     name = instance["name"]
     if instance["class"] in ("Program", "Include", "Includes",
