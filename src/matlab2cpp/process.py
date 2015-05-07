@@ -2323,7 +2323,7 @@ tree : Node
 if __name__ == "__main__":
 
     test_code = """
-[m, i] = max([1,2]+3)
+    [m, i] = max([1,2,3])
             """
     tree = process(test_code)
 

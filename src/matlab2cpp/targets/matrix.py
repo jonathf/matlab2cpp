@@ -135,12 +135,13 @@ def Matrix(node):
 
 def Assign(node):
 
-    if node[1].cls == "Matrix":
+    lhs, rhs = node
+    if rhs.cls == "Matrix":
 
-        if not node.num:
+        if not rhs.num:
             return "%(0)s = %(1)s ;"
 
-        if len(node[1][0]) == 0:
+        if len(rhs[0]) == 0:
             return "%(0)s.reset() ;"
 
         node.type = node["ctype"] = node[0].type
