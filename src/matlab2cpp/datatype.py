@@ -1,4 +1,4 @@
-dim0 = {"int", "float", "double", "uword", "complex"}
+dim0 = {"int", "float", "double", "uword", "cx_double"}
 dim1 = {"ivec", "fvec", "uvec", "vec", "cx_vec"}
 dim2 = {"irowvec", "frowvec", "urowvec", "rowvec", "cx_rowvec"}
 dim3 = {"imat", "fmat", "umat", "mat", "cx_mat"}
@@ -10,7 +10,7 @@ mem0 = {"uword", "uvec", "urowvec", "umat", "ucube"}
 mem1 = {"int", "ivec", "irowvec", "imat", "icube"}
 mem2 = {"float", "fvec", "frowvec", "fmat", "fcube"}
 mem3 = {"double", "vec", "rowvec", "mat", "cube"}
-mem4 = {"complex", "cx_vec", "cx_rowvec", "cx_mat", "cx_cube"}
+mem4 = {"cx_double", "cx_vec", "cx_rowvec", "cx_mat", "cx_cube"}
 
 mems = [mem0, mem1, mem2, mem3, mem4]
 

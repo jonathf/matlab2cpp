@@ -499,8 +499,8 @@ value : str
         """
         Node.__init__(self, parent)
         self["value"] = value
-        self["backend"] = "complex"
-        self.type = "complex"
+        self["backend"] = "cx_double"
+        self.type = "cx_double"
 
 
 class String(Node):
