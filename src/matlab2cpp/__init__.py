@@ -157,7 +157,7 @@ def main(path, suggestion=False, disp=False):
 #
 # Valid inputs:
 #
-# uint    int     float   double cx_double
+# uword   int     float   double cx_double
 # uvec    ivec    fvec    vec    cx_vec
 # urowvec irowvec frowvec rowvec cx_rowvec
 # umat    imat    fmat    mat    cx_mat
