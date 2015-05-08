@@ -138,7 +138,7 @@ def Assign(node):
     lhs, rhs = node
     if rhs.cls == "Matrix":
 
-        if not rhs.num:
+        if not lhs.num or not rhs.num:
             return "%(0)s = %(1)s ;"
 
         if len(rhs[0]) == 0:
