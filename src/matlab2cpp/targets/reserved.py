@@ -4,10 +4,11 @@ Reserved translation rules
 The module will always check if the specific "<class>_<name>" name
 exists before finding the generic "<class>" name.
 """
+import vec_common, rowvec_common, mat_common, cube_common
 
 # List of function names that should be handled by reserved.py:
 reserved = {
-"and", "or", "not", "all", "any",
+"i", "and", "or", "not", "all", "any",
 "false", "true", "pi", "inf", "Inf", "nan", "NaN",
 "eye", "flipud", "length", "max", "min", "size", "transpose",
 "zeros", "round", "return", "rand", "floor", "conv_to",
@@ -31,6 +32,76 @@ Var_inf = "datum::inf"
 Var_Inf = "datum::inf"
 Var_nan = "datum::nan"
 Var_NaN = "datum::nan"
+
+# Special handle of 'i'-variable
+def Declare_i(node):
+    return node.type + " " + node["name"] + " ;"
+
+def Var_i(node):
+    # exists in scope
+    if "i" in node.func[0]["names"] or\
+            "i" in node.func[2]["names"]:
+        pass
+
+    elif node.parent.cls in ("Assign", "Assigns") and\
+            not (node is node.parent[-1]):
+        node.declare()
+
+
+    else:
+        return "cx_double(0, 1)"
+
+    return "i"
+
+def Get_i(node):
+
+    if not node.num:
+        return "%(name)s(", ", ", ")"
+
+    if node.dim == 1:
+        return vec_common.Get(node)
+    elif node.dim == 2:
+        return rowvec_common.Get(node)
+    elif node.dim == 3:
+        return mat_common.Get(node)
+    elif node.dim == 4:
+        return cube_common.Get(node)
+
+    assert False
+
+def Set_i(node):
+
+    if not node.num:
+        return "%(name)s(", ", ", ")"
+
+    if node.dim == 1:
+        return vec_common.Set(node)
+    elif node.dim == 2:
+        return rowvec_common.Set(node)
+    elif node.dim == 3:
+        return mat_common.Set(node)
+    elif node.dim == 4:
+        return cube_common.Set(node)
+
+    assert False
+
+
+def Assign_i(node):
+
+    if not node.num:
+        return "%(0)s = %(1)s ;"
+
+    if node.dim == 1:
+        return vec_common.Assign(node)
+    elif node.dim == 2:
+        return rowvec_common.Assign(node)
+    elif node.dim == 3:
+        return mat_common.Assign(node)
+    elif node.dim == 4:
+        return cube_common.Assign(node)
+
+    assert False
+
 
 def Get_and(node):
     return "(", "*", ")"

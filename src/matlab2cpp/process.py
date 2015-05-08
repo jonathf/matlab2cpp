@@ -1497,8 +1497,8 @@ tree : Node
 
             if A[k] in "ij":
 
-                k += 1
                 node = col.Imag(node, A[start:k])
+                k += 1
                 if disp:
                     print "%4d %4d     Imag       " % (start, line),
                     print repr(A[start:last+1])
@@ -2323,7 +2323,9 @@ tree : Node
 if __name__ == "__main__":
 
     test_code = """
-    [m, i] = max([1,2,3])
+a = struct
+a(1).b = 4
+a(1).c = "5"
             """
     tree = process(test_code)
 

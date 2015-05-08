@@ -226,7 +226,7 @@ name : str
 
         nodes = utils.flatten(self, False, True, False)
         if disp:
-            print "iterating %d nodes" % len(nodes)
+            print "configuring %d nodes" % len(nodes)
 
         while True:
 
@@ -311,7 +311,7 @@ name : str
                     else:
                         node.generate(False, None)
 
-                elif cls == "Assign":
+                elif cls == "Assign" and node[0].cls != "Set":
                     node[0].suggest(node[1].type)
 
                 elif cls in ("Var", "Fvar", "Cget", "Fget", "Nget",
@@ -337,8 +337,6 @@ name : str
         "Declare a variable in the begining of a function."
 
         name = name or self["name"]
-        if name in targets.reserved.reserved:
-            return
 
         if self.cls in ("Fvar", "Fset", "Fget", "Nset", "Nget"):
             structs = self.program[1]
@@ -537,15 +535,28 @@ name : str
         node["suggest"] = dt.common_loose(text + [node["suggest"]])
 
 
-    def auxillary(self, type="", convert=False):
-        """create a auxillary variablele and 
-        move actual calcuations to own line."""
+    def auxillary(self, type=None, resize=0):
+        """Create a auxillary variablele and
+move actual calcuations to own line.
+
+Parameters
+----------
+type : str, None
+    If provided, auxillary variable type will be converted
+resize : int
+    If provided, will convert the shape of the object.
+For matrices:
+    1: vectorize
+For cubes:
+    1: vectorize
+    2: resize(rows, cols*slice, 1)
+        """
 
         assert self.parent["class"] != "Assign",\
                 ".auxillary() must be triggered mid expression."
 
-        if not type:
-            type = self.type
+        convert = type
+        type = type or self.type
 
         if not isinstance(type, str):
             type = dt.common_strict(type)
