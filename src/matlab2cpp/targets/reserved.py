@@ -16,6 +16,8 @@ reserved = {
 
 # Common attribute
 
+Assign = "%(0)s = %(1)s ;"
+
 def Declare(node):
     raise ValueError("Variable name '%s' is reserved."%node["name"]\
             +"\nPlease rename variable.")
@@ -36,7 +38,6 @@ Var_NaN = "datum::nan"
 # Special handle of 'i'-variable
 
 Var_i = "cx_complex(0, 1)"
-Assign_i = "%(0)s = %(1)s"
 
 def Get_and(node):
     return "(", "*", ")"
@@ -220,7 +221,7 @@ def Assigns_min(node):
 
     var = node[2][0]
     if var.cls != "Var":
-        var = var.auxillary()
+        var = var.auxillary(node[0].type)
     var = str(var)
 
     return "%(0)s = " + var + ".min(%(1)s) ;"
@@ -267,7 +268,7 @@ def Assigns_max(node):
     assert len(node) == 3
     var = node[2][0]
     if var.cls != "Var":
-        var = var.auxillary()
+        var = var.auxillary(node[0].type)
     var = str(var)
 
     return "%(0)s = " + var + ".max(%(1)s) ;"

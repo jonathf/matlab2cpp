@@ -152,9 +152,7 @@ name : str
             cls = node["class"]
             backend = node["backend"]
 
-            if name in targets.reserved.reserved:
-                backend = "reserved"
-            elif backend == "unknown" and type_ != "TYPE":
+            if backend == "unknown" and type_ != "TYPE":
                 backend = type_
 
             target = targets.__dict__[backend]
@@ -557,7 +555,7 @@ name : str
         node["suggest"] = dt.common_loose(text + [node["suggest"]])
 
 
-    def auxillary(self, type=None, resize=0):
+    def auxillary(self, type=None, convert=False, resize=0):
         """Create a auxillary variablele and
 move actual calcuations to own line.
 
@@ -577,7 +575,6 @@ For cubes:
         assert self.parent["class"] != "Assign",\
                 ".auxillary() must be triggered mid expression."
 
-        convert = type
         type = type or self.type
 
         if not isinstance(type, str):
