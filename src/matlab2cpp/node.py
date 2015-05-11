@@ -552,8 +552,11 @@ name : str
 
         if isinstance(text, str):
             text = [text]
+        elif isinstance(text[0], int):
+            text = [text]
+        else:
+            text = list(text)
 
-        text = list(text)
         node["suggest"] = dt.common_loose(text + [node["suggest"]])
 
 
@@ -811,11 +814,13 @@ a -> resize(a, a.n_rows, a.n_cols*a.n_slices, 1)
         end = cur+len(self.code)
 
         start = cur
-        while code[start] != "\n":
+        while code[start] != "\n" and start != 0:
             start -= 1
 
+        if end >= len(code):
+            end = len(code)-1
         finish = end
-        while code[finish] != "\n":
+        while code[finish] != "\n" and finish != len(code)-1:
             finish += 1
 
         pos = cur-start

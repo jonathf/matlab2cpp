@@ -1773,13 +1773,13 @@ tree : Node
         # Postfixes
         if A[end] == "'" and not A[start] == "'":
             if A[end-1] == ".":
-                node = col.Transpose(node)
+                node = col.Ctranspose(node)
                 node.cur = start
                 node.line = line
                 node.code = A[start:end+1]
                 end -= 2
             else:
-                node = col.Ctranspose(node)
+                node = col.Transpose(node)
                 node.cur = start
                 node.line = line
                 node.code = A[start:end+1]

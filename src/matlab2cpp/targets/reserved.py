@@ -10,7 +10,9 @@ import vec_common, rowvec_common, mat_common, cube_common
 reserved = {
 "i", "and", "or", "not", "all", "any",
 "false", "true", "pi", "inf", "Inf", "nan", "NaN",
-"eye", "flipud", "length", "max", "min", "size", "transpose",
+"eye", "flipud", "length", "max", "min", "size",
+"transpose", "ctranspose",
+"abs",
 "zeros", "round", "return", "rand", "floor",
 "_conv_to", "_resize_", "_vectorise",
 }
@@ -39,6 +41,10 @@ Var_NaN = "datum::nan"
 # Special handle of 'i'-variable
 
 Var_i = "cx_complex(0, 1)"
+
+def Get_abs(node):
+    node.type = node[0].type
+    return "abs(", ", ", ")"
 
 def Get_and(node):
     return "(", "*", ")"
@@ -221,8 +227,15 @@ def Assigns_min(node):
     assert len(node) == 3
 
     var = node[2][0]
+
+    if not var.num:
+        return "[", ", ", "] = max(", ") ;"
+
+    node[0].suggest((0, var.mem))
+    node[1].suggest("int")
+
     if var.cls != "Var":
-        var = var.auxiliary(node[2].type)
+        var = var.auxiliary()
     var = str(var)
 
     return "%(0)s = " + var + ".min(%(1)s) ;"
@@ -269,8 +282,15 @@ def Assigns_max(node):
     assert len(node) == 3
 
     var = node[2][0]
+
+    if not var.num:
+        return "[", ", ", "] = max(", ") ;"
+
+    node[0].suggest((0, var.mem))
+    node[1].suggest("int")
+
     if var.cls != "Var":
-        var = var.auxiliary(node[2].type)
+        var = var.auxiliary()
     var = str(var)
 
     return "%(0)s = " + var + ".max(%(1)s) ;"
@@ -297,8 +317,16 @@ def Get_transpose(node):
         node.type = (1, node[0].mem)
     else:
         node.type = node[0].type
-
     return "arma::trans(%(0)s)"
+
+def Get_ctranspose(node):
+    if node[0].dim == 1:
+        node.type = (2, node[0].mem)
+    elif node[0].dim == 2:
+        node.type = (1, node[0].mem)
+    else:
+        node.type = node[0].type
+    return "arma::strans(%(0)s)"
 
 
 def Get_flipud(node):
@@ -358,6 +386,10 @@ def Get_rand(node):
     elif len(node) == 2:
         node.type = "mat"
         return "arma::randu<mat>(%(0)s, %(1)s)"
+
+    elif len(node) == 3:
+        node.type = "cube"
+        return "arma::randu<cube>(%(0)s, %(1)s, %(2)s)"
     else:
         raise NotImplementedError
 
