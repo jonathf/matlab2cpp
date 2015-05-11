@@ -245,6 +245,7 @@ name : str
 
                     reserved[name] = False
         reserved = set([k for k,v in reserved.items() if v])
+        reserved = reserved.union({"_resize", "_vectorise", "_conv_to"})
 
         while True:
 
@@ -285,6 +286,7 @@ name : str
                 backend = node["backend"]
                 if name in reserved:
                     node["backend"] = "reserved"
+                    node.generate(False, None)
 
                 elif backend == "unknown" and type != "TYPE":
                     node["backend"] = type
@@ -555,25 +557,18 @@ name : str
         node["suggest"] = dt.common_loose(text + [node["suggest"]])
 
 
-    def auxillary(self, type=None, convert=False, resize=0):
-        """Create a auxillary variablele and
+    def auxiliary(self, type=None, convert=False, resize=0):
+        """Create a auxiliary variablele and
 move actual calcuations to own line.
 
 Parameters
 ----------
 type : str, None
-    If provided, auxillary variable type will be converted
-resize : int
-    If provided, will convert the shape of the object.
-For matrices:
-    1: vectorize
-For cubes:
-    1: vectorize
-    2: resize(rows, cols*slice, 1)
+    If provided, auxiliary variable type will be converted
         """
 
         assert self.parent["class"] != "Assign",\
-                ".auxillary() must be triggered mid expression."
+                ".auxiliary() must be triggered mid expression."
 
         type = type or self.type
 
@@ -611,14 +606,13 @@ For cubes:
         v0["backend"] = backend
         v0.declare()
 
-        # Create aux Var
+        v = s
         if convert:
-            get = collection.Get(s, "conv_to")
-            get.type = type
-            v1 = collection.Var(get, var)
-        else:
-            v1 = collection.Var(s, var)
+            v = collection.Get(v, "_conv_to")
+            v.backend = "reserved"
+            v.type = type
 
+        v1 = collection.Var(v, var)
         v1.set_global_type(type)
         v1["backend"] = backend
 
@@ -634,7 +628,7 @@ For cubes:
         v1.parent, self.parent = self.parent, v1.parent
 
         if convert:
-            get.children[-1] = self
+            v.children[-1] = self
         else:
             s.children[-1] = self
 
@@ -643,6 +637,83 @@ For cubes:
         v1.generate(False)
 
         return v1
+
+    def vectorise(self):
+
+        assert self.cls == "Var"
+        assert self.dim in (3,4)
+
+        type = self.type
+        backend = self.backend
+        parent = self.parent
+        name = self["name"]
+
+        get = collection.Get(self, "_vectorise")
+        get.type = type
+        get.dim = 1
+        get.backend = "reserved"
+
+        var = collection.Var(get, name)
+        var.type = type
+        var.backend = backend
+
+        # Rearange variables
+        i = parent.children.index(self)
+        parent.children[i] = get
+        get.parent = parent
+
+        get.generate(False)
+
+        return get
+
+    def resize(self):
+        """
+Special resize manuver for cubes
+a -> resize(a, a.n_rows, a.n_cols*a.n_slices, 1)
+        """
+
+        assert self.cls == "Var"
+        assert self.dim == 4
+
+        type = self.type
+        backend = self.backend
+        parent = self.parent
+        name = self["name"]
+
+        get = collection.Get(self, "_resize")
+        get.type = type
+        get.backend = "reserved"
+
+        var = collection.Var(get, name)
+        var.type = type
+        var.backend = backend
+
+        rows = collection.Var(get, name+".n_rows")
+        rows.type = "int"
+        rows.backend = "int"
+
+        mul = collection.Mul(get)
+        mul.type = "int"
+        mul.backend = "expression"
+
+        cols = collection.Var(mul, name+".n_cols")
+        cols.type = "int"
+        cols.backend = "int"
+
+        slices = collection.Var(mul, name+".n_slices")
+        slices.type = "int"
+        slices.backend = "int"
+
+        collection.Int(get, "1")
+
+        # Rearange variables
+        i = parent.children.index(self)
+        parent.children[i] = get
+        get.parent = parent
+
+        get.generate(False)
+
+        return get
 
 
     def include(self, name, **kws):

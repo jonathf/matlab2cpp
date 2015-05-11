@@ -11,7 +11,8 @@ reserved = {
 "i", "and", "or", "not", "all", "any",
 "false", "true", "pi", "inf", "Inf", "nan", "NaN",
 "eye", "flipud", "length", "max", "min", "size", "transpose",
-"zeros", "round", "return", "rand", "floor", "conv_to",
+"zeros", "round", "return", "rand", "floor",
+"_conv_to", "_resize_", "_vectorise",
 }
 
 # Common attribute
@@ -116,7 +117,7 @@ def Get_size(node):
 
     var = node[0]
     if var.cls != "Var":
-        var = var.auxillary()
+        var = var.auxiliary()
     var = str(var)
 
     if len(node) > 1:
@@ -151,7 +152,7 @@ def Assigns_size(node):
 
     val = node[-1][0]
     if val.cls != "Var":
-        val = val.auxillary()
+        val = val.auxiliary()
     val = str(val)
 
     if len(node)==3:
@@ -221,7 +222,7 @@ def Assigns_min(node):
 
     var = node[2][0]
     if var.cls != "Var":
-        var = var.auxillary(node[0].type)
+        var = var.auxiliary(node[2].type)
     var = str(var)
 
     return "%(0)s = " + var + ".min(%(1)s) ;"
@@ -266,9 +267,10 @@ def Get_max(node):
 
 def Assigns_max(node):
     assert len(node) == 3
+
     var = node[2][0]
     if var.cls != "Var":
-        var = var.auxillary(node[0].type)
+        var = var.auxiliary(node[2].type)
     var = str(var)
 
     return "%(0)s = " + var + ".max(%(1)s) ;"
@@ -367,6 +369,11 @@ def Get_floor(node):
     return "arma::floor(%(0)s)"
 
 
-def Get_conv_to(node):
+def Get__conv_to(node):
     return "conv_to<%(type)s>::from(%(0)s)"
 
+def Get__resize(node):
+    return "arma::resize(", ", ", ")"
+
+def Get__vectorise(node):
+    return "arma::vectorise(", ", ", ")"

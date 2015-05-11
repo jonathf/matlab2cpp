@@ -51,11 +51,4 @@ def Nget(node):
 #      node.typeerror()
     return "%(name)s.(", ", ", ")"
 
-def Assign(node):
-    return "%(0)s = %(1)s ;"
-
-
-#  def error(node):
-#  
-#      text = "The variable type"
-
+Assign = "%(0)s = %(1)s"

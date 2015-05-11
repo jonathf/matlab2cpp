@@ -85,7 +85,7 @@ Else = "else\n{\n%(0)s\n}"
 
 def Switch(node):
     if node[0].cls != "Var" and node[0].type != "TYPE":
-        node[0].auxillary()
+        node[0].auxiliary()
     return "\n".join(map(str, node[1:]))
 #      return "", "\n", ""
 #  
@@ -101,7 +101,7 @@ def Case(node):
 
     if node is node.parent[1]:
         if var.cls != "Var" and var.type != "TYPE":
-            var.auxillary()
+            var.auxiliary()
 
         return "if (%(0)s == " + str(var)+")\n{\n%(1)s\n}"
 
@@ -137,7 +137,7 @@ def Block(node):
 def Assigns(node):
 
     if node[-1]["class"] != "Var":
-        node[-1].auxillary()
+        node[-1].auxiliary()
 
     out = ""
     n = str(len(node)-1)
