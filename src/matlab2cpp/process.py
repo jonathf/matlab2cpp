@@ -536,6 +536,7 @@ tree : Node
             k += 1
 
         cur_, line = create_expression(assign, k, line, end)
+        assign["name"] = assign[-1]["name"]
 
         assert len(assign) == 2
 

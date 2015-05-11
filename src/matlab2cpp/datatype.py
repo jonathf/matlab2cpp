@@ -14,7 +14,7 @@ mem4 = {"cx_double", "cx_vec", "cx_rowvec", "cx_mat", "cx_cube"}
 
 mems = [mem0, mem1, mem2, mem3, mem4]
 
-others = {"char", "TYPE", "func_lambda", "struct"}
+others = {"char", "TYPE", "func_lambda", "struct", "imaginary_unit"}
 
 
 def common_loose(vals):
@@ -45,11 +45,16 @@ Loose enforcment"""
     for other in others:
         vals.discard(other)
 
-    if not vals:
+    if len(vals) == 0:
         return "TYPE"
+    elif len(vals) == 1:
+        return vals.pop()
 
     dims_ = map(get_dim, vals)
-    dim = max(*dims_)
+    if dims_:
+        dim = max(*dims_)
+    else:
+        return "TYPE"
     if dim == 2 and 1 in dims_:
         dim = 3
 

@@ -126,7 +126,7 @@ def Get(node):
 def Assign(node):
 
     if node[1]["decomposed"]:
-        return "%(0)s << %(1)s ;"
+        return "%(0)s = %(1)s ;"
 
     if node[0].cls == "Var":
         return "%(0)s = %(1)s ;"

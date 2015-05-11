@@ -228,6 +228,26 @@ name : str
         if disp:
             print "configuring %d nodes" % len(nodes)
 
+        # Find if some names should be reserved
+        reserved = {}
+        for node in nodes[::-1]:
+
+            name = node["name"]
+            if name in targets.reserved.reserved:
+
+                if name not in reserved:
+                    reserved[name] = True
+
+                if (node.cls in ("Var", "Fvar", "Cvar") and \
+                        node.parent.cls in \
+                        ("Assign", "Assigns") and \
+                        not (node is node.parent[-1])) or \
+                        node.cls in ("Set", "Cset", "Fset", "Nset") or \
+                        node.parent.cls == "Param":
+
+                    reserved[name] = False
+        reserved = set([k for k,v in reserved.items() if v])
+
         while True:
 
             for node in nodes[::-1]:
@@ -265,8 +285,7 @@ name : str
                         node.set_global_type(type)
 
                 backend = node["backend"]
-
-                if backend == "unknown" and name in targets.reserved.reserved:
+                if name in reserved:
                     node["backend"] = "reserved"
 
                 elif backend == "unknown" and type != "TYPE":
@@ -292,7 +311,7 @@ name : str
                         for i in xrange(len(node)):
                             params[i].suggest(node[i].type)
 
-                    if backend == "func_returns":
+                    elif backend == "func_returns":
                         names = node.program["names"]
                         func = node.program[names.index(name)]
                         params = func[2]
@@ -307,6 +326,9 @@ name : str
 #                          params = func[2]
 #                          for i in xrange(len(node)):
 #                              params[i].suggest(node[i].type)
+
+#                      elif name in ("i", "j"):
+#                          node.suggest("imaginary_unit")
 
                     else:
                         node.generate(False, None)
