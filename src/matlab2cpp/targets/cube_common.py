@@ -51,8 +51,6 @@ def Get(node):
         if -1 in (dim0, dim1, dim2):
             return "%(name)s(", ", ", ")"
 
-        node = node.resize()
-
         # Configure dimensions
         if dim0:
             if dim1:
@@ -87,7 +85,7 @@ def Get(node):
                 else:
                     node.dim = 0
 
-        return "%(name)s(" + arg0 + ", " + arg1 + ", 1)"
+        return "%(name)s(" + arg0 + ", " + arg1 + ", " + arg2 + ")"
 
 
 def Set(node):
@@ -175,5 +173,5 @@ def Set(node):
                 else:
                     node.dim = 0
 
-        return "%(name)s(" + arg0 + ", " + arg1 + ", 1)"
+        return "%(name)s(" + arg0 + ", " + arg1 + ", " + arg2 + ")"
 
