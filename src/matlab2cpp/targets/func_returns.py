@@ -74,7 +74,7 @@ def Declares(node):
         if type == "func_lambda":
             type == "std::function"
 
-        if child.cls in ("Fvar", "Fget", "Fset", "Nget", "Nset"):
+        if type == "struct":
             type = child["name"].capitalize()
 
         if type not in declares:

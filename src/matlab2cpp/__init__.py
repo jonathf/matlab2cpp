@@ -16,9 +16,6 @@ from MatlabListener import MatlabListener
 import antlr4 as antlr
 
 import os
-#  import sys
-import shutil
-import cPickle
 import imp
 
 import utils
@@ -62,63 +59,10 @@ def main(path, suggestion=False, disp=False):
     code1 = f.read()
     f.close()
 
-#      # Deal with backup and pickled files
-#      if os.path.isfile("." + filename + ".backup")\
-#              and os.path.isfile("." + filename + ".pickled"):
-#  
-#          if disp:
-#              print "reading backup..."
-#  
-#          f = open("." + filename + ".backup", "rU")
-#          code2 = f.read()
-#          f.close()
-#  
-#          if code1 != code2:
-#  
-#              if disp:
-#                  print "code mismatch!"
-#  
-#              if disp:
-#                  print "building token-tree..."
-#  
-#              tree = process.process(code1, disp=disp)
-#  
-#              if disp:
-#                  print "writing pickle..."
-#  
-#              f = open("." + filename + ".pickled", "w")
-#              cPickle.dump(tree, f)
-#              f.close()
-#  
-#              if disp:
-#                  print "writing backup..."
-#  
-#              f = open("." + filename+".backup", "w")
-#              f.write(code1)
-#              f.close()
-#  
-#          else:
-#  
-#              if disp:
-#                  print "reading pickle..."
-#  
-#              f = open("." + filename + ".pickled", "r")
-#              tree = cPickle.load(f)
-#              f.close()
-#  
-#      else:
-
-
     if disp:
         print "building token-tree..."
 
     tree = process.process(code1, disp=disp)
-
-
-#          if disp:
-#              print "writing backup..."
-#  
-#          shutil.copyfile(filename, "." + filename + ".backup")
 
     if os.path.isfile(filename + ".py"):
 
@@ -134,9 +78,9 @@ def main(path, suggestion=False, disp=False):
         cfg, scfg = utils.get_cfg(tree)
         for name in cfg.keys():
             if name in scope:
-                for key in cfg[name].keys():
-                    if key in scope[name]:
-                        cfg[name][key] = scope[name][key]
+                for key in scope[name].keys():
+                    cfg[name][key] = scope[name][key]
+        print cfg
         utils.set_cfg(tree, cfg)
 
     else:

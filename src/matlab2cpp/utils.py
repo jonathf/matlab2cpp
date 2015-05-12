@@ -1,3 +1,4 @@
+import collection
 
 def flatten(node, ordered=False, reverse=False, inverse=False):
     r"""
@@ -65,13 +66,14 @@ reverse : bool
     return out
 
 
-def set_cfg(root, func_cfg, struct_cfg={}):
+def set_cfg(root, cfg):
 
-    for name in func_cfg.keys():
+    structs = root[1]
+    for name in cfg.keys():
 
-        if name in root["names"]:
+        if name in root["names"][2:]:
 
-            cfg_ = func_cfg[name]
+            cfg_ = cfg[name]
             func = root[root["names"].index(name)]
             declares, returns, params = func[0], func[1], func[2]
 
@@ -88,11 +90,9 @@ def set_cfg(root, func_cfg, struct_cfg={}):
                     var = returns[returns["names"].index(key)]
                     var.type = cfg_[key]
 
-    structs = root[1]
-    for name in struct_cfg.keys():
-        if name in structs["names"]:
+        elif name in structs["names"]:
 
-            cfg_ = struct_cfg[name]
+            cfg_ = cfg[name]
             struct = structs[structs["names"].index(name)]
 
             for key in cfg_.keys():
@@ -100,6 +100,12 @@ def set_cfg(root, func_cfg, struct_cfg={}):
                 if key in struct["names"]:
                     var = struct[struct["names"].index(key)]
                     var.type = cfg_[key]
+
+                else:
+                    var = collection.Declare(struct, key)
+                    var.backend = "struct"
+                    var.type = cfg_[key]
+
 
 
 def get_cfg(root):
@@ -130,15 +136,38 @@ def get_cfg(root):
                 if type:
                     scfg_[var["name"]] = type
 
+    for struct in root[1]:
+
+        cfg[struct["name"]] = cfg_ = {}
+        scfg[struct["name"]] = scfg_ = {}
+
+        for var in struct:
+
+            type = var.prop["type"]
+            if type == "TYPE":
+                type = ""
+            cfg_[var["name"]] = type
+
+            if not type:
+
+                type = var.prop["suggest"]
+                if type == "TYPE":
+                    type = ""
+                if type:
+                    scfg_[var["name"]] = type
+
     return cfg, scfg
 
 
 
-def str_cfg(cfg, scfg={}):
+def str_cfg(cfg, scfg={}, struct_cfg={}):
 
     out = "scope = {}\n\n"
 
-    for name in cfg.keys():
+    keys = cfg.keys()
+    keys.sort()
+
+    for name in keys:
         out += '%s = scope["%s"] = {}\n' % (name, name)
         cfg_ = cfg[name]
 

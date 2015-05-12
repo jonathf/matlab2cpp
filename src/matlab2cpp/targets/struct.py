@@ -2,7 +2,6 @@ from variables import *
 
 Structs = "", "\n\n", ""
 def Declare(node):
-
     name = node["name"]
     return name.capitalize() + " " + name + " ;"
 
