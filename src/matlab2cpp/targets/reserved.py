@@ -154,8 +154,6 @@ def Get_size(node):
 
 def Assigns_size(node):
 
-    assert node[-1].cls == "Get"
-
     val = node[-1][0]
     if val.cls != "Var":
         val = val.auxiliary()
@@ -173,7 +171,6 @@ def Assigns_size(node):
         node[1].suggest("int")
         node[2].suggest("int")
 
-        rows, cols, slices = map(str, node[0])
         return  "%(0)s = "+val+".n_rows ;\n"+\
                 "%(1)s = "+val+".n_cols ;\n"+\
                 "%(2)s = "+val+".n_slice ;"
