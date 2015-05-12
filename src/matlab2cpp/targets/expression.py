@@ -225,21 +225,19 @@ def Eldiv(node):
 
 def Colon(node):
 
-    group = node.group
+    parent = node.parent
 
     if len(node) == 2:
 
-        if group["class"] in ("Get", "Cget", "Nget", "Fget") and group.num:
+        if parent["class"] in ("Get", "Cget", "Nget", "Fget", "Set",
+                "Cset", "Nset", "Fset") and parent.num:
             node.type = "uvec"
+            parent[""]
             return "span(%(0)s-1, %(1)s-1)"
 
-        elif group["class"] in ("Set", "Cset", "Nset", "Fset") and group.num:
-            node.type = "uvec"
-            return "span(%(0)s-1, %(1)s-1)"
-
-        elif node.group["class"] == "Assign" and not group.mem:
-            node.type = "uvec"
-            return "span(%(0)s-1, %(1)s-1)"
+        elif node.parent["class"] == "Assign" and not parent.mem:
+            node.type = "ivec"
+            return "span(%(0)s, %(1)s)"
 
         node.type = "ivec"
         return "span(%(0)s, %(1)s)"
@@ -247,17 +245,14 @@ def Colon(node):
 
     if len(node) == 3:
 
-        if group["class"] in ("Get", "Cget", "Nget", "Fget") and group.num:
+        if parent["class"] in ("Get", "Cget", "Nget", "Fget", "Set",
+                "Cset", "Nset", "Fset") and parent.num:
             node.type = "uvec"
             return "span(%(0)s-1, %(1)s, %(2)s-1)"
 
-        elif group["class"] in ("Set", "Cset", "Nset", "Fset") and group.num:
-            node.type = "uvec"
-            return "span(%(0)s-1, %(1)s, %(2)s-1)"
-
-        elif node.group["class"] == "Assign" and not group.mem:
-            node.type = "uvec"
-            return "span(%(0)s-1, %(1)s, %(2)s-1)"
+        elif node.parent["class"] == "Assign" and not parent.mem:
+            node.type = "ivec"
+            return "span(%(0)s, %(1)s, %(2)s)"
 
         node.type = "ivec"
         return "span(%(0)s, %(1)s, %(2)s)"

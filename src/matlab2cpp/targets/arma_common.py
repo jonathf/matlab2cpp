@@ -13,6 +13,8 @@ def configure_arg(node, index):
         dim = 0
     else:
         dim = 1
+        if node.cls != "Colon":
+            out = out + "-1"
 
     if node.mem != 0 and node.dim != 0:
         node.auxiliary((node.dim, 0), convert=True)
