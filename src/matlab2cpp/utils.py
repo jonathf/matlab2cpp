@@ -65,22 +65,40 @@ reverse : bool
     return out
 
 
-def set_cfg(root, cfg):
+def set_cfg(root, func_cfg, struct_cfg={}):
 
-    for name in cfg.keys():
+    for name in func_cfg.keys():
+
         if name in root["names"]:
-            cfg_ = cfg[name]
+
+            cfg_ = func_cfg[name]
             func = root[root["names"].index(name)]
             declares, returns, params = func[0], func[1], func[2]
+
             for key in cfg_.keys():
                 if key in declares["names"]:
                     var = declares[declares["names"].index(key)]
                     var.type = cfg_[key]
+
                 if key in params["names"]:
                     var = params[params["names"].index(key)]
                     var.type = cfg_[key]
-                if key in returns["names"]:
+
+                elif key in returns["names"]:
                     var = returns[returns["names"].index(key)]
+                    var.type = cfg_[key]
+
+    structs = root[1]
+    for name in struct_cfg.keys():
+        if name in structs["names"]:
+
+            cfg_ = struct_cfg[name]
+            struct = structs[structs["names"].index(name)]
+
+            for key in cfg_.keys():
+
+                if key in struct["names"]:
+                    var = struct[struct["names"].index(key)]
                     var.type = cfg_[key]
 
 
@@ -96,7 +114,7 @@ def get_cfg(root):
         declares, params = func[0], func[2]
         for var in declares[:]+params[:]:
 
-            if var["name"][:4] == "_aux":
+            if var["name"][:1] == "_":
                 continue
 
             type = var.prop["type"]

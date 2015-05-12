@@ -51,4 +51,4 @@ def Nget(node):
 #      node.typeerror()
     return "%(name)s.(", ", ", ")"
 
-Assign = "%(0)s = %(1)s"
+Assign = "%(0)s = %(1)s ;"

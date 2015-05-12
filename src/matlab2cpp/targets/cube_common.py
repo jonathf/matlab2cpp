@@ -44,13 +44,14 @@ def Get(node):
 
     elif len(node) == 3:
 
-        node = node.resize()
         arg0, dim0 = configure_arg(node[0], 0)
         arg1, dim1 = configure_arg(node[1], 1)
         arg2, dim2 = configure_arg(node[2], 2)
 
         if -1 in (dim0, dim1, dim2):
             return "%(name)s(", ", ", ")"
+
+        node = node.resize()
 
         # Configure dimensions
         if dim0:

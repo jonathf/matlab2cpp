@@ -505,7 +505,7 @@ name : str
 
     def suggest(self, text):
 
-        if text == "TYPE" or self.type != "TYPE":
+        if text == "TYPE" or self.type not in ("TYPE", "struct"):
             return
 
         name = self["name"]
@@ -675,7 +675,7 @@ Special resize manuver for cubes
 a -> resize(a, a.n_rows, a.n_cols*a.n_slices, 1)
         """
 
-        assert self.cls == "Var"
+        assert self.cls in ("Get", "Set")
         assert self.dim == 4
 
         type = self.type

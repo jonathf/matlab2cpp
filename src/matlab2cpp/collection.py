@@ -517,6 +517,7 @@ value : str
         Node.__init__(self, parent)
         value = value.replace("%", "__percent__")
         self["value"] = value
+        self.type = "string"
         self["backend"] = "string"
 
 

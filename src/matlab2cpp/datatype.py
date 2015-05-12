@@ -14,7 +14,7 @@ mem4 = {"cx_double", "cx_vec", "cx_rowvec", "cx_mat", "cx_cube"}
 
 mems = [mem0, mem1, mem2, mem3, mem4]
 
-others = {"char", "TYPE", "func_lambda", "struct", "imaginary_unit"}
+others = {"char", "string", "TYPE", "func_lambda", "struct", "imaginary_unit"}
 
 
 def common_loose(vals):
