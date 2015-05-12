@@ -3,10 +3,11 @@ from arma_common import Assign, configure_arg
 
 def Get(node):
 
-    if node[0].type == "TYPE":
+    arg, dim = configure_arg(node[0], 0)
+
+    if dim == -1:
         return "%(name)s(%(0)s)"
 
-    arg, dim = configure_arg(node[0], 0)
     if dim == 0:
         node.dim = 0
 
@@ -14,10 +15,11 @@ def Get(node):
 
 def Set(node):
 
-    if node[0].type == "TYPE":
-        return "%(name)s(", ", ", ")"
-
     arg, dim = configure_arg(node[0], 0)
+
+    if dim == -1:
+        return "%(name)s(%(0)s)"
+
     if dim == 0:
         node.dim = 0
 

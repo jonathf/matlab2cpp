@@ -1,10 +1,12 @@
 
 def configure_arg(node, index):
 
+    out = "%(" + str(index) + ")s"
+
     if node.cls == "All":
         return "span::all", 1
-
-    out = "%(" + str(index) + ")s"
+    elif node.type == "TYPE":
+        return out, -1
 
     if node.dim == 0:
         out = out + "-1"

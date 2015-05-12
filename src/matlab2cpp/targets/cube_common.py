@@ -6,10 +6,10 @@ def Get(node):
     # Single argument
     if len(node) == 1:
 
-        if node[0].type == "TYPE":
+        arg, dim = configure_arg(node[0], 0)
+        if dim == -1:
             return "%(name)s(%(0)s)"
 
-        arg, dim = configure_arg(node[0], 0)
         if dim == 0:
             node.dim = 0
 
@@ -19,12 +19,12 @@ def Get(node):
     # Double argument
     elif len(node) == 2:
 
-        if "TYPE" in (node[0].type, node[1].type):
-            return "%(name)s(", ", ", ")"
-
         node = node.resize()
         arg0, dim0 = configure_arg(node[0], 0)
         arg1, dim1 = configure_arg(node[1], 1)
+
+        if -1 in (dim0, dim1):
+            return "%(name)s(", ", ", ")"
 
         # Configure dimensions
         if dim0:
@@ -44,13 +44,13 @@ def Get(node):
 
     elif len(node) == 3:
 
-        if "TYPE" in (node[0].type, node[1].type, node[2].type):
-            return "%(name)s(", ", ", ")"
-
         node = node.resize()
         arg0, dim0 = configure_arg(node[0], 0)
         arg1, dim1 = configure_arg(node[1], 1)
         arg2, dim2 = configure_arg(node[2], 2)
+
+        if -1 in (dim0, dim1, dim2):
+            return "%(name)s(", ", ", ")"
 
         # Configure dimensions
         if dim0:
@@ -94,10 +94,11 @@ def Set(node):
     # Single argument
     if len(node) == 1:
 
-        if node[0].type == "TYPE":
+        arg, dim = configure_arg(node[0], 0)
+
+        if dim == -1:
             return "%(name)s(%(0)s)"
 
-        arg, dim = configure_arg(node[0], 0)
         if dim == 0:
             node.dim = 0
 
@@ -107,12 +108,12 @@ def Set(node):
     # Double argument
     elif len(node) == 2:
 
-        if "TYPE" in (node[0].type, node[1].type):
-            return "%(name)s(", ", ", ")"
-
         node = node.resize()
         arg0, dim0 = configure_arg(node[0], 0)
         arg1, dim1 = configure_arg(node[1], 1)
+
+        if -1 in (dim0, dim1):
+            return "%(name)s(", ", ", ")"
 
         # Configure dimensions
         if dim0:
@@ -132,13 +133,13 @@ def Set(node):
 
     elif len(node) == 3:
 
-        if "TYPE" in (node[0].type, node[1].type, node[2].type):
-            return "%(name)s(", ", ", ")"
-
         node = node.resize()
         arg0, dim0 = configure_arg(node[0], 0)
         arg1, dim1 = configure_arg(node[1], 1)
         arg2, dim2 = configure_arg(node[2], 2)
+
+        if -1 in (dim0, dim1, dim2):
+            return "%(name)s(", ", ", ")"
 
         # Configure dimensions
         if dim0:
