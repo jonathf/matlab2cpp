@@ -18,11 +18,11 @@ def Program(tree):
         line = lines[i]
 
         # Fix indentation and linesplit
-        if line and line[0] == "}":
+        if line in ("}", "} ;") or line[:4] == "} //":
             indent -= 1
             line = "  "*indent + line
 
-        elif line and line[0] == "{":
+        elif line == "{":
             line = "  "*indent + line
             indent += 1
         else:

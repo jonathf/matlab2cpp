@@ -5,49 +5,19 @@ Matlab2cpp
 Toolbox for automatically converting Matlab into C++ code.
 """
 
-#  import collection
-#  import node
-#  import targets
-#  import snippets
-
-from MatlabLexer import MatlabLexer
-from MatlabParser import MatlabParser
-from MatlabListener import MatlabListener
-import antlr4 as antlr
+import collection
+import node
+import targets
+import snippets
 
 import os
 import imp
 
 import utils
-#  import preproc
 import process
 
-def build(arg, disp=False):
-    """Contruct token tree from file"""
 
-    if disp:
-        print "loading Antlr..."
-
-    input = antlr.FileStream(arg)
-    lexer = MatlabLexer(input)
-    stream = antlr.CommonTokenStream(lexer)
-    parser = MatlabParser(stream)
-    program = parser.program()
-
-    if disp:
-        print "running tree-walker..."
-
-    listener = MatlabListener()
-    walker = antlr.ParseTreeWalker()
-    walker.walk(listener, program)
-
-    program = program.program
-    program.index = 0
-
-    return program
-
-
-def main(path, suggestion=False, disp=False):
+def main(path, suggestion=False, disp=False, comments=True):
 
     filename = os.path.basename(path)
     dirname = os.path.dirname(path)
@@ -62,7 +32,7 @@ def main(path, suggestion=False, disp=False):
     if disp:
         print "building token-tree..."
 
-    tree = process.process(code1, disp=disp)
+    tree = process.process(code1, disp=disp, comments=comments)
 
     if os.path.isfile(filename + ".py"):
 
@@ -80,7 +50,6 @@ def main(path, suggestion=False, disp=False):
             if name in scope:
                 for key in scope[name].keys():
                     cfg[name][key] = scope[name][key]
-        print cfg
         utils.set_cfg(tree, cfg)
 
     else:

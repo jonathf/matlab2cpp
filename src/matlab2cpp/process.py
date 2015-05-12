@@ -23,7 +23,7 @@ operator2 = (
 
 string_prefix = " \t\n=><"
 
-def process(text, disp=True):
+def process(text, disp=True, comments=True):
     """Process raw Matlab-code and create a token tree
 representation of the code.
 
@@ -1385,6 +1385,10 @@ tree : Node
         assert A[cur] == "%"
 
         end = findend_comment(cur)
+        line += A.count("\n", cur, end+1)
+
+        if comments:
+            return end, line
 
         if disp:
             print "%4d %4d   Comment      " % (cur, line),
@@ -1404,8 +1408,6 @@ tree : Node
         comment.cur = cur
         comment.line = line
         comment.code = A[cur:end+1]
-
-        line += A.count("\n", cur, end+1)
 
         return end, line
 
