@@ -14,7 +14,7 @@ reserved = {
 "transpose", "ctranspose",
 "abs",
 "zeros", "round", "return", "rand", "floor",
-"_conv_to", "_resize_", "_vectorise",
+"_conv_to", "_reshape",
 }
 
 # Common attribute
@@ -119,7 +119,7 @@ def Var_return(node):
 def Get_size(node):
 
     if node[0].type == "TYPE":
-        return "size(%(0)s)"
+        return "size(", ", ", ")"
 
     var = node[0]
     if var.cls != "Var":
@@ -145,12 +145,7 @@ def Get_size(node):
         node.type = "ivec"
         return "{%(0)s.n_rows, %(0)s.n_cols}"
 
-    name = node[0]["name"]
-    node.error(
-            "'size(%s)'\t\t illigal type (%s)" \
-                    % (name, type))
-
-    return "<error:size(%(0)s)>"
+    return "size(", ", ", ")"
 
 def Assigns_size(node):
 
@@ -401,8 +396,5 @@ def Get_floor(node):
 def Get__conv_to(node):
     return "conv_to<%(type)s>::from(%(0)s)"
 
-def Get__resize(node):
-    return "arma::resize(", ", ", ")"
-
-def Get__vectorise(node):
-    return "arma::vectorise(", ", ", ")"
+def Get__reshape(node):
+    return "%(value)s(", ", ", ")"
