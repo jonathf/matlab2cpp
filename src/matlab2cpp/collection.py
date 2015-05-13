@@ -4,6 +4,12 @@ All the different kinds of nodes
 
 from node import Node
 
+class Filler(Node):
+    def __init__(self, parent, value=""):
+        Node.__init__(self, parent)
+        self["value"] = value
+        self["backend"] = "program"
+
 class Program(Node):
     """Root of the tree"""
 

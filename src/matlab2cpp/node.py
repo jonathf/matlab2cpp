@@ -245,7 +245,7 @@ name : str
 
                     reserved[name] = False
         reserved = set([k for k,v in reserved.items() if v])
-        reserved = reserved.union({"_resize", "_vectorise", "_conv_to"})
+        reserved = reserved.union({"_reshape", "_conv_to"})
 
         while True:
 
@@ -641,82 +641,35 @@ type : str, None
 
         return v1
 
-    def vectorise(self):
-
-        assert self.cls == "Var"
-        assert self.dim in (3,4)
-
-        type = self.type
-        backend = self.backend
-        parent = self.parent
-        name = self["name"]
-
-        get = collection.Get(self, "_vectorise")
-        get.type = type
-        get.dim = 1
-        get.backend = "reserved"
-
-        var = collection.Var(get, name)
-        var.type = type
-        var.backend = backend
-
-        # Rearange variables
-        i = parent.children.index(self)
-        parent.children[i] = get
-        get.parent = parent
-
-        get.generate(False)
-
-        return get
-
     def resize(self):
-        """
-Special resize manuver for cubes
-a -> resize(a, a.n_rows, a.n_cols*a.n_slices, 1)
-        """
 
-        assert self.cls in ("Get", "Set")
-        assert self.dim == 4
+        if self["_resize"]:
+            return
+        self["_resize"] = True
 
         type = self.type
-        backend = self.backend
-        parent = self.parent
+        self.dim = 3
+
+        line = self
+        while line.parent.cls != "Block":
+            line = line.parent
+
         name = self["name"]
+        value = self.type + " _" + name + "(" + name + \
+                ".memptr(), " + name + ".n_rows, " + name + \
+                ".n_cols*" + name + ".n_slices, false) ;"
+        filler = collection.Filler(line.parent, value)
 
-        get = collection.Get(self, "_resize")
-        get.type = type
-        get.backend = "reserved"
+        i = line.parent.children.index(line)
 
-        var = collection.Var(get, name)
-        var.type = type
-        var.backend = backend
+        ps = line.parent.children
+        line.parent.children = ps[:i] + ps[-1:] + ps[i:-1]
+        ns = line.parent["names"]
+        line.parent["names"] = ns[:i] + ns[-1:] + ns[i:-1]
 
-        rows = collection.Var(get, name+".n_rows")
-        rows.type = "int"
-        rows.backend = "int"
+        filler.generate(False)
 
-        mul = collection.Mul(get)
-        mul.type = "int"
-        mul.backend = "expression"
-
-        cols = collection.Var(mul, name+".n_cols")
-        cols.type = "int"
-        cols.backend = "int"
-
-        slices = collection.Var(mul, name+".n_slices")
-        slices.type = "int"
-        slices.backend = "int"
-
-        collection.Int(get, "1")
-
-        # Rearange variables
-        i = parent.children.index(self)
-        parent.children[i] = get
-        get.parent = parent
-
-        get.generate(False)
-
-        return get
+        self.type = type
 
 
     def include(self, name, **kws):
@@ -736,6 +689,7 @@ a -> resize(a, a.n_rows, a.n_cols*a.n_slices, 1)
         include["value"] = code
         include["backend"] = "program"
         return idname
+
 
     def pointer(self, num=None):
         if num is None:

@@ -19,7 +19,6 @@ def Get(node):
     # Double argument
     elif len(node) == 2:
 
-        node = node.resize()
         arg0, dim0 = configure_arg(node[0], 0)
         arg1, dim1 = configure_arg(node[1], 1)
 
@@ -32,15 +31,16 @@ def Get(node):
                 node.dim = 3
             else:
                 node.dim = 1
-                arg1 = "span("+out1+")"
+                arg1 = "span("+arg1+")"
         else:
             if dim1:
                 node.dim = 2
-                arg0 = "span("+out0+")"
+                arg0 = "span("+arg0+")"
             else:
                 node.dim = 0
 
-        return "%(name)s(" + arg0 + ", " + arg1 + ", 1)"
+        node.resize()
+        return "_%(name)s(" + arg0 + ", " + arg1 + ")"
 
     elif len(node) == 3:
 
@@ -120,11 +120,11 @@ def Set(node):
                 node.dim = 3
             else:
                 node.dim = 1
-                arg1 = "span("+out1+")"
+                arg1 = "span("+arg1+")"
         else:
             if dim1:
                 node.dim = 2
-                arg0 = "span("+out0+")"
+                arg0 = "span("+arg0+")"
             else:
                 node.dim = 0
 

@@ -30,7 +30,9 @@ if __name__ == "__main__":
     dirname = os.path.dirname(path)
 
     if opt.reset:
-        os.remove(dirname + os.sep + filename + ".py")
+        py = dirname + os.sep + filename + ".py"
+        if os.path.isfile(py):
+            os.remove(py)
 
     tree = matlab2cpp.main(path, opt.suggestion, disp=opt.display,
             comments=opt.comments)
@@ -46,7 +48,9 @@ if __name__ == "__main__":
     else:
         print tree["str"]
 
-    os.remove(dirname + os.sep + filename + ".pyc")
+    pyc = dirname + os.sep + filename + ".pyc"
+    if os.path.isfile(pyc):
+        os.remove(pyc)
 
     f = open(path + ".cpp", "w")
     f.write(tree["str"])
