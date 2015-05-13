@@ -145,6 +145,10 @@ def Get_size(node):
         node.type = "ivec"
         return "{%(0)s.n_rows, %(0)s.n_cols}"
 
+    elif node[0].dim == 4:
+        node.type = "ivec"
+        return "{%(0)s.n_rows, %(0)s.n_cols, %(0)s.n_slices}"
+
     return "size(", ", ", ")"
 
 def Assigns_size(node):
