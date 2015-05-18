@@ -135,7 +135,7 @@ def Get_size(node):
         if arg2 == "2":
             return var+".n_cols"
         if arg2 == "3":
-            return var+".n_slice"
+            return var+".n_slices"
 
     elif node[0].dim in (1,2):
         node.type = "int"
@@ -172,7 +172,7 @@ def Assigns_size(node):
 
         return  "%(0)s = "+val+".n_rows ;\n"+\
                 "%(1)s = "+val+".n_cols ;\n"+\
-                "%(2)s = "+val+".n_slice ;"
+                "%(2)s = "+val+".n_slices ;"
 
     raise NotImplementedError
 
