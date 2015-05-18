@@ -48,7 +48,7 @@ def Vector(node):
         nodes = []
         for i in xrange(len(node)):
             if node[i].dim == 0:
-                nodes.append(str(node[i].auxillary((2, node.type))))
+                nodes.append(str(node[i].auxiliary((2, node.type))))
             else:
                 nodes.append(str(node[i]))
 
@@ -89,14 +89,14 @@ def Matrix(node):
         if node.parent["class"] in ("Assign", "Statement"):
             node.parent["backend"] = "matrix"
             return "{", ", ", "}"
-        return str(node.auxillary())
+        return str(node.auxiliary())
 
     elif dims == {0}:
 
         if node.parent["class"] in ("Assign", "Statement"):
             node.parent["backend"] = "matrix"
             return ""
-        return str(node.auxillary())
+        return str(node.auxiliary())
 
     elif dims in ({0,1}, {1}):
         node.dim = 1
@@ -105,10 +105,8 @@ def Matrix(node):
         for i in xrange(len(node)):
 
             if node[i]["decomposed"] or node[i].dim == 0:
-                nodei = node[i].auxillary()
+                nodei = node[i].auxiliary()
                 nodes.append(str(nodei))
-#                  if nodei.parent["class"] in ("Assign", "Statement"):
-#                      nodei.parent["backend"] = "matrix"
 
             else:
                 nodes.append(str(node[i]))
@@ -121,7 +119,7 @@ def Matrix(node):
         nodes = []
         for i in xrange(len(node)):
             if node[i]["decomposed"]:
-                nodes.append(str(node[i].auxillary()))
+                nodes.append(str(node[i].auxiliary()))
             else:
                 nodes.append(str(node[i]))
 
@@ -177,6 +175,6 @@ Var = "%(name)s"
 def Cell(node):
 
     if node.parent.cls not in ("Assign", "Assigns"):
-        node.auxillary()
+        node.auxiliary()
 
     return "{", ", ", "}"

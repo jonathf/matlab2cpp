@@ -2257,9 +2257,11 @@ tree : Node
             if A[k] == "%":
                 assert False
 
+            elif A[k:k+3] == "...":
+                k = findend_dots(k)
+
             elif A[k] == "'" and is_string(k):
-                k_ = findend_string(k)
-                k = k_
+                k = findend_string(k)
 
             elif A[k] == "[":
                 k = findend_matrix(k)
@@ -2326,9 +2328,19 @@ tree : Node
 if __name__ == "__main__":
 
     test_code = """
-a = struct
-a(1).b = 4
-a(1).c = "5"
+function y = uhh(x)
+
+if(...
+        (piT*(pr-refVector(t-1))<(QdeltaP_oneFreqDatHF(im,t,2)-refVector(t-1))&&...
+        0.85*refDeltaP(t)>deltaP(t))&&...
+        ((waitToLearn<=waitIndex)&&(waitIndex<=fromRestartFBased))&&...%detect at restart
+        ((QdeltaP_oneFreqDatHF(im,t,2)-lRefPi)>0.1*abs(pr-lRefPi)||......%Going back
+        QdeltaP_oneFreqDatHF(im,t,2)>=pr)&&...%dont change compare to Pr.
+        QdeltaP_oneFreqDatHF(iMotor,t,2)>fT&&startFlag>100)
+    x = y;
+end
+
+end
             """
     tree = process(test_code)
 
