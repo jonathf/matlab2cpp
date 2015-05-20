@@ -191,15 +191,15 @@ def Elrdiv(node):
     return out[1:]
 
 def Rdiv(node):
-    if {n.dim for n in node} == {0}:
+    if 0 in {n.dim for n in node}:
         return Elrdiv(node)
-    out = ""
-    for child in node[::-1]:
+    out = str(node[0])
+    for child in node[1:]:
         if child.dim == 3:
-            out = out + "*" + str(child) + ".i()"
+            out = "arma::solve(" +out + ", " + str(child) + ")"
         else:
-            out = out + "/" + str(child)
-    return out[1:]
+            out = str(child) + "/" + out
+    return out
 
 def Exp(node):
     out = str(node[0])
