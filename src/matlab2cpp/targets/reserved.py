@@ -14,6 +14,7 @@ reserved = {
 "transpose", "ctranspose",
 "abs",
 "zeros", "round", "return", "rand", "floor",
+"clear", "close", "plot", "hold",
 "_conv_to", "_reshape",
 }
 
@@ -26,8 +27,7 @@ def Declare(node):
             +"\nPlease rename variable.")
 
 def Var(node):
-    raise ValueError("Variable name '%s' is reserved."%node["name"]\
-            +"\nPlease rename variable.")
+    return "%(name)s"
 
 
 Var_pi = "datum::pi"
@@ -399,6 +399,29 @@ def Get_floor(node):
 
     return "arma::floor(%(0)s)"
 
+def Var_clear(node):
+    return "// clear"
+
+def Get_clear(node):
+    return "// clear(", ", ", ")"
+
+def Var_close(node):
+    return "// close"
+
+def Get_close(node):
+    return "// close(", ", ", ")"
+
+def Var_plot(node):
+    return "// plot"
+
+def Get_plot(node):
+    return "// plot(", ", ", ")"
+
+def Var_hold(node):
+    return "// hold"
+
+def Get_hold(node):
+    return "// hold(", ", ", ")"
 
 def Get__conv_to(node):
     return "conv_to<%(type)s>::from(%(0)s)"
