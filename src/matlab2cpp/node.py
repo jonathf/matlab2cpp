@@ -266,11 +266,16 @@ name : str
                         else:
                             node["backend"] = "func_returns"
 
-                elif type == "TYPE":
-                    if cls == "Assign":
-                        node.type = node[0].type
+                if cls == "Assign":
+                    if node[1].cls == "Matrix":
+                        node.backend = "matrix"
+                    if node[1].cls == "Cell":
+                        node.backend = "cell"
+                    node.type = node[0].type
 
-                    elif node.children and cls not in\
+                elif type == "TYPE":
+
+                    if node.children and cls not in\
                             ("Set", "Cset", "Fset", "Nset",
                             "Cget", "Fget", "Nget", "Assign"):
                         node.type = [n.type for n in node]
@@ -304,31 +309,24 @@ name : str
                         ret_val = func[1][0]
                         node.set_global_type(ret_val.type)
                         params = func[2]
-#                          print repr(params.code)
-#                          print repr(node.code)
-#                          print params["class"]
-#                          print len(node)
                         for i in xrange(len(node)):
                             params[i].suggest(node[i].type)
 
                     elif backend == "func_returns":
                         names = node.program["names"]
                         func = node.program[names.index(name)]
+
                         params = func[2]
                         for j in xrange(len(params)):
                             params[j].suggest(node[j].type)
 
-#                      if backend == "func_lambda":
-#                          names = node.program["names"]
-#                          func = node.program[names.index(name)]
-#                          ret_val = func[1][0]
-#                          node.set_global_type(ret_val.type)
-#                          params = func[2]
-#                          for i in xrange(len(node)):
-#                              params[i].suggest(node[i].type)
+                        if node.parent.cls == "Assigns":
+                            node.parent.backend = "func_returns"
 
-#                      elif name in ("i", "j"):
-#                          node.suggest("imaginary_unit")
+                            returns = func[1]
+                            for j in xrange(len(returns)):
+                                returns[j].suggest(node.parent[j].type)
+                                node.parent[j].suggest(returns[j].type)
 
                     else:
                         node.generate(False, None)
@@ -576,7 +574,10 @@ type : str, None
         type = type or self.type
 
         if not isinstance(type, str):
-            type = dt.common_strict(type)
+            if isinstance(type[0], int):
+                type = dt.get_name(*type)
+            else:
+                type = dt.common_strict(type)
 
         if self["class"] in ("Vector", "Matrix"):
             backend = "matrix"

@@ -28,12 +28,8 @@ Get : Function/Array retrieval
     Property: name
 """
 
-from variables import *
-import func_return as fr
+from func_common import *
 
-def Func(node):
-#      return fr.Func(node)
-    return ""#// placeholder for %(name)s"
 
 def Lambda(node):
 
@@ -88,24 +84,5 @@ def Lambda(node):
     return out
 
 
-def Params(node):
-    return ", ".join(["%s %s" % (n.type, n["name"]) for n in node])
-
-
-def Returns(node):
-    return ""
-
-def Declares(node):
-    return ", ".join(["%s %s" % (n.type, n["name"]) for n in node])
-
 
 Declare = "std::function %(name)s ;"
-
-def Var(node):
-    return "%(name)s"
-
-def Assign(node):
-    return "%(0)s = %(1)s ;"
-
-def Get(node):
-    return "%(name)s(", ", ", ")"

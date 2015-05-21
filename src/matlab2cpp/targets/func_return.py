@@ -23,49 +23,6 @@ Get : Function/Array retrieval
     Contains: Gets
     Property: name
 """
-from variables import *
 
-def Returns(node):
-    return "%(0)s"
+from func_common import *
 
-def Get(node):
-    return "%(name)s(", ", ", ")"
-
-
-def Params(node):
-    out = ""
-    for child in node[:]:
-        out += ", " + child.type + child.pointer() + " " + str(child)
-    return out[2:]
-
-
-
-def Func(node):
-    type = node[1][0].type
-    return type + " %(name)s(%(2)s)\n{\n%(0)s\n%(3)s\nreturn %(1)s ;\n}"
-
-def Declares(node):
-    declares = {}
-    for child in node[:]:
-
-        type = child.type
-
-        if type == "func_lambda":
-            type == "std::function"
-
-        if type == "struct":
-            type = child["name"].capitalize()
-
-        if type not in declares:
-            declares[type] = []
-        declares[type].append(child)
-
-    out = ""
-    for key, val in declares.items():
-        out = out + "\n" + key + " " + ", ".join([v["name"] for v in val]) + " ;"
-
-    return out[1:]
-
-def Var(node):
-    out = "@%(name)s"
-    return out
