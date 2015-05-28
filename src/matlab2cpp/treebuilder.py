@@ -729,8 +729,8 @@ Args:
                             (cur, line),
                     print repr(self.code[cur:end])
 
-                    node = col.Sset(node, name, value=value, cur=cur, line=line,
-                            code=self.code[cur:end])
+                    node = col.Sset(node, name, value, cur=cur, line=line,
+                            code=self.code[cur:end], pointer=1)
 
                 last, line = self.create_list(node, k, line)
                 cur = end
@@ -1314,16 +1314,38 @@ Args:
         # Get value of array
         elif self.code[k] == "(":
     
-            end = self.findend_paren(k)
+            if self.code[end+1] == "." and self.code[end+2] in letters:
+
+                start = end+2
+                end += 2
+                while self.code[end] in letters+digits+"_":
+                    end += 1
+                value = self.code[start:end]
+
+                if self.disp:
+                    print "%4d %4d     Sget        " %\
+                            (cur, line),
+                    print repr(self.code[cur:end])
+
+                    node = col.Sget(node, name, value, cur=cur, line=line,
+                            code=self.code[cur:end], pointer=1)
+
+                last, line = self.create_list(node, k, line)
+                cur = end
+
+            else:
+        
+                if self.disp:
+                    print "%4d %4d     Get        " %\
+                            (cur, line),
+                    print repr(self.code[cur:end+1])
+        
+                node = col.Get(node, name, cur=cur, line=line,
+                        code=self.code[cur:end+1])
+        
+                last, line = self.create_list(node, k, line)
+                cur = last
     
-            if self.disp:
-                print "%4d %4d     Get        " % (cur, line),
-                print repr(self.code[cur:end+1])
-    
-            node = col.Get(parent, name, cur=cur, line=line,
-                    code=self.code[cur:end+1])
-    
-            cur, line = self.create_list(node, k, line)
     
     
         elif self.code[k] == "." and self.code[k+1] not in "*/\\^'":
