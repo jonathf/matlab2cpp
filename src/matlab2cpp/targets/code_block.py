@@ -136,6 +136,9 @@ def Block(node):
 
 def Assigns(node):
 
+    if node[-1].type == "TYPE":
+        return ("[",) + (", ",)*(len(node)-2) + ("] = ", " ;")
+
     if node[-1]["class"] != "Var":
         node[-1].auxiliary()
 

@@ -3,6 +3,8 @@ from arma_common import Assign, configure_arg
 
 def Get(node):
 
+    assert len(node) in (1,2)
+
     # Single argument
     if len(node) == 1:
 

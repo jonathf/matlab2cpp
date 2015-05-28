@@ -9,6 +9,8 @@ Program : The root node
 """
 import re
 
+Project = "", "\n\n", ""
+
 def Program(tree):
 
     lines = "\n\n".join(map(str, tree[:])).split("\n")

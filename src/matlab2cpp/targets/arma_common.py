@@ -30,7 +30,7 @@ def configure_arg(node, index):
 
 def Assign(node):
 
-    if node[1]["decomposed"]:
+    if node[1].value: # true if decomposed into components
         return "%(0)s = %(1)s ;"
 
     if node[0].cls == "Var":

@@ -14,7 +14,7 @@ mem4 = {"cx_double", "cx_vec", "cx_rowvec", "cx_mat", "cx_cube"}
 
 mems = [mem0, mem1, mem2, mem3, mem4]
 
-others = {"char", "string", "TYPE", "func_lambda", "struct", "imaginary_unit"}
+others = {"char", "string", "TYPE", "func_lambda", "struct", "cell"}
 
 
 def common_loose(vals):
@@ -101,9 +101,17 @@ Strict enforcment"""
     val = get_name(dim, type)
     return val
 
+def pointer_split(name):
+    p = name.count("*")
+    if not p:
+        return 0, name
+    return p, name[:-p]
 
 
 def get_dim(val):
+
+    while val[-1] == "*":
+        val = val[:-1]
 
     if val in dim0:     dim = 0
     elif val in dim1:   dim = 1
@@ -118,6 +126,9 @@ def get_dim(val):
 
 def get_mem(val):
 
+    while val[-1] == "*":
+        val = val[:-1]
+
     if val in mem0:    mem = 0
     elif val in mem1:  mem = 1
     elif val in mem2:  mem = 2
@@ -131,6 +142,9 @@ def get_mem(val):
 
 def get_num(val):
 
+    while val[-1] == "*":
+        val = val[:-1]
+
     if val in others:   num = False
     else:               num = True
 
@@ -143,60 +157,9 @@ def get_name(dim, mem):
 
 def get_type(instance):
 
-    name = instance["name"]
-    val = instance.prop["type"]
-    if val != "TYPE":
-        return val
-
-    if instance.parent["class"] in ("Params", "Declares", "Struct"):
-        return val
-
-    if instance["class"] in ("Program", "Include", "Includes"):
-        return "TYPE"
-
-    elif instance.cls in ("Fvar", "Fget", "Fset", "Nget", "Nset"):
-        if instance.cls in ("Nget", "Nset"):
-            if instance[0].cls == "String":
-                sname = instance[0]["value"]
-            else:
-                return "TYPE"
-        else:
-            sname = instance["sname"]
-
-        structs = instance.program[1]
-        if name not in structs["names"]:
-            return "TYPE"
-
-        struct = structs[structs["names"].index(name)]
-
-        if sname not in struct["names"]:
-            return "TYPE"
-
-        node = struct[struct["names"].index(sname)]
-
-    else:
-        if instance["class"] == "Func":
-            func = instance
-        else:
-            func = instance.func
-
-        declares = func[0]
-        params = func[2]
-
-        if name in declares["names"]:
-            node = declares[declares["names"].index(name)]
-        elif name in params["names"]:
-            node = params[params["names"].index(name)]
-        else:
-            return "TYPE"
-
-    return node.prop["type"]
-
-    name = instance["name"]
-    if instance["class"] in ("Program", "Include", "Includes",
-            "Struct", "Structs"):
-        return
-
+    if instance.prop["type"] == "TYPE":
+        instance = instance.declare
+    return instance.prop["type"]
 
 class Dim(object):
 
@@ -233,9 +196,19 @@ class Num(object):
 class Type(object):
 
     def __get__(self, instance, owner):
-        return get_type(instance)
+        return get_type(instance) + "*"*instance.pointer
 
     def __set__(self, instance, value):
         value = value or "TYPE"
-        value = common_strict(value)
+        if isinstance(value, str):
+            p, value = pointer_split(value)
+            instance.pointer = p
+        else:
+            value = common_strict(value)
         instance.prop["type"] = value
+
+
+class Suggest(object):
+
+    def __set__(self, instance, value):
+        instance.declare.prop["suggest"] = value

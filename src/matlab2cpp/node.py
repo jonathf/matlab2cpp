@@ -3,60 +3,10 @@ import datatype as dt
 import targets
 import snippets
 import utils
+import reference as ref
 
 import time
 from datetime import datetime as date
-
-indexnames = [
-    "Assign", "Assigns", "Branch", "For", "Func",
-    "Set", "Cset", "Fset", "Nset",
-    "Get", "Cget", "Fget", "Nget",
-    "Statement", "Switch", "Tryblock",
-    "While", "Program", "Block", "Node",
-]
-
-class Prop(object):
-    "general property node"
-
-    def __init__(self, name):
-        self.name = name
-    def __get__(self, instance, owner):
-        return instance.prop[self.name]
-    def __set__(self, instance, value):
-        instance.prop[self.name] = value
-
-class Rprop(object):
-    "recursive property node"
-
-    def __init__(self, name):
-        self.name = name
-
-    def __get__(self, instance, owner):
-
-        a = instance.prop[self.name]
-        if not (a is None):
-            return a
-
-        instances = [instance]
-        while True:
-            instance = instance.parent
-            a = instance.prop[self.name]
-            instances.append(instance)
-            if a is None:
-                assert instance["class"] not in ("Program", "Node")
-            else:
-                break
-
-        for instance in instances[:-1]:
-            instance.prop[self.name] = a
-
-        return a
-
-    def __set__(self, instance, value):
-        instance.prop[self.name] = value
-
-
-
 
 
 class Node(object):
@@ -68,19 +18,30 @@ General definition of a token representation of code
     mem = dt.Mem()
     num = dt.Num()
     type = dt.Type()
+    suggest = dt.Suggest()
 
-    backend = Prop("backend")
-    str = Prop("str")
-    value = Prop("value")
-    pointer = Prop("pointer")
-    cls = Prop("class")
+    func = ref.Func_reference()
+    program = ref.Program_reference()
+    line = ref.Line_reference()
+    group = ref.Group_reference()
+    declare = ref.Declare_reference()
 
-    end = Prop("end")
-    line = Rprop("line")
-    cur = Rprop("cur")
-    code = Rprop("code")
+    names = ref.Names()
 
-    def __init__(self, parent=None, name=None):
+    backend = ref.Property_reference("backend")
+    str = ref.Property_reference("str")
+    ret = ref.Property_reference("ret")
+    value = ref.Property_reference("value")
+    pointer = ref.Property_reference("pointer")
+    cls = ref.Property_reference("class")
+    name = ref.Property_reference("name")
+
+    line = ref.Recursive_property_reference("line")
+    cur = ref.Recursive_property_reference("cur")
+    code = ref.Recursive_property_reference("code")
+
+    def __init__(self, parent, name="", backend="unknown", value="",
+            type="TYPE", pointer=0, line=None, cur=None, code=None):
         """
 Parameters
 ----------
@@ -89,474 +50,129 @@ parent : Node
 name : str
     Optional name of the node
         """
-        if parent is None:
-            parent = self
-            self.program = self
-            name = "program"
+        self.children = []
+        self.prop = {"type":type, "suggest":type,
+                "value":value, "str":"", "name":name,
+                "pointer":pointer, "backend":backend,
+                "line":line, "cur":cur, "code":code,
+                "ret":"",
+                "class":self.__class__.__name__}
 
-        init(self, parent, name)
+        # Parental relationship
+        self.parent = parent
 
-    def summary(self, disp=False, group=None):
+        if not (self is parent):
+            parent.children.append(self)
+
+
+    def summary(self, opt=None):
         "Node summary"
 
         nodes = utils.flatten(self, False, False, False)
-        if disp:
+        if not (opt is None) and opt.disp:
             print "iterating %d nodes" % len(nodes)
 
-        if not (group is None):
+        if not (opt is None) and not (opt.line is None):
             for node in nodes:
-                if node.cls != "Block" and node.line == group:
-                    return node.summary(disp, None)
+                if node.cls != "Block" and node.line == opt.line:
+                    self = node
+                    break
 
         indent = [self]
         out = ""
         for node in nodes:
-
-            line = node.line
-            cur = node.cur
-
-            name = node["name"]
-            cls = node["class"]
-            backend = node["backend"]
-            type = node.type
-
-            if backend == "unknown" and type != "TYPE":
-                backend = type
 
             while indent and not (node.parent is indent[-1]):
                 indent.pop()
 
             space = "| "*(len(indent)-1)
             out += "%3d %3d %s%-10s %-12s %-7s %-18s" % \
-                    (line, cur, space, cls, backend, type, name)
-            out += str(node["ret"]) + "\n"
-
+                    (node.line, node.cur, space, node.cls,
+                            node.backend, node.type, node.name)
+            out += repr(node.ret) + "\n"
             indent.append(node)
 
         return out
 
 
-    def generate(self, disp=False, group=None):
+    def generate(self, opt=None):
         """Generate code"""
 
         nodes = utils.flatten(self, False, True, False)
-        if disp:
+        if not (opt is None) and opt.disp:
             print "iterating %d nodes" % len(nodes)
 
         for node in nodes[::-1]:
-
-            type_ = node.get_global_type()
-            if type == "TYPE":
-                type_ = node.type
-            name = node["name"]
-            cls = node["class"]
-            backend = node["backend"]
-
-            if backend == "unknown" and type_ != "TYPE":
-                backend = type_
-
-            target = targets.__dict__[backend]
-            if cls+"_"+name in target.__dict__:
-                value = target.__dict__[cls+"_"+name]
-            elif cls in target.__dict__:
-                value = target.__dict__[cls]
-            else:
-                print node.program.summary(disp, group)
-                raise KeyError("no %s in %s" % (cls, backend))
-
-            if not isinstance(value, (unicode, str, list, tuple)):
-                value = value(node)
-
-            if isinstance(value, unicode):
-                value = str(value)
-
-            elif isinstance(value, Node):
-                value = str(value)
-
-            elif value is None:
-                raise ValueError(
-        "missing return in function %s in file %s" % (cls, backend))
-
-            node["ret"] = repr(value)
-
-            prop = node.prop.copy()
-            I = len(node)
-            for i in xrange(I):
-                prop["%d" % i] = prop["-%d" % (I-i)] = node[i]["str"]
-            prop["type"] = node.type
-
-            if not isinstance(value, str):
-
-                value = list(value)
-                children = ["%("+str(i)+")s" for i in xrange(len(node))]
-
-                if len(value) == 2:
-                    value.insert(1, "")
-
-                value = value[:-1] + [value[-2]] *\
-                    (len(children)-len(value)+1) + value[-1:]
-
-                if len(children) == 0:
-                    value = value[0] + value[-1]
-
-                elif len(children) == 1:
-                    value = value[0] + children[0] + value[-1]
-
-                else:
-
-                    out = value[0]
-                    for i in xrange(len(children)):
-                        out += children[i] + value[i+1]
-                    value = out
-
-            try:
-                value = value % prop
-            except:
-                raise SyntaxError("interpolation in " + backend + "." + cls +
-                                " is misbehaving\n" + value + "\n"+str(prop))
-
-            node.prop["str"] = value
+            node._generate(opt)
 
         return self.prop["str"]
 
+    def _generate(node, opt=None):
 
-    def configure(self, suggestion=False, disp=False):
+        target = targets.__dict__[node.backend]
+        spesific_name = node.cls + "_" + node.name
 
-        nodes = utils.flatten(self, False, True, False)
-        if disp:
-            print "configuring %d nodes" % len(nodes)
+        if spesific_name in target.__dict__:
+            value = target.__dict__[spesific_name]
 
-        # Find if some names should be reserved
-        reserved = {}
-        for node in nodes[::-1]:
-
-            name = node["name"]
-            if name in targets.reserved.reserved:
-
-                if name not in reserved:
-                    reserved[name] = True
-
-                if (node.cls in ("Var", "Fvar", "Cvar") and \
-                        node.parent.cls in \
-                        ("Assign", "Assigns") and \
-                        not (node is node.parent[-1])) or \
-                        node.cls in ("Set", "Cset", "Fset", "Nset") or \
-                        node.parent.cls == "Param":
-
-                    reserved[name] = False
-        reserved = set([k for k,v in reserved.items() if v])
-        reserved = reserved.union({"_reshape", "_conv_to"})
-
-        while True:
-
-            for node in nodes[::-1]:
-
-                name = node["name"]
-                cls = node["class"]
-                type = node.type
-
-                # Assign some hereditary types
-                if cls == "Get":
-
-                    names = node.program["names"]
-                    if node["name"] in names:
-                        func = node.program[names.index(node["name"])]
-                        if len(func[1]) == 1:
-                            node["backend"] = "func_return"
-                        else:
-                            node["backend"] = "func_returns"
-
-                if cls == "Assign":
-                    if node[1].cls == "Matrix":
-                        node.backend = "matrix"
-                    if node[1].cls == "Cell":
-                        node.backend = "cell"
-                    node.type = node[0].type
-
-                elif type == "TYPE":
-
-                    if node.children and cls not in\
-                            ("Set", "Cset", "Fset", "Nset",
-                            "Cget", "Fget", "Nget", "Assign"):
-                        node.type = [n.type for n in node]
-
-
-                    elif cls in ("Div", "Eldiv", "Rdiv", "Elrdiv"):
-                        if node.num and node.mem < 2:
-                            node.mem = 2
-
-                    elif cls == "Fvar":
-                        node.set_global_type(type)
-
-                backend = node["backend"]
-                if name in reserved:
-                    node["backend"] = "reserved"
-                    node.generate(False, None)
-
-                elif backend == "unknown" and type != "TYPE":
-                    node["backend"] = type
-
-                # Assign suggestion
-                if cls == "For":
-                    var, range = node[:2]
-                    var.suggest("int")
-
-                elif cls == "Get":
-
-                    if backend == "func_return":
-                        names = node.program["names"]
-                        func = node.program[names.index(name)]
-                        ret_val = func[1][0]
-                        node.set_global_type(ret_val.type)
-                        params = func[2]
-                        for i in xrange(len(node)):
-                            params[i].suggest(node[i].type)
-
-                    elif backend == "func_returns":
-                        names = node.program["names"]
-                        func = node.program[names.index(name)]
-
-                        params = func[2]
-                        for j in xrange(len(params)):
-                            params[j].suggest(node[j].type)
-
-                        if node.parent.cls == "Assigns":
-                            node.parent.backend = "func_returns"
-
-                            returns = func[1]
-                            for j in xrange(len(returns)):
-                                returns[j].suggest(node.parent[j].type)
-                                node.parent[j].suggest(returns[j].type)
-
-                    else:
-                        node.generate(False, None)
-
-                elif cls == "Assign" and node[0].cls != "Set":
-                    node[0].suggest(node[1].type)
-
-                elif cls in ("Var", "Fvar", "Cget", "Fget", "Nget",
-                        "Assigns", "Vector", "Matrix", "Colon"):
-                    node.generate(False, None)
-
-                elif cls == "Neg" and node[0].mem == 0:
-                    node.mem = 1
-
-            if suggestion:
-                cfg, scfg = utils.get_cfg(self)
-                if not [c for c in scfg.values() if any(c)]:
-                    return
-                else:
-                    utils.set_cfg(self, scfg)
-
-            else:
-                return
-
-
-
-    def declare(self, name=""):
-        "Declare a variable in the begining of a function."
-
-        name = name or self["name"]
-
-        if self.cls in ("Fvar", "Fset", "Fget", "Nset", "Nget"):
-            structs = self.program[1]
-
-            if name not in structs["names"]:
-                struct = collection.Struct(structs, name)
-            else:
-                struct = structs[structs["names"].index(name)]
-
-            if self.cls in ("Nget", "Nset"):
-
-                if self[0].cls == "String":
-                    sname = self[0]["value"]
-                else:
-                    sname = ""
-
-            else:
-                sname = self["sname"]
-
-            if sname:
-                if sname in struct["names"]:
-                    node = struct[struct["names"].index(sname)]
-                    if self.type != "TYPE":
-                        node.type = self.type
-
-                else:
-                    node = collection.Declare(struct, sname)
-                    node.type = self.type
-                    node["suggestion"] = self.type
-
-            type = "struct"
+        elif node.cls in target.__dict__:
+            value = target.__dict__[node.cls]
 
         else:
-            type = self.type
-
-        func = self.func
-        declares = func[0]
-        params = func[2]
-
-        if name in params["names"]:
-            return
-
-        if name in declares["names"]:
-            node = declares[declares["names"].index(name)]
-            if type != "TYPE":
-                node.type = type
-            return
-
-        node = collection.Declare(declares, name)
-        node.type = type
-        node["suggest"] = type
+            print node.program.summary()
+            raise KeyError("no %s in %s" % (node.cls, node.backend))
 
 
-    def set_global_type(self, text):
+        if not isinstance(value, (unicode, str, list, tuple)):
+            value = value(node)
 
-        name = self["name"]
-        if self["class"] in ("Program", "Include", "Includes",
-                "Struct", "Structs"):
-            return
+        if isinstance(value, (unicode, Node)):
+            value = str(value)
 
-        elif self.cls in ("Fvar", "Fget", "Fset", "Nget", "Nset"):
-            if self.cls in ("Nget", "Nset"):
-                if self[0].cls == "String":
-                    sname = self[0]["value"]
-                else:
-                    return
+        elif value is None:
+            raise ValueError(
+    "missing return in function %s in file %s" % (node.cls, node.backend))
+
+        node.ret = repr(value)
+
+        prop = node.prop.copy()
+        I = len(node)
+        for i in xrange(I):
+            prop["%d" % i] = prop["-%d" % (I-i)] = node[i]["str"]
+        prop["type"] = node.type
+
+        if not isinstance(value, str):
+
+            value = list(value)
+            children = ["%("+str(i)+")s" for i in xrange(len(node))]
+
+            if len(value) == 2:
+                value.insert(1, "")
+
+            value = value[:-1] + [value[-2]] *\
+                (len(children)-len(value)+1) + value[-1:]
+
+            if len(children) == 0:
+                value = value[0] + value[-1]
+
+            elif len(children) == 1:
+                value = value[0] + children[0] + value[-1]
+
             else:
-                sname = self["sname"]
 
-            structs = self.program[1]
-            if name not in structs["names"]:
-                return
+                out = value[0]
+                for i in xrange(len(children)):
+                    out += children[i] + value[i+1]
+                value = out
 
-            struct = structs[structs["names"].index(name)]
+        try:
+            value = value % prop
+        except:
+            raise SyntaxError("interpolation in " + node.backend + "." +\
+                    node.cls + " is misbehaving\n" + value + "\n"+str(prop))
+        # print repr(value)
 
-            if sname not in struct["names"]:
-                return
-
-            node = struct[struct["names"].index(sname)]
-
-        else:
-            if self["class"] == "Func":
-                func = self
-            else:
-                func = self.func
-
-            declares = func[0]
-            params = func[2]
-
-            if name in declares["names"]:
-                node = declares[declares["names"].index(name)]
-            elif name in params["names"]:
-                node = params[params["names"].index(name)]
-            else:
-                return
-
-        node.type = text
-
-    def get_global_type(self):
-
-        name = self["name"]
-        if self["class"] in ("Program", "Include", "Includes",
-                "Struct", "Structs"):
-            return
-
-        elif self.cls in ("Fvar", "Fget", "Fset", "Nget", "Nset"):
-            if self.cls in ("Nget", "Nset"):
-                if self[0].cls == "String":
-                    sname = self[0]["value"]
-                else:
-                    return "TYPE"
-            else:
-                sname = self["sname"]
-
-            structs = self.program[1]
-            if name not in structs["names"]:
-                return "TYPE"
-
-            struct = structs[structs["names"].index(name)]
-
-            if sname not in struct["names"]:
-                return "TYPE"
-
-            node = struct[struct["names"].index(sname)]
-
-        else:
-            if self["class"] == "Func":
-                func = self
-            else:
-                func = self.func
-
-            declares = func[0]
-            params = func[2]
-
-            if name in declares["names"]:
-                node = declares[declares["names"].index(name)]
-            elif name in params["names"]:
-                node = params[params["names"].index(name)]
-            else:
-                return "TYPE"
-
-        return node.prop["type"]
-
-
-    def suggest(self, text):
-
-        if text == "TYPE" or self.type not in ("TYPE", "struct"):
-            return
-
-        name = self["name"]
-
-
-        if self["class"] in ("Program", "Include", "Includes"):
-            return
-
-        elif self.cls in ("Fvar", "Fget", "Fset", "Nget", "Nset"):
-            if self.cls in ("Nget", "Nset"):
-                if self[0].cls == "String":
-                    sname = self[0]["value"]
-                else:
-                    return
-            else:
-                sname = self["sname"]
-
-            structs = self.program[1]
-            if name not in structs["names"]:
-                return
-
-            struct = structs[structs["names"].index(name)]
-
-            if sname not in struct["names"]:
-                return
-
-            node = struct[struct["names"].index(sname)]
-
-        else:
-            if self["class"] == "Func":
-                func = self
-            else:
-                func = self.func
-
-            declares = func[0]
-            params = func[2]
-
-            if name in declares["names"]:
-                node = declares[declares["names"].index(name)]
-            elif name in params["names"]:
-                node = params[params["names"].index(name)]
-            else:
-                return
-
-        if isinstance(text, str):
-            text = [text]
-        elif isinstance(text[0], int):
-            text = [text]
-        else:
-            text = list(text)
-
-        node["suggest"] = dt.common_loose(text + [node["suggest"]])
-
+        node.prop["str"] = value
 
     def auxiliary(self, type=None, convert=False, resize=0):
         """Create a auxiliary variablele and
@@ -579,46 +195,44 @@ type : str, None
             else:
                 type = dt.common_strict(type)
 
-        if self["class"] in ("Vector", "Matrix"):
+        if type == "TYPE":
+            return self
+
+        if self.cls in ("Vector", "Matrix"):
             backend = "matrix"
-        elif type == "TYPE":
-            backend = "unknown"
         else:
             backend = type
 
         line = self
-        while line.parent["class"] != "Block":
+        while line.parent.cls != "Block":
             line = line.parent
         block = line.parent
 
         # Create new var
         var = "_aux_" + type + "_"
-        if not line[var]:
+        if var not in line.prop:
             line.prop[var] = 1
         else:
             line.prop[var] += 1
-        var = var + str(line[var])
+        var = var + str(line.prop[var])
 
         # Create Assign
-        s = collection.Assign(block)
-        s["backend"] = backend
-        s.set_global_type(type)
+        assign = collection.Assign(block, backend=backend, type=type)
+        assign.declare.type = type
 
         # Return value
-        v0 = collection.Var(s, var)
-        v0.set_global_type(type)
-        v0["backend"] = backend
-        v0.declare()
+        aux_var = collection.Var(assign, var, backend=backend, type=type)
+        aux_var.create_declare()
 
-        v = s
         if convert:
-            v = collection.Get(v, "_conv_to")
-            v.backend = "reserved"
-            v.type = type
+            rhs = collection.Get(assign, "_conv_to", backend=backend,
+                    type=type)
+        else:
+            rhs = assign
 
-        v1 = collection.Var(v, var)
-        v1.set_global_type(type)
-        v1["backend"] = backend
+        swap_var = collection.Var(rhs, var, backend=backend, type=type)
+        swap_var.declare.type = type
+        rhs._generate()
 
         # Place Assign correctly in Block
         i = block.children.index(line)
@@ -626,21 +240,21 @@ type : str, None
 
         # Swap self and Var
         index = self.parent.children.index(self)
-        self.parent.children[index] = v1
+        self.parent.children[index] = swap_var
+        rhs.children[-1] = self
 
-        v1.group, self.group = self.group, v1.group
-        v1.parent, self.parent = self.parent, v1.parent
-
-        if convert:
-            v.children[-1] = self
-        else:
-            s.children[-1] = self
+        swap_var.parent, self.parent = self.parent, swap_var.parent
 
         # generate code
-        s.generate(False)
-        v1.generate(False)
+        swap_var._generate()
+        aux_var._generate()
+        if convert:
+            assign._generate()
 
-        return v1
+        if convert:
+            assert self.type != swap_var.type
+
+        return swap_var
 
     def resize(self):
 
@@ -655,7 +269,7 @@ type : str, None
         while line.parent.cls != "Block":
             line = line.parent
 
-        name = self["name"]
+        name = self.name
         value = self.type + " _" + name + "(" + name + \
                 ".memptr(), " + name + ".n_rows, " + name + \
                 ".n_cols*" + name + ".n_slices, false) ;"
@@ -665,8 +279,6 @@ type : str, None
 
         ps = line.parent.children
         line.parent.children = ps[:i] + ps[-1:] + ps[i:-1]
-        ns = line.parent["names"]
-        line.parent["names"] = ns[:i] + ns[-1:] + ns[i:-1]
 
         filler.generate(False)
 
@@ -675,35 +287,19 @@ type : str, None
 
     def include(self, name, **kws):
 
-        includes = self.program[0]
+        program = self.program
+        includes = program[0]
         idname, code = snippets.retrieve(self, name, **kws)
 
-        if idname in includes["names"]:
+        if idname in includes.names:
             return idname
 
         for val in kws.values():
             if val == "TYPE":
                 return "FUNC"
 
-        includes["names"].append(idname)
-        include = collection.Include(includes, idname)
-        include["value"] = code
-        include["backend"] = "program"
+        collection.Include(includes, name=idname, value=code)
         return idname
-
-
-    def pointer(self, num=None):
-        if num is None:
-            num = self.prop["pointer"]
-        else:
-            num = int(num)
-            self.prop["pointer"] = num
-
-        if num>0:
-            return num*"*"
-        elif num<0:
-            return (-num)*"&"
-        return ""
 
 
     def error_log(self):
@@ -787,12 +383,57 @@ type : str, None
 
         return error
 
+    def create_declare(node):
+
+        if not (node is node.declare):
+            return node
+
+        if node.cls in ref.structvars:
+            if node.cls in ("Nget", "Nset"):
+                if node[0].cls == "String":
+                    return None
+                value = node[0]["value"]
+            else:
+                value = node.value
+
+            structs = node.program[1]
+            assert structs.cls == "Structs"
+
+            if node not in structs:
+                struct = collection.Struct(structs, name=node.name)
+            else:
+                struct = structs[node]
+
+            if value in struct.names:
+                return struct[struct.names.index(value)]
+
+            return collection.Var(struct, name=value)
+            parent = struct
+
+        else:
+            parent = node.func[0]
+
+        if node in parent:
+            declare = parent[node]
+            declare.type = node.type
+            return declare
+
+        return collection.Var(parent, name=node.name,
+                type=node.type)
+
 
     def __getitem__(self, i):
         if isinstance(i, str):
-            out = self.prop.get(i, "")
+            out = self.prop[i]
             return out
+
+        if isinstance(i, Node):
+            i = self.names.index(i.name)
+
         return self.children[i]
+
+    def __contains__(self, i):
+        return i.name in self.names
 
     def __setitem__(self, key, val):
         self.prop[key] = val
@@ -817,63 +458,9 @@ type : str, None
 
     def append(self, node):
         node.children.append(node)
-        node.prop["names"].append(node["name"])
 
     def pop(self, index):
-        self.prop["names"].pop(index)
         return self.children.pop(index)
 
 
-
-def init(node, parent, name):
-
-    node.children = []      # node children
-    node.prop = {}          # node property
-
-    # Parental relationship
-    node.parent = parent
-    node.program = parent.program
-    if name != "program":
-        parent.children.append(node)
-        parent["names"].append(name)
-
-    cls = node.__class__.__name__
-    node.prop["class"] = cls
-
-    if cls in indexnames:
-        index = node["index"] = 0
-        node.group = node
-
-    elif parent["index"] != 0:
-        node["index"] = parent["index"]
-        node.group = parent.group
-
-    else:
-        index = node.program["index"] + 1
-        node["index"] = index
-        node.program["index"] = index
-        node.group = parent.group
-
-    if name:
-        node["name"] = name
-    else:
-        node["name"] = ""
-
-    if cls in ("Program", "Func", "Node"):
-        node.func = node
-    else:
-        node.func = parent.func
-
-    node["backend"] = "unknown"
-    node["str"] = ""
-    node["value"] = ""
-    node["pointer"] = 0
-    node["names"] = []
-
-    node["suggest"] = "TYPE"
-    node["type"] = "TYPE"
-
-    node["cur"] = None
-    node["line"] = None
-    node["code"] = None
 

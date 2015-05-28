@@ -128,23 +128,23 @@ Paren = "(%(0)s)"
 def End(node):
 
     pnode = node
-    while pnode.parent["index"] != 0: pnode = pnode.parent
+    while pnode.parent["class"] not in \
+            ("Get", "Cget", "Nget", "Fget",
+            "Set", "Cset", "Nset", "Fset", "Block"):
+        pnode = pnode.parent
 
-    if pnode.parent["class"] in ("Get", "Cget", "Nget", "Fget",
-            "Set", "Cset", "Nset", "Fset"):
+    if pnode.cls == "Block":
+        return "end"
 
-        index = pnode.parent.children.index(pnode)
+    index = pnode.parent.children.index(pnode)
+    name = pnode = pnode.parent["name"]
 
-        name = pnode = pnode.parent["name"]
-
-        if index == 0:
-            return name + ".n_rows"
-        elif index == 1:
-            return name + ".n_cols"
-        elif index == 2:
-            return name + ".n_slices"
-
-    return "&$"
+    if index == 0:
+        return name + ".n_rows"
+    elif index == 1:
+        return name + ".n_cols"
+    elif index == 2:
+        return name + ".n_slices"
 
 Break = "break"
 
@@ -232,7 +232,6 @@ def Colon(node):
         if parent["class"] in ("Get", "Cget", "Nget", "Fget", "Set",
                 "Cset", "Nset", "Fset") and parent.num:
             node.type = "uvec"
-            parent[""]
             return "span(%(0)s-1, %(1)s-1)"
 
         elif node.parent["class"] == "Assign" and not parent.mem:

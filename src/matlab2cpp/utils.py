@@ -66,39 +66,40 @@ reverse : bool
     return out
 
 
-def set_cfg(root, cfg):
+def set_cfg(program, cfg):
 
-    structs = root[1]
+    structs = program[1]
     for name in cfg.keys():
 
-        if name in root["names"][2:]:
+        if name in program.names[2:]:
 
             cfg_ = cfg[name]
-            func = root[root["names"].index(name)]
+            func = program[program.names.index(name)]
             declares, returns, params = func[0], func[1], func[2]
 
             for key in cfg_.keys():
-                if key in declares["names"]:
-                    var = declares[declares["names"].index(key)]
+
+                if key in declares.names:
+                    var = declares[declares.names.index(key)]
                     var.type = cfg_[key]
 
-                if key in params["names"]:
-                    var = params[params["names"].index(key)]
+                if key in params.names:
+                    var = params[params.names.index(key)]
                     var.type = cfg_[key]
 
-                elif key in returns["names"]:
-                    var = returns[returns["names"].index(key)]
+                elif key in returns.names:
+                    var = returns[returns.names.index(key)]
                     var.type = cfg_[key]
 
-        elif name in structs["names"]:
+        elif name in structs.names:
 
             cfg_ = cfg[name]
-            struct = structs[structs["names"].index(name)]
+            struct = structs[structs.names.index(name)]
 
             for key in cfg_.keys():
 
-                if key in struct["names"]:
-                    var = struct[struct["names"].index(key)]
+                if key in struct.names:
+                    var = struct[struct.names.index(key)]
                     var.type = cfg_[key]
 
                 else:
@@ -107,12 +108,11 @@ def set_cfg(root, cfg):
                     var.type = cfg_[key]
 
 
-
-def get_cfg(root):
+def get_cfg(program):
     "Retrieve datatype and suggestions from tokentree"
     cfg = {}
     scfg = {}
-    for func in root[2:]:
+    for func in program[2:]:
 
         cfg[func["name"]] = cfg_ = {}
         scfg[func["name"]] = scfg_ = {}
@@ -136,7 +136,7 @@ def get_cfg(root):
                 if type:
                     scfg_[var["name"]] = type
 
-    for struct in root[1]:
+    for struct in program[1]:
 
         cfg[struct["name"]] = cfg_ = {}
         scfg[struct["name"]] = scfg_ = {}

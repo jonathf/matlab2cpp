@@ -159,16 +159,16 @@ def Assigns_size(node):
     val = str(val)
 
     if len(node)==3:
-        node[0].suggest("int")
-        node[1].suggest("int")
+        node[0].suggest = "int"
+        node[1].suggest = "int"
 
         return "%(0)s = " +val+ ".n_rows ;\n%(1)s = " +val+ ".n_cols ;"
 
     if len(node)==4:
 
-        node[0].suggest("int")
-        node[1].suggest("int")
-        node[2].suggest("int")
+        node[0].suggest = "int"
+        node[1].suggest = "int"
+        node[2].suggest = "int"
 
         return  "%(0)s = "+val+".n_rows ;\n"+\
                 "%(1)s = "+val+".n_cols ;\n"+\
@@ -227,8 +227,8 @@ def Assigns_min(node):
     if not var.num:
         return "[", ", ", "] = max(", ") ;"
 
-    node[0].suggest((0, var.mem))
-    node[1].suggest("int")
+    node[0].suggest = (0, var.mem)
+    node[1].suggest = "int"
 
     if var.cls != "Var":
         var = var.auxiliary()
@@ -282,8 +282,8 @@ def Assigns_max(node):
     if not var.num:
         return "[", ", ", "] = max(", ") ;"
 
-    node[0].suggest((0, var.mem))
-    node[1].suggest("int")
+    node[0].suggest = (0, var.mem)
+    node[1].suggest = "int"
 
     if var.cls != "Var":
         var = var.auxiliary()

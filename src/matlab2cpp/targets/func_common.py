@@ -8,8 +8,7 @@ def Returns(node):
     if node.backend == "func_returns":
         out = ""
         for child in node[:]:
-            child.prop["pointer"] -= 1
-            out += ", " + child.type + child.pointer() + " " + str(child)
+            out += ", " + child.type + " " + str(child)
         return out[2:]
 
     if node.backend == "func_lambda":
@@ -24,12 +23,12 @@ def Params(node):
 
         out = ""
         for child in node[:]:
-            out += ", " + child.type + child.pointer() + " " + str(child)
+            out += ", " + child.type + " " + str(child)
         return out[2:]
 
 
     if node.backend == "func_lambda":
-        return ", ".join(["%s %s" % (n.type, n["name"]) for n in node])
+        return ", ".join(["%s %s" % (n.type, n.name) for n in node])
 
 
     assert False

@@ -19,43 +19,42 @@ def Vector(node):
         return "", ", ", ""
 
     if [n for n in node if not n.num]:
-        node["decomposed"] = False
+        node.value = "decomposed"
         return "", ", ", ""
 
     if len(node) == 1 and dims == {0}:
         node.dim = 0
-        node["decomposed"] = True
+        node.value = "decomposed"
         return "", ", ", ""
 
     # Decomposed row
     if dims == {0}:
-        node["decomposed"] = True
+        node.value = "decomposed"
         node.dim = 2
         return "", ", ", ""
 
     # Concatenate rows
     elif dims == {2}:
 
-        node["decomposed"] = False
+        node.value = ""
         node.dim = 2
         nodes = [str(n) for n in node]
 
     elif dims == {0,2}:
 
-        node["decomposed"] = False
+        node.value = ""
         node.dim = 2
 
         nodes = []
         for i in xrange(len(node)):
             if node[i].dim == 0:
-                nodes.append(str(node[i].auxiliary((2, node.type))))
-            else:
-                nodes.append(str(node[i]))
+                node[i].auxiliary((2, node.mem))
+            nodes.append(str(node[i]))
 
     # Concatenate mats
     elif dims in ({1}, {3}, {1,3}):
 
-        node["decomposed"] = False
+        node.value = ""
         node.dim = 3
         nodes = [str(n) for n in node]
 
@@ -70,21 +69,28 @@ def Matrix(node):
     dims = {n.dim for n in node}
 
     if None in dims:
-        return "{", ", ", "}"
+        return "[", ", ", "]"
 
     if len(node) == 1 and len(node[0]) == 0:
+        node.dim = 0
         if node.parent["class"] in ("Assign", "Statement"):
             node.parent["backend"] = "matrix"
         return ""
 
-    elif all([n["decomposed"] for n in node]):
+    elif all([n.value for n in node]):
+        node.value = "decomposed"
 
-        if len(node) == 1:
-            node.dim = 2
-        elif dims == {0}:
-            node.dim = 1
+        ax0, ax1 = len(node), len(node[0])
+        if ax0 > 1:
+            if ax1 > 1:
+                node.dim = 3
+            else:
+                node.dim = 2
         else:
-            node.dim = 3
+            if ax1 > 1:
+                node.dim = 1
+            else:
+                node.dim = 0
 
         if node.parent["class"] in ("Assign", "Statement"):
             node.parent["backend"] = "matrix"
@@ -93,18 +99,33 @@ def Matrix(node):
 
     elif dims == {0}:
 
+        if len(node) > 1:
+            if len(node[0]) > 1:
+                node.dim = 3
+            else:
+                node.dim = 2
+        else:
+            if len(node[0]) > 1:
+                node.dim = 1
+            else:
+                node.dim = 0
+
         if node.parent["class"] in ("Assign", "Statement"):
             node.parent["backend"] = "matrix"
             return ""
         return str(node.auxiliary())
 
     elif dims in ({0,1}, {1}):
-        node.dim = 1
+
+        if len(node)>1:
+            node.dim = 3
+        else:
+            node.dim = 1
 
         nodes = []
         for i in xrange(len(node)):
 
-            if node[i]["decomposed"] or node[i].dim == 0:
+            if node[i].value or node[i].dim == 0: # value=decomposed
                 nodei = node[i].auxiliary()
                 nodes.append(str(nodei))
 
@@ -114,18 +135,20 @@ def Matrix(node):
     # Concatenate mats
     elif dims in ({2}, {3}, {2,3}):
 
-        node.dim = 3
+        if dims == {2} and len(node)==1:
+            node.dim = 2
+        else:
+            node.dim = 3
 
         nodes = []
         for i in xrange(len(node)):
-            if node[i]["decomposed"]:
+            if node[i].value: # decomposed
                 nodes.append(str(node[i].auxiliary()))
             else:
                 nodes.append(str(node[i]))
 
     else:
-        return "{", ", ", "}"
-
+        return "[", "; ", "]"
 
     return reduce(lambda a,b: ("arma::join_rows(%s, %s)" % (a,b)), nodes)
 
@@ -134,38 +157,46 @@ def Matrix(node):
 def Assign(node):
 
     lhs, rhs = node
-    if rhs.cls == "Matrix":
 
-        if not lhs.num or not rhs.num:
-            return "%(0)s = %(1)s ;"
+    assert rhs.cls in ("Matrix", "Cell")
+    assert rhs.cls in ("Matrix")
 
-        if len(rhs[0]) == 0:
-            return "%(0)s.reset() ;"
+    if len(rhs[0]) == 0:
+        return "%(0)s.reset() ;"
 
-        node.type = node["ctype"] = node[0].type
-        dim = node.dim
-        node.dim = 0
+    if not lhs.num or not rhs.num:
+        return "%(0)s = %(1)s ;"
 
-        if dim == 1: #vec
-            node["rows"] = len(node[1])
+    node.type = node["ctype"] = node[0].type
+    dim = node.dim
+    node.dim = 0
+
+    if rhs.value: # decomposed
+
+        if dim == 0:
+            return "%(0)s = " + str(rhs[0][0]) + " ;"
+
+        elif dim == 1: #vec
+            node["rows"] = len(node[1][0])
             return "%(type)s _%(0)s [] = %(1)s ;\n"+\
                     "%(0)s = %(ctype)s(_%(0)s, %(rows)s, false) ;"
 
         elif dim == 2: #rowvec
-            node["cols"] = len(node[1][0])
+            node["cols"] = len(node[1])
             return "%(type)s _%(0)s [] = %(1)s ;\n"+\
                     "%(0)s = %(ctype)s(_%(0)s, %(cols)s, false) ;"
 
         elif dim == 3: #mat
-            node["rows"] = len(node[1])
-            node["cols"] = len(node[1][0])
+            node["rows"] = len(node[1][0])
+            node["cols"] = len(node[1])
             return "%(type)s _%(0)s [] = %(1)s ;\n"+\
         "%(0)s = %(ctype)s(_%(0)s, %(rows)s, %(cols)s, false) ;"
 
-    elif node[1].cls == "Cell":
+        print rhs.type
+        print [r.type for r in rhs]
         assert False
 
-    assert False
+    return "%(0)s = %(1)s ;"
 
 def Statement(node):
     return "// " + node.code[:-1]

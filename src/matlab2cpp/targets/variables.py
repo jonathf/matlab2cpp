@@ -1,6 +1,6 @@
 
 Var = "%(name)s"
-Fvar = "%(name)s.%(sname)s"
+Fvar = "%(name)s.%(value)s"
 
 def Cvar(node):
 #      node.typeerror()
@@ -12,7 +12,6 @@ def Set(node):
 
 def Cset(node):
     n_fields = node["n_fields"]
-    print n_fields, len(node)
 
     out = "%(name)s{%("
     out = out + ")s}{%(".join(map(str, range(n_fields)))
@@ -23,7 +22,7 @@ def Cset(node):
 
 def Fset(node):
 #      node.typeerror()
-    return "%(name)s.%(sname)s(", ", ", ")"
+    return "%(name)s.%(value)s(", ", ", ")"
 
 def Nset(node):
 #      node.typeerror()
@@ -45,7 +44,7 @@ def Cget(node):
 
 def Fget(node):
 #      node.typeerror()
-    return "%(name)s.%(sname)s(", ", ", ")"
+    return "%(name)s.%(value)s(", ", ", ")"
 
 def Nget(node):
 #      node.typeerror()

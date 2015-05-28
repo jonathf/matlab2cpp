@@ -14,59 +14,79 @@ import os
 import imp
 
 import utils
-import process
+from treebuilder import Treebuilder
 
 
-def main(path, suggestion=False, disp=False, comments=True):
+def main(opt, args):
 
-    filename = os.path.basename(path)
-    dirname = os.path.dirname(path)
+    path = os.path.abspath(args[0])
+    dirname = os.path.dirname(path) + os.path.sep
     os.chdir(dirname)
 
-    if disp:
-        print "reading file..."
-    f = open(filename, "rU")
-    code1 = f.read()
-    f.close()
+    if opt.disp:
+        print "building tree..."
 
-    if disp:
-        print "building token-tree..."
+    builder = Treebuilder(dirname, opt.disp, opt.comments, opt.suggestion)
 
-    tree = process.process(code1, disp=disp, comments=comments)
+    filenames = [os.path.basename(path)]
 
-    if os.path.isfile(filename + ".py"):
+    stack = []
+    while filenames:
 
-        if disp:
-            print "cfg found!"
-            print "loading cfg..."
+        filename = filenames.pop(0)
 
-        scope = imp.load_source("cfg", filename + ".py").scope
+        if opt.disp:
+            print "loading", filename
 
-        if disp:
-            print "loading scope..."
+        stack.append(filename)
 
-        cfg, scfg = utils.get_cfg(tree)
-        for name in cfg.keys():
-            if name in scope:
-                for key in scope[name].keys():
-                    cfg[name][key] = scope[name][key]
-        utils.set_cfg(tree, cfg)
+        unassigned = builder.load(filename)
+        for i in xrange(len(unassigned)-1, -1, -1):
 
-    else:
+            if os.path.isfile(unassigned[i] + ".m"):
+                unassigned[i] = unassigned[i] + ".m"
 
-        if disp:
-            print "cfg missing!"
-            print "loading scope..."
+            if not os.path.isfile(unassigned[i]):
+                # TODO error for unassigned
+                del unassigned[i]
 
-    tree.configure(suggestion=suggestion, disp=disp)
-    tree.generate(disp=disp)
-    cfg, scfg = utils.get_cfg(tree)
-    tree["str"] = tree["str"].replace("__percent__", "%")
+        filenames.extend(unassigned)
 
-    if disp:
-        print "creating cfg..."
+        if os.path.isfile(filename + ".py"):
 
-    annotation = """# Supplement file
+            cfg = imp.load_source("cfg", filename + ".py")
+            scope = cfg.scope
+
+            cfg, scfg = utils.get_cfg(builder.project[-1])
+            for name in cfg.keys():
+                if name in scope:
+                    for key in scope[name].keys():
+                        cfg[name][key] = scope[name][key]
+            utils.set_cfg(builder.project[-1], cfg)
+
+    builder.configure()
+
+    if opt.disp:
+        print "configure tree"
+    builder.configure()
+
+    if opt.disp:
+        print builder.project.summary()
+        print "generate translation"
+
+    builder.project.generate(opt)
+
+    if opt.disp:
+        print "writing files..."
+
+    # TODO spread over multiple files
+    first = True
+    for program in builder.project:
+
+        cfg, scfg = utils.get_cfg(program)
+        program["str"] = program["str"].replace("__percent__", "%")
+
+        annotation = """# Supplement file
 #
 # Valid inputs:
 #
@@ -80,37 +100,48 @@ def main(path, suggestion=False, disp=False, comments=True):
 
 """ + utils.str_cfg(cfg, scfg)
 
-    if disp:
-        print "writing cfg..."
+        filename = program.name
+        f = open(filename + ".py", "w")
+        f.write(annotation)
+        f.close()
 
-    f = open(filename + ".py", "w")
-    f.write(annotation)
-    f.close()
+        if opt.disp:
+            print "creating error-log..."
 
-#      if disp:
-#          print "writing pickle..."
-#  
-#      f = open("."+filename+".pickled", "w")
-#      cPickle.dump(tree, f)
-#      f.close()
+        errorlog = program.error_log()
 
-    if disp:
-        print "creating error-log..."
+        if opt.disp:
+            print "writing error-log..."
 
-    errorlog = tree.error_log()
+        f = open(filename + ".log", "w")
+        f.write(errorlog)
+        f.close()
 
-    if disp:
-        print "writing error-log..."
+        if opt.disp:
+            print "writing translation..."
 
-    f = open(filename + ".log", "w")
-    f.write(errorlog)
-    f.close()
+        f = open(filename + ".cpp", "w")
+        f.write(str(program))
+        f.close()
 
-    if disp:
-        print "writing translation..."
+        if os.path.isfile(filename+".pyc"):
+            os.remove(filename+".pyc")
 
-    f = open(filename + ".cpp", "w")
-    f.write(str(tree))
-    f.close()
+        f = open(path + ".cpp", "w")
+        f.write(program["str"])
+        f.close()
 
-    return tree
+
+        if first:
+            first = False
+            if opt.tree_view:
+                print program.summary(opt)
+            elif opt.line:
+                nodes = utils.flatten(program, False, False, False)
+                for node_ in nodes:
+                    if node_.line == opt.line and node_.cls != "Block":
+                        print node_["str"]
+                        break
+            else:
+                print program["str"]
+
