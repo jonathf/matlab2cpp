@@ -136,7 +136,9 @@ class Declare_reference(object):
         if instance.cls in nondeclares:
             return instance
 
-        if instance.cls in structvars:
+        if instance.cls in structvars or\
+                instance.backend in ("structs", "struct"):
+
             if instance.cls in ("Nget", "Nset"):
                 if instance[0].cls == "String":
                     value = instance[0]["value"]
@@ -156,7 +158,7 @@ class Declare_reference(object):
 
             return struct[struct.names.index(value)]
 
-        elif instance.parent.cls == "Struct":
+        elif instance.parent.cls in "Struct":
 
             return instance
 

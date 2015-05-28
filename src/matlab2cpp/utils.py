@@ -120,8 +120,9 @@ def get_cfg(program):
         declares, params = func[0], func[2]
         for var in declares[:]+params[:]:
 
-            if var["name"][:1] == "_":
-                continue
+            if var.name[:1] == "_":
+                if var.name[:-5] != "_size":
+                    continue
 
             type = var.prop["type"]
             if type == "TYPE":

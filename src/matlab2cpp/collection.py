@@ -8,6 +8,12 @@ class Filler(Node):
     def __init__(self, parent, backend="program", **kws):
         Node.__init__(self, parent, backend=backend, **kws)
 
+class Counter(Node):
+    def __init__(self, parent, name, value,
+            backend="structs", type="structs", **kws):
+        Node.__init__(self, parent, name,
+                value=value, backend=backend, type=type, **kws)
+
 class Project(Node):
     def __init__(self, backend="program", name="project", line=0,
             cur=0, **kws):
@@ -165,7 +171,7 @@ class Fget(Node):
         Node.__init__(self, parent, name=name, value=value, backend=backend, **kws)
 
 class Sget(Node):
-    def __init__(self, parent, name, value, backend="struct", **kws):
+    def __init__(self, parent, name, value, backend="structs", **kws):
         Node.__init__(self, parent, name=name, value=value, backend=backend, **kws)
 
 class Nget(Node):
@@ -181,7 +187,7 @@ class Fset(Node):
         Node.__init__(self, parent, name=name, value=value, backend=backend, **kws)
 
 class Sset(Node):
-    def __init__(self, parent, name, value, backend="struct", **kws):
+    def __init__(self, parent, name, value, backend="structs", **kws):
         Node.__init__(self, parent, name=name, value=value, backend=backend, **kws)
 
 class Nset(Node):

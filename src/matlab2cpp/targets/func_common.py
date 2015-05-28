@@ -46,7 +46,11 @@ def Declares(node):
                 type == "std::function"
 
             if type == "struct":
-                type = child["name"].capitalize()
+                type = child.name.capitalize()
+
+            if type == "structs":
+                type = child.name.capitalize()
+
 
             if type not in declares:
                 declares[type] = []
@@ -54,12 +58,12 @@ def Declares(node):
 
         out = ""
         for key, val in declares.items():
-            out = out + "\n" + key + " " + ", ".join([v["name"] for v in val]) + " ;"
+            out = out + "\n" + key + " " + ", ".join([str(v) for v in val]) + " ;"
 
         return out[1:]
 
     if node.backend == "func_lambda":
-        return ", ".join(["%s %s" % (n.type, n["name"]) for n in node])
+        return ", ".join(["%s %s" % (n.type, str(n)) for n in node])
 
 
     assert False

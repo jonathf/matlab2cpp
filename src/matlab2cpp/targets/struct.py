@@ -16,6 +16,9 @@ def Struct(node):
         if type == "func_lambda":
             type == "std::function"
 
+        if type == "structs":
+            type = "int"
+
         if type not in declares:
             declares[type] = []
 
@@ -23,7 +26,7 @@ def Struct(node):
 
     out = "struct " + name + "\n{"
     for key, val in declares.items():
-        out = out + "\n" + key + " " + ", ".join([v["name"] for v in val]) + " ;"
+        out = out + "\n" + key + " " + ", ".join([str(v) for v in val]) + " ;"
     out = out + "\n} ;"
 
     return out

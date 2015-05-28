@@ -382,6 +382,17 @@ type : str, None
             if value in struct.names:
                 return struct[struct.names.index(value)]
 
+            declares = node.func[0]
+
+            if node.cls in ("Sset", "Sget"):
+                sname = "_"+value+"_size"
+                if sname not in struct.names:
+                    collection.Counter(struct, sname, value="100")
+
+                collection.Var(declares, name=node.name, value=value, type="structs")
+            else:
+                collection.Var(declares, name=node.name, value=value, type="struct")
+
             return collection.Var(struct, name=value)
             parent = struct
 
@@ -391,10 +402,11 @@ type : str, None
         if node in parent:
             declare = parent[node]
             declare.type = node.type
+            declare.pointer = node.pointer
             return declare
 
         return collection.Var(parent, name=node.name,
-                type=node.type)
+                type=node.type, pointer=node.pointer, value=node.value)
 
 
     def __getitem__(self, i):
