@@ -68,8 +68,8 @@ def Lambda(node):
 
     out = ""
 
-    expr.generate()
-    lfunc.generate()
+    expr.translate_tree()
+    lfunc.translate_tree()
 
     for declare in ldeclares:
         name = declare["name"]

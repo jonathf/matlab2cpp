@@ -65,37 +65,12 @@ name : str
             parent.children.append(self)
 
 
-    def summary(self, opt=None):
+    def summary(self):
         "Node summary"
-
-        nodes = utils.flatten(self, False, False, False)
-        if not (opt is None) and opt.disp:
-            print "iterating %d nodes" % len(nodes)
-
-        if not (opt is None) and not (opt.line is None):
-            for node in nodes:
-                if node.cls != "Block" and node.line == opt.line:
-                    self = node
-                    break
-
-        indent = [self]
-        out = ""
-        for node in nodes:
-
-            while indent and not (node.parent is indent[-1]):
-                indent.pop()
-
-            space = "| "*(len(indent)-1)
-            out += "%3d %3d %s%-10s %-12s %-7s %-18s" % \
-                    (node.line, node.cur, space, node.cls,
-                            node.backend, node.type, node.name)
-            out += repr(node.ret) + "\n"
-            indent.append(node)
-
-        return out
+        return utils.summary(self, None)
 
 
-    def generate(self, opt=None):
+    def translate_tree(self, opt=None):
         """Generate code"""
 
         nodes = utils.flatten(self, False, True, False)
@@ -103,11 +78,11 @@ name : str
             print "iterating %d nodes" % len(nodes)
 
         for node in nodes[::-1]:
-            node._generate(opt)
+            node.translate_node(opt)
 
         return self.prop["str"]
 
-    def _generate(node, opt=None):
+    def translate_node(node, opt=None):
 
         target = targets.__dict__[node.backend]
         spesific_name = node.cls + "_" + node.name
@@ -232,7 +207,7 @@ type : str, None
 
         swap_var = collection.Var(rhs, var, backend=backend, type=type)
         swap_var.declare.type = type
-        rhs._generate()
+        rhs.translate_node()
 
         # Place Assign correctly in Block
         i = block.children.index(line)
@@ -246,10 +221,10 @@ type : str, None
         swap_var.parent, self.parent = self.parent, swap_var.parent
 
         # generate code
-        swap_var._generate()
-        aux_var._generate()
+        swap_var.translate_node()
+        aux_var.translate_node()
         if convert:
-            assign._generate()
+            assign.translate_node()
 
         if convert:
             assert self.type != swap_var.type
@@ -280,7 +255,7 @@ type : str, None
         ps = line.parent.children
         line.parent.children = ps[:i] + ps[-1:] + ps[i:-1]
 
-        filler.generate(False)
+        filler.translate_node(False)
 
         self.type = type
 
@@ -340,7 +315,7 @@ type : str, None
 #                      msg = "Undefined function/array (%s)" % node["name"]
 #                      log = log + node.message(msg, "Error")
 
-            elif cls in ("Fvar", "Fget", "Fset", "Nget", "Nset"):
+            elif cls in ("Fvar", "Fget", "Fset", "Nget", "Nset", "Sset", "Sget"):
                 msg = "Fieldnames is currently not supported"
                 log = log + node.message(msg, "Error")
 

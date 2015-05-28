@@ -69,8 +69,8 @@ Args:
         unassigned = {}
         for node in nodes[::-1]:
 
-            if node.cls not in ("Var", "Fvar", "Cvar", "Set", "Cset",
-                    "Fset", "Nset", "Get", "Cget", "Fget", "Nget"):
+            if node.cls not in ("Var", "Fvar", "Cvar", "Set", "Cset", "Sset",
+                    "Fset", "Nset", "Get", "Cget", "Fget", "Nget", "Sget"):
                 continue
 
             if node.name not in unassigned:
@@ -118,8 +118,8 @@ Args:
                 elif node.type == "TYPE":
 
                     if node.cls not in\
-                            ("Set", "Cset", "Fset", "Nset",
-                            "Get", "Cget", "Fget", "Nget",
+                            ("Set", "Cset", "Fset", "Nset", "Sset",
+                            "Get", "Cget", "Fget", "Nget", "Sget",
                             "Assign", "Assigns"):
                         node.type = [n.type for n in node]
 
@@ -164,7 +164,7 @@ Args:
                                 node.parent[j].suggest = returns[j].type
 
                     else:
-                        node._generate()
+                        node.translate_node()
                     
                     if node.num and node.dim<len(node):
                         node.declare.dim = len(node)
@@ -175,7 +175,7 @@ Args:
 
                 elif node.cls in ("Var", "Fvar", "Cget", "Fget", "Nget",
                         "Assigns", "Vector", "Matrix", "Colon"):
-                    node._generate()
+                    node.translate_node()
 
                 elif node.cls == "Neg" and node[0].mem == 0:
                     node.mem = 1
@@ -714,18 +714,39 @@ Args:
     
         # Set value of array
         elif self.code[k] == "(":
-    
-            if self.disp:
-                print "%4d %4d     Set        " %\
-                        (cur, line),
-                print repr(self.code[cur:end+1])
-    
+
             end = self.findend_paren(k)
-            node = col.Set(node, name, cur=cur, line=line,
-                    code=self.code[cur:end+1])
-    
-            last, line = self.create_list(node, k, line)
-            cur = last
+            if self.code[end+1] == "." and self.code[end+2] in letters:
+
+                start = end+2
+                end += 2
+                while self.code[end] in letters+digits+"_":
+                    end += 1
+                value = self.code[start:end]
+
+                if self.disp:
+                    print "%4d %4d     Sset        " %\
+                            (cur, line),
+                    print repr(self.code[cur:end])
+
+                    node = col.Sset(node, name, value=value, cur=cur, line=line,
+                            code=self.code[cur:end])
+
+                last, line = self.create_list(node, k, line)
+                cur = end
+
+            else:
+        
+                if self.disp:
+                    print "%4d %4d     Set        " %\
+                            (cur, line),
+                    print repr(self.code[cur:end+1])
+        
+                node = col.Set(node, name, cur=cur, line=line,
+                        code=self.code[cur:end+1])
+        
+                last, line = self.create_list(node, k, line)
+                cur = last
     
         elif self.code[k] == ".":
     
@@ -2315,19 +2336,7 @@ Args:
 if __name__ == "__main__":
 
     code = """
-function y = uhh(x)
-
-if(...
-        (piT*(pr-refVector(t-1))<(QdeltaP_oneFreqDatHF(im,t,2)-refVector(t-1))&&...
-        0.85*refDeltaP(t)>deltaP(t))&&...
-        ((waitToLearn<=waitIndex)&&(waitIndex<=fromRestartFBased))&&...%detect at restart
-        ((QdeltaP_oneFreqDatHF(im,t,2)-lRefPi)>0.1*abs(pr-lRefPi)||......%Going back
-        QdeltaP_oneFreqDatHF(im,t,2)>=pr)&&...%dont change compare to Pr.
-        QdeltaP_oneFreqDatHF(iMotor,t,2)>fT&&startFlag>100)
-    x = y;
-end
-
-end
+    a(1).b = 4
     """
     tree = Treebuilder(code, disp=True, comments=True)
     tree.code = code
@@ -2336,6 +2345,6 @@ end
 
     project = tree.project
     print project.summary()
-    print project.generate()
+    print project.translate_tree()
     print code
 

@@ -164,6 +164,10 @@ class Fget(Node):
     def __init__(self, parent, name, value, backend="struct", **kws):
         Node.__init__(self, parent, name=name, value=value, backend=backend, **kws)
 
+class Sget(Node):
+    def __init__(self, parent, name, value, backend="struct", **kws):
+        Node.__init__(self, parent, name=name, value=value, backend=backend, **kws)
+
 class Nget(Node):
     def __init__(self, parent, name, backend="struct", **kws):
         Node.__init__(self, parent, backend=backend, name=name, **kws)
@@ -173,6 +177,10 @@ class Cset(Node):
         Node.__init__(self, parent, name=name, backend=backend, **kws)
 
 class Fset(Node):
+    def __init__(self, parent, name, value, backend="struct", **kws):
+        Node.__init__(self, parent, name=name, value=value, backend=backend, **kws)
+
+class Sset(Node):
     def __init__(self, parent, name, value, backend="struct", **kws):
         Node.__init__(self, parent, name=name, value=value, backend=backend, **kws)
 

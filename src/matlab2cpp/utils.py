@@ -186,3 +186,31 @@ def str_cfg(cfg, scfg={}, struct_cfg={}):
 
 
 
+def summary(node, opt):
+
+    nodes = flatten(node, False, False, False)
+    if not (opt is None) and opt.disp:
+        print "iterating %d nodes" % len(nodes)
+
+    if not (opt is None) and not (opt.line is None):
+        for node in nodes:
+            if node.cls != "Block" and node.line == opt.line:
+                node = node
+                break
+
+    indent = [node]
+    out = ""
+    for node in nodes:
+
+        while indent and not (node.parent is indent[-1]):
+            indent.pop()
+
+        space = "| "*(len(indent)-1)
+        out += "%3d %3d %s%-10s %-12s %-7s %-18s" % \
+                (node.line, node.cur, space, node.cls,
+                        node.backend, node.type, node.name)
+        out += repr(node.ret) + "\n"
+        indent.append(node)
+
+    return out
+

@@ -24,6 +24,9 @@ def Fset(node):
 #      node.typeerror()
     return "%(name)s.%(value)s(", ", ", ")"
 
+def Sset(node):
+    return "%(name)s(", ", ", ").%(value)s"
+
 def Nset(node):
 #      node.typeerror()
     return "%(name)s.(", ", ", ")"
@@ -43,11 +46,12 @@ def Cget(node):
     return out
 
 def Fget(node):
-#      node.typeerror()
     return "%(name)s.%(value)s(", ", ", ")"
 
+def Sget(node):
+    return "%(name)s(", ", ", ").%(value)s"
+
 def Nget(node):
-#      node.typeerror()
     return "%(name)s.(", ", ", ")"
 
 Assign = "%(0)s = %(1)s ;"

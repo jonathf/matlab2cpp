@@ -129,8 +129,8 @@ def End(node):
 
     pnode = node
     while pnode.parent["class"] not in \
-            ("Get", "Cget", "Nget", "Fget",
-            "Set", "Cset", "Nset", "Fset", "Block"):
+            ("Get", "Cget", "Nget", "Fget", "Sget",
+            "Set", "Cset", "Nset", "Fset", "Sset", "Block"):
         pnode = pnode.parent
 
     if pnode.cls == "Block":
@@ -229,8 +229,8 @@ def Colon(node):
 
     if len(node) == 2:
 
-        if parent["class"] in ("Get", "Cget", "Nget", "Fget", "Set",
-                "Cset", "Nset", "Fset") and parent.num:
+        if parent["class"] in ("Get", "Cget", "Nget", "Fget", "Sget",
+                "Set", "Cset", "Nset", "Fset", "Sset") and parent.num:
             node.type = "uvec"
             return "span(%(0)s-1, %(1)s-1)"
 
@@ -244,8 +244,8 @@ def Colon(node):
 
     if len(node) == 3:
 
-        if parent["class"] in ("Get", "Cget", "Nget", "Fget", "Set",
-                "Cset", "Nset", "Fset") and parent.num:
+        if parent["class"] in ("Get", "Cget", "Nget", "Fget", "Sget",
+                "Set", "Cset", "Nset", "Fset", "Sset") and parent.num:
             node.type = "uvec"
             return "span(%(0)s-1, %(1)s, %(2)s-1)"
 

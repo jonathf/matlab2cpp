@@ -74,7 +74,7 @@ def main(opt, args):
         print builder.project.summary()
         print "generate translation"
 
-    builder.project.generate(opt)
+    builder.project.translate_tree(opt)
 
     if opt.disp:
         print "writing files..."
@@ -135,7 +135,7 @@ def main(opt, args):
         if first:
             first = False
             if opt.tree_view:
-                print program.summary(opt)
+                print utils.summary(program, opt)
             elif opt.line:
                 nodes = utils.flatten(program, False, False, False)
                 for node_ in nodes:
@@ -144,4 +144,5 @@ def main(opt, args):
                         break
             else:
                 print program["str"]
+
 
