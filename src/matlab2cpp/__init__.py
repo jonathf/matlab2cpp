@@ -34,6 +34,8 @@ def main(opt, args):
     while filenames:
 
         filename = filenames.pop(0)
+        if filename in stack:
+            continue
 
         if opt.disp:
             print "loading", filename

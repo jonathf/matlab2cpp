@@ -47,6 +47,7 @@ Args:
         self.comments = comments
         self.suggestion = suggestion
         self.project = col.Project()
+        col.library(self.project)
 
     def load(self, filename):
 

@@ -4,6 +4,14 @@ All the different kinds of nodes
 
 from node import Node
 
+class Project(Node):
+    def __init__(self, backend="program", name="project", line=0,
+            cur=0, **kws):
+        self.parent = self
+        self._program = self
+        Node.__init__(self, self, cur=cur, line=line, name=name,
+                backend=backend, **kws)
+
 class Filler(Node):
     def __init__(self, parent, backend="program", **kws):
         Node.__init__(self, parent, backend=backend, **kws)
@@ -14,12 +22,16 @@ class Counter(Node):
         Node.__init__(self, parent, name,
                 value=value, backend=backend, type=type, **kws)
 
-class Project(Node):
-    def __init__(self, backend="program", name="project", line=0,
-            cur=0, **kws):
-        self.parent = self
-        self._program = self
-        Node.__init__(self, self, cur=cur, line=line, name=name,
+class Library(Node):
+    def __init__(self, parent, name,
+            backend="program", **kws):
+        Node.__init__(self, parent, name,
+                backend=backend, **kws)
+
+class Snippet(Node):
+    def __init__(self, parent, name,
+            backend="program", **kws):
+        Node.__init__(self, parent, name,
                 backend=backend, **kws)
 
 class Program(Node):
