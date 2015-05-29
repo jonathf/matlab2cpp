@@ -2,13 +2,14 @@ import snippets
 
 def retrieve(node, name, **kws):
 
-    prms, code = snippets.__dict__.get(name)
+    prms, include_code, library_code = snippets.__dict__.get(name)
     prms.update(kws)
-    code = code % prms
+    include_code = include_code % prms
+    library_code = library_code % prms
 
     keys = prms.keys()
     keys.sort()
     vals = [prms[key] for key in keys]
     key = name+"_"+"_".join(vals)
 
-    return key, code
+    return key, include_code, library_code

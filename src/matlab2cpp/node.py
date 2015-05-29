@@ -244,38 +244,27 @@ type : str, None
         while line.parent.cls != "Block":
             line = line.parent
 
-        name = self.name
-        value = self.type + " _" + name + "(" + name + \
-                ".memptr(), " + name + ".n_rows, " + name + \
-                ".n_cols*" + name + ".n_slices, false) ;"
-        filler = collection.Filler(line.parent, value)
+        resize = collection.Resize(line.parent, name=self.name, type=type)
 
         i = line.parent.children.index(line)
 
         ps = line.parent.children
         line.parent.children = ps[:i] + ps[-1:] + ps[i:-1]
 
-        filler.translate_node(False)
-
-        self.type = type
+        resize.translate_node(False)
 
 
     def include(self, name, **kws):
 
-        program = self.program
-        includes = program[0]
-        idname, code = snippets.retrieve(self, name, **kws)
+        key, include_code, library_code = snippets.retrieve(self, name, **kws)
 
-        if idname in includes.names:
-            return idname
+        includes = self.program[0]
+        if key not in includes.names:
+            collection.Include(includes, key, include_code)
 
-        for val in kws.values():
-            if val == "TYPE":
-                return "FUNC"
-
-        collection.Include(includes, name=idname, value=code)
-        return idname
-
+        library = self.program.parent[0]
+        if key not in library:
+            collection.Snippet(library, key, library_code)
 
     def error_log(self):
 
@@ -333,7 +322,7 @@ type : str, None
         return log
 
 
-    def message(self, msg, typ="Error"):
+    def error(self, msg):
 
         code = self.program.code
         cur = self.cur
@@ -351,12 +340,10 @@ type : str, None
 
         pos = cur-start
 
-        error = "%d %d" % (self.line, pos) + " " + typ + " in " +\
-                self.cls + ": " + msg + "\n"
-        error = error + '"' + code[start+1:finish] + '"'
-        error = error + "\n\n"
+        errors = self.program.parent[1]
+        collection.Error(errors,
+                line=self.line, cur=pos, value=msg, code=code[start+1:finish])
 
-        return error
 
     def create_declare(node):
 
@@ -420,6 +407,8 @@ type : str, None
         return self.children[i]
 
     def __contains__(self, i):
+        if isinstance(i, str):
+            return i in self.names
         return i.name in self.names
 
     def __setitem__(self, key, val):

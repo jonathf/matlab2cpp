@@ -54,7 +54,7 @@ def main(opt, args):
 
         filenames.extend(unassigned)
 
-        if os.path.isfile(filename + ".py"):
+        if os.path.isfile(filename + ".py") and not opt.reset:
 
             cfg = imp.load_source("cfg", filename + ".py")
             scope = cfg.scope
@@ -66,10 +66,9 @@ def main(opt, args):
                         cfg[name][key] = scope[name][key]
             utils.set_cfg(builder.project[-1], cfg)
 
-    builder.configure()
-
     if opt.disp:
         print "configure tree"
+
     builder.configure()
 
     if opt.disp:
@@ -78,12 +77,37 @@ def main(opt, args):
 
     builder.project.translate_tree(opt)
 
-    if opt.disp:
-        print "writing files..."
+    filename = builder.project[2].name
 
-    # TODO spread over multiple files
+    library = str(builder.project[0])
+    if library:
+
+        if opt.disp:
+            print "creating library..."
+
+        f = open(filename + ".h", "w")
+        f.write(library)
+        f.close()
+
+    elif opt.reset and os.path.isfile(filename+".h"):
+        os.remove(filename+".h")
+
+    errors = str(builder.project[1])
+    if errors:
+
+        if opt.disp:
+            print "creating error-log..."
+
+        f = open(filename + ".log", "w")
+        f.write(errors)
+        f.close()
+
+    elif opt.reset and os.path.isfile(filename+".log"):
+        os.remove(filename+".log")
+
+
     first = True
-    for program in builder.project:
+    for program in builder.project[2:]:
 
         cfg, scfg = utils.get_cfg(program)
         program["str"] = program["str"].replace("__percent__", "%")
@@ -108,18 +132,6 @@ def main(opt, args):
         f.close()
 
         if opt.disp:
-            print "creating error-log..."
-
-        errorlog = program.error_log()
-
-        if opt.disp:
-            print "writing error-log..."
-
-        f = open(filename + ".log", "w")
-        f.write(errorlog)
-        f.close()
-
-        if opt.disp:
             print "writing translation..."
 
         f = open(filename + ".cpp", "w")
@@ -129,13 +141,10 @@ def main(opt, args):
         if os.path.isfile(filename+".pyc"):
             os.remove(filename+".pyc")
 
-        f = open(path + ".cpp", "w")
-        f.write(program["str"])
-        f.close()
-
-
         if first:
+
             first = False
+
             if opt.tree_view:
                 print utils.summary(program, opt)
             elif opt.line:
@@ -146,5 +155,4 @@ def main(opt, args):
                         break
             else:
                 print program["str"]
-
 

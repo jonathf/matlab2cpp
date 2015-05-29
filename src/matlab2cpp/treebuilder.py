@@ -47,7 +47,8 @@ Args:
         self.comments = comments
         self.suggestion = suggestion
         self.project = col.Project()
-        col.library(self.project)
+        col.Library(self.project)
+        col.Errors(self.project)
 
     def load(self, filename):
 
@@ -184,7 +185,7 @@ Args:
             if self.suggestion:
 
                 complete = True
-                for program in self.project:
+                for program in self.project[2:]:
                     cfg, scfg = utils.get_cfg(program)
                     if [c for c in scfg.values() if any(c)]:
                         utils.set_cfg(program, scfg)
@@ -1315,6 +1316,7 @@ Args:
         # Get value of array
         elif self.code[k] == "(":
     
+            end = self.findend_paren(k)
             if self.code[end+1] == "." and self.code[end+2] in letters:
 
                 start = end+2
@@ -1328,7 +1330,7 @@ Args:
                             (cur, line),
                     print repr(self.code[cur:end])
 
-                    node = col.Sget(node, name, value, cur=cur, line=line,
+                    node = col.Sget(parent, name, value, cur=cur, line=line,
                             code=self.code[cur:end], pointer=1)
 
                 last, line = self.create_list(node, k, line)
@@ -1341,7 +1343,7 @@ Args:
                             (cur, line),
                     print repr(self.code[cur:end+1])
         
-                node = col.Get(node, name, cur=cur, line=line,
+                node = col.Get(parent, name, cur=cur, line=line,
                         code=self.code[cur:end+1])
         
                 last, line = self.create_list(node, k, line)

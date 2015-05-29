@@ -1,8 +1,8 @@
 complex = ({}, """#include <complex>
-#include <cmath>""")
+#include <cmath>""", "")
 
 armadillo = ({}, """#include <armadillo>
-using namespace arma ;""")
+using namespace arma ;""", "")
 
 # depricated (I think)
 span = ({"target":"ivec", "start":"int","end":"int"},

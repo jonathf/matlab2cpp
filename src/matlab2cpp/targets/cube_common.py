@@ -175,3 +175,7 @@ def Set(node):
 
         return "%(name)s(" + arg0 + ", " + arg1 + ", " + arg2 + ")"
 
+
+def Resize(node):
+    return "%(type)s_%(name)s(%(name)s.memptr(), %(name)s.n_rows, " +\
+            "%(name)s.n_cols*%(name)s.n_slices, false) ;"

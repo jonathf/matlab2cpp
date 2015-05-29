@@ -111,16 +111,16 @@ class Program_reference(object):
             return instance._program
 
         node = instance
-        while node.cls != "Program" and\
+        while node.cls not in ("Program", "Errors", "Library") and\
                 not hasattr(node, "_program"):
             node = node.parent
 
-        if node.cls == "Program":
+        if node.cls in ("Program", "Errors", "Library"):
             instance._program = node
         else:
             instance._program = node._program
 
-        assert instance._program.cls == "Program"
+        assert instance._program.cls in ("Program", "Errors", "Library")
 
         return instance._program
 

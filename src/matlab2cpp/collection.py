@@ -12,9 +12,17 @@ class Project(Node):
         Node.__init__(self, self, cur=cur, line=line, name=name,
                 backend=backend, **kws)
 
-class Filler(Node):
+class Resize(Node):
+    def __init__(self, parent, backend="cube_common", **kws):
+        Node.__init__(self, parent, backend=backend, **kws)
+
+class Errors(Node):
     def __init__(self, parent, backend="program", **kws):
         Node.__init__(self, parent, backend=backend, **kws)
+
+class Error(Node):
+    def __init__(self, parent, name, value, backend="program", **kws):
+        Node.__init__(self, parent, name, value=value, backend=backend, **kws)
 
 class Counter(Node):
     def __init__(self, parent, name, value,
@@ -23,16 +31,12 @@ class Counter(Node):
                 value=value, backend=backend, type=type, **kws)
 
 class Library(Node):
-    def __init__(self, parent, name,
-            backend="program", **kws):
-        Node.__init__(self, parent, name,
-                backend=backend, **kws)
+    def __init__(self, parent, backend="program", **kws):
+        Node.__init__(self, parent, backend=backend, **kws)
 
 class Snippet(Node):
-    def __init__(self, parent, name,
-            backend="program", **kws):
-        Node.__init__(self, parent, name,
-                backend=backend, **kws)
+    def __init__(self, parent, name, value, backend="program", **kws):
+        Node.__init__(self, parent, name, value=value, backend=backend, **kws)
 
 class Program(Node):
     def __init__(self, parent, name="program", backend="program", **kws):
@@ -42,7 +46,9 @@ class Program(Node):
 class Includes(Node):
     def __init__(self, parent, backend="program", **kws):
         Node.__init__(self, parent, backend=backend, **kws)
-class Include(Includes):         pass
+class Include(Includes):
+    def __init__(self, parent, name, value, backend="program", **kws):
+        Node.__init__(self, parent, name=name, value=value, backend=backend, **kws)
 
 class Structs(Node):
     def __init__(self, parent, backend="struct", **kws):
