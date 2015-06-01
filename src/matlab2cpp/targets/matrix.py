@@ -61,7 +61,7 @@ def Vector(node):
     else:
         return ""
 
-    return reduce(lambda x,y: ("arma::join_cols(%s, %s)" % (x, y)), nodes)
+    return reduce(lambda x,y: ("arma::join_rows(%s, %s)" % (x, y)), nodes)
 
 
 def Matrix(node):
@@ -150,7 +150,7 @@ def Matrix(node):
     else:
         return "[", "; ", "]"
 
-    return reduce(lambda a,b: ("arma::join_rows(%s, %s)" % (a,b)), nodes)
+    return reduce(lambda a,b: ("arma::join_cols(%s, %s)" % (a,b)), nodes)
 
 
 
