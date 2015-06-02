@@ -25,6 +25,7 @@ def Assigns(node):
 
     assigness = str(node[0])
     name = node["name"]
-    args = str(node[1])
-
-    return name + "("+assigness+", "+args+") ;\n"
+    if node[1]:
+        args = str(node[1])
+        return name + "("+assigness+", "+args+") ;\n"
+    return name + "("+assigness+") ;\n"

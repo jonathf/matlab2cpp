@@ -1,3 +1,4 @@
+from assign_common import Assign
 
 Var = "%(name)s"
 Fvar = "%(name)s.%(value)s"
@@ -53,5 +54,3 @@ def Sget(node):
 
 def Nget(node):
     return "%(name)s.(", ", ", ")"
-
-Assign = "%(0)s = %(1)s ;"

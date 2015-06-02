@@ -5,9 +5,6 @@ import snippets
 import utils
 import reference as ref
 
-import time
-from datetime import datetime as date
-
 
 class Node(object):
     """
@@ -82,6 +79,14 @@ name : str
 
         return self.prop["str"]
 
+    def properties(self):
+
+        prop = node.prop.copy()
+        I = len(self)
+        for i in xrange(I):
+            prop[str(i)] = prop["-"+str(I-i)] = self[i]["str"]
+        return prop
+
     def translate_node(node, opt=None):
 
         target = targets.__dict__[node.backend]
@@ -110,12 +115,6 @@ name : str
 
         node.ret = repr(value)
 
-        prop = node.prop.copy()
-        I = len(node)
-        for i in xrange(I):
-            prop["%d" % i] = prop["-%d" % (I-i)] = node[i]["str"]
-        prop["type"] = node.type
-
         if not isinstance(value, str):
 
             value = list(value)
@@ -141,7 +140,7 @@ name : str
                 value = out
 
         try:
-            value = value % prop
+            value = value % node.properties()
         except:
             raise SyntaxError("interpolation in " + node.backend + "." +\
                     node.cls + " is misbehaving\n" + value + "\n"+str(prop))
@@ -266,11 +265,9 @@ type : str, None
         if key not in library:
             collection.Snippet(library, key, library_code)
 
+
     def error_log(self):
 
-        ts = time.time()
-        log = "Translated on " +\
-                date.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S\n\n')
 
         for node in utils.flatten(self):
 
@@ -324,6 +321,8 @@ type : str, None
 
     def error(self, msg):
 
+        msg = msg % self.properties()
+
         code = self.program.code
         cur = self.cur
         end = cur+len(self.code)
@@ -337,12 +336,16 @@ type : str, None
         finish = end
         while code[finish] != "\n" and finish != len(code)-1:
             finish += 1
+        code = code[start+1:finish]
 
         pos = cur-start
 
+        name = str(cur) + self.cls
         errors = self.program.parent[1]
-        collection.Error(errors,
-                line=self.line, cur=pos, value=msg, code=code[start+1:finish])
+
+        if name not in errors.names:
+            collection.Error(errors, name=name,
+                    line=self.line, cur=pos, value=msg, code=code)
 
 
     def create_declare(node):

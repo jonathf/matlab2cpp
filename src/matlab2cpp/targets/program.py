@@ -8,6 +8,8 @@ Program : The root node
     Rule: program.py
 """
 import re
+import time
+from datetime import datetime as date
 
 def add_indenting(text):
 
@@ -89,7 +91,10 @@ namespace m2cpp
 Snippet = "%(value)s"
 
 def Errors(node):
-    return "", "\n\n", ""
+    ts = time.time()
+    log = "Translated on " +\
+            date.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S\n\n')
+    return log, "\n\n", ""
 
 def Error(node):
     return '''%(line)s %(cur)s Error in in %(cls)s: %(value)s

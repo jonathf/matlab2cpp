@@ -104,10 +104,53 @@ Args:
 
                 if node.cls == "Get":
 
+                    # local scope
                     if node in node.program:
-                        node.backend = node.program[node].backend
+                        func = node.program[node]
 
-                if node.cls in ("Assign", "Assigns"):
+                    # external file in same folder
+                    elif node in self.project:
+                        func = self.project[node][2]
+
+                    elif node.name + ".m" in self.project:
+                        func = self.project[self.project.names.index(node.name+".m")][2]
+
+                    else:
+                        func = None
+                        node.translate_node()
+                        if node.backend != "reserved" and\
+                                node.num and node.dim<len(node):
+                            node.declare.dim = len(node)
+
+                    if not (func is None):
+                        node.backend = func.backend
+
+                        if node.backend == "func_return":
+                            node.declare.type = func[1][0].type
+                            params = func[2]
+                            for i in xrange(len(node)):
+                                params[i].suggest = node[i].type
+
+                        elif node.backend == "func_returns":
+                            params = func[2]
+
+                            for j in xrange(len(params)):
+                                params[j].suggest = node[j].type
+                                node[j].suggest = params[j].type
+
+                            if node.parent.cls == "Assigns":
+                                node.parent.backend = "func_returns"
+
+                                returns = func[1]
+                                for j in xrange(len(returns)):
+                                    returns[j].suggest = node.parent[j].type
+                                    node.parent[j].suggest = returns[j].type
+
+                elif node.cls in ("Var", "Fvar", "Cget", "Fget", "Nget",
+                        "Assigns", "Vector", "Matrix", "Colon"):
+                    node.translate_node()
+
+                elif node.cls in ("Assign", "Assigns"):
                     if node[-1].cls == "Matrix":
                         node.backend = "matrix"
                     if node[-1].cls == "Cell":
@@ -140,44 +183,9 @@ Args:
                     var, range = node[:2]
                     var.suggest = "int"
 
-                elif node.cls == "Get":
-
-                    if node.backend == "func_return":
-                        func = node.program[node]
-                        node.declare.type = func[1][0].type
-                        params = func[2]
-                        for i in xrange(len(node)):
-                            params[i].suggest = node[i].type
-
-                    elif node.backend == "func_returns":
-                        func = node.program[node]
-                        params = func[2]
-
-                        for j in xrange(len(params)):
-                            params[j].suggest = node[j].type
-                            node[j].suggest = params[j].type
-
-                        if node.parent.cls == "Assigns":
-                            node.parent.backend = "func_returns"
-
-                            returns = func[1]
-                            for j in xrange(len(returns)):
-                                returns[j].suggest = node.parent[j].type
-                                node.parent[j].suggest = returns[j].type
-
-                    else:
-                        node.translate_node()
-                    
-                    if node.num and node.dim<len(node):
-                        node.declare.dim = len(node)
-
-
                 elif node.cls == "Assign" and node[0].cls != "Set":
                     node[0].suggest = node[1].type
 
-                elif node.cls in ("Var", "Fvar", "Cget", "Fget", "Nget",
-                        "Assigns", "Vector", "Matrix", "Colon"):
-                    node.translate_node()
 
                 elif node.cls == "Neg" and node[0].mem == 0:
                     node.mem = 1
