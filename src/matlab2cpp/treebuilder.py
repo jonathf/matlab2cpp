@@ -595,7 +595,7 @@ Args:
         l = self.iterate_list(cur)
     
         if len(l[0]) == 1:
-            return self.create_assign(parent, cur, line, eq_loc)
+            return self.create_assign(parent, l[0][0][0], line, eq_loc)
     
         assigns = col.Assigns(parent, cur=cur, line=line, code=self.code[cur:end+1])
     
@@ -636,6 +636,11 @@ Args:
         cur += 1
         while self.code[cur] in " \t":
             cur += 1
+        
+        if self.code[cur] == "]":
+            cur += 1
+            while self.code[cur] in " \t":
+                cur += 1
     
         assert self.code[cur] == "="
     
@@ -2369,7 +2374,9 @@ Args:
 if __name__ == "__main__":
 
     code = """
-    a(1).b = 4
+function p = foo()
+   [dm] = forward_radon_freq(mc,dt,h,q,N,flow,fhigh);
+end
     """
     tree = Treebuilder(code, disp=True, comments=True)
     tree.code = code
