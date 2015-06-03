@@ -1,5 +1,5 @@
 from variables import *
-from arma_common import Assign, configure_arg
+from arma_common import configure_arg
 
 def Get(node):
 

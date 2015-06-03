@@ -75,7 +75,10 @@ def main(opt, args):
         print builder.project.summary()
         print "generate translation"
 
-    builder.project.translate_tree(opt)
+    for program in builder.project[2:]:
+        program.translate_tree(opt)
+    builder.project[0].translate_tree(opt)
+    builder.project[1].translate_tree(opt)
 
     filename = builder.project[2].name
 
@@ -146,7 +149,7 @@ def main(opt, args):
             first = False
 
             if opt.tree_view:
-                print utils.summary(program, opt)
+                print utils.summary(builder.project, opt)
             elif opt.line:
                 nodes = utils.flatten(program, False, False, False)
                 for node_ in nodes:

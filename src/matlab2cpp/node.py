@@ -81,7 +81,7 @@ name : str
 
     def properties(self):
 
-        prop = node.prop.copy()
+        prop = self.prop.copy()
         I = len(self)
         for i in xrange(I):
             prop[str(i)] = prop["-"+str(I-i)] = self[i]["str"]
@@ -143,7 +143,7 @@ name : str
             value = value % node.properties()
         except:
             raise SyntaxError("interpolation in " + node.backend + "." +\
-                    node.cls + " is misbehaving\n" + value + "\n"+str(prop))
+                    node.cls + " is misbehaving\n'" + value + "'\n"+str(node.prop))
         # print repr(value)
 
         node.prop["str"] = value
@@ -318,6 +318,33 @@ type : str, None
 
         return log
 
+    def warning(self, msg):
+
+        msg = msg % self.properties()
+
+        code = self.program.code
+        cur = self.cur
+        end = cur+len(self.code)
+
+        start = cur
+        while code[start] != "\n" and start != 0:
+            start -= 1
+
+        if end >= len(code):
+            end = len(code)-1
+        finish = end
+        while code[finish] != "\n" and finish != len(code)-1:
+            finish += 1
+        code = code[start:finish]
+
+        pos = cur-start
+
+        name = "%010d" % cur + self.cls
+        errors = self.program.parent[1]
+
+        if name not in errors.names:
+            collection.Warning(errors, name=name,
+                    line=self.line, cur=pos, value=msg, code=code)
 
     def error(self, msg):
 
@@ -336,11 +363,11 @@ type : str, None
         finish = end
         while code[finish] != "\n" and finish != len(code)-1:
             finish += 1
-        code = code[start+1:finish]
+        code = code[start:finish]
 
         pos = cur-start
 
-        name = str(cur) + self.cls
+        name = "%010d" % cur + self.cls
         errors = self.program.parent[1]
 
         if name not in errors.names:

@@ -67,7 +67,10 @@ Assigned : Lhs in Assigns
 
 
 Statement = "%(0)s ;"
-While = "while (%(0)s)\n{\n%(1)s\n}"
+def While(node):
+    node.error("While-loops are currently not supported.")
+    return"while (%(0)s)\n{\n%(1)s\n}"
+
 Cond = "", ",", ""
 
 Branch = "", "\n", ""
@@ -111,8 +114,12 @@ def Otherwise(node):
     return "else\n{\n%(0)s\n}"
 
 def Tryblock(node):
+    node.error("Try-statement are currently not supported.")
     return "", "\n", ""
-Try = "try\n{\n", "", "\n}"
+
+def Try(node):
+    return "try\n{\n", "", "\n}"
+
 def Catch(node):
     name = node["name"]
     if not name:

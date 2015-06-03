@@ -23,6 +23,12 @@ class Errors(Node):
 class Error(Node):
     def __init__(self, parent, name, value, backend="program", **kws):
         Node.__init__(self, parent, name, value=value, backend=backend, **kws)
+        self.prop["cls"] = name[10:]
+
+class Warning(Node):
+    def __init__(self, parent, name, value, backend="program", **kws):
+        Node.__init__(self, parent, name, value=value, backend=backend, **kws)
+        self.prop["cls"] = name[10:]
 
 class Counter(Node):
     def __init__(self, parent, name, value,

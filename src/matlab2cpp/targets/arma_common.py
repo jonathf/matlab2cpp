@@ -1,4 +1,3 @@
-
 def configure_arg(node, index):
 
     out = "%(" + str(index) + ")s"
@@ -26,27 +25,4 @@ def configure_arg(node, index):
         out = "vectorise(" + out + ")"
 
     return out, dim
-
-
-def Assign(node):
-
-    if node[1].value: # true if decomposed into components
-        return "%(0)s = %(1)s ;"
-
-    if node[0].cls == "Var":
-        return "%(0)s = %(1)s ;"
-
-    node.type = "umat"
-
-    sets, expr = node
-
-    if (expr.dim == 2 and sets.dim == 1) or\
-            (expr.dim == 1 and sets.dim == 2):
-        rhs = "(%(1)s).t()"
-    else:
-        rhs = "%(1)s"
-
-
-    out = "%(0)s = " + rhs + " ;"
-    return out
 
