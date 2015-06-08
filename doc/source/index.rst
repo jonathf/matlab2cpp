@@ -8,8 +8,6 @@ Matlab2cpp
 Setup
 =====
 
-
-
 Matlab2cpp is a semi-automatic tool for converting code from Matlab to C++.
 
 Note that it is not meant as a complete tool for creating runnable C++ code.
@@ -51,6 +49,7 @@ Windows:::
 
 The executable mconvert.py can freely be copied or be added to
 environmental variables manually.
+
 
 Usage
 -----
@@ -175,17 +174,8 @@ new output for `example.m.cpp`:::
 The file `example.m.log` will contain a list of errors and warnings
 created during conversion.
 
-setup module
-============
-
-
-.. automodule:: setup
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-mconvert
-========
+Frontend: mconvert
+==================
 
 .. automodule:: mconvert
     :members:
