@@ -2,7 +2,6 @@
 """
 Matlab2cpp
 ==========
-Toolbox for automatically converting Matlab into C++ code.
 """
 
 import collection
@@ -17,16 +16,16 @@ import utils
 from treebuilder import Treebuilder
 
 
-def main(opt, args):
+def main(args):
 
-    path = os.path.abspath(args[0])
+    path = os.path.abspath(args.filename)
     dirname = os.path.dirname(path) + os.path.sep
     os.chdir(dirname)
 
-    if opt.disp:
+    if args.disp:
         print "building tree..."
 
-    builder = Treebuilder(dirname, opt.disp, opt.comments, opt.suggestion)
+    builder = Treebuilder(dirname, args.disp, args.comments, args.suggestion)
 
     filenames = [os.path.basename(path)]
 
@@ -37,7 +36,7 @@ def main(opt, args):
         if filename in stack:
             continue
 
-        if opt.disp:
+        if args.disp:
             print "loading", filename
 
         stack.append(filename)
@@ -54,7 +53,7 @@ def main(opt, args):
 
         filenames.extend(unassigned)
 
-        if os.path.isfile(filename + ".py") and not opt.reset:
+        if os.path.isfile(filename + ".py") and not args.reset:
 
             cfg = imp.load_source("cfg", filename + ".py")
             scope = cfg.scope
@@ -66,46 +65,46 @@ def main(opt, args):
                         cfg[name][key] = scope[name][key]
             utils.set_cfg(builder.project[-1], cfg)
 
-    if opt.disp:
+    if args.disp:
         print "configure tree"
 
     builder.configure()
 
-    if opt.disp:
+    if args.disp:
         print builder.project.summary()
         print "generate translation"
 
     for program in builder.project[2:]:
-        program.translate_tree(opt)
-    builder.project[0].translate_tree(opt)
-    builder.project[1].translate_tree(opt)
+        program.translate_tree(args)
+    builder.project[0].translate_tree(args)
+    builder.project[1].translate_tree(args)
 
     filename = builder.project[2].name
 
     library = str(builder.project[0])
     if library:
 
-        if opt.disp:
+        if args.disp:
             print "creating library..."
 
         f = open(filename + ".h", "w")
         f.write(library)
         f.close()
 
-    elif opt.reset and os.path.isfile(filename+".h"):
+    elif args.reset and os.path.isfile(filename+".h"):
         os.remove(filename+".h")
 
     errors = str(builder.project[1])
     if errors:
 
-        if opt.disp:
+        if args.disp:
             print "creating error-log..."
 
         f = open(filename + ".log", "w")
         f.write(errors)
         f.close()
 
-    elif opt.reset and os.path.isfile(filename+".log"):
+    elif args.reset and os.path.isfile(filename+".log"):
         os.remove(filename+".log")
 
 
@@ -134,7 +133,7 @@ def main(opt, args):
         f.write(annotation)
         f.close()
 
-        if opt.disp:
+        if args.disp:
             print "writing translation..."
 
         f = open(filename + ".cpp", "w")
@@ -148,12 +147,12 @@ def main(opt, args):
 
             first = False
 
-            if opt.tree_view:
-                print utils.summary(builder.project, opt)
-            elif opt.line:
+            if args.tree_view:
+                print utils.summary(builder.project, args)
+            elif args.line:
                 nodes = utils.flatten(program, False, False, False)
                 for node_ in nodes:
-                    if node_.line == opt.line and node_.cls != "Block":
+                    if node_.line == args.line and node_.cls != "Block":
                         print node_["str"]
                         break
             else:
