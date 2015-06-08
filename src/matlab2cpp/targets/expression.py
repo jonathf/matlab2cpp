@@ -184,21 +184,23 @@ Bor     = "", "||", ""
 Lor     = "", "|", ""
 Div     = "", "/", ""
 
-def Elrdiv(node):
+def Eldiv(node):
     out = ""
     for child in node[::-1]:
-        out = out + "/" + child
+        out = out + "/" + str(child)
     return out[1:]
 
-def Rdiv(node):
+def Div(node):
     if 0 in {n.dim for n in node}:
-        return Elrdiv(node)
+        return Eldiv(node)
     out = str(node[0])
+
     for child in node[1:]:
         if child.dim == 3:
             out = "arma::solve(" +out + ", " + str(child) + ")"
         else:
             out = str(child) + "/" + out
+
     return out
 
 def Exp(node):
@@ -219,7 +221,10 @@ Not = "not ", "", ""
 Ctranspose = "arma::strans(", "", ")"
 Transpose = "arma::trans(", "", ")"
 
-def Eldiv(node):
+def Rdiv(node):
+    return "", "/", ""
+
+def Elrdiv(node):
     children = map(str, node[:])[::-1]
     return "/".join(children)
 
