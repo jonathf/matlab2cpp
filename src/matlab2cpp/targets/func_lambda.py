@@ -59,12 +59,12 @@ def Lambda(node):
                 if name in params.names:
                     type = params[params.names.index(name)].type
                     node_.type = type
-                    node_.declare()
+                    node_.declare.type = type
 
                 elif name in declares.names:
                     type = declares[declares.names.index(name)].type
                     node_.type = type
-                    node_.declare()
+                    node_.declare.type = type
 
 
     out = ""
