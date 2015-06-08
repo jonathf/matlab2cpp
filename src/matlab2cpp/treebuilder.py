@@ -104,6 +104,8 @@ Args:
 
                 if node.cls == "Get":
 
+                    print node.name, node.cls, node.backend
+
                     # local scope
                     if node in node.program:
                         func = node.program[node]
@@ -114,6 +116,10 @@ Args:
 
                     elif node.name + ".m" in self.project:
                         func = self.project[self.project.names.index(node.name+".m")][2]
+
+                    elif node.backend == "func_lambda":
+                        print "lambda0"
+                        func = node.reference
 
                     else:
                         func = None
@@ -146,8 +152,18 @@ Args:
                                     returns[j].suggest = node.parent[j].type
                                     node.parent[j].suggest = returns[j].type
 
+                        elif node.backend == "func_lambda":
+
+                            node.declare.type = func[1][0].type
+                            params = func[2]
+                            for i in xrange(len(node)):
+                                params[i].suggest = node[i].type
+
                 elif node.cls in ("Var", "Fvar", "Cget", "Fget", "Nget",
-                        "Assigns", "Vector", "Matrix", "Colon"):
+                        "Assigns", "Colon"):
+                    node.translate_node()
+                elif node.cls in ("Vector", "Matrix"):
+                    node.type = [n.type for n in node]
                     node.translate_node()
 
                 elif node.cls in ("Assign", "Assigns"):
@@ -542,7 +558,7 @@ Args:
                 j = self.findend_expression(cur)
     
                 j += 1
-                while self.code[j] == " ":
+                while self.code[j] in " \t":
                     j += 1
                 eq_loc = j
     
@@ -1623,7 +1639,7 @@ Args:
         assign = col.Assign(node, cur=cur, line=line)
     
         _, line = self.create_assign_variable(assign, cur, line, eq_loc)
-        assign[0].set_global_type("func_lambda")
+        assign[0].declare.type = "func_lambda"
     
         k = eq_loc+1
         while self.code[k] in " \t":
@@ -1659,14 +1675,13 @@ Args:
                     (cur, line),
             print repr(self.code[cur:end+1])
     
-        parent = node.parent
-        if parent["class"] == "Assign" and parent[1] is node:
-            name = parent[0]["name"]
+        if node.cls == "Assign":
+            name = node[0].name
         else:
             name = "lambda"
     
         program = node.program
-        name = "_%s_%03d" % (name, len(program))
+        name = "_%s_%d" % (name, len(program)-2)
     
         func = col.Func(program, name, cur=cur, line=line, code=self.code[cur:end+1])
     
@@ -1702,7 +1717,6 @@ Args:
     
         lamb = col.Lambda(node, name)
         lamb.type = "func_lambda"
-    #          lamb.declare()
     
         lamb.reference = func
     
@@ -2374,9 +2388,9 @@ Args:
 if __name__ == "__main__":
 
     code = """
-function p = foo()
-   [dm] = forward_radon_freq(mc,dt,h,q,N,flow,fhigh);
-end
+residual_prev 	= y;
+supp 		= [];
+iter_count 	= 0;
     """
     tree = Treebuilder(code, disp=True, comments=True)
     tree.code = code
