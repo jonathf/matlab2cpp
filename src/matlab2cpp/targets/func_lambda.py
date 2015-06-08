@@ -85,11 +85,3 @@ def Lambda(node):
 
 Declare = "std::function %(name)s ;"
 
-def Assign(node):
-    out = A(node)
-    if node[1].cls == "Var":
-        node[0].declare.type = "func_lambda"
-    elif node[1].cls == "Get":
-        func = node.program[node.program.names.index(node.name)]
-        node[0].declare.type = func[1][0].type
-    return out

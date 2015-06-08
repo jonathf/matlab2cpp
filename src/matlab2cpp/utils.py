@@ -120,10 +120,6 @@ def get_cfg(program):
         declares, params = func[0], func[2]
         for var in declares[:]+params[:]:
 
-            if var.name[:1] == "_":
-                if var.name[:-5] != "_size":
-                    continue
-
             type = var.prop["type"]
             if type == "TYPE":
                 type = ""
@@ -173,6 +169,11 @@ def str_cfg(cfg, scfg={}, struct_cfg={}):
         cfg_ = cfg[name]
 
         for key, val in cfg_.items():
+
+            if key[0] == "_":
+                if key[1:5] in ("aux_", "ret_"):
+                    continue
+
             if val:
                 out += '%s["%s"] = "%s"\n' % (name, key, val)
             else:

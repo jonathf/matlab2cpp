@@ -104,22 +104,25 @@ Args:
 
                 if node.cls == "Get":
 
-                    print node.name, node.cls, node.backend
+                    if node.type == "func_lambda":
+                        node.backend = "func_lambda"
+                        node.reference = node.declare.reference
+
+                    # lambda scope
+                    if node.backend == "func_lambda":
+                        func = node.reference
 
                     # local scope
-                    if node in node.program:
+                    elif node in node.program:
                         func = node.program[node]
 
                     # external file in same folder
                     elif node in self.project:
                         func = self.project[node][2]
 
+                    # external file in same folder
                     elif node.name + ".m" in self.project:
                         func = self.project[self.project.names.index(node.name+".m")][2]
-
-                    elif node.backend == "func_lambda":
-                        print "lambda0"
-                        func = node.reference
 
                     else:
                         func = None
@@ -129,15 +132,15 @@ Args:
                             node.declare.dim = len(node)
 
                     if not (func is None):
-                        node.backend = func.backend
-
                         if node.backend == "func_return":
+                            node.backend = func.backend
                             node.declare.type = func[1][0].type
                             params = func[2]
                             for i in xrange(len(node)):
                                 params[i].suggest = node[i].type
 
                         elif node.backend == "func_returns":
+                            node.backend = func.backend
                             params = func[2]
 
                             for j in xrange(len(params)):
@@ -154,7 +157,7 @@ Args:
 
                         elif node.backend == "func_lambda":
 
-                            node.declare.type = func[1][0].type
+                            node.type = func[1][0].type
                             params = func[2]
                             for i in xrange(len(node)):
                                 params[i].suggest = node[i].type
@@ -169,12 +172,13 @@ Args:
                 elif node.cls in ("Assign", "Assigns"):
                     if node[-1].cls == "Matrix":
                         node.backend = "matrix"
-                    if node[-1].cls == "Cell":
+                    elif node[-1].cls == "Cell":
                         node.backend = "cell"
+                    elif node[-1].backend == "func_lambda":
+                        node[0].declare.reference = node[-1].declare.reference
+
                     if node[-1].backend == "reserved":
                         node.backend = "reserved"
-                    if node.cls == "Assign":
-                        node.type = node[0].type
 
                 elif node.type == "TYPE":
 
@@ -200,7 +204,11 @@ Args:
                     var.suggest = "int"
 
                 elif node.cls == "Assign" and node[0].cls != "Set":
-                    node[0].suggest = node[1].type
+                    if node[1].type == "func_lambda" and node[1].cls == "Get":
+                        type = node.declare.reference[1][0]
+                    else:
+                        type = node[1].type
+                    node[0].suggest = type
 
 
                 elif node.cls == "Neg" and node[0].mem == 0:
@@ -1636,10 +1644,11 @@ Args:
                     (cur, line),
             print repr(self.code[cur:self.code.find("\n", cur)])
     
-        assign = col.Assign(node, cur=cur, line=line)
+        assign = col.Assign(node, cur=cur, line=line, backend="func_lambda")
     
         _, line = self.create_assign_variable(assign, cur, line, eq_loc)
         assign[0].declare.type = "func_lambda"
+        assign[0].type = "func_lambda"
     
         k = eq_loc+1
         while self.code[k] in " \t":
@@ -1649,6 +1658,7 @@ Args:
         assign.code = self.code[cur:end+1]
     
         assign[0].reference = assign[1].reference
+        assign[0].declare.reference = assign[1].reference
     
         return line, end
     
@@ -1707,10 +1717,10 @@ Args:
     
         cur, line = self.create_expression(assign, cur, line, end=end)
     
-        func["backend"] = "func_lambda"
-        returns["backend"] = "func_lambda"
-        params["backend"] = "func_lambda"
-        declares["backend"] = "func_lambda"
+        func.backend = "func_lambda"
+        returns.backend = "func_lambda"
+        params.backend = "func_lambda"
+        declares.backend = "func_lambda"
     
         var = col.Var(returns, "_retval")
         var.create_declare()
@@ -1719,7 +1729,7 @@ Args:
         lamb.type = "func_lambda"
     
         lamb.reference = func
-    
+
         return cur, line
     
     

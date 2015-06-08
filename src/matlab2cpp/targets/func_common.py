@@ -43,12 +43,15 @@ def Declares(node):
             type = child.type
 
             if type == "func_lambda":
-                type == "std::function"
+                ret = child.reference[1][0].type
+                params = [n.type for n in child.reference[2]]
+                params = ", ".join(params)
+                type = "std::function<"+ret+"("+params+")>"
 
-            if type == "struct":
+            elif type == "struct":
                 type = child.name.capitalize()
 
-            if type == "structs":
+            elif type == "structs":
                 type = child.name.capitalize()
 
 
