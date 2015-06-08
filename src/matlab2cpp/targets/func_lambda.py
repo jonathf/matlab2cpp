@@ -29,13 +29,14 @@ Get : Function/Array retrieval
 """
 
 from func_common import *
+from assign_common import Assign as A
 
 
 def Lambda(node):
 
     lfunc = node.reference
     ldeclares, lreturns, lparams, lblock = lfunc
-    lnames = lparams["names"] + ldeclares["names"]
+    lnames = lparams.names + ldeclares.names
     expr = lblock[0][1]
 
     func = node.func
@@ -53,36 +54,42 @@ def Lambda(node):
 
         if node_["class"] in ["Var", "Cvar", "Fvar",
                 "Get", "Cget", "Fget", "Nget"]:
-            name = node_["name"]
+            name = node_.name
             if name not in lnames:
-                if name in params["names"]:
-                    type = params[params["names"].index(name)].type
+                if name in params.names:
+                    type = params[params.names.index(name)].type
                     node_.type = type
                     node_.declare()
 
-                elif name in declares["names"]:
-                    type = declares[declares["names"].index(name)].type
+                elif name in declares.names:
+                    type = declares[declares.names.index(name)].type
                     node_.type = type
                     node_.declare()
 
 
     out = ""
 
-    expr.translate_tree()
-    lfunc.translate_tree()
-
     for declare in ldeclares:
-        name = declare["name"]
+        name = declare.name
         if name != "_retval":
             out += ", " + name
         else:
             node.type = declare.type
 
-#      out = node["name"] + " = " + 
+    expr.translate_tree()
+    lfunc.translate_tree()
+
     out = "[" + out[2:] + "] "
     out += "(" + str(lparams) + ") {" + str(expr) + " ; }"
     return out
 
-
-
 Declare = "std::function %(name)s ;"
+
+def Assign(node):
+    out = A(node)
+    if node[1].cls == "Var":
+        node[0].declare.type = "func_lambda"
+    elif node[1].cls == "Get":
+        func = node.program[node.program.names.index(node.name)]
+        node[0].declare.type = func[1][0].type
+    return out

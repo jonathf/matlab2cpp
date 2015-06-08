@@ -65,7 +65,6 @@ def Declares(node):
     if node.backend == "func_lambda":
         return ", ".join(["%s %s" % (n.type, str(n)) for n in node])
 
-
     assert False
 
 
@@ -89,9 +88,3 @@ def Func(node):
 
         return ""#// placeholder for %(name)s"
 
-
-def Get(node):
-    return "%(name)s(", ", ", ")"
-
-def Var(node):
-    return "@%(name)s"
