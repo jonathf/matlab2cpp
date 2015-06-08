@@ -39,6 +39,7 @@ def Assign(node):
 
     else:
         node.error("Types incompatible %s and %s" % (lhs.type, rhs.type))
+        out = "%(1)s"
 
     out = "%(0)s = " + out + " ;"
     return out
