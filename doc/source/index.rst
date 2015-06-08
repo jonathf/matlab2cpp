@@ -132,7 +132,7 @@ To use suggestions, run conversion with the `-s` flag:
     $ mconvert example.m -s
 
 The file `example.m.py` will then automatically be filled with
-types from context:::
+types from context: ::
 
 
     # ...
@@ -151,7 +151,7 @@ some cases be wrong.  It is therefore also possible to adjust these
 values at any time.
 
 Having run the conversion with the variables converted, creates a
-new output for `example.m.cpp`:::
+new output for `example.m.cpp`: ::
 
     #include <armadillo>
     using namespace arma ;
@@ -177,10 +177,10 @@ created during conversion.
 Frontend: mconvert
 ==================
 
-.. automodule:: mconvert
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. argparse::
+    :module: matlab2cpp
+    :func: create_parser
+    :prog: mconvert
 
 matlab2cpp
 ==========
