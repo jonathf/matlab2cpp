@@ -6,6 +6,7 @@ import utils
 import targets
 import collection as col
 import os
+import reference
 
 # Some code constants
 
@@ -1716,6 +1717,13 @@ Args:
         var = col.Var(assign, "_retval")
     
         cur, line = self.create_expression(assign, cur, line, end=end)
+
+        for n in utils.flatten(assign[1]):
+            if (n.cls in ("Get", "Cget", "Var", "Fvar", "Fget",
+                "Sget")) and n.name in node.func[0].names + node.func[2].names:
+
+                n.create_declare()
+
     
         func.backend = "func_lambda"
         returns.backend = "func_lambda"

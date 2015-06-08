@@ -69,7 +69,10 @@ def Lambda(node):
 
     out = ""
 
-    for declare in ldeclares:
+    for declare in declares:
+        if declare not in ldeclares:
+            continue
+
         name = declare.name
         if name != "_retval":
             out += ", " + name
