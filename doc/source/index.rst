@@ -8,6 +8,11 @@ Matlab2cpp
 Setup
 =====
 
+.. automodule:: matlab2cpp
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Matlab2cpp is a semi-automatic tool for converting code from Matlab to C++.
 
 Note that it is not meant as a complete tool for creating runnable C++ code.
@@ -132,7 +137,7 @@ To use suggestions, run conversion with the `-s` flag:
     $ mconvert example.m -s
 
 The file `example.m.py` will then automatically be filled with
-types from context:::
+types from context: ::
 
 
     # ...
@@ -151,7 +156,7 @@ some cases be wrong.  It is therefore also possible to adjust these
 values at any time.
 
 Having run the conversion with the variables converted, creates a
-new output for `example.m.cpp`:::
+new output for `example.m.cpp`: ::
 
     #include <armadillo>
     using namespace arma ;
@@ -177,18 +182,10 @@ created during conversion.
 Frontend: mconvert
 ==================
 
-.. automodule:: mconvert
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-matlab2cpp
-==========
-
-.. toctree::
-   :maxdepth: 4
-
-   matlab2cpp
+.. argparse::
+    :module: matlab2cpp
+    :func: create_parser
+    :prog: mconvert
 
 Code snippits
 =============
@@ -249,6 +246,7 @@ Module contents
     :members:
     :undoc-members:
     :show-inheritance:
+
 matlab2cpp.snippets.snippets module
 -----------------------------------
 
