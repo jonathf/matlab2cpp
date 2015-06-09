@@ -19,18 +19,16 @@ of functions that Matlab currently possesses.
 However, there is no reason for the code not to support these features in time.
 """
 
-import collection
-import node
-import targets
-import snippets
-import suppliment
+import supplement
+import utils
 
 import os
 import imp
 import argparse
 
-import utils
-from treebuilder import Treebuilder
+from treebuilder import Treebuilder, build
+from supplement import set_variables, get_variables, str_variables
+from utils import translate
 
 def create_parser():
 
@@ -99,12 +97,12 @@ def main(args):
             cfg = imp.load_source("cfg", filename + ".py")
             scope = cfg.scope
 
-            types, suggestions = suppliment.get_variables(builder.project[-1])
+            types, suggestions = supplement.get_variables(builder.project[-1])
             for name in types.keys():
                 if name in scope:
                     for key in scope[name].keys():
                         types[name][key] = scope[name][key]
-            suppliment.set_variables(builder.project[-1], types)
+            supplement.set_variables(builder.project[-1], types)
 
     if args.disp:
         print "configure tree"
@@ -152,10 +150,10 @@ def main(args):
     first = True
     for program in builder.project[2:]:
 
-        types, suggestions = suppliment.get_variables(program)
+        types, suggestions = supplement.get_variables(program)
         program["str"] = program["str"].replace("__percent__", "%")
 
-        annotation = suppliment.str_variables(types, suggestions)
+        annotation = supplement.str_variables(types, suggestions)
 
         filename = program.name
         f = open(filename + ".py", "w")

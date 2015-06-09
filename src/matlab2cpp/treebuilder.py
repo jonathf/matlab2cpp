@@ -7,7 +7,7 @@ import targets
 import collection as col
 import os
 import reference
-import suppliment
+import supplement
 
 # Some code constants
 
@@ -51,6 +51,9 @@ Args:
         self.project = col.Project()
         col.Library(self.project)
         col.Errors(self.project)
+
+    def __getitem__(self, i):
+        return self.project[i]
 
     def load(self, filename):
 
@@ -220,9 +223,9 @@ Args:
 
                 complete = True
                 for program in self.project[2:]:
-                    types, suggestions = suppliment.get_variables(program)
+                    types, suggestions = supplement.get_variables(program)
                     if [c for c in suggestions.values() if any(c)]:
-                        suppliment.set_variables(program, suggestions)
+                        supplement.set_variables(program, suggestions)
                         complete = False
 
                 if complete:
@@ -414,10 +417,10 @@ Args:
                 end += 1
     
             name = self.code[start:end]
-            func = col.Func(program, name, cur=cur, func=func)
+            func = col.Func(program, name, cur=cur, line=line)
     
             col.Declares(func)
-            col.Returns(func)
+            returns = col.Returns(func)
     
             cur = end
     
@@ -2407,15 +2410,24 @@ Args:
         return True
 
 
-if __name__ == "__main__":
+def build(code, disp=False, retall=False, suggest=False, comments=True):
 
-    code = """
-[a + b];
-    """
-    tree = Treebuilder(code, disp=True, comments=True)
+    code = code + "\n\n\n\n"
+    tree = Treebuilder("", disp=disp, comments=comments, suggestion=suggest)
     tree.code = code
     tree.create_program("unnamed")
     tree.configure()
+    if retall:
+        return tree
+    if tree[2].name == "main":
+        return tree[2][3]
+    return tree[2]
+
+if __name__ == "__main__":
+    code = """
+[a + b];
+    """
+    tree = build(code, True)
 
     project = tree.project
     print project.summary()

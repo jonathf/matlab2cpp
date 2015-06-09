@@ -343,4 +343,15 @@ def create_declare(node):
     return collection.Var(parent, name=node.name,
             type=node.type, pointer=node.pointer, value=node.value)
 
+
+def translate(node, opt=None):
+    nodes = flatten(node, False, True, False)
+    if not (opt is None) and opt.disp:
+        print "iterating %d nodes" % len(nodes)
+
+    for node in nodes[::-1]:
+        node.translate_node(opt)
+
+    return node.prop["str"]
+
 from node import Node

@@ -16,7 +16,7 @@ matrix.py       Matrix/Vector declaration
 program.py      Program as a whole. Includes and using namespace
 
 There are also type dependent nodes which must be defined
-from either context or suppliment file. These include:
+from either context or supplement file. These include:
 
 float.py        Imaginary floats
 fmat.py         Matrix of floats

@@ -11,7 +11,7 @@ kws : dict
 include : str
     Code included in top of document (typically a for for include, if needed).
 code : str
-    Code included in suppliment '.h' file.
+    Code included in supplement '.h' file.
 """
 
 complex = ({}, """#include <complex>

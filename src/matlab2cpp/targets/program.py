@@ -57,14 +57,15 @@ def number_fix(text):
 
 def Program(tree):
 
-    text = "\n\n".join(map(str, tree[:]))
+    text = "\n".join(map(str, tree[:]))
     text = add_indenting(text)
     text = number_fix(text)
+    text = re.sub(r"\n *(\n *)+", r"\n\n", text)
 
     return text
 
 
-Includes = "", "\n\n", ""
+Includes = "", "\n", ""
 Include = "%(value)s"
 
 def Library(node):

@@ -68,14 +68,7 @@ name : str
     def translate_tree(self, opt=None):
         """Generate code"""
 
-        nodes = utils.flatten(self, False, True, False)
-        if not (opt is None) and opt.disp:
-            print "iterating %d nodes" % len(nodes)
-
-        for node in nodes[::-1]:
-            node.translate_node(opt)
-
-        return self.prop["str"]
+        return utils.translate(self, opt)
 
     def properties(self):
 
