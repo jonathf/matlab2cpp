@@ -1809,13 +1809,13 @@ Args:
     
                 elif opr == self.code[k:k+len(opr)]:
     
-                    # no prefixes and no (scientific) numbers
-                    if opr in "+-" and\
-                            (self.code[last] not in letters+digits+")]}" or\
-                                self.code[k-1] in "dDeE" and self.code[k-2] in digits+"." and\
-                                        self.code[k+1] in digits):
-                        k += 1
-                        continue
+                    if opr in "+-":
+                        # no prefixes and no (scientific) numbers
+                        if self.code[last] not in letters+digits+")]}" or\
+                                self.code[k-1] in "dDeE" and self.code[k-2] in\
+                                digits+"." and self.code[k+1] in digits:
+                            k += 1
+                            continue
     
     
                     k += len(opr)-1
@@ -2087,7 +2087,7 @@ Args:
         count = False
     
         while True:
-    
+
             if self.code[k:k+3] == "...":
                 k = self.findend_dots(k)
     
@@ -2160,7 +2160,7 @@ Args:
         return k
     
     def findend_expression_space(self, start):
-    
+
         assert self.code[start] in expression_start
         k = last = start
     
@@ -2172,8 +2172,11 @@ Args:
             elif self.code[k] == "[":
                 k = last = self.findend_matrix(k)
     
-            elif self.code[k] == "'" and (self.code[k-1] != "." or k-1 != last):
-                k = last = self.findend_string(k)
+            elif self.code[k] == "'":
+                if self.is_string(k):
+                    k = last = self.findend_string(k)
+                else:
+                    last = k
     
             elif self.code[k] == "{":
                 k = last = self.findend_cell(k)
@@ -2231,7 +2234,7 @@ Args:
                 pass
     
             elif self.code[k] in "+-~":
-                if self.code[k] in " \t":
+                if self.code[k+1] in " \t":
                     return False
     
             elif self.code[k:k+2] in operator2:
@@ -2406,7 +2409,7 @@ Args:
 if __name__ == "__main__":
 
     code = """
-f([0]);
+[a + b];
     """
     tree = Treebuilder(code, disp=True, comments=True)
     tree.code = code
