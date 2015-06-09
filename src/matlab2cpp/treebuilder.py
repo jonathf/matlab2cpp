@@ -7,6 +7,7 @@ import targets
 import collection as col
 import os
 import reference
+import suppliment
 
 # Some code constants
 
@@ -219,9 +220,9 @@ Args:
 
                 complete = True
                 for program in self.project[2:]:
-                    cfg, scfg = utils.get_cfg(program)
-                    if [c for c in scfg.values() if any(c)]:
-                        utils.set_cfg(program, scfg)
+                    types, suggestions = suppliment.get_variables(program)
+                    if [c for c in suggestions.values() if any(c)]:
+                        suppliment.set_variables(program, suggestions)
                         complete = False
 
                 if complete:

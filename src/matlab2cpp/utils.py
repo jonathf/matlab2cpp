@@ -1,4 +1,7 @@
+import targets
 import collection
+import datatype
+import reference
 
 def flatten(node, ordered=False, reverse=False, inverse=False):
     r"""
@@ -66,129 +69,9 @@ reverse : bool
     return out
 
 
-def set_cfg(program, cfg):
-
-    structs = program[1]
-    for name in cfg.keys():
-
-        if name in program.names[2:]:
-
-            cfg_ = cfg[name]
-            func = program[program.names.index(name)]
-            declares, returns, params = func[0], func[1], func[2]
-
-            for key in cfg_.keys():
-
-                if key in declares.names:
-                    var = declares[declares.names.index(key)]
-                    var.type = cfg_[key]
-
-                if key in params.names:
-                    var = params[params.names.index(key)]
-                    var.type = cfg_[key]
-
-                elif key in returns.names:
-                    var = returns[returns.names.index(key)]
-                    var.type = cfg_[key]
-
-        elif name in structs.names:
-
-            cfg_ = cfg[name]
-            struct = structs[structs.names.index(name)]
-
-            for key in cfg_.keys():
-
-                if key in struct.names:
-                    var = struct[struct.names.index(key)]
-                    var.type = cfg_[key]
-
-                else:
-                    var = collection.Declare(struct, key)
-                    var.backend = "struct"
-                    var.type = cfg_[key]
 
 
-def get_cfg(program):
-    "Retrieve datatype and suggestions from tokentree"
-    cfg = {}
-    scfg = {}
-    for func in program[2:]:
-
-        cfg[func["name"]] = cfg_ = {}
-        scfg[func["name"]] = scfg_ = {}
-
-        declares, params = func[0], func[2]
-        for var in declares[:]+params[:]:
-
-            type = var.prop["type"]
-            if type == "TYPE":
-                type = ""
-            cfg_[var["name"]] = type
-
-            if not type:
-
-                type = var.prop["suggest"]
-                if type == "TYPE":
-                    type = ""
-                if type:
-                    scfg_[var["name"]] = type
-
-    for struct in program[1]:
-
-        cfg[struct["name"]] = cfg_ = {}
-        scfg[struct["name"]] = scfg_ = {}
-
-        for var in struct:
-
-            type = var.prop["type"]
-            if type == "TYPE":
-                type = ""
-            cfg_[var["name"]] = type
-
-            if not type:
-
-                type = var.prop["suggest"]
-                if type == "TYPE":
-                    type = ""
-                if type:
-                    scfg_[var["name"]] = type
-
-    return cfg, scfg
-
-
-
-def str_cfg(cfg, scfg={}, struct_cfg={}):
-
-    out = "scope = {}\n\n"
-
-    keys = cfg.keys()
-    keys.sort()
-
-    for name in keys:
-        out += '%s = scope["%s"] = {}\n' % (name, name)
-        cfg_ = cfg[name]
-
-        for key, val in cfg_.items():
-
-            if key[0] == "_":
-                if key[1:5] in ("aux_", "ret_"):
-                    continue
-
-            if val:
-                out += '%s["%s"] = "%s"\n' % (name, key, val)
-            else:
-                suggest = scfg.get(name, {}).get(key, "")
-                if suggest:
-                    out += '%s["%s"] = "" # %s\n' % (name, key, suggest)
-                else:
-                    out += '%s["%s"] = ""\n' % (name, key)
-        out += "\n"
-
-    return out
-
-
-
-def summary(node, opt):
+def node_summary(node, opt):
 
     nodes = flatten(node, False, False, False)
     if not (opt is None) and opt.disp:
@@ -216,3 +99,248 @@ def summary(node, opt):
 
     return out
 
+
+def node_translate(node, opt):
+
+    target = targets.__dict__[node.backend]
+    spesific_name = node.cls + "_" + node.name
+
+    if spesific_name in target.__dict__:
+        value = target.__dict__[spesific_name]
+
+    elif node.cls in target.__dict__:
+        value = target.__dict__[node.cls]
+
+    else:
+        print node.program.summary()
+        raise KeyError("no %s in %s" % (node.cls, node.backend))
+
+
+    if not isinstance(value, (unicode, str, list, tuple)):
+        value = value(node)
+
+    if isinstance(value, (unicode, Node)):
+        value = str(value)
+
+    elif value is None:
+        raise ValueError(
+"missing return in function %s in file %s" % (node.cls, node.backend))
+
+    node.ret = repr(value)
+
+    if not isinstance(value, str):
+
+        value = list(value)
+        children = ["%("+str(i)+")s" for i in xrange(len(node))]
+
+        if len(value) == 2:
+            value.insert(1, "")
+
+        value = value[:-1] + [value[-2]] *\
+            (len(children)-len(value)+1) + value[-1:]
+
+        if len(children) == 0:
+            value = value[0] + value[-1]
+
+        elif len(children) == 1:
+            value = value[0] + children[0] + value[-1]
+
+        else:
+
+            out = value[0]
+            for i in xrange(len(children)):
+                out += children[i] + value[i+1]
+            value = out
+
+    try:
+        value = value % node.properties()
+    except:
+        raise SyntaxError("interpolation in " + node.backend + "." +\
+                node.cls + " is misbehaving\n'" + value + "'\n"+str(node.prop))
+    # print repr(value)
+
+    node.prop["str"] = value
+
+
+def create_auxillary(node, type, convert):
+
+    assert node.parent["class"] != "Assign",\
+            ".auxiliary() must be triggered mid expression."
+
+    type = type or node.type
+
+    if not isinstance(type, str):
+        if isinstance(type[0], int):
+            type = datatype.get_name(*type)
+        else:
+            type = datatype.common_strict(type)
+
+    if type == "TYPE":
+        return node
+
+    if node.cls in ("Vector", "Matrix"):
+        backend = "matrix"
+    else:
+        backend = type
+
+    line = node
+    while line.parent.cls != "Block":
+        line = line.parent
+    block = line.parent
+
+    # Create new var
+    var = "_aux_" + type + "_"
+    if var not in line.prop:
+        line.prop[var] = 1
+    else:
+        line.prop[var] += 1
+    var = var + str(line.prop[var])
+
+    # Create Assign
+    assign = collection.Assign(block, backend=backend, type=type)
+    assign.declare.type = type
+
+    # Return value
+    aux_var = collection.Var(assign, var, backend=backend, type=type)
+    aux_var.create_declare()
+
+    if convert:
+        rhs = collection.Get(assign, "_conv_to", backend=backend,
+                type=type)
+    else:
+        rhs = assign
+
+    swap_var = collection.Var(rhs, var, backend=backend, type=type)
+    swap_var.declare.type = type
+
+    # Place Assign correctly in Block
+    i = block.children.index(line)
+    block.children = block[:i] + block[-1:] + block[i:-1]
+
+    # Swap node and Var
+    index = node.parent.children.index(node)
+    node.parent.children[index] = swap_var
+    rhs.children[-1] = node
+
+    swap_var.parent, node.parent = node.parent, swap_var.parent
+
+    # generate code
+    swap_var.translate_node()
+    aux_var.translate_node()
+    if convert:
+        rhs.translate_node()
+    assign.translate_node()
+
+    if convert:
+        assert node.type != swap_var.type
+
+    return swap_var
+
+
+def create_resize(node):
+
+    if node["_resize"]:
+        return
+    node["_resize"] = True
+
+    type = node.type
+    node.dim = 3
+
+    line = node
+    while line.parent.cls != "Block":
+        line = line.parent
+
+    resize = collection.Resize(line.parent, name=node.name, type=type)
+
+    i = line.parent.children.index(line)
+
+    ps = line.parent.children
+    line.parent.children = ps[:i] + ps[-1:] + ps[i:-1]
+
+    resize.translate_node(False)
+
+
+def create_error(node, msg, onlyw=False):
+
+    msg = msg % node.properties()
+
+    code = node.program.code
+    cur = node.cur
+    end = cur+len(node.code)
+
+    start = cur
+    while code[start] != "\n" and start != 0:
+        start -= 1
+
+    if end >= len(code):
+        end = len(code)-1
+    finish = end
+    while code[finish] != "\n" and finish != len(code)-1:
+        finish += 1
+    code = code[start:finish]
+
+    pos = cur-start
+
+    name = "%010d" % cur + node.cls
+    errors = node.program.parent[1]
+
+    if name not in errors.names:
+        if onlyw:
+            collection.Warning(errors, name=name,
+                    line=node.line, cur=pos, value=msg, code=code)
+        else:
+            collection.Error(errors, name=name,
+                    line=node.line, cur=pos, value=msg, code=code)
+
+
+def create_declare(node):
+
+    if not (node is node.declare):
+        return node
+
+    if node.cls in reference.structvars:
+        if node.cls in ("Nget", "Nset"):
+            if node[0].cls == "String":
+                return None
+            value = node[0]["value"]
+        else:
+            value = node.value
+
+        structs = node.program[1]
+        assert structs.cls == "Structs"
+
+        if node not in structs:
+            struct = collection.Struct(structs, name=node.name)
+        else:
+            struct = structs[node]
+
+        if value in struct.names:
+            return struct[struct.names.index(value)]
+
+        declares = node.func[0]
+
+        if node.cls in ("Sset", "Sget"):
+            sname = "_"+value+"_size"
+            if sname not in struct.names:
+                collection.Counter(struct, sname, value="100")
+
+            collection.Var(declares, name=node.name, value=value, type="structs")
+        else:
+            collection.Var(declares, name=node.name, value=value, type="struct")
+
+        return collection.Var(struct, name=value)
+        parent = struct
+
+    else:
+        parent = node.func[0]
+
+    if node in parent:
+        declare = parent[node]
+        declare.type = node.type
+        declare.pointer = node.pointer
+        return declare
+
+    return collection.Var(parent, name=node.name,
+            type=node.type, pointer=node.pointer, value=node.value)
+
+from node import Node

@@ -1,9 +1,7 @@
-import collection
 import datatype as dt
-import targets
 import snippets
-import utils
 import reference as ref
+import collection
 
 
 class Node(object):
@@ -64,7 +62,7 @@ name : str
 
     def summary(self):
         "Node summary"
-        return utils.summary(self, None)
+        return utils.node_summary(self, None)
 
 
     def translate_tree(self, opt=None):
@@ -87,68 +85,11 @@ name : str
             prop[str(i)] = prop["-"+str(I-i)] = self[i]["str"]
         return prop
 
-    def translate_node(node, opt=None):
-
-        target = targets.__dict__[node.backend]
-        spesific_name = node.cls + "_" + node.name
-
-        if spesific_name in target.__dict__:
-            value = target.__dict__[spesific_name]
-
-        elif node.cls in target.__dict__:
-            value = target.__dict__[node.cls]
-
-        else:
-            print node.program.summary()
-            raise KeyError("no %s in %s" % (node.cls, node.backend))
+    def translate_node(self, opt=None):
+        utils.node_translate(self, opt)
 
 
-        if not isinstance(value, (unicode, str, list, tuple)):
-            value = value(node)
-
-        if isinstance(value, (unicode, Node)):
-            value = str(value)
-
-        elif value is None:
-            raise ValueError(
-    "missing return in function %s in file %s" % (node.cls, node.backend))
-
-        node.ret = repr(value)
-
-        if not isinstance(value, str):
-
-            value = list(value)
-            children = ["%("+str(i)+")s" for i in xrange(len(node))]
-
-            if len(value) == 2:
-                value.insert(1, "")
-
-            value = value[:-1] + [value[-2]] *\
-                (len(children)-len(value)+1) + value[-1:]
-
-            if len(children) == 0:
-                value = value[0] + value[-1]
-
-            elif len(children) == 1:
-                value = value[0] + children[0] + value[-1]
-
-            else:
-
-                out = value[0]
-                for i in xrange(len(children)):
-                    out += children[i] + value[i+1]
-                value = out
-
-        try:
-            value = value % node.properties()
-        except:
-            raise SyntaxError("interpolation in " + node.backend + "." +\
-                    node.cls + " is misbehaving\n'" + value + "'\n"+str(node.prop))
-        # print repr(value)
-
-        node.prop["str"] = value
-
-    def auxiliary(self, type=None, convert=False, resize=0):
+    def auxiliary(self, type=None, convert=False):
         """Create a auxiliary variablele and
 move actual calcuations to own line.
 
@@ -157,100 +98,11 @@ Parameters
 type : str, None
     If provided, auxiliary variable type will be converted
         """
+        utils.create_auxillary(self, type, convert)
 
-        assert self.parent["class"] != "Assign",\
-                ".auxiliary() must be triggered mid expression."
-
-        type = type or self.type
-
-        if not isinstance(type, str):
-            if isinstance(type[0], int):
-                type = dt.get_name(*type)
-            else:
-                type = dt.common_strict(type)
-
-        if type == "TYPE":
-            return self
-
-        if self.cls in ("Vector", "Matrix"):
-            backend = "matrix"
-        else:
-            backend = type
-
-        line = self
-        while line.parent.cls != "Block":
-            line = line.parent
-        block = line.parent
-
-        # Create new var
-        var = "_aux_" + type + "_"
-        if var not in line.prop:
-            line.prop[var] = 1
-        else:
-            line.prop[var] += 1
-        var = var + str(line.prop[var])
-
-        # Create Assign
-        assign = collection.Assign(block, backend=backend, type=type)
-        assign.declare.type = type
-
-        # Return value
-        aux_var = collection.Var(assign, var, backend=backend, type=type)
-        aux_var.create_declare()
-
-        if convert:
-            rhs = collection.Get(assign, "_conv_to", backend=backend,
-                    type=type)
-        else:
-            rhs = assign
-
-        swap_var = collection.Var(rhs, var, backend=backend, type=type)
-        swap_var.declare.type = type
-
-        # Place Assign correctly in Block
-        i = block.children.index(line)
-        block.children = block[:i] + block[-1:] + block[i:-1]
-
-        # Swap self and Var
-        index = self.parent.children.index(self)
-        self.parent.children[index] = swap_var
-        rhs.children[-1] = self
-
-        swap_var.parent, self.parent = self.parent, swap_var.parent
-
-        # generate code
-        swap_var.translate_node()
-        aux_var.translate_node()
-        if convert:
-            rhs.translate_node()
-        assign.translate_node()
-
-        if convert:
-            assert self.type != swap_var.type
-
-        return swap_var
 
     def resize(self):
-
-        if self["_resize"]:
-            return
-        self["_resize"] = True
-
-        type = self.type
-        self.dim = 3
-
-        line = self
-        while line.parent.cls != "Block":
-            line = line.parent
-
-        resize = collection.Resize(line.parent, name=self.name, type=type)
-
-        i = line.parent.children.index(line)
-
-        ps = line.parent.children
-        line.parent.children = ps[:i] + ps[-1:] + ps[i:-1]
-
-        resize.translate_node(False)
+        utils.create_resize(self)
 
 
     def include(self, name, **kws):
@@ -265,166 +117,14 @@ type : str, None
         if key not in library:
             collection.Snippet(library, key, library_code)
 
-
-    def error_log(self):
-
-
-        for node in utils.flatten(self):
-
-            cls = node.cls
-
-            if cls == "Assign":
-                n0, n1 = node
-                t0, t1 = n0.type, n1.type
-                if "TYPE" in (t0, t1):
-                    continue
-
-                elif n0.num != n1.num:
-                    msg = "Incompatible types (%s) and (%s)" % (t0, t1)
-                    log = log + node.message(msg, "Error")
-
-                elif n0.dim == n1.dim and n0.mem < n1.mem:
-                    msg = "Type conversion (%s) and (%s)" % (t0, t1)
-                    log = log + node.message(msg, "Warning")
-
-                elif n0.dim != n1.dim:
-                    msg = "Incompatible dimensions (%s) and (%s)" % (t0, t1)
-                    log = log + node.message(msg, "Error")
-
-#              elif cls == "Var":
-#                  if node.type == "TYPE":
-#                      msg = "Undefined variable (%s)" % node["name"]
-#                      log = log + node.message(msg, "Error")
-#  
-#              elif cls == "Get":
-#                  if node.type == "TYPE":
-#                      msg = "Undefined function/array (%s)" % node["name"]
-#                      log = log + node.message(msg, "Error")
-
-            elif cls in ("Fvar", "Fget", "Fset", "Nget", "Nset", "Sset", "Sget"):
-                msg = "Fieldnames is currently not supported"
-                log = log + node.message(msg, "Error")
-
-
-            elif cls in ("Cvar", "Cget", "Cset"):
-                msg = "Cell-structures currently not supported"
-                log = log + node.message(msg, "Error")
-
-            elif cls == "Try":
-                msg = "Try-catch currently not supported"
-
-            elif cls == "While":
-                msg = "While-loops currently not supported"
-
-        return log
-
     def warning(self, msg):
-
-        msg = msg % self.properties()
-
-        code = self.program.code
-        cur = self.cur
-        end = cur+len(self.code)
-
-        start = cur
-        while code[start] != "\n" and start != 0:
-            start -= 1
-
-        if end >= len(code):
-            end = len(code)-1
-        finish = end
-        while code[finish] != "\n" and finish != len(code)-1:
-            finish += 1
-        code = code[start:finish]
-
-        pos = cur-start
-
-        name = "%010d" % cur + self.cls
-        errors = self.program.parent[1]
-
-        if name not in errors.names:
-            collection.Warning(errors, name=name,
-                    line=self.line, cur=pos, value=msg, code=code)
+        utils.create_error(self, msg, True)
 
     def error(self, msg):
+        utils.create_error(self, msg, False)
 
-        msg = msg % self.properties()
-
-        code = self.program.code
-        cur = self.cur
-        end = cur+len(self.code)
-
-        start = cur
-        while code[start] != "\n" and start != 0:
-            start -= 1
-
-        if end >= len(code):
-            end = len(code)-1
-        finish = end
-        while code[finish] != "\n" and finish != len(code)-1:
-            finish += 1
-        code = code[start:finish]
-
-        pos = cur-start
-
-        name = "%010d" % cur + self.cls
-        errors = self.program.parent[1]
-
-        if name not in errors.names:
-            collection.Error(errors, name=name,
-                    line=self.line, cur=pos, value=msg, code=code)
-
-
-    def create_declare(node):
-
-        if not (node is node.declare):
-            return node
-
-        if node.cls in ref.structvars:
-            if node.cls in ("Nget", "Nset"):
-                if node[0].cls == "String":
-                    return None
-                value = node[0]["value"]
-            else:
-                value = node.value
-
-            structs = node.program[1]
-            assert structs.cls == "Structs"
-
-            if node not in structs:
-                struct = collection.Struct(structs, name=node.name)
-            else:
-                struct = structs[node]
-
-            if value in struct.names:
-                return struct[struct.names.index(value)]
-
-            declares = node.func[0]
-
-            if node.cls in ("Sset", "Sget"):
-                sname = "_"+value+"_size"
-                if sname not in struct.names:
-                    collection.Counter(struct, sname, value="100")
-
-                collection.Var(declares, name=node.name, value=value, type="structs")
-            else:
-                collection.Var(declares, name=node.name, value=value, type="struct")
-
-            return collection.Var(struct, name=value)
-            parent = struct
-
-        else:
-            parent = node.func[0]
-
-        if node in parent:
-            declare = parent[node]
-            declare.type = node.type
-            declare.pointer = node.pointer
-            return declare
-
-        return collection.Var(parent, name=node.name,
-                type=node.type, pointer=node.pointer, value=node.value)
-
+    def create_declare(self):
+        utils.create_declare(self)
 
     def __getitem__(self, i):
         if isinstance(i, str):
@@ -469,4 +169,4 @@ type : str, None
         return self.children.pop(index)
 
 
-
+import utils

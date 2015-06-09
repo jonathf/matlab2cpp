@@ -8,28 +8,7 @@ Matlab2cpp
 Setup
 =====
 
-.. automodule:: matlab2cpp
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-Matlab2cpp is a semi-automatic tool for converting code from Matlab to C++.
-
-Note that it is not meant as a complete tool for creating runnable C++ code.
-For example, the `eval`-function will not be supported because there is no
-general way to implement it in C++.
-Instead the program is aimed as support tool, which aims at speed up the
-conversion process as much as possible for a user that needs to convert Matlab
-programs by hand anyway.
-The software does this by converting the basic structures of the
-Matlab-program (functions, branches, loops, etc.), adds
-variable declarations, and for some lower level code, do a complete
-translation.
-Any problem the program encounters will be written in a log-file.
-
-Currently, the code will not convert the large library collection
-of functions that Matlab currently possesses.
-However, there is no reason for the code not to support these features in time.
+.. automodule:: matlab2cpp.__init__
 
 Installation
 ------------
@@ -55,14 +34,13 @@ Windows:::
 The executable mconvert.py can freely be copied or be added to
 environmental variables manually.
 
-
 Usage
 -----
 
 Assuming Linux installation and ´mconvert´ available in path.
 Code works analogous in Mac and Windows.
 
-Consider the following code snippet in the file ´example.m´:::
+Consider the following code snippet in the file ´example.m´: ::
 
     function y=f(x)
         y = x+4
@@ -80,7 +58,7 @@ This will create three files: `example.m.cpp`, `example.m.py` and
 `example.m.log`.
 
 In example.m.cpp, the translated C++ code is placed. It looks as
-follows:::
+follows: ::
 
     #include <armadillo>
     using namespace arma ;
@@ -102,7 +80,7 @@ follows:::
 Matlab doesn't declare variables explicitly, so
 Matlab2cpp is not able to do a complete translation.
 To create a full conversion, the variables must be declared.
-Declarations can be done in the file `example.m.py`:::
+Declarations can be done in the file `example.m.py`: ::
 
     # Supplement file
     #
@@ -179,13 +157,20 @@ new output for `example.m.cpp`: ::
 The file `example.m.log` will contain a list of errors and warnings
 created during conversion.
 
-Frontend: mconvert
-==================
+Program frontend (`mconvert`)
+=============================
 
+TODO as soon as sphinxarg is working
 .. argparse::
     :module: matlab2cpp
     :func: create_parser
     :prog: mconvert
+
+Suppliment configuration (`.py`)
+================================
+
+.. automodule:: matlab2cpp.
+
 
 Code snippits
 =============

@@ -1,12 +1,29 @@
 #!/usr/bin/env python
 """
-Dette er en test
+Matlab2cpp is a semi-automatic tool for converting code from Matlab to C++.
+
+Note that it is not meant as a complete tool for creating runnable C++ code.
+For example, the `eval`-function will not be supported because there is no
+general way to implement it in C++.
+Instead the program is aimed as support tool, which aims at speed up the
+conversion process as much as possible for a user that needs to convert Matlab
+programs by hand anyway.
+The software does this by converting the basic structures of the
+Matlab-program (functions, branches, loops, etc.), adds
+variable declarations, and for some lower level code, do a complete
+translation.
+Any problem the program encounters will be written in a log-file.
+
+Currently, the code will not convert the large library collection
+of functions that Matlab currently possesses.
+However, there is no reason for the code not to support these features in time.
 """
 
 import collection
 import node
 import targets
 import snippets
+import suppliment
 
 import os
 import imp
@@ -82,12 +99,12 @@ def main(args):
             cfg = imp.load_source("cfg", filename + ".py")
             scope = cfg.scope
 
-            cfg, scfg = utils.get_cfg(builder.project[-1])
-            for name in cfg.keys():
+            types, suggestions = suppliment.get_variables(builder.project[-1])
+            for name in types.keys():
                 if name in scope:
                     for key in scope[name].keys():
-                        cfg[name][key] = scope[name][key]
-            utils.set_cfg(builder.project[-1], cfg)
+                        types[name][key] = scope[name][key]
+            suppliment.set_variables(builder.project[-1], types)
 
     if args.disp:
         print "configure tree"
@@ -135,22 +152,10 @@ def main(args):
     first = True
     for program in builder.project[2:]:
 
-        cfg, scfg = utils.get_cfg(program)
+        types, suggestions = suppliment.get_variables(program)
         program["str"] = program["str"].replace("__percent__", "%")
 
-        annotation = """# Supplement file
-#
-# Valid inputs:
-#
-# uword   int     float   double cx_double
-# uvec    ivec    fvec    vec    cx_vec
-# urowvec irowvec frowvec rowvec cx_rowvec
-# umat    imat    fmat    mat    cx_mat
-# ucube   icube   fcube   cube   cx_cube
-#
-# char    struct  func_lambda
-
-""" + utils.str_cfg(cfg, scfg)
+        annotation = suppliment.str_variables(types, suggestions)
 
         filename = program.name
         f = open(filename + ".py", "w")
