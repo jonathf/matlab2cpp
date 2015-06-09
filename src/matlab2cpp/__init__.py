@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """
-Matlab2cpp
-==========
+Dette er en test
 """
 
 import collection

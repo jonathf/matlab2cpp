@@ -8,6 +8,11 @@ Matlab2cpp
 Setup
 =====
 
+.. automodule:: matlab2cpp
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Matlab2cpp is a semi-automatic tool for converting code from Matlab to C++.
 
 Note that it is not meant as a complete tool for creating runnable C++ code.
@@ -182,14 +187,6 @@ Frontend: mconvert
     :func: create_parser
     :prog: mconvert
 
-matlab2cpp
-==========
-
-.. toctree::
-   :maxdepth: 4
-
-   matlab2cpp
-
 Code snippits
 =============
 
@@ -249,6 +246,7 @@ Module contents
     :members:
     :undoc-members:
     :show-inheritance:
+
 matlab2cpp.snippets.snippets module
 -----------------------------------
 
