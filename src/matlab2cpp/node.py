@@ -206,7 +206,6 @@ type : str, None
 
         swap_var = collection.Var(rhs, var, backend=backend, type=type)
         swap_var.declare.type = type
-        rhs.translate_node()
 
         # Place Assign correctly in Block
         i = block.children.index(line)
@@ -223,7 +222,8 @@ type : str, None
         swap_var.translate_node()
         aux_var.translate_node()
         if convert:
-            assign.translate_node()
+            rhs.translate_node()
+        assign.translate_node()
 
         if convert:
             assert self.type != swap_var.type

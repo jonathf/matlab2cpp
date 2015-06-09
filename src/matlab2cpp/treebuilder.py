@@ -2398,9 +2398,7 @@ Args:
 if __name__ == "__main__":
 
     code = """
-residual_prev 	= y;
-supp 		= [];
-iter_count 	= 0;
+f([0]);
     """
     tree = Treebuilder(code, disp=True, comments=True)
     tree.code = code

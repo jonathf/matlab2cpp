@@ -159,7 +159,6 @@ def Assign(node):
     lhs, rhs = node
 
     assert rhs.cls in ("Matrix", "Cell")
-    assert rhs.cls in ("Matrix")
 
     if len(rhs[0]) == 0:
         return "%(0)s.reset() ;"
