@@ -2,27 +2,27 @@
 def configure_arg(node, index):
     """
 Examples:
-    >>> print mc.translate(mc.build('x=[1,2]; x(:)'))
+    >>> print mc.qtranslate('x=[1,2]; x(:)')
     int _x [] = {1, 2} ;
     x = ivec(_x, 2, false) ;
     x(span::all) ;
-    >>> print mc.translate(mc.build('x=[1,2]; x(1)'))
+    >>> print mc.qtranslate('x=[1,2]; x(1)')
     int _x [] = {1, 2} ;
     x = ivec(_x, 2, false) ;
     x(0) ;
-    >>> print mc.translate(mc.build('x=[1,2]; x([1,2])'))
+    >>> print mc.qtranslate('x=[1,2]; x([1,2])')
     int _x [] = {1, 2} ;
     x = ivec(_x, 2, false) ;
     uword __aux_uvec_1 [] = {1, 2} ;
     _aux_uvec_1 = uvec(__aux_uvec_1, 2, false) ;
     x(_aux_uvec_1-1) ;
-    >>> print mc.translate(mc.build('x=[1,2]; x([1,2;2,1])'))
+    >>> print mc.qtranslate('x=[1,2]; x([1,2;2,1])')
     int _x [] = {1, 2} ;
     x = ivec(_x, 2, false) ;
     uword __aux_uvec_1 [] = {1, 2, 2, 1} ;
     _aux_uvec_1 = uvec(__aux_uvec_1, 4, false) ;
     x(_aux_uvec_1-1) ;
-    >>> print mc.translate(mc.build("x=[1,2]; x(x')"))
+    >>> print mc.qtranslate("x=[1,2]; x(x')")
     int _x [] = {1, 2} ;
     x = ivec(_x, 2, false) ;
     x(arma::trans(arma::trans(x))-1) ;

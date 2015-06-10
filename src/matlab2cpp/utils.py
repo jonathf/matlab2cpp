@@ -355,4 +355,26 @@ def translate(node, opt=None):
 
     return node.prop["str"]
 
+
+def build(code, disp=False, retall=False, suggest=False, comments=False):
+
+    code = code + "\n\n\n\n"
+    tree = treebuilder.Treebuilder("", disp=disp, comments=comments, suggestion=suggest)
+    tree.code = code
+    tree.create_program("unnamed")
+    tree.configure()
+    if retall:
+        return tree
+    if tree[2][2].name == "main":
+        out = tree[2][2][3]
+        del out.children[0]
+        return out
+    return tree[2]
+
+
+def qtranslate(code):
+    return translate(build(code, suggest=True))
+
+
 from node import Node
+import treebuilder

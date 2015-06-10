@@ -5,8 +5,6 @@ import string
 import utils
 import targets
 import collection as col
-import os
-import reference
 import supplement
 
 # Some code constants
@@ -214,7 +212,10 @@ Args:
                         type = node.declare.reference[1][0]
                     else:
                         type = node[1].type
-                    node[0].suggest = type
+                    if node[1].cls == "Matrix":
+                        node[0].declare.type = type
+                    else:
+                        node[0].suggest = type
 
 
                 elif node.cls == "Neg" and node[0].mem == 0:
@@ -260,9 +261,6 @@ Args:
     
             elif self.code[cur] in " \t;":
                 pass
-    
-            elif self.code[cur] == "%":
-                cur = self.findend_comment(cur)
     
             elif self.code[cur:cur+8] == "function":
                 cur, line = self.create_function(program, cur, line)
@@ -2411,29 +2409,13 @@ Args:
         return True
 
 
-def build(code, disp=False, retall=False, suggest=True, comments=True):
-
-    code = code + "\n\n\n\n"
-    tree = Treebuilder("", disp=disp, comments=comments, suggestion=suggest)
-    tree.code = code
-    tree.create_program("unnamed")
-    tree.configure()
-    if retall:
-        return tree
-    if tree[2][2].name == "main":
-        out = tree[2][2][3]
-        del out.children[0]
-        return out
-    return tree[2]
-
 if __name__ == "__main__":
     code = """
-[a + b];
+% 123
     """
-    tree = build(code, True)
+    tree = utils.build(code, True)
 
-    project = tree.project
-    print project.summary()
-    print project.translate_tree()
+    print tree.summary()
+    print tree.translate_tree()
     print code
 

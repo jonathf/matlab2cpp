@@ -89,7 +89,7 @@ Args:
     types (dict): Nested dictionary as provided in the supplement `.py` file.
 
 Example:
-    >>> prog = mc.build("function f(a,b); c=4; end", suggest=False)
+    >>> prog = mc.build("function f(a,b); c=4; end")
     >>> types = {"f": {"a":"int", "b":"vec", "c":"float"}}
     >>> mc.set_variables(prog, types)
     >>> print mc.translate(prog)
@@ -155,7 +155,7 @@ Returns: types (dict), suggestions (dict)
     One for the types set, and one for suggestions.
 
 Example:
-    >>> prog = mc.build("function f(); a=1; b='s'; end", suggest=False)
+    >>> prog = mc.build("function f(); a=1; b='s'; end")
     >>> types, suggestions = mc.get_variables(prog)
     >>> print suggestions
     {'f': {'a': 'int', 'b': 'string'}}

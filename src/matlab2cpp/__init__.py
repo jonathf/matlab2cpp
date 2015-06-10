@@ -26,9 +26,9 @@ import os
 import imp
 import argparse
 
-from treebuilder import Treebuilder, build
+from treebuilder import Treebuilder
 from supplement import set_variables, get_variables, str_variables
-from utils import translate
+from utils import translate, qtranslate, build
 
 def create_parser():
 
