@@ -32,7 +32,9 @@ Windows:::
     > Python setup.py install
 
 The executable mconvert.py can freely be copied or be added to
-environmental variables manually.
+environmental variables manually (with or without the `.py` extendtion).
+
+
 
 Example
 -------

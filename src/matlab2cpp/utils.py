@@ -102,7 +102,7 @@ def node_summary(node, opt):
 
 def node_translate(node, opt):
 
-    target = targets.__dict__[node.backend]
+    target = targets.__dict__["_"+node.backend]
     spesific_name = node.cls + "_" + node.name
 
     if spesific_name in target.__dict__:
@@ -178,10 +178,10 @@ def create_auxillary(node, type, convert):
     if type == "TYPE":
         return node
 
-    if node.cls in ("Vector", "Matrix"):
-        backend = "matrix"
-    else:
-        backend = type
+    matrix_mode = False
+    if node.cls == "Matrix":
+        matrix_mode = True
+        type = "uvec"
 
     line = node
     while line.parent.cls != "Block":
@@ -197,20 +197,21 @@ def create_auxillary(node, type, convert):
     var = var + str(line.prop[var])
 
     # Create Assign
-    assign = collection.Assign(block, backend=backend, type=type)
-    assign.declare.type = type
+    if matrix_mode:
+        assign = collection.Assign(block, type=type, backend="matrix")
+    else:
+        assign = collection.Assign(block, type=type)
 
     # Return value
-    aux_var = collection.Var(assign, var, backend=backend, type=type)
+    aux_var = collection.Var(assign, var, backend=type, type=type)
     aux_var.create_declare()
 
     if convert:
-        rhs = collection.Get(assign, "_conv_to", backend=backend,
-                type=type)
+        rhs = collection.Get(assign, "_conv_to", type=type)
     else:
         rhs = assign
 
-    swap_var = collection.Var(rhs, var, backend=backend, type=type)
+    swap_var = collection.Var(rhs, var, type=type)
     swap_var.declare.type = type
 
     # Place Assign correctly in Block

@@ -91,7 +91,7 @@ Args:
         reserved = set([])
         for i in xrange(len(unassigned)-1, -1, -1):
 
-            if unassigned[i] in targets.reserved.reserved:
+            if "_"+unassigned[i] in targets.reserved.reserved:
                 reserved.add(unassigned.pop(i))
 
         for node in nodes[::-1]:
@@ -107,7 +107,7 @@ Args:
 
             for node in nodes[::-1]:
 
-                if node.cls == "Get":
+                if node.cls in ("Get", "Var"):
 
                     if node.type == "func_lambda":
                         node.backend = "func_lambda"
@@ -127,12 +127,13 @@ Args:
 
                     # external file in same folder
                     elif node.name + ".m" in self.project:
-                        func = self.project[self.project.names.index(node.name+".m")][2]
+                        func = self.project[self.project.names.index(
+                            node.name+".m")][2]
 
                     else:
                         func = None
                         node.translate_node()
-                        if node.backend != "reserved" and\
+                        if node.cls == "Get" and node.backend != "reserved" and\
                                 node.num and node.dim<len(node):
                             node.declare.dim = len(node)
 
@@ -167,7 +168,7 @@ Args:
                             for i in xrange(len(node)):
                                 params[i].suggest = node[i].type
 
-                elif node.cls in ("Var", "Fvar", "Cget", "Fget", "Nget",
+                elif node.cls in ("Fvar", "Cget", "Fget", "Nget",
                         "Assigns", "Colon"):
                     node.translate_node()
                 elif node.cls in ("Vector", "Matrix"):
@@ -185,7 +186,7 @@ Args:
                     if node[-1].backend == "reserved":
                         node.backend = "reserved"
 
-                elif node.type == "TYPE":
+                if node.type == "TYPE":
 
                     if node.cls not in\
                             ("Set", "Cset", "Fset", "Nset", "Sset",
@@ -200,7 +201,7 @@ Args:
                     elif node.cls == "Fvar":
                         node.declare.type = node.type
 
-                elif node.backend == "unknown" and node.type != "TYPE":
+                elif node.backend == "unknown":
                     node.backend = node.type
 
                 # Assign suggestion
@@ -2410,7 +2411,7 @@ Args:
         return True
 
 
-def build(code, disp=False, retall=False, suggest=False, comments=True):
+def build(code, disp=False, retall=False, suggest=True, comments=True):
 
     code = code + "\n\n\n\n"
     tree = Treebuilder("", disp=disp, comments=comments, suggestion=suggest)
@@ -2419,8 +2420,10 @@ def build(code, disp=False, retall=False, suggest=False, comments=True):
     tree.configure()
     if retall:
         return tree
-    if tree[2].name == "main":
-        return tree[2][3]
+    if tree[2][2].name == "main":
+        out = tree[2][2][3]
+        del out.children[0]
+        return out
     return tree[2]
 
 if __name__ == "__main__":

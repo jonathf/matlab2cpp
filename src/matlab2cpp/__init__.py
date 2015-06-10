@@ -175,7 +175,7 @@ def main(args):
             first = False
 
             if args.tree_view:
-                print utils.summary(builder.project, args)
+                print utils.node_summary(builder.project, args)
             elif args.line:
                 nodes = utils.flatten(program, False, False, False)
                 for node_ in nodes:
