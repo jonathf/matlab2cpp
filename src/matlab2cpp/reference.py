@@ -1,4 +1,11 @@
+"""
+Each node has a set of node attributes that allows for quick access to node
+properties and other nodes of interest.
+For example, if the node has a name, it can be referred to by `node.name`.
+Another example is to access the parent node by `node.parent`.
 
+Note that, if a reference does not exist, the node itself will be returned.
+"""
 
 groups = [
     "Assign", "Assigns", "Branch", "For", "Func",

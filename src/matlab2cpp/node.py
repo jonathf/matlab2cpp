@@ -10,30 +10,82 @@ General definition of a token representation of code
     """
 
     dim = dt.Dim()
+    """The number of dimensions in a numerical datatype. The values 0
+through 4 represents scalar, column vector, row vector, matrix and cube
+respectively. The value is None if datatype is not numerical."""
+
     mem = dt.Mem()
+    """The amount of type-space reserved per element in a numerical datatype.
+The value 0 through 4 represents unsigned int, int, float, double and complex.
+The value is None if datatype is not numerical."""
+
     num = dt.Num()
+    """A bool value that is true if and only if the datatype is numerical."""
+
     type = dt.Type()
+    """A short string representation of the nodes datatype."""
+
     suggest = dt.Suggest()
+    """A short string representation of the suggested datatype. It is used
+for suggesting datatype in general, and can only be assigned, not read."""
+
+    pointer = ref.Property_reference("pointer")
+    """A numerical value of the reference count. The value 0 imply that the
+node refer to the actual variable, 1 is a reference to the variable, 2 is a
+reference of references, and so on."""
 
     func = ref.Func_reference()
+    "A reference to Func (function) ancestor."
+
     program = ref.Program_reference()
+    "A reference to program ancestor."
+
     line = ref.Line_reference()
+    "A refrence to the first child of a Block."
+
     group = ref.Group_reference()
+    """A reference to the first ancestor where the datatype does not
+autmatically affect nodes upwards. A list of these nodes are listed in
+mc.reference.groups`."""
+
     declare = ref.Declare_reference()
+    """A reference to the node of same name where it is defined.
+This would be under `Declares`, `Params` or `Struct`.
+Useful for setting scope defined common datatypes"""
 
     names = ref.Names()
+    """A list of the names of the nodes children."""
 
     backend = ref.Property_reference("backend")
+    """The currently set translation backend."""
+        
     str = ref.Property_reference("str")
+    """The translation of the node. Note that the code is translated leaf to
+root, and parents will not be translated before after current node is
+translated."""
+
     ret = ref.Property_reference("ret")
+    """The raw translation of the node. Same as `node.str`, but on the exact
+form the tranlsation rule returned it."""
+
     value = ref.Property_reference("value")
-    pointer = ref.Property_reference("pointer")
+    """A free variable resereved for content. The use varies from node to node."""
+
     cls = ref.Property_reference("class")
+    """A string representation of the class name. Note that the word `class`
+is reserved in Python, so the name `cls` is used instead."""
+
     name = ref.Property_reference("name")
+    """The name of the node."""
 
     line = ref.Recursive_property_reference("line")
+    """The codeline number in original code where this node was concived."""
+
     cur = ref.Recursive_property_reference("cur")
+    """The index to the position in the code where this node was concived."""
+
     code = ref.Recursive_property_reference("code")
+    """The code that concived this node."""
 
     def __init__(self, parent, name="", backend="unknown", value="",
             type="TYPE", pointer=0, line=None, cur=None, code=None):

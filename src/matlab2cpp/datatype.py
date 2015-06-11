@@ -1,3 +1,38 @@
+"""
+Each node has there own datatype.
+It can be referenced by `node.type` and can be inserted as placeholder through
+`%(type)s`.
+Note however that there are many data types available, both numerical and
+non-numerical.
+For an overview, see `supplement`.
+
+Most of the allowed datatypes are numerical values with varying type-space and
+dimensionality.
+So when addressing a numerical value, the nodes attributes `node.dim` and
+node.mem` can often be useful, since they contain direct information about that
+information.
+
+Example:
+    >>> node = mc.collection.Var("name", type="ivec")
+    >>> print node.type
+    ivec
+    >>> print node.dim, node.mem
+    (1, 1)
+
+These nodes also support dynamic rewriting of the datatype.
+Continuing our example:
+    >>> node.dim = 2
+    >>> print node.type
+    imat
+    >>> node.mem = 4
+    >>> print node.type
+    cx_mat
+
+Note that the datatype are locally defined.
+If you want to change the global datatype, change the local attributes of
+`node.declare`.
+"""
+
 dim0 = {"int", "float", "double", "uword", "cx_double"}
 dim1 = {"ivec", "fvec", "uvec", "vec", "cx_vec"}
 dim2 = {"irowvec", "frowvec", "urowvec", "rowvec", "cx_rowvec"}
