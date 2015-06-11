@@ -2,6 +2,14 @@
 
 def Assign(node):
     """
+Assignment (General case)
+
+Args:
+    node (Assign): Current position in node-tree.
+
+Returns:
+    str : Translation of current node.
+
 Examples:
     >>> print mc.qtranslate("a = b")
     a = b ;

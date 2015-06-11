@@ -1,4 +1,4 @@
-import targets
+import translations
 import collection
 import datatype
 import reference
@@ -102,7 +102,7 @@ def node_summary(node, opt):
 
 def node_translate(node, opt):
 
-    target = targets.__dict__["_"+node.backend]
+    target = translations.__dict__["_"+node.backend]
     spesific_name = node.cls + "_" + node.name
 
     if spesific_name in target.__dict__:

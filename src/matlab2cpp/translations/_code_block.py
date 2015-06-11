@@ -4,13 +4,16 @@ def Statement(node):
 Stand-alone codeline without assignment etc.
 
 Args:
-    node (Statement): Current possition in node-tree
+    node (Statement): Current position in node-tree
 
-Return: str | tuple
-    Accepted return-format
+Return:
+    str : Translation of current node.
 
-Children: Expression
-    Expression : Right hand side of expression
+Children:
+    Expression
+
+    Expression:
+        Right hand side of expression
 
 Examples:
     >>> print mc.qtranslate("'text'")
@@ -34,12 +37,16 @@ While-loop
 Args:
     node (While): Current position in node-tree
 
-Return: str | tuple
-    Accepted return-format
+Return:
+    str : Translation of current node.
 
-Children: Expression Block
-    Expression  : Loop condition
-    Block       : Loop content
+Children:
+    Expression Block
+
+    Expression:
+        Loop condition
+    Block:
+        Loop content
 
 Examples:
     >>> print mc.qtranslate("while 1, f()")
@@ -56,15 +63,20 @@ def Branch(node):
 Root of if/then/else branch
 
 Args:
-    node (Branch): Current possition in node-tree
+    node (Branch): Current position in node-tree
 
-Return: str | tuple
-    Accepted return-format
+Return:
+    str : Translation of current node.
 
-Children: If Elif* Else?
-    If      : If block
-    Elif    : Elseif block
-    Else    : Else block
+Children:
+    If Elif* Else?
+
+    If:
+        If block
+    Elif:
+        Elseif block
+    Else:
+        Else block
 
 Examples:
     >>> print mc.qtranslate("if a, b; elseif c, d; else e")
@@ -89,14 +101,18 @@ If in if/then/else branch
 
 
 Args:
-    node (If): Current possition in node-tree
+    node (If): Current position in node-tree
 
-Return: str | tuple
-    Accepted return-format
+Return:
+    str : Translation of current node.
 
-Children: Expression Block
-    Expression  : Branch condition
-    Block       : Code to be evaluated give condition
+Children:
+    Expression Block
+
+    Expression:
+        Branch condition
+    Block:
+        Code to be evaluated give condition
 
 Examples:
     >>> print mc.qtranslate("if a, b")
@@ -118,14 +134,18 @@ def Elif(node):
 Elseif in if/then/else branch
 
 Args:
-    node (Elif): Current possition in node-tree
+    node (Elif): Current position in node-tree
 
-Return: str | tuple
-    Accepted return-format
+Return:
+    str : Translation of current node.
 
-Children: Expression Block
-    Expression  : Branch condition
-    Block       : Code to be evaluated give condition
+Children:
+    Expression Block
+
+    Expression:
+        Branch condition
+    Block:
+        Code to be evaluated give condition
 
 Examples:
     >>> print mc.qtranslate("if a, b; elseif c, d")
@@ -155,13 +175,16 @@ def Else(node):
 Else in if/then/else branch
 
 Args:
-    node (Else): Current possition in node-tree
+    node (Else): Current position in node-tree
 
-Return: str | tuple
-    Accepted return-format
+Return:
+    str : Translation of current node.
 
-Children: Block
-    Block       : Code to be evaluated give condition
+Children:
+    Block
+
+    Block:
+        Code to be evaluated give condition
 
 Examples:
     >>> print mc.qtranslate("if a, b; else c")
@@ -191,15 +214,20 @@ def Switch(node):
 Root of switch/case branch
 
 Args:
-    node (Switch): Current possition in node-tree
+    node (Switch): Current position in node-tree
 
-Return: str | tuple
-    Accepted return-format
+Return:
+    str : Translation of current node.
 
-Children: Expression Case+ Otherwise?
-    Expression  : Test-expression
-    Case        : Case-block
-    Otherwise   : Otherwise-block
+Children:
+    Expression Case+ Otherwise?
+
+    Expression:
+        Test-expression
+    Case:
+        Case-block
+    Otherwise:
+        Otherwise-block
 
 Examples:
     >>> print mc.qtranslate("a=1; switch a; case b; c; otherwise; d")
@@ -225,14 +253,18 @@ def Case(node):
 Case in switch/case
 
 Args:
-    node (Case): Current possition in node-tree
+    node (Case): Current position in node-tree
 
-Return: str | tuple
-    Accepted return-format
+Return:
+    str : Translation of current node.
 
-Children: Expression Block
-    Expression  : Condition
-    Block       : Code to be evaluated give condition
+Children:
+    Expression Block
+
+    Expression:
+        Condition
+    Block:
+        Code to be evaluated give condition
 
 Example:
     >>> print mc.qtranslate("switch 1; case b; c")
@@ -266,13 +298,16 @@ def Otherwise(node):
 Otherwise in switch/case
 
 Args:
-    node (Otherwise): Current possition in node-tree
+    node (Otherwise): Current position in node-tree
 
-Return: str | tuple
-    Accepted return-format
+Return:
+    str : Translation of current node.
 
-Children: Block
-    Block       : Code to be evaluated give condition
+Children:
+    Block
+
+    Block:
+        Code to be evaluated give condition
 
 Example:
     >>> print mc.qtranslate("switch 1; case a; b; otherwise; c")
@@ -293,14 +328,18 @@ def Tryblock(node):
 Root of try/catch
 
 Args:
-    node (<+type+>): Current possition in node-tree
+    node (<+type+>): Current position in node-tree
 
-Return: str | tuple
-    Accepted return-format
+Return:
+    str : Translation of current node.
 
-Children: Try Catch+
-    Try     : Try-block
-    Catch   : Catch-block
+Children:
+    Try Catch+
+
+    Try:
+        Try-block
+    Catch:
+        Catch-block
 
 Examples:
     >>> print mc.qtranslate("try; a; catch; b")
@@ -320,12 +359,14 @@ def Try(node):
     """Try
 
 Args:
-    node (Try): Current possition in node-tree
+    node (Try): Current position in node-tree
 
-Return: str | tuple
-    Accepted return-format
+Return:
+    str : Translation of current node.
 
-Children: Block
+Children:
+    Block
+
     Block : Try content
     """
     return "try\n{\n", "", "\n}"
@@ -335,12 +376,14 @@ def Catch(node):
 Catch-block in Try/Catch
 
 Args:
-    node (Catch): Current possition in node-tree
+    node (Catch): Current position in node-tree
 
-Return: str | tuple
-    Accepted return-format
+Return:
+    str : Translation of current node.
 
-Children: Block
+Children:
+    Block
+
     Block : Catch content
     """
     
@@ -357,12 +400,14 @@ def Block(node):
 Codeblock
 
 Args:
-    node (Block): Current possition in node-tree
+    node (Block): Current position in node-tree
 
-Return: str | tuple
-    Accepted return-format
+Return:
+    str : Translation of current node.
 
-Children: Codeline*
+Children:
+    Codeline*
+
     Codeline : Sub-block, statement or assigments
 
 Examples:
@@ -391,14 +436,18 @@ def Assigns(node):
 Multiple assignment
 
 Args:
-    node (Assigns): Current possition in node-tree
+    node (Assigns): Current position in node-tree
 
-Return: str | tuple
-    Accepted return-format
+Return:
+    str : Translation of current node.
 
-Children: Lhs Lhs+ Expression
-    Lhs         : Left hand side of assignment
-    Expression  : Right hand side of assignment
+Children:
+    Lhs Lhs+ Expression
+
+    Lhs:
+        Left hand side of assignment
+    Expression:
+        Right hand side of assignment
 
 Examples:
     >>> print mc.qtranslate("[a,b,c] = d")
@@ -428,15 +477,20 @@ def For(node):
 For-loop
 
 Args:
-    node (For): Current possition in node-tree
+    node (For): Current position in node-tree
 
-Return: str | tuple
-    Accepted return-format
+Return:
+    str : Translation of current node.
 
-Children: Var Expression Block
-    Var         : Variable running the loop
-    Expression  : Container for loop (special handle for Colon)
-    Block       : Content to loop over
+Children:
+    Var Expression Block
+
+    Var:
+        Variable running the loop
+    Expression:
+        Container for loop (special handle for Colon)
+    Block:
+        Content to loop over
 
 Examples:
     >>> print mc.qtranslate("for i=1:10; a")
@@ -487,10 +541,10 @@ def Bcomment(node):
 Block comment
 
 Args:
-    node (Bcomment): Current possition in node-tree
+    node (Bcomment): Current position in node-tree
 
-Return: str | tuple
-    Accepted return-format
+Return:
+    str : Translation of current node.
 
 Examples:
     >>> print mc.qtranslate("%{ comment %}")
@@ -503,10 +557,10 @@ def Lcomment(node):
 Line comment
 
 Args:
-    node (Lcomment): Current possition in node-tree
+    node (Lcomment): Current position in node-tree
 
-Return: str | tuple
-    Accepted return-format
+Return:
+    str : Translation of current node.
 
 Examples:
     >>> print mc.qtranslate("% comment")
@@ -519,10 +573,10 @@ def Ecomment(node):
 End comment
 
 Args:
-    node (Ecomment): Current possition in node-tree
+    node (Ecomment): Current position in node-tree
 
-Return: str | tuple
-    Accepted return-format
+Return:
+    str : Translation of current node.
 
 Examples:
     >>> print mc.qtranslate("a % comment")

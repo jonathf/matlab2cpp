@@ -3,7 +3,7 @@
 
 import string
 import utils
-import targets
+import translations
 import collection as col
 import supplement
 
@@ -89,7 +89,7 @@ Args:
         reserved = set([])
         for i in xrange(len(unassigned)-1, -1, -1):
 
-            if "_"+unassigned[i] in targets.reserved.reserved:
+            if "_"+unassigned[i] in translations.reserved.reserved:
                 reserved.add(unassigned.pop(i))
 
         for node in nodes[::-1]:

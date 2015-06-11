@@ -1,4 +1,4 @@
-.. toctree::
+..tex toctree::
    :maxdepth: 2
 
 
@@ -181,4 +181,46 @@ Suppliment configuration (`matlabfile.py`)
 .. autofunction:: matlab2cpp.supplement.set_variables
 .. autofunction:: matlab2cpp.supplement.get_variables
 .. autofunction:: matlab2cpp.supplement.str_variables
+
+Code translation
+================
+
+Translation rules
+-----------------
+
+.. automodule:: matlab2cpp.translations.__init__
+
+Administrative translation
+--------------------------
+
+.. autofunction:: matlab2cpp.target._program.Program
+
+Mathematical Variables
+----------------------
+.. autofunction:: matlab2cpp.translations._arma_common.configure_arg
+
+Codeblock translation
+---------------------
+.. automodule:: matlab2cpp.supplement
+
+.. autofunction:: matlab2cpp.translations._assign_common.Assign
+
+.. autofunction:: matlab2cpp.translations._code_block.Statement
+.. autofunction:: matlab2cpp.translations._code_block.While
+.. autofunction:: matlab2cpp.translations._code_block.Branch
+.. autofunction:: matlab2cpp.translations._code_block.If
+.. autofunction:: matlab2cpp.translations._code_block.Elif
+.. autofunction:: matlab2cpp.translations._code_block.Else
+.. autofunction:: matlab2cpp.translations._code_block.Switch
+.. autofunction:: matlab2cpp.translations._code_block.Case
+.. autofunction:: matlab2cpp.translations._code_block.Otherwise
+.. autofunction:: matlab2cpp.translations._code_block.Tryblock
+.. autofunction:: matlab2cpp.translations._code_block.Try
+.. autofunction:: matlab2cpp.translations._code_block.Catch
+.. autofunction:: matlab2cpp.translations._code_block.Block
+.. autofunction:: matlab2cpp.translations._code_block.Assigns
+.. autofunction:: matlab2cpp.translations._code_block.For
+.. autofunction:: matlab2cpp.translations._code_block.Bcomment
+.. autofunction:: matlab2cpp.translations._code_block.Lcomment
+.. autofunction:: matlab2cpp.translations._code_block.Ecomment
 

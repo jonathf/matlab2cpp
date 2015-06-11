@@ -1,6 +1,16 @@
 
 def configure_arg(node, index):
     """
+Configure an argument of an vector, matrix or cube.
+
+Args:
+    node (Get, Set): Current possition in node-tree
+    index (int): argument index (starting from 0)
+
+Returns:
+    tuple: A string representation of argument and an index (-1,0,1) indicating
+    if the argument was unknown, scalar or a vector, respectively.
+
 Examples:
     >>> print mc.qtranslate('x=[1,2]; x(:)')
     int _x [] = {1, 2} ;

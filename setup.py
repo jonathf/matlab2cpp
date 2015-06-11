@@ -11,7 +11,7 @@ from distutils.core import setup
 setup(
     name='matlab2cpp',
     version='0.2',
-    packages=['matlab2cpp', 'matlab2cpp.targets',
+    packages=['matlab2cpp', 'matlab2cpp.translations',
               'matlab2cpp.testsuite', 'matlab2cpp.snippets'],
     package_dir={'': 'src'},
     url='http://github.com/jonathf/matlab2cpp',
