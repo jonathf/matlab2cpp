@@ -11,15 +11,89 @@ unknown and impossible for the Matlab2cpp software to translate.
 How to translate the behavior of an integer is vastly different from an float
 matrix.
 
+In practice, the program will not automatically assign datatype.
+The result is an fairly incomplete program and datatypes get a default
+dummy datatype `TYPE`.
+For example:
+
+    >>> print mc.qtranslate(
+    ...     "function c=f(); a = 4; b = 4.; c = a+b", suggest=False)
+    #include <armadillo>
+    using namespace arma ;
+    <BLANKLINE>
+    TYPE f()
+    {
+      TYPE a, b, c ;
+      a = 4 ;
+      b = 4. ;
+      c = a+b ;
+      return c ;
+    }
+
 To aid in the process of translation, `mconvert` automatically creates a
 supplement file.
 The name of the name of the file is the same as the source file, but with a
 `.py` extension.
 This file will also be imported (as a python script) each time `mconvert` is
 executed.
+For example:
+
+    >>> print mc.qsupplement(
+    ...     "function c=f(); a = 4; b = 4.; c = a+b", suggest=False)
+    scope = {}
+    <BLANKLINE>
+    f = scope["f"] = {}
+    f["a"] = "" # int
+    f["c"] = ""
+    f["b"] = "" # double
+
+To the right of the type assignment, the program will add a suggestion to aid
+the user.
+
 The user can automatically populate it to some degree by using the `-s` or
-`--suggestions` flag.
-In the other end, the `-r` or `--reset` flag deletes the file before process.
+`--suggestions` flag (or using the `suggest=True` flat).
+For example:
+
+    >>> print mc.qsupplement(
+    ...     "function c=f(); a = 4; b = 4.; c = a+b", suggest=True)
+    scope = {}
+    <BLANKLINE>
+    f = scope["f"] = {}
+    f["a"] = "int"
+    f["c"] = "double"
+    f["b"] = "double"
+
+The suggestions are created through an iterative process.
+The variable `a` and `b` get assigned the datatypes `int` and `double` because
+of the direct assignment of variable.
+After this, the process starts over and tries to find other variables that
+suggestion could fill out for.
+In the case of the `c` variable, the assignment on the right were and addition
+between `int` and `double`.
+To not loose precision, it then chooses to keep `double`, which is passed on to
+the `c` variable.
+In practice the suggestions can potentially fill in all datatypes automatically
+in large programs, and often quite intelligently.
+
+The resulting program will have the following complete form:
+
+    >>> print mc.qtranslate(
+    ...     "function c=f(); a = 4; b = 4.; c = a+b", suggest=True)
+    #include <armadillo>
+    using namespace arma ;
+    <BLANKLINE>
+    double f()
+    {
+      int a ;
+      double b, c ;
+      a = 4 ;
+      b = 4. ;
+      c = a+b ;
+      return c ;
+    }
+
+Variable types
+--------------
 
 The supplement file consists in practice of only variable `scope` which is a
 nested dictionary.
@@ -61,6 +135,72 @@ string       Text string
 struct       Struct container
 func_lambda  Anonymous function
 ===========  =====================
+
+
+Anonymous/Lambda functions
+--------------------------
+
+In addition to normal function, Matlab have support for anonymous function
+through the name prefix `@`.
+For example:
+
+    >>> print mc.qtranslate("function f(); g = @(x) x^2; g(4)", suggest=True)
+    #include <armadillo>
+    using namespace arma ;
+    <BLANKLINE>
+    void f()
+    {
+      std::function<int(int)> g ;
+      g = [] (int x) {pow(x,2) ; } ;
+      g(4) ;
+    }
+
+The translator creates an C++11 lambda function equivalently functionality.
+To achieve this, the translator creates an extra function in the node-tree.
+The name of the function is the same as assigned variable with a `_`-prefix (and
+a number postfix, if name is taken).
+The information about this function dictate the behaviour of the output
+The supplement file have the following form:
+
+    >>> print mc.qsupplement("function f(); g = @(x) x^2; g(4)", suggest=True)
+    scope = {}
+    <BLANKLINE>
+    _g = scope["_g"] = {}
+    _g["x"] = "int"
+    <BLANKLINE>
+    f = scope["f"] = {}
+    f["g"] = "func_lambda"
+
+The function `g` is a variable inside `f`'s function scope.
+It has the datatype `func_lambda` to indicate that it should be handled as a
+function.
+The associated function scope `_g` contains the variables inside the definition
+of the anonymous function.
+
+Data structures and structure arrays
+------------------------------------
+
+Data structures in Matlab can be constructed explicitly through the
+`struct`-function.
+However, they can also be constructed implicitly by direct assignment.
+For example will `a.b=4` create a `struct` ẁith name `a` that has one field `b`.
+When translating such a snippet, it creates a C++-struct, such that 
+
+    >>> print mc.qtranslate("function f(); a.b = 4")
+    #include <armadillo>
+    using namespace arma ;
+    <BLANKLINE>
+    struct A
+    {
+      int b ;
+    } ;
+    <BLANKLINE>
+    void f()
+    {
+      A a ;
+      a.b = 4 ;
+    }
+
 """
 
 import collection
@@ -207,7 +347,7 @@ Example:
 
 
 
-def str_variables(types, suggestions={}, structs={}):
+def str_variables(types, suggestions={}, structs={}, header=True):
     """
 Convert a nested dictionary for types, suggestions and structs and use them to
 create a suppliment text ready to be saved.
@@ -260,7 +400,7 @@ Example:
         for key, val in types_.items():
 
             if key[0] == "_":
-                if key[1:5] in ("aux_", "ret_"):
+                if key[:4] in ("_aux", "_ret"):
                     continue
 
             if val:
@@ -272,8 +412,10 @@ Example:
                 else:
                     out += '%s["%s"] = ""\n' % (name, key)
         out += "\n"
+    if header:
+        out = PREFIX + "\n" + out
 
-    return PREFIX + "\n" + out[:-2]
+    return out[:-2]
 
 if __name__ == "__main__":
     import matlab2cpp as mc

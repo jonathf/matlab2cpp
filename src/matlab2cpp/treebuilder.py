@@ -89,7 +89,7 @@ Args:
         reserved = set([])
         for i in xrange(len(unassigned)-1, -1, -1):
 
-            if "_"+unassigned[i] in translations.reserved.reserved:
+            if "_"+unassigned[i] in translations._reserved.reserved:
                 reserved.add(unassigned.pop(i))
 
         for node in nodes[::-1]:
@@ -109,11 +109,19 @@ Args:
 
                     if node.type == "func_lambda":
                         node.backend = "func_lambda"
-                        node.reference = node.declare.reference
+
+                        if not (node.parent.cls in ("Declares", "Returns", "Params")):
+                            if node.parent.cls == "Assign":
+                                node.declare.reference = \
+                                        node.parent[-1].declare.reference
+                            node.reference = node.declare.reference
 
                     # lambda scope
                     if node.backend == "func_lambda":
-                        func = node.reference
+                        if not (node.parent.cls in ("Declares", "Returns", "Params")):
+                            func = node.reference
+                        else:
+                            func = None
 
                     # local scope
                     elif node in node.program:
@@ -161,7 +169,12 @@ Args:
 
                         elif node.backend == "func_lambda":
 
-                            node.type = func[1][0].type
+                            ret = func[1][0]
+                            if ret.type != "TYPE" and node.type == "TYPE":
+                                node.type = ret.type
+                            elif ret.type == "TYPE" and node.type != "TYPE":
+                                ret.type = node.type
+
                             params = func[2]
                             for i in xrange(len(node)):
                                 params[i].suggest = node[i].type
@@ -169,17 +182,19 @@ Args:
                 elif node.cls in ("Fvar", "Cget", "Fget", "Nget",
                         "Assigns", "Colon"):
                     node.translate_node()
+
                 elif node.cls in ("Vector", "Matrix"):
+
                     node.type = [n.type for n in node]
                     node.translate_node()
 
                 elif node.cls in ("Assign", "Assigns"):
+
                     if node[-1].cls == "Matrix":
                         node.backend = "matrix"
+
                     elif node[-1].cls == "Cell":
                         node.backend = "cell"
-                    elif node[-1].backend == "func_lambda":
-                        node[0].declare.reference = node[-1].declare.reference
 
                     if node[-1].backend == "reserved":
                         node.backend = "reserved"
@@ -213,7 +228,7 @@ Args:
                     else:
                         type = node[1].type
                     if node[1].cls == "Matrix":
-                        node[0].declare.type = type
+                        node[0].suggest = type
                     else:
                         node[0].suggest = type
 
@@ -235,6 +250,7 @@ Args:
 
             else:
                 return
+
 
     def create_program(self, filename):
     
@@ -1661,9 +1677,6 @@ Args:
         line, end = self.create_lambda_func(assign, k, line)
         assign.code = self.code[cur:end+1]
     
-        assign[0].reference = assign[1].reference
-        assign[0].declare.reference = assign[1].reference
-    
         return line, end
     
     
@@ -1695,7 +1708,12 @@ Args:
             name = "lambda"
     
         program = node.program
-        name = "_%s_%d" % (name, len(program)-2)
+        name = "_%s" % (name)
+        if name in program.names:
+            i = 0
+            while name+"%d" % i in program.names:
+                i += 1
+            name = name + "%d" % i
     
         func = col.Func(program, name, cur=cur, line=line, code=self.code[cur:end+1])
     

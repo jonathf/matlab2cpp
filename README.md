@@ -1,48 +1,54 @@
-Matlab2cpp
-----------
-A semi-automatic tool for converting Matlab to C++
+Matlab2cpp is a semi-automatic tool for converting code from Matlab to C++.
 
-It is not meant as a complete tool for creating runnable C++ code.
-Instead it is a support tool, which aims at speed up the conversion
-process as much as possible.
+Note that it is not meant as a complete tool for creating runnable C++ code.
+For example, the `eval`-function will not be supported because there is no
+general way to implement it in C++.
+Instead the program is aimed as support tool, which aims at speed up the
+conversion process as much as possible for a user that needs to convert Matlab
+programs by hand anyway.
 The software does this by converting the basic structures of the
 Matlab-program (functions, branches, loops, etc.), adds
 variable declarations, and for some lower level code, do a complete
 translation.
+Any problem the program encounters will be written in a log-file.
+
 Currently, the code will not convert the large library collection
 of functions that Matlab currently possesses.
-There are also basic structures where conversion can not be perform
-as easily.
-In any case, these part of the code will be left untouched.
+However, there is no reason for the code not to support these features in time.
 
 Installation
 ------------
+
 Requirements:
+
 * Python 2.7.3
 * Armadillo (Not required for running, but generator
   creates armadillo code.)
 
 Linux/Mac:
 
-As root, run the following command:
+As root, run the following command:::
 
     $ python setup.py install
 
 The executable ´mconvert´ is now available from path.
 
-Windows:
+Windows:::
 
     > Python setup.py install
 
 The executable mconvert.py can freely be copied or be added to
-environmental variables manually.
+environmental variables manually (with or without the `.py` extendtion).
 
-Usage
------
+
+
+Example
+-------
+
 Assuming Linux installation and ´mconvert´ available in path.
 Code works analogous in Mac and Windows.
 
-Consider the following code snippet in the file ´example.m´:
+Consider the following code snippet in the file ´example.m´: ::
 
     function y=f(x)
         y = x+4
@@ -60,7 +66,7 @@ This will create three files: `example.m.cpp`, `example.m.py` and
 `example.m.log`.
 
 In example.m.cpp, the translated C++ code is placed. It looks as
-follows:
+follows: ::
 
     #include <armadillo>
     using namespace arma ;
@@ -82,7 +88,7 @@ follows:
 Matlab doesn't declare variables explicitly, so
 Matlab2cpp is not able to do a complete translation.
 To create a full conversion, the variables must be declared.
-Declarations can be done in the file `example.m.py`:
+Declarations can be done in the file `example.m.py`: ::
 
     # Supplement file
     #
@@ -117,7 +123,7 @@ To use suggestions, run conversion with the `-s` flag:
     $ mconvert example.m -s
 
 The file `example.m.py` will then automatically be filled with
-types from context:
+types from context: ::
 
 
     # ...
@@ -136,7 +142,7 @@ some cases be wrong.  It is therefore also possible to adjust these
 values at any time.
 
 Having run the conversion with the variables converted, creates a
-new output for `example.m.cpp`:
+new output for `example.m.cpp`: ::
 
     #include <armadillo>
     using namespace arma ;

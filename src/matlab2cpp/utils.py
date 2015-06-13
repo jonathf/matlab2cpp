@@ -2,6 +2,7 @@ import translations
 import collection
 import datatype
 import reference
+import supplement
 
 def flatten(node, ordered=False, reverse=False, inverse=False):
     r"""
@@ -372,8 +373,16 @@ def build(code, disp=False, retall=False, suggest=False, comments=False):
     return tree[2]
 
 
-def qtranslate(code):
-    return translate(build(code, suggest=True))
+def qtranslate(code, suggest=True):
+    return translate(build(code, suggest=suggest))
+
+def qsupplement(code, suggest=True):
+    tree = build(code, suggest=suggest, retall=True)
+    types, suggestions = supplement.get_variables(tree[2])
+    return supplement.str_variables(types, suggestions, header=False)
+
+def qlogging(code):
+    pass
 
 
 from node import Node

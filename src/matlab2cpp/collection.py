@@ -17,16 +17,16 @@ class Resize(Node):
         Node.__init__(self, parent, backend=backend, **kws)
 
 class Errors(Node):
-    def __init__(self, parent, backend="program", **kws):
+    def __init__(self, parent, backend="error_log", **kws):
         Node.__init__(self, parent, backend=backend, **kws)
 
 class Error(Node):
-    def __init__(self, parent, name, value, backend="program", **kws):
+    def __init__(self, parent, name, value, backend="error_log", **kws):
         Node.__init__(self, parent, name, value=value, backend=backend, **kws)
         self.prop["cls"] = name[10:]
 
 class Warning(Node):
-    def __init__(self, parent, name, value, backend="program", **kws):
+    def __init__(self, parent, name, value, backend="error_log", **kws):
         Node.__init__(self, parent, name, value=value, backend=backend, **kws)
         self.prop["cls"] = name[10:]
 

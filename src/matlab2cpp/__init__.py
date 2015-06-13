@@ -1,23 +1,4 @@
 #!/usr/bin/env python
-"""
-Matlab2cpp is a semi-automatic tool for converting code from Matlab to C++.
-
-Note that it is not meant as a complete tool for creating runnable C++ code.
-For example, the `eval`-function will not be supported because there is no
-general way to implement it in C++.
-Instead the program is aimed as support tool, which aims at speed up the
-conversion process as much as possible for a user that needs to convert Matlab
-programs by hand anyway.
-The software does this by converting the basic structures of the
-Matlab-program (functions, branches, loops, etc.), adds
-variable declarations, and for some lower level code, do a complete
-translation.
-Any problem the program encounters will be written in a log-file.
-
-Currently, the code will not convert the large library collection
-of functions that Matlab currently possesses.
-However, there is no reason for the code not to support these features in time.
-"""
 
 import supplement
 import utils
@@ -28,12 +9,12 @@ import argparse
 
 from treebuilder import Treebuilder
 from supplement import set_variables, get_variables, str_variables
-from utils import translate, qtranslate, build
+from utils import translate, qtranslate, qsupplement, build
 
 def create_parser():
 
     parser = argparse.ArgumentParser(
-        description="Convert Matlab code to C++")
+        description="A tool for converting Matlab code to C++")
         # "usage: %prog [options] matlab_file.m"
 
     parser.add_argument("filename",

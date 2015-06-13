@@ -1,15 +1,4 @@
-"""
-Program rules
-
-Nodes
------
-Program : The root node
-    Contains: Func, ...
-    Rule: program.py
-"""
 import re
-import time
-from datetime import datetime as date
 
 def add_indenting(text):
 
@@ -32,6 +21,10 @@ def add_indenting(text):
         lines[i] = line
 
     text = "\n".join(lines)
+
+    while text[-1:] == "\n":
+        text = text[:-1]
+
     return text
 
 
@@ -57,7 +50,7 @@ def number_fix(text):
 
 def Program(tree):
 
-    text = "\n".join(map(str, tree[:]))
+    text = "\n\n".join(map(str, tree[:]))
     text = add_indenting(text)
     text = number_fix(text)
     text = re.sub(r"\n *(\n *)+", r"\n\n", text)
@@ -90,21 +83,3 @@ namespace m2cpp
     return text
 
 Snippet = "%(value)s"
-
-def Errors(node):
-    if not node.children:
-        return ""
-    ts = time.time()
-    log = "Translated on " +\
-            date.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S\n\n')
-    return log, "\n\n", ""
-
-def Error(node):
-    return '''Error [%(line)d,%(cur)d]: %(value)s in %(cls)s
-"%(code)s"'''
-
-def Warning(node):
-    return '''Warning [%(line)d,%(cur)d]: %(value)s in %(cls)s
-"%(code)s"'''
-
-Project = ""

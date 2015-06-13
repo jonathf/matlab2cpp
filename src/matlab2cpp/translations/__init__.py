@@ -68,13 +68,15 @@ The `str(node)` is used to get the translation.
 Quick tailoring
 ~~~~~~~~~~~~~~~
 
-Unfortunately, most nodes with children are not fixed, but vary on context.
-How many children is given by `len(node)`, and create by context.
-This can often add much unnecessary complexity in translation, so a way around
-this was devised.
-Instead of returning a string, it is possible to return a tuple of strings.
+The number of children is usually not fixed, but vary on context.
+How many children is given by `len(node)` and code for each case could be
+deviced through branching.
+Unfortunatly, this adds much complexity to each node.
+So instead, it is possible return general rules that can be used on a variable
+number of childre.
+To do so return a tuple of strings in the translation.
 If, for example, three strings are returned, the three strings represents,
-prefix, infix and postfix.
+prefix, infix and postfix in bettween each child which is sorted by order.
 For example would a function call could be written as follows ::
 
     def Get(node):
