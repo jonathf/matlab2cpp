@@ -26,6 +26,7 @@ def Fset(node):
     return "%(name)s.%(value)s(", ", ", ")"
 
 def Sset(node):
+    node.pointer = 0
     return "%(name)s(", ", ", ").%(value)s"
 
 def Nset(node):
