@@ -2,52 +2,68 @@
 Matlab2cpp
 ==========
 
+
+
 Introduction
 ============
 
+
 .. include:: ../../README.md
+
+
 
 User interaction
 ================
 
-The frontend (`mconvert`)
--------------------------
 
-.. automodule:: mconvert
+The simplest way to interact with the `Matlab2cpp`-toolbox is to use the
+`mconvert` frontend.
+As noted in the introduction, the script automatically creates three files with
+extensions `.cpp`, `.py` and `.log`.
+In the next subsection, the behavior of `mconvert` will be discussed.
+In the sections after, the behavior of the `.py` and the `.log`.
+
+.. autoprogram:: mconvert:parser
+    :prog: mconvert
+
 
 The supplement configuration (`.py`-file)
 -----------------------------------------
 
 .. automodule:: matlab2cpp.supplement
-.. autoprogram:: mconvert:parser
+
 
 Translation report (`.log`-file)
 --------------------------------
 
-Code translation
-================
+.. automodule:: matlab2cpp.translations._error_log
+
+
+Application programming interface
+=================================
+
+
+Building node-tree
+------------------
+
+.. automodule:: matlab2cpp.treebuilder
+
+Treebuilder class
+~~~~~~~~~~~~~~~~~
+.. autoclass:: matlab2cpp.treebuilder.Treebuilder
+    :members:
+
 
 Translation rules
 -----------------
+
 .. automodule:: matlab2cpp.translations.__init__
 
+
 Node references
-===============
-.. automodule:: matlab2cpp.references
-
-Node properties
 ---------------
-These nodes refer to a set of properties specific to the node and are usually
-strings or simple numerical values.
-All of these values are available in translations as placeholders.
-In addition they can all be manipulated and given new values, if needed.
-For example::
-    
-    node.name = "new_name"
 
-will give a node a new (permanent) name.
-The associated placeholder `%(name)s` is then changed accordingly as well.
-
+.. automodule:: matlab2cpp.references
 .. autoattribute:: matlab2cpp.node.backend
 .. autoattribute:: matlab2cpp.node.cls
 .. autoattribute:: matlab2cpp.node.code
@@ -59,16 +75,20 @@ The associated placeholder `%(name)s` is then changed accordingly as well.
 .. autoattribute:: matlab2cpp.node.str
 .. autoattribute:: matlab2cpp.node.value
 
+
 Other nodes
 -----------
+
 .. autoattribute:: matlab2cpp.node.declare
 .. autoattribute:: matlab2cpp.node.func
 .. autoattribute:: matlab2cpp.node.group
 .. autoattribute:: matlab2cpp.node.line
 .. autoattribute:: matlab2cpp.node.program
 
+
 Datatypes
 ---------
+
 .. automodule:: matlab2cpp.datatype
 
 .. autoattribute:: matlab2cpp.node.dim
@@ -79,11 +99,15 @@ Datatypes
 .. autoattribute:: matlab2cpp.node.pointer
 
 
-Overview of Translation rules
-=============================
+
+Translation rules
+=================
+
 
 Function translation
 --------------------
+
+.. automodule:: matlab2cpp.translations._func_common
 
 Single return
 ~~~~~~~~~~~~~
@@ -102,7 +126,6 @@ Codeblock translation
 ---------------------
 
 .. automodule:: matlab2cpp.translations._code_block
-
 .. autofunction:: matlab2cpp.translations._code_block.Statement
 .. autofunction:: matlab2cpp.translations._code_block.While
 .. autofunction:: matlab2cpp.translations._code_block.Branch
@@ -122,8 +145,10 @@ Codeblock translation
 .. autofunction:: matlab2cpp.translations._code_block.Lcomment
 .. autofunction:: matlab2cpp.translations._code_block.Ecomment
 
+
 Expressions
 -----------
+
 .. automodule:: matlab2cpp.translations._expressions
 
 
@@ -131,6 +156,7 @@ Administrative translation
 --------------------------
 
 .. autofunction:: matlab2cpp.target._program.Program
+
 
 Mathematical variables
 ----------------------
@@ -140,11 +166,10 @@ Mathematical variables
 .. autofunction:: matlab2cpp.translations._assign_common.Assign
 
 
-Application programming interface
-=================================
 
-Suppliment configuration (`matlabfile.py`)
-------------------------------------------
+Library modules
+===============
+
 
 .. autofunction:: matlab2cpp.supplement.set_variables
 .. autofunction:: matlab2cpp.supplement.get_variables

@@ -49,6 +49,8 @@ For example:
 
 To the right of the type assignment, the program will add a suggestion to aid
 the user.
+The next time the `mconvert`-script is run, the inserted values will be imported
+and used.
 
 The user can automatically populate it to some degree by using the `-s` or
 `--suggestions` flag (or using the `suggest=True` flat).

@@ -1,16 +1,59 @@
 #!/usr/bin/env python
 # encoding: utf8
 
-"""
-The frontend of the Matlab2cpp program is the `mconvert` script.
-Most operations for performing a translation can be handled from it.
-"""
-
 import matlab2cpp
+import argparse
+from textwrap import dedent
 
-parser = matlab2cpp.create_parser()
+def create_parser():
+
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=dedent("""\
+The front end of the Matlab2cpp toolbox is the `mconvert` script.
+The script takes the following arguments:
+    """))
+
+    parser.add_argument("filename",
+            help="File containing valid Matlab code.")
+
+    parser.add_argument("-t", '--tree', action="store_true",
+            help="""\
+Print the underlying node tree. Each line in the output represents a node and
+is formated as follows:
+
+`<codeline> <position> <class> <backend> <datatype> <name> <translation>`
+
+The indentation represents the tree structure.
+            """)
+
+    parser.add_argument("-s", '--suggest', action="store_true",
+            help="""\
+Automatically populate the `<filename>.py` file with datatype with suggestions
+if possible.""")
+
+    parser.add_argument("-r", '--reset', action="store_true",
+            help="""\
+Ignore the content of `<filename>.py` and make a fresh translation.""")
+
+    parser.add_argument("-d", '--disp', action="store_true",
+            help="""\
+Print out the progress of the translation process.""")
+
+    parser.add_argument("-c", '--comments', action="store_true",
+            help="""\
+Strip away all the comments in the output of the translation.""")
+
+    parser.add_argument("-l", '--line', type=int, dest="line",
+            help="Only display code related to code line number `<line>`.")
+
+    return parser
+
+
+parser = create_parser()
 
 if __name__ == "__main__":
+
     args = parser.parse_args()
     matlab2cpp.main(args)
 

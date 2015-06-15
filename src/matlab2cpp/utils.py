@@ -360,10 +360,10 @@ def translate(node, opt=None):
 def build(code, disp=False, retall=False, suggest=False, comments=False):
 
     code = code + "\n\n\n\n"
-    tree = treebuilder.Treebuilder("", disp=disp, comments=comments, suggestion=suggest)
+    tree = treebuilder.Treebuilder("", disp=disp, comments=comments)
     tree.code = code
     tree.create_program("unnamed")
-    tree.configure()
+    tree.configure(2*suggest)
     if retall:
         return tree
     if tree[2][2].name == "main":

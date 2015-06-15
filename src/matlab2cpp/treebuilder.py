@@ -34,18 +34,30 @@ string_prefix = " \t\n=><"
 class Treebuilder(object):
     """Convert Matlab-code to Tokentree"""
 
-    def __init__(self, folder, disp=False, comments=True, suggestion=True):
+    def __init__(self, folder=None, code=None, disp=False, comments=True):
         """
-Args:
-    code (str): string-representation of code
-    disp (bool): Display output
-    comments (bool): Include comments
-    suggestion (bool): Fill in suggestion
+    Kwargs:
+        folder (str):
+            The path to matlab project root. Either `folder` or `code` must be
+            provided. If `folder` is used, the module function `load` can be
+            used to load multiple files.
+        code (str):
+            Raw matlab code to load. Either `folder` or `code` must be provided.
+        disp (bool):
+            Verbose output while loading code.
+        comments (bool):
+            Include comments in the code interpretation.
         """
-        self.folder = folder
+
+        assert not (folder is None) or not (code is None)
+
+        if folder:
+            self.folder = folder
+        if code:
+            self.code = code
+
         self.disp = disp
         self.comments = comments
-        self.suggestion = suggestion
         self.project = col.Project()
         col.Library(self.project)
         col.Errors(self.project)
@@ -54,6 +66,18 @@ Args:
         return self.project[i]
 
     def load(self, filename):
+        """
+    Load a Matlab file into the node tree.
+
+    Will throw and exception if module loaded without the `folder` option.
+
+    Args:
+        filename (str):
+            Valid name of file accessible from `folder`.
+        """
+
+        if not hasattr(self, "folder"):
+            raise AttributeError("Module not in file-reading-mode.")
 
         if self.disp:
             print "loading", filename
@@ -98,7 +122,7 @@ Args:
 
         return unassigned
 
-    def configure(self):
+    def configure(self, suggest=True):
 
         nodes = utils.flatten(self.project, False, True, False)
         while True:
@@ -236,7 +260,7 @@ Args:
                 elif node.cls == "Neg" and node[0].mem == 0:
                     node.mem = 1
 
-            if self.suggestion:
+            if suggest:
 
                 complete = True
                 for program in self.project[2:]:
@@ -247,6 +271,9 @@ Args:
 
                 if complete:
                     return
+
+                if suggest == 1:
+                    suggest = 0
 
             else:
                 return
