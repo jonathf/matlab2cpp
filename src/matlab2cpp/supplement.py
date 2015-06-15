@@ -131,12 +131,13 @@ The names are equivalent to the ones in the Armadillo package.
 
 The non-numerical types are as follows:
 
-===========  =====================
+===========  ======================
 char         Single text character
 string       Text string
 struct       Struct container
+structs      Struct array container
 func_lambda  Anonymous function
-===========  =====================
+===========  ======================
 
 
 Anonymous/Lambda functions
@@ -185,7 +186,7 @@ Data structures and structure arrays
 Data structures in Matlab can be constructed explicitly through the
 `struct`-function.
 However, they can also be constructed implicitly by direct assignment.
-For example will `a.b=4` create a `struct` ẁith name `a` that has one field `b`.
+For example will `a.b=4` create a `struct` with name `a` that has one field `b`.
 When translating such a snippet, it creates a C++-struct, such that 
 
     >>> print mc.qtranslate("function f(); a.b = 4")
