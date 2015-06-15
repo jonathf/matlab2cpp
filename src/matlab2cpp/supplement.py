@@ -257,16 +257,17 @@ Example:
             for key in types_.keys():
 
                 if key in declares.names:
+
+                    if key in returns.names:
+                        var = returns[returns.names.index(key)]
+                        var.type = types_[key]
+
                     var = declares[declares.names.index(key)]
-                    var.type = types_[key]
 
-                if key in params.names:
+                elif key in params.names:
                     var = params[params.names.index(key)]
-                    var.type = types_[key]
 
-                elif key in returns.names:
-                    var = returns[returns.names.index(key)]
-                    var.type = types_[key]
+                var.type = types_[key]
 
         elif name in structs.names:
 
@@ -276,8 +277,13 @@ Example:
             for key in types_.keys():
 
                 if key in struct.names:
+
                     var = struct[struct.names.index(key)]
-                    var.type = types_[key]
+
+                    if var.cls == "Counter":
+                        var.value = str(types_[key])
+                    else:
+                        var.type = types_[key]
 
                 else:
                     var = collection.Declare(struct, key)
@@ -335,7 +341,11 @@ Example:
             type = var.prop["type"]
             if type == "TYPE":
                 type = ""
-            types_[var["name"]] = type
+
+            if var.cls == "Counter":
+                types_[var.name] = var.value
+            else:
+                types_[var.name] = type
 
             if not type:
 
@@ -401,11 +411,17 @@ Example:
 
         for key, val in types_.items():
 
-            if key[0] == "_":
+            if key[:1] == "_":
                 if key[:4] in ("_aux", "_ret"):
                     continue
 
-            if val:
+                if key[-5:] == "_size":
+                    if val:
+                        out += '%s["%s"] = %s\n' % (name, key, val)
+                    else:
+                        out += '%s["%s"] = 100\n' % (name, key)
+
+            elif val:
                 out += '%s["%s"] = "%s"\n' % (name, key, val)
             else:
                 suggest = suggestions.get(name, {}).get(key, "")

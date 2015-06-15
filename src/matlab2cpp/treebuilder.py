@@ -62,6 +62,12 @@ class Treebuilder(object):
         col.Library(self.project)
         col.Errors(self.project)
 
+        if disp:
+            if not (folder is None):
+                print "Loaded module in import-mode"
+            else:
+                print "Loaded module in standalone-mode"
+
     def __getitem__(self, i):
         return self.project[i]
 
@@ -731,7 +737,7 @@ class Treebuilder(object):
     def create_assign_variable(self, node, cur, line, end=None):
     
         assert self.code[cur] in letters
-    
+
         k = cur+1
         while self.code[k] in letters+digits+"_":
             k += 1
@@ -815,8 +821,8 @@ class Treebuilder(object):
                             (cur, line),
                     print repr(self.code[cur:end])
 
-                    node = col.Sset(node, name, value, cur=cur, line=line,
-                            code=self.code[cur:end], pointer=1)
+                node = col.Sset(node, name, value, cur=cur, line=line,
+                        code=self.code[cur:end], pointer=1)
 
                 last, line = self.create_list(node, k, line)
                 cur = end
@@ -2456,7 +2462,7 @@ class Treebuilder(object):
 
 if __name__ == "__main__":
     code = """
-% 123
+a(1).b = 4
     """
     tree = utils.build(code, True)
 

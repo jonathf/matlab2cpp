@@ -20,7 +20,7 @@ def main(args):
     if args.disp:
         print "building tree..."
 
-    builder = Treebuilder(dirname, args.disp, args.comments)
+    builder = Treebuilder(dirname, disp=args.disp, comments=args.comments)
 
     filenames = [os.path.basename(path)]
 
@@ -53,12 +53,12 @@ def main(args):
             cfg = imp.load_source("cfg", filename + ".py")
             scope = cfg.scope
 
-            types, suggestions = supplement.get_variables(builder.project[-1])
+            types, suggestions = get_variables(builder.project[-1])
             for name in types.keys():
                 if name in scope:
                     for key in scope[name].keys():
                         types[name][key] = scope[name][key]
-            supplement.set_variables(builder.project[-1], types)
+            set_variables(builder.project[-1], types)
 
     if args.disp:
         print "configure tree"
@@ -130,7 +130,7 @@ def main(args):
 
             first = False
 
-            if args.tree_view:
+            if args.tree:
                 print utils.node_summary(builder.project, args)
             elif args.line:
                 nodes = utils.flatten(program, False, False, False)
