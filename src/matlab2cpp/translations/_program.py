@@ -22,9 +22,6 @@ def add_indenting(text):
 
     text = "\n".join(lines)
 
-    while text[-1:] == "\n":
-        text = text[:-1]
-
     return text
 
 
@@ -47,6 +44,21 @@ def number_fix(text):
     text = re.sub(r"\+-", r"-", text)
     return text
 
+def strip(text):
+
+    start = 0
+    while text[start] in "\n ":
+        start += 1
+    end = 0
+    while text[end-1] in "\n ":
+        end -= 1
+    if end:
+        text = text[start:end]
+    else:
+        text = text[start:]
+
+    return text
+
 
 def Program(tree):
 
@@ -54,6 +66,7 @@ def Program(tree):
     text = add_indenting(text)
     text = number_fix(text)
     text = re.sub(r"\n *(\n *)+", r"\n\n", text)
+    text = strip(text)
 
     return text
 

@@ -62,8 +62,8 @@ For example:
     <BLANKLINE>
     f = scope["f"] = {}
     f["a"] = "int"
-    f["c"] = "double"
     f["b"] = "double"
+    f["c"] = "double"
 
 The suggestions are created through an iterative process.
 The variable `a` and `b` get assigned the datatypes `int` and `double` because
@@ -462,7 +462,11 @@ Example:
         out += '%s = scope["%s"] = {}\n' % (name, name)
         types_ = types[name]
 
-        for key, val in types_.items():
+        keys2 = types_.keys()
+        keys2.sort()
+
+        for key in keys2:
+            val = types_[key]
 
             if key[:1] == "_":
                 if key[:4] in ("_aux", "_ret"):
