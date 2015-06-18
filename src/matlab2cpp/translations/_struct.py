@@ -17,7 +17,7 @@ def Struct(node):
             type == "std::function"
 
         if type == "structs":
-            type = "int"
+            continue
 
         if type not in declares:
             declares[type] = []

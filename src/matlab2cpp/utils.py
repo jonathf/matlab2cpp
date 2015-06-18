@@ -322,7 +322,7 @@ def create_declare(node):
         declares = node.func[0]
 
         if node.cls in ("Sset", "Sget"):
-            sname = "_"+value+"_size"
+            sname = "_size"
             if sname not in struct.names:
                 collection.Counter(struct, sname, value="100")
 

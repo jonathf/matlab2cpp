@@ -119,10 +119,11 @@ class Treebuilder(object):
         reserved = set([])
         for i in xrange(len(unassigned)-1, -1, -1):
 
-            if "_"+unassigned[i] in translations._reserved.reserved:
+            if unassigned[i] in translations._reserved.reserved:
                 reserved.add(unassigned.pop(i))
 
         for node in nodes[::-1]:
+
             if node.name in reserved:
                 node.backend = "reserved"
 
@@ -156,22 +157,22 @@ class Treebuilder(object):
                     # local scope
                     elif node in node.program:
                         func = node.program[node]
+                        node.backend = func.backend
 
                     # external file in same folder
                     elif node in self.project:
                         func = self.project[node][2]
+                        node.backend = func.backend
 
                     # external file in same folder
                     elif node.name + ".m" in self.project:
                         func = self.project[self.project.names.index(
                             node.name+".m")][2]
+                        node.backend = func.backend
 
                     else:
                         func = None
                         node.translate_node()
-                        if node.cls == "Get" and node.backend != "reserved" and\
-                                node.num and node.dim<len(node):
-                            node.declare.dim = len(node)
 
                     if not (func is None):
                         if node.backend == "func_return":
@@ -209,8 +210,7 @@ class Treebuilder(object):
                             for i in xrange(len(node)):
                                 params[i].suggest = node[i].type
 
-                elif node.cls in ("Fvar", "Cget", "Fget", "Nget",
-                        "Assigns", "Colon"):
+                elif node.cls in ("Fvar", "Cget", "Fget", "Nget", "Colon"):
                     node.translate_node()
 
                 elif node.cls in ("Vector", "Matrix"):
@@ -226,8 +226,8 @@ class Treebuilder(object):
                     elif node[-1].cls == "Cell":
                         node.backend = "cell"
 
-                    if node[-1].backend == "reserved":
-                        node.backend = "reserved"
+                    else:
+                        node.translate_node()
 
                 if node.type == "TYPE":
 
@@ -686,7 +686,7 @@ class Treebuilder(object):
     
         cur_, line =  self.create_expression(assigns, cur, line)
     
-        assigns["name"] = assigns[-1]["name"]
+        assigns.name = assigns[-1].name
     
         return cur_, line
     
@@ -726,7 +726,7 @@ class Treebuilder(object):
             k += 1
     
         cur_, line = self.create_expression(assign, k, line, end)
-        assign["name"] = assign[-1]["name"]
+        assign.name = assign[-1].name
     
         assert len(assign) == 2
     
@@ -1012,6 +1012,7 @@ class Treebuilder(object):
             cur += 1
     
         cur, line = self.create_variable(for_loop, cur, line)
+        for_loop[0].create_declare()
     
         cur += 1
         while self.code[cur] in " \t":
@@ -1463,8 +1464,6 @@ class Treebuilder(object):
                         code=self.code[cur:end+1])
     
                 cur, line = self.create_expression(node, k, line)
-    
-                node.create_declare()
     
     
             elif self.code[k] in letters:

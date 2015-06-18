@@ -8,7 +8,8 @@ def Returns(node):
     if node.backend == "func_returns":
         out = ""
         for child in node[:]:
-            out += ", " + child.type + " " + str(child)
+            out += ", " + child.type + "& " + str(child)
+        print out
         return out[2:]
 
     if node.backend == "func_lambda":
@@ -36,9 +37,42 @@ def Params(node):
 
 def Declares(node):
 
-    if node.backend in ("func_return", "func_returns"):
+    if node.backend == "func_return":
         declares = {}
         for child in node[:]:
+
+            type = child.type
+
+            if type == "func_lambda":
+                ret = child.reference[1][0].type
+                params = [n.type for n in child.reference[2]]
+                params = ", ".join(params)
+                type = "std::function<"+ret+"("+params+")>"
+
+            elif type == "struct":
+                type = child.name.capitalize()
+
+            elif type == "structs":
+                type = child.name.capitalize()
+
+
+            if type not in declares:
+                declares[type] = []
+            declares[type].append(child)
+
+        out = ""
+        for key, val in declares.items():
+            out = out + "\n" + key + " " + ", ".join([str(v) for v in val]) + " ;"
+
+        return out[1:]
+
+    if node.backend == "func_returns":
+
+        declares = {}
+        for child in node[:]:
+
+            if child in node.parent[1]:
+                continue
 
             type = child.type
 
@@ -74,8 +108,10 @@ def Declares(node):
 def Func(node):
 
     if node.backend == "func_return":
-        type = node[1][0].type
-        return type + " %(name)s(%(2)s)\n{\n%(0)s\n%(3)s\nreturn %(1)s ;\n}"
+        node.type = node[1][0].type
+        if node[-1][-1] and node[-1][-1][-1].cls == "Return":
+            return "%(type)s %(name)s(%(2)s)\n{\n%(0)s\n%(3)s\n}"
+        return "%(type)s %(name)s(%(2)s)\n{\n%(0)s\n%(3)s\nreturn %(1)s ;\n}"
 
     if node.backend == "func_returns":
 

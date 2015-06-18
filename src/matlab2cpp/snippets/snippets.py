@@ -14,9 +14,6 @@ code : str
     Code included in supplement '.h' file.
 """
 
-complex = ({}, """#include <complex>
-#include <cmath>""", "")
-
 armadillo = ({}, """#include <armadillo>
 using namespace arma ;""", "")
 
@@ -37,7 +34,7 @@ s(ii) = step * ii + a;
 return s;
 }""")
 
-nextpow2 = ({}, "",
+nextpow2 = ({}, '<#include <mconvert.h>>',
 """inline int nextpow2(int n)
 {
 n = abs(n);
@@ -51,4 +48,36 @@ p++;
 return p;
 }""")
 
+length = ({}, "",
+"""template<typename T1>
+arma::uword length(const T1& A)
+{
+return T1.n_elem;
+}""")
 
+hankel = ({}, "",
+"""template<typename T1, typename T2>
+inline arma::Mat<typename T1::elem_type> hankel(const T1& c, const T2& r)
+{
+int nc = r.n_elem;
+int nr = c.n_elem;
+if (r[0] != c[0])
+{
+//("hankel: differing diagonal element. Using the column one");
+}
+arma::Mat<typename T1::elem_type> retval(nr, nc);
+for (int i = 1; i <= std::min(nr, nc); i++)
+{
+retval.submat(1-1, nr-i, i-1, i-1) = c.rows(i-1, nr-1);
+}
+int tmp = 1;
+if (nc <= nr)
+{
+tmp = nr-nc+2;
+}
+for (int i = nr; i >= tmp; i--)
+{
+retval.submat(2+nr-i-1, nc-1, i-1, i-1) = arma::trans(r.cols(2-1, nc-nr+i-1));
+}
+return retval;
+}""")

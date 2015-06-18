@@ -31,11 +31,9 @@ def Get(node):
                 node.dim = 3
             else:
                 node.dim = 1
-                arg1 = "span("+arg1+")"
         else:
             if dim1:
                 node.dim = 2
-                arg0 = "span("+arg0+")"
             else:
                 node.dim = 0
 
@@ -58,30 +56,21 @@ def Get(node):
                     node.dim = 4
                 else:
                     node.dim = 3
-                    arg2 = "span("+arg2+")"
             else:
                 if dim2:
                     node.dim = 3
-                    arg1 = "span("+arg1+")"
                 else:
                     node.dim = 1
-                    arg1 = "span("+arg1+")"
-                    arg2 = "span("+arg2+")"
 
         else:
             if dim1:
                 if dim2:
                     node.dim = 3
-                    arg0 = "span("+arg0+")"
                 else:
                     node.dim = 1
-                    arg0 = "span("+arg0+")"
-                    arg2 = "span("+arg2+")"
             else:
                 if dim2:
                     node.dim = 1
-                    arg0 = "span("+arg0+")"
-                    arg1 = "span("+arg1+")"
                 else:
                     node.dim = 0
 
@@ -120,11 +109,9 @@ def Set(node):
                 node.dim = 3
             else:
                 node.dim = 1
-                arg1 = "span("+arg1+")"
         else:
             if dim1:
                 node.dim = 2
-                arg0 = "span("+arg0+")"
             else:
                 node.dim = 0
 
@@ -146,30 +133,21 @@ def Set(node):
                     node.dim = 4
                 else:
                     node.dim = 3
-                    arg2 = "span("+arg2+")"
             else:
                 if dim2:
                     node.dim = 3
-                    arg1 = "span("+arg1+")"
                 else:
                     node.dim = 1
-                    arg1 = "span("+arg1+")"
-                    arg2 = "span("+arg2+")"
 
         else:
             if dim1:
                 if dim2:
                     node.dim = 3
-                    arg0 = "span("+arg0+")"
                 else:
                     node.dim = 1
-                    arg0 = "span("+arg0+")"
-                    arg2 = "span("+arg2+")"
             else:
                 if dim2:
                     node.dim = 1
-                    arg0 = "span("+arg0+")"
-                    arg1 = "span("+arg1+")"
                 else:
                     node.dim = 0
 

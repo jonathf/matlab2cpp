@@ -34,11 +34,9 @@ def Get(node):
                 node.dim = 3
             else:
                 node.dim = 1
-                arg1 = "span("+arg1+")"
         else:
             if dim1:
                 node.dim = 2
-                arg0 = "span("+arg0+")"
             else:
                 node.dim = 0
 
@@ -74,11 +72,9 @@ def Set(node):
                 node.dim = 3
             else:
                 node.dim = 1
-                arg1 = "span("+arg1+")"
         else:
             if dim1:
                 node.dim = 2
-                arg0 = "span("+arg0+")"
             else:
                 node.dim = 0
 

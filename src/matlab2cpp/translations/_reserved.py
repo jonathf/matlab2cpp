@@ -11,7 +11,7 @@ reserved = {
 "false", "true", "pi", "inf", "Inf", "nan", "NaN",
 "eye", "flipud", "length", "max", "min", "size",
 "transpose", "ctranspose",
-"abs",
+"abs", "nextpow2", "fft", "ifft", "hankel",
 "zeros", "round", "return", "rand", "floor",
 "clear", "close", "plot", "hold",
 "_conv_to", "_reshape",
@@ -176,8 +176,12 @@ def Assigns_size(node):
     raise NotImplementedError
 
 def Get_length(node):
-    node.type = "int"
-    return "length(%(0)s)"
+    node.type = "uword"
+    node.include("length")
+    if node.cls == "Var":
+        return "%(0)s.n_elem"
+
+    return "m2cpp::length(%(0)s)"
 
 
 def Get_min(node):
@@ -330,17 +334,19 @@ def Get_flipud(node):
 
 def Get_zeros(node):
 
-    if len(node) == 1:
-        node.type = "vec"
-        return "arma::zeros<vec>(%(0)s)"
-    if len(node) == 2:
-        node.type = "mat"
-        return "arma::zeros<mat>(%(0)s, %(1)s)"
-    if len(node) == 3:
-        node.type = "cube"
-        return "arma::zeros<cube>(%(0)s, %(1)s, %(2)s)"
+    if node.parent.cls == "Assign" and node.parent[0].type != "TYPE":
+        node.type = node.parent[0].type
 
-    raise NotImplementedError
+    elif len(node) == 1:
+        node.type = "vec"
+
+    elif len(node) == 2:
+        node.type = "mat"
+
+    elif len(node) == 3:
+        node.type = "cube"
+
+    return "arma::zeros<%(type)s>(", ", ", ")"
 
 def Get_round(node):
 
@@ -427,3 +433,93 @@ def Get__conv_to(node):
 
 def Get__reshape(node):
     return "%(value)s(", ", ", ")"
+
+def Get_nextpow2(node):
+    node.include("nextpow2")
+    return "m2cpp::nextpow2(", ", ", ")"
+
+def Get_fft(node):
+
+    if len(node) == 1:
+        return "arma::fft(%(0)s)"
+
+    elif len(node) == 2:
+        return "arma::fft(%(0)s, %(1)s)"
+
+    elif len(node) == 3:
+
+        if node[2].cls == "Int":
+
+            if node[2].value == "1":
+
+                if node[1].cls == "Matrix" and len(node[1][0])==0:
+                    return "arma::fft(%(0)s)"
+
+                else:
+                    return "arma::fft(%(0)s, %(1)s)"
+
+            elif node[2].value == "2":
+
+                if node[1].cls == "Matrix" and len(node[1][0])==0:
+                    return "arma::transpose(arma::fft(arma::transpose(%(0)s)))"
+
+                else:
+                    return "arma::transpose(arma::fft(arma::transpose(%(0)s), %(1)s))"
+
+            else:
+                node.error("Third argument in 'fft' should either be '1' or '2'")
+
+        else:
+            node.warning("Third argument in 'fft' is assumed to be '1'")
+
+    else:
+        node.error("Number of args in 'fft' should be between 1 and 3")
+
+    return "arma::fft(", ", ", ")"
+
+def Get_ifft(node):
+
+    if len(node) == 1:
+        return "arma::ifft(%(0)s)"
+
+    elif len(node) == 2:
+        return "arma::ifft(%(0)s, %(1)s)"
+
+    elif len(node) == 3:
+
+        if node[2].cls == "Int":
+
+            if node[2].value == "1":
+
+                if node[1].cls == "Matrix" and len(node[1][0])==0:
+                    return "arma::ifft(%(0)s)"
+
+                else:
+                    return "arma::ifft(%(0)s, %(1)s)"
+
+            elif node[2].value == "2":
+
+                if node[1].cls == "Matrix" and len(node[1][0])==0:
+                    return "arma::transpose(arma::ifft(arma::transpose(%(0)s)))"
+
+                else:
+                    return "arma::transpose(arma::ifft(arma::transpose(%(0)s), %(1)s))"
+
+            else:
+                node.error("Third argument in 'ifft' should either be '1' or '2'")
+
+        else:
+            node.warning("Third argument in 'ifft' is assumed to be '1'")
+
+    else:
+        node.error("Number of args in 'ifft' should be between 1 and 3")
+
+    if node[0].mem != 4:
+        node.warning("Argument datatype of 'ifft' should be complex")
+
+    return "arma::ifft(", ", ", ")"
+
+def Get_hankel(node):
+
+    node.include("hankel")
+    return "m2cpp::hankel(", ", ", ")"

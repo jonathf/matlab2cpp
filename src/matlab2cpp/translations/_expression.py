@@ -36,6 +36,42 @@ def Return(node):
 
 # simple operators
 def Mul(node):
+    dim = node[0].dim
+    for child in node[1:]:
+
+        if dim == 0:
+            dim = node.dim
+
+        if dim == 1:
+            if node.dim == 0:
+                dim = 1
+            elif node.dim == 1:
+                node.error("multiplication shape mismatch, colvec*colvec")
+            elif node.dim == 2:
+                dim = 3
+            elif node.dim == 3:
+                node.error("multiplication shape mismatch, colvec*matrix")
+            elif node.dim == 4:
+                node.error("multiplication shape mismatch, colvec*cube")
+
+        elif dim == 2:
+            if node.dim == 0:
+                dim = 2
+            elif node.dim == 1:
+                dim = 0
+            elif node.dim == 2:
+                node.error("multiplication shape mismatch, rowvec*rowvec")
+            elif node.dim in (3,4):
+                dim = node.dim
+
+        elif dim == 3:
+            if node.dim == 0:
+                dim = 3
+            elif node.dim == 1:
+                dim = 1
+            elif node.dim == 2:
+                node.error("multiplication shape mismatch, matrix*rowvec")
+
     return "", "*", ""
 
 def Elmul(node):
@@ -57,17 +93,17 @@ Band    = "", "&&", ""
 Land    = "", "&", ""
 Bor     = "", "||", ""
 Lor     = "", "|", ""
-Div     = "", "/", ""
 
 def Eldiv(node):
     out = ""
-    for child in node[::-1]:
+    for child in node:
         out = out + "/" + str(child)
     return out[1:]
 
 def Div(node):
     if 0 in {n.dim for n in node}:
         return Eldiv(node)
+
     out = str(node[0])
 
     for child in node[1:]:
@@ -83,6 +119,7 @@ def Exp(node):
     for child in node[1:]:
         out = "pow(" + str(out) + "," + str(child) + ")"
     return out
+
 def Elexp(node):
     out = str(node[0])
     for child in node[1:]:
@@ -112,7 +149,20 @@ def Ctranspose(node):
     return "arma::strans(", "", ")"
 
 def Rdiv(node):
-    return "", "/", ""
+    if 0 in {n.dim for n in node}:
+        return Elrdiv(node)
+
+    out = str(node[0])
+
+    for child in node[1:]:
+        if child.dim == 3:
+            out = "arma::solve(" +out + ", " + str(child) + ")"
+        else:
+            out = str(child) + "/" + out
+
+    node.type = node[0].type
+
+    return out
 
 def Elrdiv(node):
     children = map(str, node[:])[::-1]

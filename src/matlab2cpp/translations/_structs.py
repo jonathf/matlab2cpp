@@ -5,6 +5,6 @@ def Counter(node):
 
 def Var(node):
  
-    index = node.declare.parent.names.index("_"+node.value+"_size")
+    index = node.declare.parent.names.index("_size")
     number = node.declare.parent[index].value
     return node.name + "[" + number + "]"

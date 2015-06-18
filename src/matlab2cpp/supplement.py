@@ -189,21 +189,73 @@ However, they can also be constructed implicitly by direct assignment.
 For example will `a.b=4` create a `struct` with name `a` that has one field `b`.
 When translating such a snippet, it creates a C++-struct, such that 
 
-    >>> print mc.qtranslate("function f(); a.b = 4")
+    >>> print mc.qtranslate("function f(); a.b = 4.", suggest=True)
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
     struct A
     {
-      int b ;
+      double b ;
     } ;
     <BLANKLINE>
     void f()
     {
       A a ;
-      a.b = 4 ;
+      a.b = 4. ;
     }
 
+In the suppliment file, the local variable `a` will be assigned as a `struct`.
+In addition, since the struct has content, the suppliment file creates a new
+section for the new struct.
+It will have the following form:
+
+    >>> print mc.qsupplement("function f(); a.b = 4.", suggest=True)
+    scope = {}
+    <BLANKLINE>
+    a = scope["a"] = {}
+    a["b"] = "double"
+    <BLANKLINE>
+    f = scope["f"] = {}
+    f["a"] = "struct"
+
+Given that the data structure is in the form of an array, the process is similar
+to a single element.
+There is only two differences.
+In the translation, the struct is declared as an array:
+
+    >>> print mc.qtranslate("function f(); a(1).b = 4.", suggest=True)
+    #include <armadillo>
+    using namespace arma ;
+    <BLANKLINE>
+    struct A
+    {
+      double b ;
+    } ;
+    <BLANKLINE>
+    void f()
+    {
+      A a[100] ;
+      a(1).b = 4. ;
+    }
+
+The translation assigned reserves 100 pointers for the content of `a`.
+Obviously, there are situations where this isn't enough, and the number should
+be increase.
+This leads to the second difference between structs and struct arrays:
+In struct part of the suppliment file, the number of array elements is set as
+its own variable `_size` and the variable now is donoted as `structs`:
+
+    >>> print mc.qsupplement("function f(); a(1).b = 4.", suggest=True)
+    scope = {}
+    <BLANKLINE>
+    a = scope["a"] = {}
+    a["_size"] = 100
+    a["b"] = "double"
+    <BLANKLINE>
+    f = scope["f"] = {}
+    f["a"] = "structs"
+
+As illustrated the `_size` variable should be an integer.
 """
 
 import collection
