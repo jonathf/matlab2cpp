@@ -41,8 +41,8 @@ class Library(Node):
         Node.__init__(self, parent, backend=backend, **kws)
 
 class Snippet(Node):
-    def __init__(self, parent, name, value, backend="program", **kws):
-        Node.__init__(self, parent, name, value=value, backend=backend, **kws)
+    def __init__(self, parent, name, backend="program", **kws):
+        Node.__init__(self, parent, name, backend=backend, **kws)
 
 class Program(Node):
     def __init__(self, parent, name="program", backend="program", **kws):
@@ -53,8 +53,8 @@ class Includes(Node):
     def __init__(self, parent, backend="program", **kws):
         Node.__init__(self, parent, backend=backend, **kws)
 class Include(Includes):
-    def __init__(self, parent, name, value, backend="program", **kws):
-        Node.__init__(self, parent, name=name, value=value, backend=backend, **kws)
+    def __init__(self, parent, name, backend="program", **kws):
+        Node.__init__(self, parent, name=name, backend=backend, **kws)
 
 class Structs(Node):
     def __init__(self, parent, backend="struct", **kws):
@@ -100,10 +100,10 @@ class Elexp(Opr):           pass
 class Mul(Opr):             pass
 class Minus(Opr):           pass
 class Elmul(Opr):           pass
-class Div(Opr):             pass
-class Eldiv(Opr):           pass
-class Rdiv(Opr):            pass
-class Elrdiv(Opr):          pass
+class Matrixdivision(Opr):      pass
+class Elementdivision(Opr):     pass
+class Leftmatrixdivision(Opr):  pass
+class Leftelementdivision(Opr): pass
 class Plus(Opr):            pass
 class Colon(Opr):           pass
 class Gt(Opr):              pass

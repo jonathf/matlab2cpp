@@ -72,7 +72,7 @@ def Program(tree):
 
 
 Includes = "", "\n", ""
-Include = "%(value)s"
+Include = "%(name)s"
 
 def Library(node):
 
@@ -95,4 +95,4 @@ namespace m2cpp
     text = add_indenting(text)
     return text
 
-Snippet = "%(value)s"
+Snippet = "%(name)s"

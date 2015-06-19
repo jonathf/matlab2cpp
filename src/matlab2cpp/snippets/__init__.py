@@ -3,13 +3,14 @@ import snippets
 def retrieve(node, name, **kws):
 
     prms, include_code, library_code = snippets.__dict__.get(name)
-    prms.update(kws)
-    include_code = include_code % prms
-    library_code = library_code % prms
 
-    keys = prms.keys()
-    keys.sort()
-    vals = [prms[key] for key in keys]
-    key = name+"_"+"_".join(vals)
+    params = {}
+    params.update(node.prop)
+    params.update(prms)
+    params.update(kws)
+    params["file"] = node.program.name + ".h"
 
-    return key, include_code, library_code
+    include_code = include_code % params
+    library_code = library_code % params
+
+    return include_code, library_code

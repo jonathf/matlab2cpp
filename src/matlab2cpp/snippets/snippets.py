@@ -12,12 +12,14 @@ include : str
     Code included in top of document (typically a for for include, if needed).
 code : str
     Code included in supplement '.h' file.
+
+The value '%(file)s' will be substituted with the name of the file.
 """
 
 armadillo = ({}, """#include <armadillo>
 using namespace arma ;""", "")
 
-span = ({}, "",
+span = ({}, '#include "%(file)s"',
 """arma::uvec span(int a, int step, int b)
 {
 arma::uvec s((arma::uword)0);
@@ -34,7 +36,7 @@ s(ii) = step * ii + a;
 return s;
 }""")
 
-nextpow2 = ({}, '<#include <mconvert.h>>',
+nextpow2 = ({}, '#include "%(file)s"',
 """inline int nextpow2(int n)
 {
 n = abs(n);
@@ -48,14 +50,14 @@ p++;
 return p;
 }""")
 
-length = ({}, "",
+length = ({}, '#include "%(file)s"',
 """template<typename T1>
 arma::uword length(const T1& A)
 {
 return T1.n_elem;
 }""")
 
-hankel = ({}, "",
+hankel = ({}, '#include "%(file)s"',
 """template<typename T1, typename T2>
 inline arma::Mat<typename T1::elem_type> hankel(const T1& c, const T2& r)
 {

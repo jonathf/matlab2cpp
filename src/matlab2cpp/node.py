@@ -152,15 +152,15 @@ type : str, None
 
     def include(self, name, **kws):
 
-        key, include_code, library_code = snippets.retrieve(self, name, **kws)
+        include_code, library_code = snippets.retrieve(self, name, **kws)
 
         includes = self.program[0]
-        if key not in includes.names:
-            collection.Include(includes, key, include_code)
+        if include_code not in includes.names:
+            collection.Include(includes, include_code, value=includes.value)
 
         library = self.program.parent[0]
-        if key not in library:
-            collection.Snippet(library, key, library_code)
+        if library_code not in library:
+            collection.Snippet(library, library_code)
 
     def warning(self, msg):
         utils.create_error(self, msg, True)

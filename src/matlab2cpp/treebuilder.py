@@ -141,7 +141,10 @@ class Treebuilder(object):
                     if node.type == "func_lambda":
                         node.backend = "func_lambda"
 
-                        if not (node.parent.cls in ("Declares", "Returns", "Params")):
+                        if not (node.parent.cls in \
+                                ("Declares", "Returns", "Params")) and\
+                                hasattr(node.parent[-1].declare, "reference"):
+
                             if node.parent.cls == "Assign":
                                 node.declare.reference = \
                                         node.parent[-1].declare.reference
@@ -149,7 +152,7 @@ class Treebuilder(object):
 
                     # lambda scope
                     if node.backend == "func_lambda":
-                        if not (node.parent.cls in ("Declares", "Returns", "Params")):
+                        if hasattr(node, "reference"):
                             func = node.reference
                         else:
                             func = None
@@ -253,8 +256,9 @@ class Treebuilder(object):
                     var.suggest = "int"
 
                 elif node.cls == "Assign" and node[0].cls != "Set":
-                    if node[1].type == "func_lambda" and node[1].cls == "Get":
-                        type = node.declare.reference[1][0]
+                    if node[1].type == "func_lambda" and\
+                            hasattr(node.declare, "reference"):
+                        type = node.declare.reference[1][0].type
                     else:
                         type = node[1].type
                     if node[1].cls == "Matrix":
@@ -276,13 +280,34 @@ class Treebuilder(object):
                         complete = False
 
                 if complete:
-                    return
+                    break
 
                 if suggest == 1:
                     suggest = 0
 
             else:
-                return
+                break
+
+        for program in self.project[2:]:
+
+            includes = program[0]
+            for func in program[2:]:
+                if func.backend == "func_return":
+                    code = "\n" + func[1][0].type + " " + func.name + "(" +\
+                        ", ".join([p.type + " " + p.name for p in func[2]]) + ") ;"
+                    col.Include(includes, code)
+
+                elif func.backend == "func_returns" and not func[1]:
+                    code = "\nvoid " + func.name + "(" +\
+                        ", ".join([p.type + " " + p.name for p in func[2]]) + ") ;"
+                    col.Include(includes, code)
+
+                elif func.backend == "func_returns" and func[1]:
+                    code = "\nvoid " + func.name + "(" +\
+                        ", ".join([p.type + " " + p.name for p in func[2]]) + ", " +\
+                        ", ".join([p.type + "& " + p.name for p in func[1]]) + ") ;"
+                    col.Include(includes, code)
+    
 
 
     def create_program(self, filename):
@@ -292,7 +317,7 @@ class Treebuilder(object):
     
         # Create intial nodes
         program = col.Program(self.project, name=filename, line=0, cur=0, code=self.code)
-        includes = col.Includes(program)
+        includes = col.Includes(program, value=filename)
         includes.include("armadillo")
     
         col.Structs(program)
@@ -329,7 +354,6 @@ class Treebuilder(object):
             if len(self.code)-cur<=2:
                 break
             cur += 1
-    
         return program
     
     
@@ -1999,10 +2023,10 @@ class Treebuilder(object):
     
         if opr == "^":      return col.Exp
         elif opr == ".^":   return col.Elexp
-        elif opr == "\\":   return col.Rdiv
-        elif opr == ".\\":  return col.Elrdiv
-        elif opr == "/":    return col.Div
-        elif opr == "./":   return col.Rdiv
+        elif opr == "\\":   return col.Leftmatrixdivision
+        elif opr == ".\\":  return col.Leftelementdivision
+        elif opr == "/":    return col.Matrixdivision
+        elif opr == "./":   return col.Elementdivision
         elif opr == "*":    return col.Mul
         elif opr == ".*":   return col.Elmul
         elif opr == "+":    return col.Plus
@@ -2461,7 +2485,9 @@ class Treebuilder(object):
 
 if __name__ == "__main__":
     code = """
-a(1).b = 4
+function x = cgsolve(A, b)
+x = A(b);
+end
     """
     tree = utils.build(code, True)
 

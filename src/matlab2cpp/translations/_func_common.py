@@ -9,7 +9,6 @@ def Returns(node):
         out = ""
         for child in node[:]:
             out += ", " + child.type + "& " + str(child)
-        print out
         return out[2:]
 
     if node.backend == "func_lambda":

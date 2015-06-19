@@ -94,13 +94,13 @@ Land    = "", "&", ""
 Bor     = "", "||", ""
 Lor     = "", "|", ""
 
-def Eldiv(node):
+def Elementdivision(node):
     out = ""
     for child in node:
         out = out + "/" + str(child)
     return out[1:]
 
-def Div(node):
+def Matrixdivision(node):
     if 0 in {n.dim for n in node}:
         return Eldiv(node)
 
@@ -113,6 +113,41 @@ def Div(node):
             out = str(child) + "/" + out
 
     return out
+
+def Leftmatrixdivision(node):
+    if 0 in {n.dim for n in node}:
+        return Elrdiv(node)
+
+    out = str(node[0])
+    mem = node[0].mem
+
+    for child in node[1:]:
+        if child.dim == 3:
+            out = "arma::solve(" +out + ", " + str(child) + ")"
+        elif child.mem < 2 and mem < 2:
+            out = str(child) + "*1./" + out
+            mem = 2
+        else:
+            out = str(child) + "/" + out
+        mem = max(mem, child.mem)
+
+    node.type = node[0].type
+
+    return out
+
+def Leftelementdivision(node):
+    out = str(node[-1])
+    mem = node[-1].mem
+
+    for child in node[-2::-1]:
+        if child.mem < 2 and mem < 2:
+            out = str(child) + "*1./" + out
+            mem = 2
+        else:
+            out = str(child) + "/" + out
+    
+    return out
+
 
 def Exp(node):
     out = str(node[0])
@@ -132,10 +167,10 @@ Not = "not ", "", ""
 
 def Transpose(node):
     if not node.num:
-        return "arma::trans(", "", ")"
-    if node.dim == 1:
+        return "arma::trans(%(0)s)"
+    if node[0].dim == 1:
         node.dim = 2
-    elif node.dim == 2:
+    elif node[0].dim == 2:
         node.dim = 1
     return "arma::trans(", "", ")"
 
@@ -147,26 +182,6 @@ def Ctranspose(node):
     elif node.dim == 3:
         node.dim = 2
     return "arma::strans(", "", ")"
-
-def Rdiv(node):
-    if 0 in {n.dim for n in node}:
-        return Elrdiv(node)
-
-    out = str(node[0])
-
-    for child in node[1:]:
-        if child.dim == 3:
-            out = "arma::solve(" +out + ", " + str(child) + ")"
-        else:
-            out = str(child) + "/" + out
-
-    node.type = node[0].type
-
-    return out
-
-def Elrdiv(node):
-    children = map(str, node[:])[::-1]
-    return "/".join(children)
 
 def Colon(node):
 
