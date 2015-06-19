@@ -40,38 +40,38 @@ def Mul(node):
     for child in node[1:]:
 
         if dim == 0:
-            dim = node.dim
+            dim = child.dim
 
         if dim == 1:
-            if node.dim == 0:
+            if child.dim == 0:
                 dim = 1
-            elif node.dim == 1:
-                node.error("multiplication shape mismatch, colvec*colvec")
-            elif node.dim == 2:
+            elif child.dim == 1:
+                child.error("multiplication shape mismatch, colvec*colvec")
+            elif child.dim == 2:
                 dim = 3
-            elif node.dim == 3:
-                node.error("multiplication shape mismatch, colvec*matrix")
-            elif node.dim == 4:
-                node.error("multiplication shape mismatch, colvec*cube")
+            elif child.dim == 3:
+                child.error("multiplication shape mismatch, colvec*matrix")
+            elif child.dim == 4:
+                child.error("multiplication shape mismatch, colvec*cube")
 
         elif dim == 2:
-            if node.dim == 0:
+            if child.dim == 0:
                 dim = 2
-            elif node.dim == 1:
+            elif child.dim == 1:
                 dim = 0
-            elif node.dim == 2:
-                node.error("multiplication shape mismatch, rowvec*rowvec")
-            elif node.dim == 3:
+            elif child.dim == 2:
+                child.error("multiplication shape mismatch, rowvec*rowvec")
+            elif child.dim == 3:
                 dim = 3
 
         elif dim == 3:
-            if node.dim == 0:
+            if child.dim == 0:
                 dim = 3
-            elif node.dim == 1:
+            elif child.dim == 1:
                 dim = 1
-            elif node.dim == 2:
-                node.error("multiplication shape mismatch, matrix*rowvec")
-            elif node.dim == 3:
+            elif child.dim == 2:
+                child.error("multiplication shape mismatch, matrix*rowvec")
+            elif child.dim == 3:
                 dim = 3
 
     node.dim = dim
@@ -170,42 +170,42 @@ def Matrixdivision(node):
             mem = max(mem, child.mem)
 
             if dim == 0:
-                dim = node.dim
+                dim = child.dim
 
             elif dim == 1:
-                if node.dim == 0:
+                if child.dim == 0:
                     dim = 1
-                elif node.dim == 1:
+                elif child.dim == 1:
                     node.error("Matrix division error 'colvec\\colvec'")
-                elif node.dim == 2:
+                elif child.dim == 2:
                     dim = 3
-                elif node.dim == 3:
+                elif child.dim == 3:
                     node.error("Matrix division error 'colvec\\matrix'")
-                elif node.dim == 3:
+                elif child.dim == 3:
                     node.error("Matrix division error 'colvec\\cube'")
 
             elif dim == 2:
-                if node.dim == 0:
+                if child.dim == 0:
                     dim = 2
-                elif node.dim == 1:
+                elif child.dim == 1:
                     dim = 0
-                elif node.dim == 2:
+                elif child.dim == 2:
                     node.error("Matrix division error 'rowvec\\rowvec'")
-                elif node.dim == 3:
+                elif child.dim == 3:
                     dim = 2
-                elif node.dim == 4:
+                elif child.dim == 4:
                     dim = 3
 
             elif dim == 3:
-                if node.dim == 0:
+                if child.dim == 0:
                     dim = 3
-                elif node.dim == 1:
+                elif child.dim == 1:
                     dim = 1
-                elif node.dim == 2:
+                elif child.dim == 2:
                     node.error("Matrix division error 'matrix\\rowvec'")
-                elif node.dim == 3:
+                elif child.dim == 3:
                     dim = 3
-                elif node.dim == 4:
+                elif child.dim == 4:
                     dim = 4
 
     node.type = (dim, mem)
