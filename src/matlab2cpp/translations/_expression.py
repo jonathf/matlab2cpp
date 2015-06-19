@@ -61,8 +61,8 @@ def Mul(node):
                 dim = 0
             elif node.dim == 2:
                 node.error("multiplication shape mismatch, rowvec*rowvec")
-            elif node.dim in (3,4):
-                dim = node.dim
+            elif node.dim == 3:
+                dim = 3
 
         elif dim == 3:
             if node.dim == 0:
@@ -71,6 +71,10 @@ def Mul(node):
                 dim = 1
             elif node.dim == 2:
                 node.error("multiplication shape mismatch, matrix*rowvec")
+            elif node.dim == 3:
+                dim = 3
+
+    node.dim = dim
 
     return "", "*", ""
 
@@ -95,47 +99,28 @@ Bor     = "", "||", ""
 Lor     = "", "|", ""
 
 def Elementdivision(node):
-    out = ""
-    for child in node:
-        out = out + "/" + str(child)
-    return out[1:]
 
-def Matrixdivision(node):
-    if 0 in {n.dim for n in node}:
-        return Eldiv(node)
-
-    out = str(node[0])
-
-    for child in node[1:]:
-        if child.dim == 3:
-            out = "arma::solve(" +out + ", " + str(child) + ")"
-        else:
-            out = str(child) + "/" + out
-
-    return out
-
-def Leftmatrixdivision(node):
-    if 0 in {n.dim for n in node}:
-        return Elrdiv(node)
+    if node.type == "TYPE":
+        return "", "/", ""
 
     out = str(node[0])
     mem = node[0].mem
 
-    for child in node[1:]:
-        if child.dim == 3:
-            out = "arma::solve(" +out + ", " + str(child) + ")"
-        elif child.mem < 2 and mem < 2:
+    for child in node:
+        if child.mem < 2 and mem < 2:
             out = str(child) + "*1./" + out
             mem = 2
         else:
-            out = str(child) + "/" + out
+            out = out + "/" + str(child)
         mem = max(mem, child.mem)
-
-    node.type = node[0].type
 
     return out
 
 def Leftelementdivision(node):
+
+    if node.type == "TYPE":
+        return "", "/", ""
+
     out = str(node[-1])
     mem = node[-1].mem
 
@@ -147,6 +132,164 @@ def Leftelementdivision(node):
             out = str(child) + "/" + out
     
     return out
+
+
+def Matrixdivision(node):
+
+    if node.type == "TYPE":
+        return "", "/", ""
+
+    out = str(node[0])
+    mem = node[0].mem
+    dim = node[0].dim
+
+
+    if {n.dim for n in node} == {0}:
+
+        for child in node[1:]:
+            if child.mem < 2 and mem < 2:
+                out = str(child) + "*1./" + out
+                mem = 2
+            else:
+                out = out + "/" + str(child)
+            mem = max(mem, child.mem)
+
+    else:
+
+        for child in node[1:]:
+
+            if child.dim == 3:
+                out = "arma::solve(" + str(child) + ".t(), " + out + ".t()).t()"
+
+            elif child.mem < 2 and mem < 2:
+                out = out + "*1./" + str(child)
+                mem = 2
+
+            else:
+                out = out + "/" + str(child)
+            mem = max(mem, child.mem)
+
+            if dim == 0:
+                dim = node.dim
+
+            elif dim == 1:
+                if node.dim == 0:
+                    dim = 1
+                elif node.dim == 1:
+                    node.error("Matrix division error 'colvec\\colvec'")
+                elif node.dim == 2:
+                    dim = 3
+                elif node.dim == 3:
+                    node.error("Matrix division error 'colvec\\matrix'")
+                elif node.dim == 3:
+                    node.error("Matrix division error 'colvec\\cube'")
+
+            elif dim == 2:
+                if node.dim == 0:
+                    dim = 2
+                elif node.dim == 1:
+                    dim = 0
+                elif node.dim == 2:
+                    node.error("Matrix division error 'rowvec\\rowvec'")
+                elif node.dim == 3:
+                    dim = 2
+                elif node.dim == 4:
+                    dim = 3
+
+            elif dim == 3:
+                if node.dim == 0:
+                    dim = 3
+                elif node.dim == 1:
+                    dim = 1
+                elif node.dim == 2:
+                    node.error("Matrix division error 'matrix\\rowvec'")
+                elif node.dim == 3:
+                    dim = 3
+                elif node.dim == 4:
+                    dim = 4
+
+    node.type = (dim, mem)
+
+    return out
+
+def Leftmatrixdivision(node):
+
+    if node.type == "TYPE":
+        return "", "/", ""
+
+    out = str(node[0])
+    mem = node[0].mem
+    dim = node[0].dim
+
+    if {n.dim for n in node} == {0}:
+
+        for child in node[1:]:
+            if child.mem < 2 and mem < 2:
+                out = str(child) + "*1./" + out
+                mem = 2
+            else:
+                out = out + "/" + str(child)
+            mem = max(mem, child.mem)
+
+    else:
+
+        for child in node[1:]:
+
+            if child.dim == 3:
+                out = "arma::solve(" + out + ", " + str(child) + ")"
+
+            elif child.mem < 2 and mem < 2:
+                out = str(child) + "*1./" + out
+                mem = 2
+
+            else:
+                out = str(child) + "/" + out
+
+            mem = max(mem, child.mem)
+
+            if dim == 0:
+                dim = node.dim
+
+            elif dim == 1:
+                if node.dim == 0:
+                    dim = 1
+                elif node.dim == 1:
+                    node.error("Matrix division error 'colvec\\colvec'")
+                elif node.dim == 2:
+                    dim = 3
+                elif node.dim == 3:
+                    node.error("Matrix division error 'colvec\\matrix'")
+                elif node.dim == 3:
+                    node.error("Matrix division error 'colvec\\cube'")
+
+            elif dim == 2:
+                if node.dim == 0:
+                    dim = 2
+                elif node.dim == 1:
+                    dim = 0
+                elif node.dim == 2:
+                    node.error("Matrix division error 'rowvec\\rowvec'")
+                elif node.dim == 3:
+                    dim = 2
+                elif node.dim == 4:
+                    dim = 3
+
+            elif dim == 3:
+                if node.dim == 0:
+                    dim = 3
+                elif node.dim == 1:
+                    dim = 1
+                elif node.dim == 2:
+                    node.error("Matrix division error 'matrix\\rowvec'")
+                elif node.dim == 3:
+                    dim = 3
+                elif node.dim == 4:
+                    dim = 4
+
+    node.type = (dim, mem)
+
+    return out
+
 
 
 def Exp(node):
