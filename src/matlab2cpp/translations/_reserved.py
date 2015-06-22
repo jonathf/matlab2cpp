@@ -15,6 +15,7 @@ reserved = {
 "zeros", "round", "return", "rand", "floor",
 "clear", "close", "plot", "hold",
 "_conv_to", "_reshape",
+"interp1"
 }
 
 # Common attribute
@@ -117,17 +118,13 @@ def Var_return(node):
 
 def Get_size(node):
 
-    if node[0].type == "TYPE":
+    if node[0].type == "TYPE" or node.parent.cls == "Assigns":
         return "size(", ", ", ")"
 
-    var = node[0]
-    if var.cls != "Var":
-        var = var.auxiliary()
-    var = str(var)
-
+    var = str(node[0])
     if len(node) > 1:
 
-        node.type = "int"
+        node.type = "uword"
         arg2 = node[1]["value"]
         if arg2 == "1":
             return var+".n_rows"
@@ -137,18 +134,33 @@ def Get_size(node):
             return var+".n_slices"
 
     elif node[0].dim in (1,2):
-        node.type = "int"
+        node.type = "uword"
         return var+".n_elem"
 
     elif node[0].dim == 3:
-        node.type = "ivec"
+        node.type = "urowvec"
+        if node.parent.cls not in ("Statement", "Assign"):
+            return str(node.auxiliary())
+
+        node.parent.backend = "reserved"
+        node.parent.name = "size"
         return "{%(0)s.n_rows, %(0)s.n_cols}"
 
     elif node[0].dim == 4:
-        node.type = "ivec"
+        node.type = "urowvec"
+        if node.parent.cls not in ("Statement", "Assign"):
+            return str(node.auxiliary())
+
+        node.parent.backend = "reserved"
+        node.parent.name = "size"
         return "{%(0)s.n_rows, %(0)s.n_cols, %(0)s.n_slices}"
 
     return "size(", ", ", ")"
+
+def Assign_size(node):
+    num = node[-1][0].dim == 3 and "2" or "3"
+    return "uword _%(0)s [] = %(1)s ;\n"+\
+            "%(0)s = urowvec(_%(0)s, " + num + ", false) ;"
 
 def Assigns_size(node):
 
@@ -346,6 +358,18 @@ def Get_zeros(node):
     elif len(node) == 3:
         node.type = "cube"
 
+    if node[0].num and node[0].dim in (1,2):
+
+        if node[0].cls != "Var":
+            node[0].auxiliary()
+
+        if node.dim in (1,2):
+            return "arma::zeros<%(type)s>(%(0)s(0))"
+        if node.dim == 3:
+            return "arma::zeros<%(type)s>(%(0)s(0), %(0)s(1))"
+        if node.dim == 4:
+            return "arma::zeros<%(type)s>(%(0)s(0), %(0)s(1), %(0)s(2))"
+
     return "arma::zeros<%(type)s>(", ", ", ")"
 
 def Get_round(node):
@@ -523,3 +547,12 @@ def Get_hankel(node):
 
     node.include("hankel")
     return "m2cpp::hankel(", ", ", ")"
+
+def Get_interp1(node):
+    node.include("interp1")
+    node.error("'interp1' uses matlib library")
+    if node[-1].cls == "String" and node[-1].value == "linear":
+        return "matlib::interp1<matlib::row, double, double, double>"\
+                "(%(0)s, %(1)s, %(2)s, matlib::linear)"
+
+    return "interp1(", ", ", ")" 

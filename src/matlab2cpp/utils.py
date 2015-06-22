@@ -182,7 +182,9 @@ def create_auxillary(node, type, convert):
     matrix_mode = False
     if node.cls == "Matrix":
         matrix_mode = True
-        type = "uvec"
+
+    if matrix_mode and type == "int" and node.group.cls in ("Get", "Set"):
+        type = "uword"
 
     line = node
     while line.parent.cls != "Block":

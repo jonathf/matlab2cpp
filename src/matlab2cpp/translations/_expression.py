@@ -112,7 +112,7 @@ def Elementdivision(node):
 
     for child in node:
         if child.mem < 2 and mem < 2:
-            out = str(child) + "*1./" + out
+            out = out + "*1./" + str(child)
             mem = 2
         else:
             out = out + "/" + str(child)
@@ -152,7 +152,7 @@ def Matrixdivision(node):
 
         for child in node[1:]:
             if child.mem < 2 and mem < 2:
-                out = str(child) + "*1./" + out
+                out = out + "*1./" + str(child)
                 mem = 2
             else:
                 out = out + "/" + str(child)

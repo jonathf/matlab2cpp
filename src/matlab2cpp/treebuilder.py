@@ -221,17 +221,6 @@ class Treebuilder(object):
                     node.type = [n.type for n in node]
                     node.translate_node()
 
-                elif node.cls in ("Assign", "Assigns"):
-
-                    if node[-1].cls == "Matrix":
-                        node.backend = "matrix"
-
-                    elif node[-1].cls == "Cell":
-                        node.backend = "cell"
-
-                    else:
-                        node.translate_node()
-
                 if node.type == "TYPE":
 
                     if node.cls not in\

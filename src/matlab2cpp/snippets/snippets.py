@@ -92,3 +92,5 @@ smat = ({}, '#include "%(file)s"',
 """""")
 scube = ({}, '#include "%(file)s"',
 """""")
+
+interp1 = ({}, "#include <matlib/interpolation.hpp>", "")

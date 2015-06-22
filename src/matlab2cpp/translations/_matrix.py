@@ -47,8 +47,10 @@ def Vector(node):
         nodes = []
         for i in xrange(len(node)):
             if node[i].dim == 0:
-                node[i].auxiliary((2, node.mem))
-            nodes.append(str(node[i]))
+                node[i].include("srow")
+                nodes.append("m2cpp::srow("+ str(node[i]) + ")")
+            else:
+                nodes.append(str(node[i]))
 
     # Concatenate mats
     elif dims in ({1}, {3}, {1,3}):
@@ -62,6 +64,7 @@ def Vector(node):
         node.error("Row-wise concatination trouble: %s" % types)
         nodes = [str(n) for n in node]
 
+    node.value = ""
     return reduce(lambda x,y: ("arma::join_rows(%s, %s)" % (x, y)), nodes)
 
 
@@ -73,7 +76,7 @@ def Matrix(node):
         return "[", ", ", "]"
 
     if len(node) == 1 and len(node[0]) == 0:
-        node.dim = 0
+        node.num = False
         return ""
 
     elif all([n.value for n in node]):
@@ -84,14 +87,15 @@ def Matrix(node):
             if ax1 > 1:
                 node.dim = 3
             else:
-                node.dim = 2
+                node.dim = 1
         else:
             if ax1 > 1:
-                node.dim = 1
+                node.dim = 2
             else:
                 node.dim = 0
 
-        if node.parent["class"] in ("Assign", "Statement"):
+        if node.parent.cls in ("Assign", "Statement"):
+            node.parent.backend = "matrix"
             return "{", ", ", "}"
         return str(node.auxiliary())
 
@@ -109,6 +113,7 @@ def Matrix(node):
                 node.dim = 0
 
         if node.parent.cls in ("Assign", "Statement"):
+            node.parent.backend = "matrix"
             return ""
         return str(node.auxiliary())
 
@@ -123,8 +128,8 @@ def Matrix(node):
         for i in xrange(len(node)):
 
             if node[i].value or node[i].dim == 0: # value=decomposed
-                nodei = node[i].auxiliary()
-                nodes.append(str(nodei))
+                node[i].include("scol")
+                nodes.append("m2cpp::scol(" + str(node[i]) + ")")
 
             else:
                 nodes.append(str(node[i]))
