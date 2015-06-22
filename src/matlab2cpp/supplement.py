@@ -316,11 +316,11 @@ Example:
                         var.type = types_[key]
 
                     var = declares[declares.names.index(key)]
+                    var.type = types_[key]
 
                 elif key in params.names:
                     var = params[params.names.index(key)]
-
-                var.type = types_[key]
+                    var.type = types_[key]
 
         elif name in structs.names:
 

@@ -68,6 +68,34 @@ Examples:
     return out, dim
 
 
+def scalar_assign(node):
+    lhs, rhs = node
+
+    if lhs.mem < rhs.mem:
+        node.warning("Type reduction from %s to %s" % (rhs.type, lhs.type))
+
+    if rhs.cls == "Matrix":
+        rhs = str(rhs[0][0])
+    else:
+        rhs = "%(1)s"
+
+    if lhs.dim == 0:
+        pass
+    elif lhs.dim == 1:
+        node.include("scol")
+        rhs = "m2cpp::scol(" + rhs + ")"
+    elif lhs.dim == 2:
+        node.include("srow")
+        rhs = "m2cpp::srow(" + rhs + ")"
+    elif lhs.dim == 3:
+        node.include("smat")
+        rhs = "m2cpp::smat(" + rhs + ")"
+    elif lhs.dim == 4:
+        node.include("scube")
+        rhs = "m2cpp::scube(" + rhs + ")"
+    return "%(0)s = " + rhs + " ;"
+
+
 if __name__ == "__main__":
     import matlab2cpp as mc
     import doctest

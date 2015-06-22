@@ -83,3 +83,12 @@ retval.submat(2+nr-i-1, nc-1, i-1, i-1) = arma::trans(r.cols(2-1, nc-nr+i-1));
 }
 return retval;
 }""")
+
+srow = ({}, '#include "%(file)s"',
+"""""")
+scol = ({}, '#include "%(file)s"',
+"""""")
+smat = ({}, '#include "%(file)s"',
+"""""")
+scube = ({}, '#include "%(file)s"',
+"""""")

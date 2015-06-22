@@ -52,6 +52,7 @@ def strip(text):
     end = 0
     while text[end-1] in "\n ":
         end -= 1
+
     if end:
         text = text[start:end]
     else:
@@ -71,7 +72,28 @@ def Program(tree):
     return text
 
 
-Includes = "", "\n", ""
+def Includes(node):
+
+    out = ""
+    for func in node.program[3:]:
+        if func.backend == "func_return":
+            code = "\n" + func[1][0].type + " " + func.name + "(" +\
+                ", ".join([p.type + " " + p.name for p in func[2]]) + ") ;"
+            out = out + code
+
+        elif func.backend == "func_returns" and not func[1]:
+            code = "\nvoid " + func.name + "(" +\
+                ", ".join([p.type + " " + p.name for p in func[2]]) + ") ;"
+            out = out + code
+
+        elif func.backend == "func_returns" and func[1]:
+            code = "\nvoid " + func.name + "(" +\
+                ", ".join([p.type + " " + p.name for p in func[2]]) + ", " +\
+                ", ".join([p.type + "& " + p.name for p in func[1]]) + ") ;"
+            out = out + code
+    
+    return "", "\n", "\n"+out
+
 Include = "%(name)s"
 
 def Library(node):

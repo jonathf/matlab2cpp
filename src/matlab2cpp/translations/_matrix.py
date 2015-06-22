@@ -10,16 +10,15 @@ Matrix : Matrix container
 Vector : (Column)-Vector container
     Contains: Expr, ...
 """
+from _arma_common import scalar_assign
+from _assign_common import Assign as default_Assign
 
 
 def Vector(node):
 
     dims = {n.dim for n in node}
-    if None in dims:
-        return "", ", ", ""
 
-    if [n for n in node if not n.num]:
-        node.value = "decomposed"
+    if None in dims or [n for n in node if not n.num]:
         return "", ", ", ""
 
     if len(node) == 1 and dims == {0}:
@@ -36,7 +35,7 @@ def Vector(node):
     # Concatenate rows
     elif dims == {2}:
 
-        node.value = ""
+        node.value = "", ", ", ""
         node.dim = 2
         nodes = [str(n) for n in node]
 
@@ -59,7 +58,9 @@ def Vector(node):
         nodes = [str(n) for n in node]
 
     else:
-        return ""
+        types = "{"+", ".join([n.type for n in node])+"}"
+        node.error("Row-wise concatination trouble: %s" % types)
+        nodes = [str(n) for n in node]
 
     return reduce(lambda x,y: ("arma::join_rows(%s, %s)" % (x, y)), nodes)
 
@@ -107,7 +108,7 @@ def Matrix(node):
             else:
                 node.dim = 0
 
-        if node.parent["class"] in ("Assign", "Statement"):
+        if node.parent.cls in ("Assign", "Statement"):
             return ""
         return str(node.auxiliary())
 
@@ -168,8 +169,8 @@ def Assign(node):
 
     if rhs.value: # decomposed
 
-        if dim == 0:
-            return "%(0)s = " + str(rhs[0][0]) + " ;"
+        if rhs.dim == 0:
+            return scalar_assign(node)
 
         elif dim == 1: #vec
             node["rows"] = len(node[1][0])*len(node[1])
@@ -189,7 +190,7 @@ def Assign(node):
 
         assert False
 
-    return "%(0)s = %(1)s ;"
+    return default_Assign(node)
 
 def Statement(node):
     return "%(0)s"

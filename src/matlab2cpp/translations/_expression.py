@@ -36,6 +36,10 @@ def Return(node):
 
 # simple operators
 def Mul(node):
+
+    if not node.num:
+        return "", "*", ""
+
     dim = node[0].dim
     for child in node[1:]:
 

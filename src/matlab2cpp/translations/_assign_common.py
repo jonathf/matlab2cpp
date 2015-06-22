@@ -1,4 +1,4 @@
-
+from _arma_common import scalar_assign
 
 def Assign(node):
     """
@@ -46,6 +46,9 @@ Examples:
             else:
                 node.warning("Type reduction from %s to %s" %\
                         (rhs.type, lhs.type))
+
+        elif lhs.dim > 0 and rhs.dim == 0:
+            return scalar_assign(node)
 
         elif lhs.dim in (1,2) and rhs.dim in (3, 4):
             out = "arma::vectorise(" + out + ")"
