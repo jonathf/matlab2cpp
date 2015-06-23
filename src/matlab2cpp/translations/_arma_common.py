@@ -14,28 +14,28 @@ Returns:
 Examples:
     >>> print mc.qtranslate('x=[1,2]; x(:)')
     int _x [] = {1, 2} ;
-    x = ivec(_x, 2, false) ;
+    x = irowvec(_x, 2, false) ;
     x(span::all) ;
     >>> print mc.qtranslate('x=[1,2]; x(1)')
     int _x [] = {1, 2} ;
-    x = ivec(_x, 2, false) ;
+    x = irowvec(_x, 2, false) ;
     x(0) ;
     >>> print mc.qtranslate('x=[1,2]; x([1,2])')
     int _x [] = {1, 2} ;
-    x = ivec(_x, 2, false) ;
-    uword __aux_uvec_1 [] = {1, 2} ;
-    _aux_uvec_1 = uvec(__aux_uvec_1, 2, false) ;
+    x = irowvec(_x, 2, false) ;
+    uword __aux_urowvec_1 [] = {1, 2} ;
+    _aux_uvec_1 = urowvec(__aux_uvec_1, 2, false) ;
     x(_aux_uvec_1-1) ;
     >>> print mc.qtranslate('x=[1,2]; x([1,2;2,1])')
     int _x [] = {1, 2} ;
-    x = ivec(_x, 2, false) ;
-    uword __aux_uvec_1 [] = {1, 2, 2, 1} ;
-    _aux_uvec_1 = uvec(__aux_uvec_1, 4, false) ;
-    x(_aux_uvec_1-1) ;
+    x = irowvec(_x, 2, false) ;
+    int __aux_imat_1 [] = {1, 2, 2, 1} ;
+    _aux_imat_1 = imat(__aux_imat_1, 2, 2, false) ;
+    x(_aux_imat_1-1) ;
     >>> print mc.qtranslate("x=[1,2]; x(x')")
     int _x [] = {1, 2} ;
-    x = ivec(_x, 2, false) ;
-    x(arma::trans(arma::trans(x))-1) ;
+    x = irowvec(_x, 2, false) ;
+    x(arma::trans(x)-1) ;
     """
 
     out = "%(" + str(index) + ")s"
@@ -53,7 +53,8 @@ Examples:
 
     elif node.dim > 2:
         # TODO: multi-index arguments through snippits
-        out = "vectorise(" + out + ")"
+        # out = "vectorise(" + out + ")"
+        pass
 
     if node.dim == 0:
         if node.cls in ("Int", "Float"):

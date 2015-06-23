@@ -1413,8 +1413,8 @@ class Treebuilder(object):
                             (cur, line),
                     print repr(self.code[cur:end])
 
-                    node = col.Sget(parent, name, value, cur=cur, line=line,
-                            code=self.code[cur:end], pointer=1)
+                node = col.Sget(parent, name, value, cur=cur, line=line,
+                        code=self.code[cur:end], pointer=1)
 
                 last, line = self.create_list(node, k, line)
                 cur = end

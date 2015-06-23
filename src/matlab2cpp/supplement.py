@@ -271,7 +271,7 @@ PREFIX = """# Supplement file
 # umat    imat    fmat    mat    cx_mat
 # ucube   icube   fcube   cube   cx_cube
 #
-# char    string  struct  func_lambda
+# char    string  struct  structs func_lambda
 """
 
 
@@ -298,6 +298,7 @@ Example:
     }
 """
 
+    includes = program[0]
     structs = program[1]
     for name in types.keys():
 
@@ -342,6 +343,14 @@ Example:
                     var = collection.Declare(struct, key)
                     var.backend = "struct"
                     var.type = types_[key]
+
+        # elif name == "_include_libraries":
+        #
+        #     for key in types[name]:
+        #
+        #         if key not in includes.names:
+        #             collection.Include(includes, key)
+
 
 
 def get_variables(program):
@@ -408,6 +417,12 @@ Example:
                 if type:
                     suggestions_[var["name"]] = type
 
+    # types["_include_libraries"] = []
+    # for include in program[0]:
+    #     types["_include_libraries"] = repr(include.name)
+    # if not types["_include_libraries"]:
+    #     del types["_include_libraries"]
+
     return types, suggestions
 
 
@@ -459,6 +474,14 @@ Example:
     keys.sort()
 
     for name in keys:
+
+        if name == "_include_libraries":
+            out += 'scope["%s"] = [' % name
+            for key in types[name]:
+                out += key + ",\n"
+            out += "]\n\n"
+            continue
+
         out += '%s = scope["%s"] = {}\n' % (name, name)
         types_ = types[name]
 

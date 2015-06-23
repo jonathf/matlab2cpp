@@ -103,7 +103,11 @@ def node_summary(node, opt):
 
 def node_translate(node, opt):
 
-    target = translations.__dict__["_"+node.backend]
+    backend = node.backend
+    if backend == "TYPE":
+        backend = "unknown"
+
+    target = translations.__dict__["_"+backend]
     spesific_name = node.cls + "_" + node.name
 
     if spesific_name in target.__dict__:
@@ -176,8 +180,8 @@ def create_auxillary(node, type, convert):
         else:
             type = datatype.common_strict(type)
 
-    if type == "TYPE":
-        return node
+    # if type == "TYPE":
+    #     return node
 
     matrix_mode = False
     if node.cls == "Matrix":

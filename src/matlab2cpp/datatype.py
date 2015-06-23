@@ -231,7 +231,7 @@ class Num(object):
 class Type(object):
 
     def __get__(self, instance, owner):
-        return get_type(instance) + "*"*instance.pointer
+        return get_type(instance) #+ "*"*instance.pointer
 
     def __set__(self, instance, value):
         value = value or "TYPE"

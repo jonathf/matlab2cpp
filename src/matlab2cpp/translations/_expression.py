@@ -147,7 +147,6 @@ def Matrixdivision(node):
     mem = node[0].mem
     dim = node[0].dim
 
-
     if {n.dim for n in node} == {0}:
 
         for child in node[1:]:

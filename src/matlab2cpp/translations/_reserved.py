@@ -15,7 +15,7 @@ reserved = {
 "zeros", "ones", "round", "return", "rand", "floor",
 "clear", "close", "plot", "hold",
 "_conv_to", "_reshape",
-"interp1", "linspace"
+"interp1", "linspace",
 }
 
 # Common attribute
@@ -577,14 +577,14 @@ def Get_hankel(node):
     return "m2cpp::hankel(", ", ", ")"
 
 def Get_interp1(node):
-    node.include("interp1")
-    node.error("'interp1' uses matlib library")
-    if node[-1].cls == "String" and node[-1].value == "linear":
-        return "matlib::interp1<matlib::row, double, double, double>"\
-                "(%(0)s, %(1)s, %(2)s, matlib::linear)"
+    # node.include("interp1")
+    # node.error("'interp1' uses matlib library")
+    # if node[-1].cls == "String" and node[-1].value == "linear":
+    #     return "matlib::interp1<matlib::row, double, double, double>"\
+    #             "(%(0)s, %(1)s, %(2)s, matlib::linear)"
 
-    return "interp1(", ", ", ")" 
+    return "arma::interp1(", ", ", ")" 
 
 def Get_linspace(node):
-    node.type = "vec"
-    return "arma::linspace(", ", ", ")"
+    node.type = "rowvec"
+    return "arma::linspace<%(type)s>(", ", ", ")"

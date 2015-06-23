@@ -467,14 +467,13 @@ Examples:
     c = _aux_int_1(2) ;
     """
 
-    if node[-1]["class"] != "Var":
+    if node[-1].cls != "Var":
         node[-1].auxiliary()
 
     out = ""
-    n = str(len(node)-1)
     for i in xrange(len(node[:-1])):
         i = str(i)
-        out += "%(" +i+ ")s = %(" +n+ ")s(" +i+ ") ;\n"
+        out += "%(" +i+ ")s = " +str(node[-1])+ "(" +i+ ") ;\n"
     out = out[:-1]
     return out
 
