@@ -13,7 +13,7 @@ def Get(node):
         if dim == 0:
             node.dim = 0
 
-        return "vectorise(%(name)s(" + arg + "))"
+        return "%(name)s(" + arg + ")"
 
 
     # Double argument

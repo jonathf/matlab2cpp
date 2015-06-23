@@ -94,3 +94,5 @@ scube = ({}, '#include "%(file)s"',
 """""")
 
 interp1 = ({}, "#include <matlib/interpolation.hpp>", "")
+
+call = ({}, "", "")

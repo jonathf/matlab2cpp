@@ -52,6 +52,7 @@ Examples:
         out = "arma::trans(" + out + ")"
 
     elif node.dim > 2:
+        # TODO: multi-index arguments through snippits
         out = "vectorise(" + out + ")"
 
     if node.dim == 0:
@@ -66,7 +67,6 @@ Examples:
             out = out + "-1"
 
     return out, dim
-
 
 def scalar_assign(node):
     lhs, rhs = node

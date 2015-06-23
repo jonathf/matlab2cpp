@@ -51,7 +51,7 @@ Examples:
             return scalar_assign(node)
 
         elif lhs.dim in (1,2) and rhs.dim in (3, 4):
-            out = "arma::vectorise(" + out + ")"
+            pass
 
         elif lhs.dim > 0 and rhs.dim > 0:
 
