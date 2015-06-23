@@ -248,12 +248,18 @@ its own variable `_size` and the variable now is donoted as `structs`:
     >>> print mc.qsupplement("function f(); a(1).b = 4.", suggest=True)
     scope = {}
     <BLANKLINE>
-    a = scope["a"] = {}
-    a["_size"] = 100
-    a["b"] = "double"
+    scope["_include_libraries"] = [
+      '#include <armadillo>',
+      'using namespace arma ;',
+    ]
     <BLANKLINE>
-    f = scope["f"] = {}
-    f["a"] = "structs"
+    scope["a"] = {
+    "_size" : 100,
+        "b" : "double",
+    }
+    scope["f"] = {
+    "a" : "structs",
+    }
 
 As illustrated the `_size` variable should be an integer.
 """
@@ -344,12 +350,15 @@ Example:
                     var.backend = "struct"
                     var.type = types_[key]
 
-        # elif name == "_include_libraries":
-        #
-        #     for key in types[name]:
-        #
-        #         if key not in includes.names:
-        #             collection.Include(includes, key)
+        elif name == "_include_libraries":
+
+            for key in types[name]:
+
+                if key[0] == key[-1] and key[0] in ("'",'"'):
+                    key = key[1:-1]
+
+                if key not in includes.names:
+                    collection.Include(includes, key)
 
 
 
@@ -417,11 +426,11 @@ Example:
                 if type:
                     suggestions_[var["name"]] = type
 
-    # types["_include_libraries"] = []
-    # for include in program[0]:
-    #     types["_include_libraries"] = repr(include.name)
-    # if not types["_include_libraries"]:
-    #     del types["_include_libraries"]
+    types["_include_libraries"] = []
+    for include in program[0]:
+        types["_include_libraries"].append(repr(include.name))
+    if not types["_include_libraries"]:
+        del types["_include_libraries"]
 
     return types, suggestions
 
@@ -457,15 +466,18 @@ Example:
     # umat    imat    fmat    mat    cx_mat
     # ucube   icube   fcube   cube   cx_cube
     #
-    # char    string  struct  func_lambda
+    # char    string  struct  structs func_lambda
     <BLANKLINE>
     scope = {}
     <BLANKLINE>
-    f = scope["f"] = {}
-    f["a"] = "int"
+    scope["f"] = {
+    "a" : "int",
+    }
     <BLANKLINE>
-    g = scope["g"] = {}
-    g["b"] = "" # float
+    scope["g"] = {
+    "b" : "", # float
+    }
+    <BLANKLINE>
 """
 
     out = "scope = {}\n\n"
@@ -476,44 +488,46 @@ Example:
     for name in keys:
 
         if name == "_include_libraries":
-            out += 'scope["%s"] = [' % name
+
+            out += 'scope["%s"] = [\n' % name
             for key in types[name]:
-                out += key + ",\n"
+                out += "  " + key + ",\n"
             out += "]\n\n"
-            continue
 
-        out += '%s = scope["%s"] = {}\n' % (name, name)
-        types_ = types[name]
+        else:
 
-        keys2 = types_.keys()
-        keys2.sort()
+            out += 'scope["%s"] = {\n' % (name)
+            types_ = types[name]
 
-        for key in keys2:
-            val = types_[key]
+            keys2 = types_.keys()
+            keys2.sort()
+            l = max([len(k) for k in keys2])
 
-            if key[:1] == "_":
-                if key[:4] in ("_aux", "_ret"):
-                    continue
+            for key in keys2:
+                val = types_[key]
 
-                if key[-5:] == "_size":
-                    if val:
-                        out += '%s["%s"] = %s\n' % (name, key, val)
-                    else:
-                        out += '%s["%s"] = 100\n' % (name, key)
+                if key[:1] == "_":
+                    if key[:4] in ("_aux", "_ret"):
+                        continue
 
-            elif val:
-                out += '%s["%s"] = "%s"\n' % (name, key, val)
-            else:
-                suggest = suggestions.get(name, {}).get(key, "")
-                if suggest:
-                    out += '%s["%s"] = "" # %s\n' % (name, key, suggest)
+                    if key[-5:] == "_size":
+                        val = val or 100
+                        out += " "*(l-len(key)) + '"%s" : %s,\n' % (key, val)
+
+                elif val:
+                    out += " "*(l-len(key)) + '"%s" : "%s",\n' % (key, val)
                 else:
-                    out += '%s["%s"] = ""\n' % (name, key)
-        out += "\n"
+                    suggest = suggestions.get(name, {}).get(key, "")
+                    if suggest:
+                        out += " "*(l-len(key)) + '"%s" : "", # %s\n' % (key, suggest)
+                    else:
+                        out += " "*(l-len(key)) + '"%s" : "",\n' % (key)
+
+            out += "}\n"
+
     if header:
         out = PREFIX + "\n" + out
-
-    return out[:-2]
+    return out
 
 if __name__ == "__main__":
     import matlab2cpp as mc

@@ -287,6 +287,7 @@ class Treebuilder(object):
         program = col.Program(self.project, name=filename, line=0, cur=0, code=self.code)
         includes = col.Includes(program, value=filename)
         includes.include("armadillo")
+        includes.include("namespace_arma")
     
         col.Structs(program)
     

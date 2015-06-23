@@ -55,9 +55,16 @@ def main(args):
 
             types, suggestions = get_variables(builder.project[-1])
             for name in types.keys():
-                if name in scope:
+
+                if name == "_include_libraries":
+                    for key in scope[name]:
+                        if key not in types:
+                            types[name].append(key)
+
+                elif name in scope:
                     for key in scope[name].keys():
                         types[name][key] = scope[name][key]
+
             set_variables(builder.project[-1], types)
 
     if args.disp:

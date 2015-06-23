@@ -16,8 +16,8 @@ code : str
 The value '%(file)s' will be substituted with the name of the file.
 """
 
-armadillo = ({}, """#include <armadillo>
-using namespace arma ;""", "")
+armadillo = ({}, "#include <armadillo>", "")
+namespace_arma = ({}, "using namespace arma ;", "")
 
 span = ({}, '#include "%(file)s"',
 """arma::uvec span(int a, int step, int b)
