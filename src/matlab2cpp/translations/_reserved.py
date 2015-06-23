@@ -12,10 +12,10 @@ reserved = {
 "eye", "flipud", "length", "max", "min", "size",
 "transpose", "ctranspose",
 "abs", "nextpow2", "fft", "ifft", "hankel",
-"zeros", "round", "return", "rand", "floor",
+"zeros", "ones", "round", "return", "rand", "floor",
 "clear", "close", "plot", "hold",
 "_conv_to", "_reshape",
-"interp1"
+"interp1", "linspace"
 }
 
 # Common attribute
@@ -344,6 +344,34 @@ def Get_flipud(node):
     return "arma::flipud(%(0)s)"
 
 
+def Get_ones(node):
+
+    if node.parent.cls == "Assign" and node.parent[0].type != "TYPE":
+        node.type = node.parent[0].type
+
+    elif len(node) == 1:
+        node.type = "vec"
+
+    elif len(node) == 2:
+        node.type = "mat"
+
+    elif len(node) == 3:
+        node.type = "cube"
+
+    if node[0].num and node[0].dim in (1,2):
+
+        if node[0].cls != "Var":
+            node[0].auxiliary()
+
+        if node.dim in (1,2):
+            return "arma::ones<%(type)s>(%(0)s(0))"
+        if node.dim == 3:
+            return "arma::ones<%(type)s>(%(0)s(0), %(0)s(1))"
+        if node.dim == 4:
+            return "arma::ones<%(type)s>(%(0)s(0), %(0)s(1), %(0)s(2))"
+
+    return "arma::ones<%(type)s>(", ", ", ")"
+
 def Get_zeros(node):
 
     if node.parent.cls == "Assign" and node.parent[0].type != "TYPE":
@@ -556,3 +584,7 @@ def Get_interp1(node):
                 "(%(0)s, %(1)s, %(2)s, matlib::linear)"
 
     return "interp1(", ", ", ")" 
+
+def Get_linspace(node):
+    node.type = "vec"
+    return "arma::linspace(", ", ", ")"
