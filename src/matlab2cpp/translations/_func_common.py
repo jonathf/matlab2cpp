@@ -1,5 +1,41 @@
 from _variables import *
 
+def type_string(node):
+
+    if node.type == "func_lambda":
+
+        if hasattr(node.declare, "reference"):
+            func = node.declare.reference
+
+            if len(func[1]) == 0:
+                ret = "void"
+                prm = ", ".join([p.type for p in func[2]])
+
+            elif len(func[1]) == 1:
+                ret = func[1][0].type
+                prm = ", ".join([p.type for p in func[2]])
+
+            else:
+                ret = "void"
+                prm = ", ".join([p.type for p in func[2][:]+func[1][:]])
+
+            
+            return "std::function<" + ret + "(" + prm + ")>"
+
+        else:
+            node.warning("lambda function content not found")
+            return "std::function"
+
+    elif type == "struct":
+        return child.name.capitalize()
+
+    elif type == "structs":
+        return child.name.capitalize()
+
+
+    return node.type
+
+
 def Returns(node):
 
     if node.backend == "func_return":
@@ -8,7 +44,7 @@ def Returns(node):
     if node.backend == "func_returns":
         out = ""
         for child in node[:]:
-            out += ", " + child.type + "& " + str(child)
+            out += ", " + type_string(child) + "& " + str(child)
         return out[2:]
 
     if node.backend == "func_lambda":
@@ -23,12 +59,12 @@ def Params(node):
 
         out = ""
         for child in node[:]:
-            out += ", " + child.type + " " + str(child)
+            out += ", " + type_string(child) + " " + str(child)
         return out[2:]
 
 
     if node.backend == "func_lambda":
-        return ", ".join(["%s %s" % (n.type, n.name) for n in node])
+        return ", ".join(["%s %s" % (type_string(n), n.name) for n in node])
 
 
     assert False
@@ -40,20 +76,7 @@ def Declares(node):
         declares = {}
         for child in node[:]:
 
-            type = child.type
-
-            if type == "func_lambda":
-                ret = child.reference[1][0].type
-                params = [n.type for n in child.reference[2]]
-                params = ", ".join(params)
-                type = "std::function<"+ret+"("+params+")>"
-
-            elif type == "struct":
-                type = child.name.capitalize()
-
-            elif type == "structs":
-                type = child.name.capitalize()
-
+            type = type_string(child)
 
             if type not in declares:
                 declares[type] = []
@@ -73,20 +96,7 @@ def Declares(node):
             if child in node.parent[1]:
                 continue
 
-            type = child.type
-
-            if type == "func_lambda":
-                ret = child.reference[1][0].type
-                params = [n.type for n in child.reference[2]]
-                params = ", ".join(params)
-                type = "std::function<"+ret+"("+params+")>"
-
-            elif type == "struct":
-                type = child.name.capitalize()
-
-            elif type == "structs":
-                type = child.name.capitalize()
-
+            type = type_string(child)
 
             if type not in declares:
                 declares[type] = []
@@ -99,7 +109,7 @@ def Declares(node):
         return out[1:]
 
     if node.backend == "func_lambda":
-        return ", ".join(["%s %s" % (n.type, str(n)) for n in node])
+        return ", ".join(["%s %s" % (type_string(n), str(n)) for n in node])
 
     assert False
 
