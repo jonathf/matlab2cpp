@@ -4,29 +4,65 @@ All the different kinds of nodes
 
 from node import Node
 
+## Administrativ part of code ##
+################################
+
 class Project(Node):
-    def __init__(self, backend="program", name="project", line=0,
-            cur=0, **kws):
+    "Head node"
+    def __init__(self, backend="program", name="project",
+            cur=0, line=0, code="", **kws):
         self.parent = self
         self._program = self
-        Node.__init__(self, self, cur=cur, line=line, name=name,
-                backend=backend, **kws)
+        Node.__init__(self, self, name=name, backend=backend, cur=cur,
+                line=line, code=code, **kws)
 
-class Resize(Node):
-    def __init__(self, parent, backend="cube_common", **kws):
+class Program(Node):
+    def __init__(self, parent, backend="program", **kws):
+        self._program = self
         Node.__init__(self, parent, backend=backend, **kws)
 
-class Errors(Node):
-    def __init__(self, parent, backend="error_log", **kws):
+class Includes(Node):
+    def __init__(self, parent, backend="program", **kws):
         Node.__init__(self, parent, backend=backend, **kws)
+
+class Funcs(Node):
+    def __init__(self, parent, backend="program", line=1, **kws):
+        Node.__init__(self, parent, line=line, backend=backend, **kws)
+
+class Inlines(Node):
+    def __init__(self, parent, backend="program", **kws):
+        Node.__init__(self, parent, backend=backend, **kws)
+
+class Structs(Node):
+    def __init__(self, parent, backend="program", **kws):
+        Node.__init__(self, parent, backend=backend,**kws)
+
+class Headers(Node):
+    def __init__(self, parent, backend="program", **kws):
+        Node.__init__(self, parent, backend=backend, **kws)
+
+class Log(Node):
+    def __init__(self, parent, backend="program", **kws):
+        Node.__init__(self, parent, backend=backend, **kws)
+
+
+
+
+
+class Header(Node):
+    def __init__(self, parent, name, backend="program", **kws):
+        Node.__init__(self, parent, name=name, backend=backend, **kws)
+
+class Main(Node):
+    def __init__(self, parent, name="main", backend="func_common", **kws):
+        Node.__init__(self, parent, name=name, backend=backend, **kws)
 
 class Error(Node):
-    def __init__(self, parent, name, value, backend="error_log", **kws):
+    def __init__(self, parent, name, value, backend="program", **kws):
         Node.__init__(self, parent, name, value=value, backend=backend, **kws)
         self.prop["cls"] = name[10:]
-
 class Warning(Node):
-    def __init__(self, parent, name, value, backend="error_log", **kws):
+    def __init__(self, parent, name, value, backend="program", **kws):
         Node.__init__(self, parent, name, value=value, backend=backend, **kws)
         self.prop["cls"] = name[10:]
 
@@ -36,29 +72,14 @@ class Counter(Node):
         Node.__init__(self, parent, name,
                 value=value, backend=backend, type=type, **kws)
 
-class Library(Node):
-    def __init__(self, parent, backend="program", **kws):
-        Node.__init__(self, parent, backend=backend, **kws)
-
-class Snippet(Node):
+class Inline(Node):
     def __init__(self, parent, name, backend="program", **kws):
         Node.__init__(self, parent, name, backend=backend, **kws)
 
-class Program(Node):
-    def __init__(self, parent, name="program", backend="program", **kws):
-        self._program = self
-        Node.__init__(self, parent, name=name, backend=backend, **kws)
-
-class Includes(Node):
-    def __init__(self, parent, backend="program", **kws):
-        Node.__init__(self, parent, backend=backend, **kws)
 class Include(Includes):
     def __init__(self, parent, name, backend="program", **kws):
         Node.__init__(self, parent, name=name, backend=backend, **kws)
 
-class Structs(Node):
-    def __init__(self, parent, backend="struct", **kws):
-        Node.__init__(self, parent, backend=backend,**kws)
 class Struct(Structs):          pass
 
 class Func(Node):           pass
@@ -217,3 +238,8 @@ class Sset(Node):
 class Nset(Node):
     def __init__(self, parent, name, backend="struct", **kws):
         Node.__init__(self, parent, name=name, backend=backend, **kws)
+
+class Resize(Node):
+    def __init__(self, parent, backend="cube_common", **kws):
+        Node.__init__(self, parent, backend=backend, **kws)
+

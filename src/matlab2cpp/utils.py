@@ -78,10 +78,11 @@ def node_summary(node, opt):
     if not (opt is None) and opt.disp:
         print "iterating %d nodes" % len(nodes)
 
+    
     if not (opt is None) and not (opt.line is None):
         for node in nodes:
             if node.cls != "Block" and node.line == opt.line:
-                node = node
+                nodes = flatten(node, False, False, False)
                 break
 
     indent = [node]
@@ -95,7 +96,13 @@ def node_summary(node, opt):
         out += "%3d %3d %s%-10s %-12s %-7s %-18s" % \
                 (node.line, node.cur, space, node.cls,
                         node.backend, node.type, node.name)
-        out += repr(node.ret) + "\n"
+        if node.parent.cls in ("Program", "Project", "Includes"):
+            out += "\n"
+        elif node.parent.cls == "Log":
+            out += repr(node.code[:30]) + " -> " + repr(node.value) + "\n"
+        else:
+            out += repr(node.code[:30]) + " -> " + repr(node.ret[:30]) + "\n"
+
         indent.append(node)
 
     return out
@@ -118,7 +125,9 @@ def node_translate(node, opt):
 
     else:
         print node.program.summary()
-        raise KeyError("no %s in %s" % (node.cls, node.backend))
+        raise KeyError(
+                "Expected to find rule for '%s' in the file '_%s.py'" %\
+                        (node.cls, node.backend))
 
 
     if not isinstance(value, (unicode, str, list, tuple)):
@@ -290,7 +299,7 @@ def create_error(node, msg, onlyw=False):
     pos = cur-start
 
     name = "%010d" % cur + node.cls
-    errors = node.program.parent[1]
+    errors = node.program[5]
 
     if name not in errors.names:
         if onlyw:
@@ -348,8 +357,9 @@ def create_declare(node):
         declare.pointer = node.pointer
         return declare
 
-    return collection.Var(parent, name=node.name,
+    out = collection.Var(parent, name=node.name,
             type=node.type, pointer=node.pointer, value=node.value)
+    return out
 
 
 def translate(node, opt=None):
@@ -366,17 +376,15 @@ def translate(node, opt=None):
 def build(code, disp=False, retall=False, suggest=False, comments=False):
 
     code = code + "\n\n\n\n"
-    tree = treebuilder.Treebuilder("", disp=disp, comments=comments)
-    tree.code = code
-    tree.create_program("unnamed")
+    tree = treebuilder.Treebuilder(disp=disp, comments=comments)
+    tree.load("unamed", code)
     tree.configure(2*suggest)
     if retall:
         return tree
-    if tree[2][2].name == "main":
-        out = tree[2][2][3]
-        del out.children[0]
+    if tree[0][1][0].name == "main":
+        out = tree[0][1][0][3]
         return out
-    return tree[2]
+    return tree[0]
 
 
 def qtranslate(code, suggest=True):

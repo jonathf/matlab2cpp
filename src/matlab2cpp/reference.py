@@ -8,11 +8,11 @@ Note that, if a reference does not exist, the node itself will be returned.
 """
 
 groups = [
-    "Assign", "Assigns", "Branch", "For", "Func",
+    "Assign", "Assigns", "Branch", "For", "Func", "Main",
     "Set", "Cset", "Fset", "Nset", "Sset",
     "Get", "Cget", "Fget", "Nget", "Sget",
-    "Statement", "Switch", "Tryblock",
-    "While", "Program", "Block", "Node",
+    "Statement", "Switch", "Tryblock", "Matrix",
+    "While", "Block", "Node",
 ]
 nondeclares = ("Program", "Project", "Include", "Includes", "Struct", "Structs")
 structvars = ("Fvar", "Fget", "Fset", "Nget", "Nset", "Sget", "Sset")
@@ -41,18 +41,8 @@ class Recursive_property_reference(object):
         if not (a is None):
             return a
 
-        instances = [instance]
-        while True:
-            instance = instance.parent
-            a = instance.prop.get(self.name, None)
-            instances.append(instance)
-            if a is None:
-                assert instance["class"] not in ("Project", "Node")
-            else:
-                break
-
-        for instance in instances[:-1]:
-            instance.prop[self.name] = a
+        a = Recursive_property_reference.__get__(self, instance.parent, owner)
+        instance.prop[self.name] = a
 
         return a
 
@@ -62,17 +52,27 @@ class Recursive_property_reference(object):
 class Line_reference(object):
 
     def __get__(self, instance, owner):
-
         if hasattr(instance, "_line"):
             return instance._line
 
-        node = instance
-        while node.parent.cls != "Block" and\
-                not (node.parent is node):
-            node = node.parent
-        
-        instance._line = node
-        return node
+        if instance.cls == "Project":
+            line = 0
+
+        elif instance.cls == "Funcs":
+            line = 1
+
+        else:
+            pline = instance.parent.line
+            pcur = instance.parent.cur
+            cur = instance.cur
+
+            if pcur == cur:
+                line = pline
+            else:
+                line = pline + instance.program.code.count("\n", pcur, cur)
+
+        instance._line = line
+        return line
 
 
 class Group_reference(object):
@@ -82,13 +82,14 @@ class Group_reference(object):
         if hasattr(instance, "_group"):
             return instance._group
 
-        node = instance
-        while node.parent.cls not in groups and\
-                not (node.parent is node):
-            node = node.parent
+        if instance.cls in groups:
+            group = instance
+
+        else:
+            group = instance.parent.group
         
-        instance._group = node
-        return node
+        instance._group = group
+        return group
 
 
 class Func_reference(object):
@@ -98,18 +99,13 @@ class Func_reference(object):
         if hasattr(instance, "_func"):
             return instance._func
 
-        node = instance
-        while node.cls != "Func" and\
-                not (node.parent is node) and\
-                not hasattr(node, "_func"):
-            node = node.parent
-
-        if node.cls == "Func" or node.parent is node:
-            instance._func = node
+        if instance.cls in ("Func", "Main", "Program"):
+            func = instance
         else:
-            instance._func = node._func
+            func = instance.parent.func
 
-        return instance._func
+        instance._func = func
+        return func
 
 class Program_reference(object):
     def __get__(self, instance, owner):
@@ -117,19 +113,27 @@ class Program_reference(object):
         if hasattr(instance, "_program"):
             return instance._program
 
-        node = instance
-        while node.cls not in ("Program", "Errors", "Library") and\
-                not hasattr(node, "_program"):
-            node = node.parent
-
-        if node.cls in ("Program", "Errors", "Library"):
-            instance._program = node
+        if instance.cls == "Program":
+            program = instance
         else:
-            instance._program = node._program
+            program = instance.parent.program
 
-        assert instance._program.cls in ("Program", "Errors", "Library")
+        instance._program = program
+        return program
 
-        return instance._program
+class Project_reference(object):
+    def __get__(self, instance, owner):
+
+        if hasattr(instance, "_project"):
+            return instance._project
+
+        if instance.cls == "Project":
+            project = instance
+        else:
+            project = instance.parent.project
+
+        instance._project = project
+        return project
 
 
 class Names(object):

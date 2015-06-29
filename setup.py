@@ -12,7 +12,7 @@ setup(
     name='matlab2cpp',
     version='0.2',
     packages=['matlab2cpp', 'matlab2cpp.translations',
-              'matlab2cpp.testsuite', 'matlab2cpp.snippets'],
+              'matlab2cpp.testsuite', 'matlab2cpp.inlines'],
     package_dir={'': 'src'},
     url='http://github.com/jonathf/matlab2cpp',
     license='BSD',

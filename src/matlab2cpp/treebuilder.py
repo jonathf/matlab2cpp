@@ -34,72 +34,48 @@ string_prefix = " \t\n=><"
 class Treebuilder(object):
     """Convert Matlab-code to Tokentree"""
 
-    def __init__(self, folder=None, code=None, disp=False, comments=True):
+    def __init__(self, disp=False, comments=True):
         """
-    Kwargs:
-        folder (str):
-            The path to matlab project root. Either `folder` or `code` must be
-            provided. If `folder` is used, the module function `load` can be
-            used to load multiple files.
-        code (str):
-            Raw matlab code to load. Either `folder` or `code` must be provided.
+   Kwargs:
         disp (bool):
             Verbose output while loading code.
         comments (bool):
             Include comments in the code interpretation.
         """
 
-        assert not (folder is None) or not (code is None)
-
-        if folder:
-            self.folder = folder
-        if code:
-            self.code = code
-
         self.disp = disp
         self.comments = comments
         self.project = col.Project()
-        col.Library(self.project)
-        col.Errors(self.project)
-
-        if disp:
-            if not (folder is None):
-                print "Loaded module in import-mode"
-            else:
-                print "Loaded module in standalone-mode"
 
     def __getitem__(self, i):
         return self.project[i]
 
-    def load(self, filename):
+    def load(self, name, code):
         """
-    Load a Matlab file into the node tree.
+    Load a Matlab code into the node tree.
 
     Will throw and exception if module loaded without the `folder` option.
 
     Args:
-        filename (str):
-            Valid name of file accessible from `folder`.
+        name (str):
+            Name of program (usually valid filename).
+        code (str):
+            Matlab code to be loaded
         """
 
-        if not hasattr(self, "folder"):
-            raise AttributeError("Module not in file-reading-mode.")
-
         if self.disp:
-            print "loading", filename
+            print "loading", name
 
-        f = open(self.folder + filename, "rU")
-        code = f.read() + "\n\n\n"
-        f.close()
-        self.code = code
+        self.code = code + "\n\n\n"
+        self.create_program(name)
+        return self.project[-1]
 
-        index = len(self.project)
-        self.create_program(filename)
 
-        nodes = utils.flatten(self.project[index], False, True, False)
-        if self.disp:
-            print "configuring", filename
+    def get_unknowns(self, name):
 
+        program = self.project[self.project.names.index(name)]
+
+        nodes = utils.flatten(program, False, True, False)
         # Find if some names should be reserved
         unassigned = {}
         for node in nodes[::-1]:
@@ -128,6 +104,7 @@ class Treebuilder(object):
                 node.backend = "reserved"
 
         return unassigned
+
 
     def configure(self, suggest=True):
 
@@ -158,19 +135,19 @@ class Treebuilder(object):
                             func = None
 
                     # local scope
-                    elif node in node.program:
-                        func = node.program[node]
+                    elif node in node.program[1]:
+                        func = node.program[1][node]
                         node.backend = func.backend
 
                     # external file in same folder
                     elif node in self.project:
-                        func = self.project[node][2]
+                        func = self.project[node][1][0]
                         node.backend = func.backend
 
                     # external file in same folder
                     elif node.name + ".m" in self.project:
                         func = self.project[self.project.names.index(
-                            node.name+".m")][2]
+                            node.name+".m")][1][0]
                         node.backend = func.backend
 
                     else:
@@ -245,15 +222,7 @@ class Treebuilder(object):
                     var.suggest = "int"
 
                 elif node.cls == "Assign" and node[0].cls != "Set":
-                    if node[1].type == "func_lambda" and\
-                            hasattr(node.declare, "reference"):
-                        type = node.declare.reference[1][0].type
-                    else:
-                        type = node[1].type
-                    if node[1].cls == "Matrix":
-                        node[0].suggest = type
-                    else:
-                        node[0].suggest = type
+                    node[0].suggest = node[1].type
 
 
                 elif node.cls == "Neg" and node[0].mem == 0:
@@ -262,11 +231,23 @@ class Treebuilder(object):
             if suggest:
 
                 complete = True
-                for program in self.project[2:]:
-                    types, suggestions = supplement.get_variables(program)
-                    if [c for c in suggestions.values() if any(c)]:
-                        supplement.set_variables(program, suggestions)
+                for program in self.project:
+                    types_f, types_s, types_i, suggests =\
+                            supplement.get_variables(program)
+
+                    for s in suggests:
+
+                        if not suggests[s]:
+                            continue
+
+                        if s in types_f:
+                            types_f[s].update(suggests[s])
+                        elif s in types_s:
+                            types_s[s].update(suggests[s])
+                        
                         complete = False
+
+                    supplement.set_variables(program, types_f, types_s)
 
                 if complete:
                     break
@@ -278,79 +259,51 @@ class Treebuilder(object):
                 break
 
 
-    def create_program(self, filename):
+    def create_program(self, name):
     
         if self.disp:
-            print "%4d %4d Program" % (0, 0)
+            print "     Program"
     
         # Create intial nodes
-        program = col.Program(self.project, name=filename, line=0, cur=0, code=self.code)
-        includes = col.Includes(program, value=filename)
+        program = col.Program(self.project, name=name, cur=0, code=self.code)
+        includes = col.Includes(program, value=name)
+        funcs = col.Funcs(program, name=name)
+
+        col.Inlines(program, name=name)
+        col.Structs(program, name=name)
+        col.Headers(program, name=name)
+        col.Log(program, name=name)
+
         includes.include("armadillo")
-        includes.include("namespace_arma")
-    
-        col.Structs(program)
-    
         # Start processing
     
-        mainblock = None
-        line = 1
         cur = 0
     
         while True:
-    
-            if self.code[cur] == "\n":
-                line += 1
-    
-            elif self.code[cur] in " \t;":
+
+            if self.code[cur] in " \t;\n":
                 pass
-    
+   
             elif self.code[cur:cur+8] == "function":
-                cur, line = self.create_function(program, cur, line)
-    
+                cur = self.create_function(funcs, cur)
+
             else:
+                if self.disp:
+                    print "%4d Script" % cur
     
-                if mainblock is None:
-    
-                    if self.disp:
-                        print "%4d %4d Function (main)" %\
-                            (cur, line)
-    
-                    mainblock = self.create_main(program, 0, 0)
-    
-                cur, line = self.fill_codeblock(mainblock, cur, line)
+                self.create_main(funcs, cur)
+                break
     
             if len(self.code)-cur<=2:
                 break
             cur += 1
+
+        includes.include("namespace_arma")
+
         return program
     
     
-    def create_main(self, program, cur, line):
-        "Create main function"
-    
-        func = col.Func(program, "main",
-                cur=cur, line=line, backend="func_return")
-    
-        col.Declares(func, backend="func_return")
-    
-        returns = col.Returns(func, backend="func_return")
-        params = col.Params(func, backend="func_return")
-    
-        col.Var(returns, "_retval", type="int", backend="int").create_declare()
-        col.Var(params, "argc", type="int", backend="int")
-        col.Var(params, "argv", type="char", pointer=2, backend="char")
-    
-        block = col.Block(func, cur=cur, line=line)
-    
-        assign = col.Assign(block)
-        col.Var(assign, "_retval", type="int")
-        col.Int(assign, "0")
-    
-        return block
-    
-    
-    def create_function(self, program, cur, line):
+    def create_function(self, program, cur):
     
         assert self.code[cur:cur+8] == "function"
         assert self.code[cur+8] in key_end+"["
@@ -373,7 +326,7 @@ class Treebuilder(object):
     
         # with return values
         if self.code[k] == "=":
-    
+
             k += 1
             while self.code[k] in " \t.":
                 if self.code[k:k+3] == "...":
@@ -397,13 +350,13 @@ class Treebuilder(object):
                 m = l
     
             if self.disp:
-                print "%4d %4d Function       " % (cur, line),
+                print "%4d Function       " % cur,
                 print repr(self.code[START:m+1])
     
             name = self.code[k:l+1]
-            func = col.Func(program, name, cur=cur, line=line)
-            col.Declares(func)
-            returns = col.Returns(func)
+            func = col.Func(program, name, cur=cur)
+            col.Declares(func, code="")
+            returns = col.Returns(func, code=self.code[start:end+1])
     
             # multi-return
             if self.code[start] == "[":
@@ -411,16 +364,15 @@ class Treebuilder(object):
                 end = START
                 for array in L:
                     for s,e in array:
-                        line += self.code.count("\n", end, s)
                         end = s
     
                         if self.disp:
-                            print "%4d %4d   Return       " % (cur, line),
+                            print "%4d   Return       " % cur,
                             print repr(self.code[s:e+1])
                         assert all([a in letters+digits+"_@" \
                                 for a in self.code[s:e+1]])
     
-                        col.Var(returns, self.code[s:e+1], cur=s, line=line,
+                        col.Var(returns, self.code[s:e+1], cur=s,
                                 code=self.code[s:e+1])
     
             # single return
@@ -428,10 +380,10 @@ class Treebuilder(object):
                 end = self.findend_expression(start)
     
                 if self.disp:
-                    print "%4d %4d   Return       " % (cur, line),
+                    print "%4d   Return       " % cur,
                     print repr(self.code[start:end+1])
     
-                col.Var(returns, self.code[start:end+1], cur=start, line=line,
+                col.Var(returns, self.code[start:end+1], cur=start,
                         code=self.code[start:end+1])
     
     
@@ -441,7 +393,6 @@ class Treebuilder(object):
     
         # No returns
         else:
-    
             m = k
             if self.code[m] == "(":
                 m = self.findend_paren(m)
@@ -450,7 +401,7 @@ class Treebuilder(object):
     
     
             if self.disp:
-                print "%4d %4d Function       " % (cur, line),
+                print "%4d Function       " % cur,
                 print repr(self.code[START:m+1])
     
             end = start+1
@@ -458,36 +409,36 @@ class Treebuilder(object):
                 end += 1
     
             name = self.code[start:end]
-            func = col.Func(program, name, cur=cur, line=line)
+            func = col.Func(program, name, cur=cur)
     
             col.Declares(func)
             returns = col.Returns(func)
     
             cur = end
     
+        # Parameters
         params = col.Params(func, cur=cur)
-    
         if self.code[cur] == "(":
     
             end = self.findend_paren(cur)
-            params.code = self.code[cur:end+1]
+            params.code = self.code[cur+1:end]
     
             L = self.iterate_comma_list(cur)
             for array in L:
                 for s,e in array:
     
                     if self.disp:
-                        print "%4d %4d   Param        " % (cur, line),
+                        print "%4d   Param        " % cur,
                         print repr(self.code[s:e+1])
     
-                    var = col.Var(params, self.code[s:e+1], cur=s, line=line,
+                    var = col.Var(params, self.code[s:e+1], cur=s,
                             code=self.code[s:e+1])
     
             cur = end
     
         cur += 1
     
-        block = col.Block(func, line=line, cur=cur)
+        cur = self.create_codeblock(func, cur)
     
         if len(returns) == 1:
             func.backend = "func_return"
@@ -500,24 +451,37 @@ class Treebuilder(object):
             func[1].backend = "func_returns"
             func[2].backend = "func_returns"
     
-        cur, line = self.fill_codeblock(block, cur, line)
-    
         # Postfix
         for var in returns:
             var.create_declare()
     
         end = cur
-        func.code = self.code[start:end+1]
+        func.code = self.code[START:end+1]
+
+        col.Header(func.program[4], func.name)
+
+        return cur
+
     
-        return cur, line
+    def create_main(self, program, cur):
+        "Create main function"
+    
+        func = col.Main(program)
+    
+        col.Declares(func, backend="func_return")
+        col.Returns(func, backend="func_return")
+        col.Params(func, backend="func_return")
+    
+        return self.create_codeblock(func, cur)
     
     
-    def fill_codeblock(self, block, cur, line):
-    
-        assert block.cls == "Block"
+    def create_codeblock(self, parent, start):
+
+        cur = start
+        block = col.Block(parent, cur=cur)
     
         if self.disp:
-            print "%4d %4d Codeblock" % (cur, line)
+            print "%4d Codeblock" % cur
     
         while True:
     
@@ -525,12 +489,11 @@ class Treebuilder(object):
                 pass
     
             elif self.code[cur] == "\n":
-                line += 1
                 if len(self.code)-cur < 3:
-                    return cur, line
+                    break
     
             elif self.code[cur] == "%":
-                cur, line = self.create_comment(block, cur, line)
+                cur = self.create_comment(block, cur)
     
             elif self.code[cur] == "[":
     
@@ -542,71 +505,73 @@ class Treebuilder(object):
     
                 if self.code[eq_loc] == "=" and self.code[eq_loc+1] != "=":
     
-                    cur, line = self.create_assigns(block, cur, line, eq_loc)
+                    cur = self.create_assigns(block, cur, eq_loc)
     
                 else:
     
-                    statement = col.Statement(block, cur=cur, line=line)
+                    statement = col.Statement(block, cur=cur)
     
                     end = self.findend_expression(cur)
                     if self.disp:
-                        print "%4d %4d   Statement    " % (cur, line),
+                        print "%4d   Statement    " % cur,
                         print repr(self.code[cur:end+1])
     
                     statement.code = self.code[cur:end+1]
     
-                    cur, line = self.create_expression(
-                            statement, cur, line, end=end)
+                    cur = self.create_expression(
+                            statement, cur, end=end)
     
     
             elif self.code[cur] == "'":
     
                 end = self.findend_string(cur)
                 if self.disp:
-                    print "%4d %4d   Statement    " % (cur, line),
+                    print "%4d   Statement    " % cur,
                     print repr(self.code[cur:end+1])
     
-                statement = col.Statement(block, cur=cur, line=line,
+                statement = col.Statement(block, cur=cur,
                         code=self.code[cur:end+1])
     
-                cur, line = self.create_string(statement, cur, line)
+                cur = self.create_string(statement, cur)
     
             elif self.code[cur:cur+4] == "case" and self.code[cur+4] in key_end:
-                return cur, line
+                break
     
             elif self.code[cur:cur+5] == "catch" and self.code[cur+5] in key_end:
-                return cur, line
+                break
     
             elif self.code[cur:cur+3] == "end" and self.code[cur+3] in key_end:
-                return cur+3, line
+                cur += 3
+                break
     
             elif self.code[cur:cur+4] == "else" and self.code[cur+4] in key_end:
-                return cur, line
+                break
     
             elif self.code[cur:cur+6] == "elseif" and self.code[cur+6] in key_end:
-                return cur, line
+                break
     
             elif self.code[cur:cur+3] == "for" and self.code[cur+3] in key_end:
-                cur, line = self.create_for(block, cur, line)
+                cur = self.create_for(block, cur)
     
             elif self.code[cur:cur+8] == "function" and\
                     self.code[cur+8] in key_end + "[":
-                return cur-1, line
+                cur -= 1
+                break
     
             elif self.code[cur:cur+2] == "if" and self.code[cur+2] in key_end:
-                cur, line = self.create_if(block, cur, line)
+                cur = self.create_if(block, cur)
     
             elif self.code[cur:cur+9] == "otherwise" and self.code[cur+9] in key_end:
-                return cur, line
+                break
     
             elif self.code[cur:cur+6] == "switch" and self.code[cur+6] in key_end:
-                cur, line = self.create_switch(block, cur, line)
+                cur = self.create_switch(block, cur)
     
             elif self.code[cur:cur+3] == "try" and self.code[cur+3] in key_end:
-                cur, line = self.create_try(block, cur, line)
+                cur = self.create_try(block, cur)
     
             elif self.code[cur:cur+5] == "while" and self.code[cur+5] in key_end:
-                cur, line = self.create_while(block, cur, line)
+                cur = self.create_while(block, cur)
     
             elif self.code[cur] in expression_start:
                 j = self.findend_expression(cur)
@@ -622,29 +587,32 @@ class Treebuilder(object):
                     while self.code[j] in " \t":
                         j += 1
                     if self.code[j] == "@":
-                        cur, line = self.create_lambda(block, cur, line, eq_loc)
+                        cur = self.create_lambda(block, cur, eq_loc)
                     else:
-                        cur, line = self.create_assign(block, cur, line, eq_loc)
+                        cur = self.create_assign(block, cur, eq_loc)
     
                 else:
                     end = self.findend_expression(cur)
                     if self.disp:
-                        print "%4d %4d   Statement    " % (cur, line),
+                        print "%4d   Statement    " % cur,
                         print repr(self.code[cur:end+1])
     
-                    statement = col.Statement(block, cur=cur, line=line,
+                    statement = col.Statement(block, cur=cur,
                             code=self.code[cur:end+1])
     
-                    cur, line = self.create_expression(statement,
-                            cur, line, end=end)
+                    cur = self.create_expression(statement,
+                            cur, end=end)
     
             cur += 1
     
             if len(self.code)-cur<3:
-                return cur, line
+                break
+
+        block.code = self.code[start:cur+1]
+        return cur
     
     
-    def create_assigns(self, parent, cur, line, eq_loc):
+    def create_assigns(self, parent, cur, eq_loc):
     
         assert self.code[cur] == "["
         assert self.code[eq_loc] == "="
@@ -658,33 +626,33 @@ class Treebuilder(object):
         end = self.findend_expression(j)
     
         if self.disp:
-            print "%4d %4d   Assigns      " %\
-                    (cur, line),
+            print "%4d   Assigns      " %\
+                    cur,
             print repr(self.code[cur:end+1])
     
         l = self.iterate_list(cur)
     
         if len(l[0]) == 1:
-            return self.create_assign(parent, l[0][0][0], line, eq_loc)
+            return self.create_assign(parent, l[0][0][0], eq_loc)
     
-        assigns = col.Assigns(parent, cur=cur, line=line, code=self.code[cur:end+1])
+        assigns = col.Assigns(parent, cur=cur, code=self.code[cur:end+1])
     
         for vector in l:
             for start,stop in vector:
-                self.create_assign_variable(assigns, start, line, end=stop)
+                self.create_assign_variable(assigns, start, end=stop)
     
         cur = eq_loc + 1
         while self.code[cur] in " \t":
             cur += 1
     
-        cur_, line =  self.create_expression(assigns, cur, line)
+        cur_ =  self.create_expression(assigns, cur)
     
         assigns.name = assigns[-1].name
     
-        return cur_, line
+        return cur_
     
     
-    def create_assign(self, parent, cur, line, eq_loc):
+    def create_assign(self, parent, cur, eq_loc):
     
         assert self.code[cur] in letters
         assert self.code[eq_loc] == "="
@@ -695,13 +663,13 @@ class Treebuilder(object):
         end = self.findend_expression(j)
     
         if self.disp:
-            print "%4d %4d   Assign       " %\
-                    (cur, line),
+            print "%4d   Assign       " %\
+                    cur,
             print repr(self.code[cur:end+1])
     
-        assign = col.Assign(parent, cur=cur, line=line, code=self.code[cur:end+1])
+        assign = col.Assign(parent, cur=cur, code=self.code[cur:end+1])
     
-        cur, line = self.create_assign_variable(assign, cur, line, eq_loc)
+        cur = self.create_assign_variable(assign, cur, eq_loc)
     
         cur += 1
         while self.code[cur] in " \t":
@@ -718,16 +686,16 @@ class Treebuilder(object):
         while self.code[k] in " \t":
             k += 1
     
-        cur_, line = self.create_expression(assign, k, line, end)
+        cur_ = self.create_expression(assign, k, end)
         assign.name = assign[-1].name
     
         assert len(assign) == 2
     
-        return end, line
+        return end
     
     
     
-    def create_assign_variable(self, node, cur, line, end=None):
+    def create_assign_variable(self, node, cur, end=None):
     
         assert self.code[cur] in letters
 
@@ -752,17 +720,17 @@ class Treebuilder(object):
             if self.code[end] == "(":
     
                 end = self.findend_paren(end)
-                node = col.Cset(node, name, cur=cur, line=line,
+                node = col.Cset(node, name, cur=cur,
                         code=self.code[cur:end+1])
     
                 if self.disp:
-                    print "%4d %4d     Cset       " % (cur, line),
+                    print "%4d     Cset       " % cur,
                     print repr(self.code[cur:end+1])
     
                 n_fields = 0
                 while self.code[k] == "{":
     
-                    cur, line = self.fill_cell(node, k, line)
+                    cur = self.fill_cell(node, k)
                     k = cur+1
                     while self.code[k] in " \t":
                         k += 1
@@ -773,24 +741,24 @@ class Treebuilder(object):
     
                 assert self.code[k] == "("
     
-                cur, line = self.create_list(node, k, line)
+                cur = self.create_list(node, k)
     
                 node["n_fields"] = n_fields
                 node["n_args"] = len(node) - n_fields
     
             else:
                 end = self.findend_cell(k)
-                node = col.Cvar(node, name, cur=cur, line=line,
+                node = col.Cvar(node, name, cur=cur,
                         code=self.code[cur:end+1])
     
                 if self.disp:
-                    print "%4d %4d     Cvar       " % (cur, line),
+                    print "%4d     Cvar       " % cur,
                     print repr(self.code[cur:end+1])
     
                 num = 0
                 while self.code[k] == "{":
     
-                    cur, line = self.fill_cell(node, k, line)
+                    cur = self.fill_cell(node, k)
                     k = cur+1
                     while self.code[k] in " \t":
                         k += 1
@@ -810,27 +778,27 @@ class Treebuilder(object):
                 value = self.code[start:end]
 
                 if self.disp:
-                    print "%4d %4d     Sset        " %\
-                            (cur, line),
+                    print "%4d     Sset        " %\
+                            cur,
                     print repr(self.code[cur:end])
 
-                node = col.Sset(node, name, value, cur=cur, line=line,
+                node = col.Sset(node, name, value, cur=cur,
                         code=self.code[cur:end], pointer=1)
 
-                last, line = self.create_list(node, k, line)
+                last = self.create_list(node, k)
                 cur = end
 
             else:
         
                 if self.disp:
-                    print "%4d %4d     Set        " %\
-                            (cur, line),
+                    print "%4d     Set        " %\
+                            cur,
                     print repr(self.code[cur:end+1])
         
-                node = col.Set(node, name, cur=cur, line=line,
+                node = col.Set(node, name, cur=cur,
                         code=self.code[cur:end+1])
         
-                last, line = self.create_list(node, k, line)
+                last = self.create_list(node, k)
                 cur = last
     
         elif self.code[k] == ".":
@@ -848,16 +816,15 @@ class Treebuilder(object):
                     k += 1
     
                 if self.disp:
-                    print "%4d %4d     Nset       " % (cur, line),
+                    print "%4d     Nset       " % cur,
                     print repr(self.code[cur:end+1])
     
     
                 node = col.Nset(node, name)
                 node.cur = cur
-                node.line = line
                 node.code = self.code[cur:end+1]
     
-                cur, line = self.create_expression(node, cur, line)
+                cur = self.create_expression(node, cur)
     
     
             elif self.code[k] in letters:
@@ -877,22 +844,22 @@ class Treebuilder(object):
     
                     end = self.findend_paren(j)
                     if self.disp:
-                        print "%4d %4d     Fset       " % (cur, line),
+                        print "%4d     Fset       " % cur,
                         print repr(self.code[cur:end+1])
     
-                    node = col.Fset(node, name, value=value, cur=cur, line=line,
+                    node = col.Fset(node, name, value=value, cur=cur,
                             code=self.code[cur:end+1])
     
-                    cur, line = self.create_list(node, j, line)
+                    cur = self.create_list(node, j)
     
                 # Fieldname of type "a.b = ..."
                 else:
     
                     if self.disp:
-                        print "%4d %4d     Fvar       " % (cur, line),
+                        print "%4d     Fvar       " % cur,
                         print repr(self.code[cur:last+1])
     
-                    node = col.Fvar(node, name, value=value, cur=cur, line=line,
+                    node = col.Fvar(node, name, value=value, cur=cur,
                             code=self.code[cur:last+1])
     
                     cur = last
@@ -900,20 +867,20 @@ class Treebuilder(object):
         # Simple variable assignment
         else:
             if self.disp:
-                print "%4d %4d     Var        " % (cur, line),
+                print "%4d     Var        " % cur,
                 print repr(self.code[cur:last])
     
     
-            node = col.Var(node, name, line=line, cur=cur,
+            node = col.Var(node, name, cur=cur,
                     code=self.code[cur:last])
     
             cur = last-1
     
         node.create_declare()
-        return cur, line
+        return cur
     
     
-    def fill_cell(self, cset, cur, line):
+    def fill_cell(self, cset, cur):
     
         assert self.code[cur] == "{"
     
@@ -922,17 +889,17 @@ class Treebuilder(object):
         while True:
     
             if self.code[cur] == "}":
-                return cur, line
+                return cur
     
             elif self.code[cur] in expression_start:
     
-                cur, line = self.create_expression(cset, cur, line)
+                cur = self.create_expression(cset, cur)
     
                 cur += 1
                 while self.code[cur] in " \t":
                     cur += 1
     
-                return cur, line
+                return cur
     
             elif self.code[cur] == " ":
                 pass
@@ -940,19 +907,18 @@ class Treebuilder(object):
             cur += 1
     
     
-    def create_matrix(self, node, cur, line):
+    def create_matrix(self, node, cur):
     
         assert self.code[cur] == "["
     
         end = self.findend_matrix(cur)
         if self.disp:
-            print "%4s %4s     Matrix     " % (cur, line),
+            print "%4d     Matrix     " % cur,
             print repr(self.code[cur:end+1])
     
         L = self.iterate_list(cur)
-        matrix = col.Matrix(node, cur=cur, line=line, code=self.code[cur:end+1])
+        matrix = col.Matrix(node, cur=cur, code=self.code[cur:end+1])
     
-        inter = -1
         for array in L:
     
             if array:
@@ -961,50 +927,45 @@ class Treebuilder(object):
             else:
                 start = cur
     
-            vector = col.Vector(matrix, cur=start, line=line,
+            vector = col.Vector(matrix, cur=start,
                     code=self.code[start:end+1])
     
             if self.disp:
-                print "%4s %4s     Vector     " % (start, line),
+                print "%4d     Vector     " % (start),
                 print repr(self.code[start:end+1])
     
             for start,end in array:
     
-                self.create_expression(vector, start, line, end)
-    
-                if inter != -1:
-                    line += self.code.count("\n", inter, start)
-    
-                inter = end-1
+                self.create_expression(vector, start, end)
     
         if not L:
     
             if self.disp:
-                print "%4s %4s     Vector     " % (cur, line),
+                print "%4d     Vector     " % cur,
                 print repr("")
-            vector = col.Vector(matrix, cur=cur, line=line, code="")
+            vector = col.Vector(matrix, cur=cur, code="")
     
     
-        return self.findend_matrix(cur), line
+        return self.findend_matrix(cur)
     
     
-    def create_for(self, parent, cur, line):
+    def create_for(self, parent, cur):
     
         assert self.code[cur:cur+3] == "for"
     
         start = cur
     
         if self.disp:
-            print "%4d %4d   For          " % (cur, line),
+            print "%4d   For          " % cur,
             print repr(self.code[cur:self.code.find("\n", cur)])
     
-        for_loop = col.For(parent, cur=cur, line=line)
+        for_loop = col.For(parent, cur=cur)
     
         cur = cur+3
         while self.code[cur] in "( \t":
             cur += 1
     
-        cur, line = self.create_variable(for_loop, cur, line)
+        cur = self.create_variable(for_loop, cur)
         for_loop[0].create_declare()
     
         cur += 1
@@ -1016,7 +977,7 @@ class Treebuilder(object):
         while self.code[cur] in " \t":
             cur += 1
     
-        cur, line = self.create_expression(for_loop, cur, line)
+        cur = self.create_expression(for_loop, cur)
         cur += 1
     
         while self.code[cur] in ") \t":
@@ -1026,23 +987,19 @@ class Treebuilder(object):
             cur += 1
     
         while self.code[cur] in " \t\n;":
-            if self.code[cur] == "\n":
-                line += 1
             cur += 1
     
-        block = col.Block(for_loop, cur=cur, line=line)
-        end, line = self.fill_codeblock(block, cur, line)
+        end = self.create_codeblock(for_loop, cur)
     
         for_loop.code = self.code[start:end]
-        block.code = self.code[cur:end]
     
-        return end, line
+        return end
     
-    def create_if(self, parent, start, line):
+    def create_if(self, parent, start):
     
         assert self.code[start:start+2] == "if" and self.code[start+2] in key_end
     
-        branch = col.Branch(parent, cur=start, line=line)
+        branch = col.Branch(parent, cur=start)
     
         cur = start
     
@@ -1054,26 +1011,20 @@ class Treebuilder(object):
         end = self.findend_expression(cur)
     
         if self.disp:
-            print "%4d %4d   If           " % (start, line),
+            print "%4d   If           " % (start),
             print repr(self.code[start:end+1])
     
-        node = col.If(branch, cur=cur, line=line)
+        node = col.If(branch, cur=cur)
     
         if self.code[cur] == "(":
             cur += 1
             while self.code[cur] in " \t":
                 cur += 1
-        _, line = self.create_expression(node, cur, line)
+        self.create_expression(node, cur)
     
+        end = self.create_codeblock(node, end+1)
         node.code = self.code[cur:end+1]
-    
-        cur = end + 1
-        block = col.Block(node, cur=cur, line=line)
-    
-        end, line = self.fill_codeblock(block, cur, line)
-        block.code = self.code[cur:end+1]
-        cur = end
-    
+
         while self.code[cur:cur+6] == "elseif" and self.code[cur+6] in key_end:
     
             node.code = self.code[start:cur]
@@ -1086,25 +1037,23 @@ class Treebuilder(object):
             end = self.findend_expression(cur)
     
             if self.disp:
-                print "%4d %4d   Else if      " % (start, line),
+                print "%4d   Else if      " % (start),
                 print repr(self.code[start:end+1])
     
-            node = col.Elif(branch, cur=start, line=line)
+            node = col.Elif(branch, cur=start)
     
             if self.code[cur] == "(":
                 cur += 1
                 while self.code[cur] in " \t":
                     cur += 1
     
-            _, line = self.create_expression(node, cur, line)
+            self.create_expression(node, cur)
             cur = end+1
     
-            block = col.Block(node, cur=cur, line=line)
+            cur = end = self.create_codeblock(node, cur)
     
-            end, line = self.fill_codeblock(block, cur, line)
-            block.code = self.code[cur:end+1]
-            cur = end
-    
+
+        cur = end
         node.code = self.code[start:cur]
     
         if self.code[cur:cur+4] == "else" and self.code[cur+4] in key_end:
@@ -1114,23 +1063,20 @@ class Treebuilder(object):
             cur += 4
     
             if self.disp:
-                print "%4d %4d   Else         " % (start, line),
+                print "%4d   Else         " % (start),
                 print repr(self.code[start:start+5])
     
-            node = col.Else(branch, cur=start, line=line)
+            node = col.Else(branch, cur=start)
     
-            block = col.Block(node, cur=cur, line=line)
-    
-            end, line = self.fill_codeblock(block, cur, line)
+            end = self.create_codeblock(node, cur)
             node.code = self.code[start:end+1]
-            block.code = self.code[cur:end+1]
     
         branch.code = self.code[start:end+1]
+
+        return end
     
-        return end, line
     
-    
-    def create_while(self, parent, cur, line):
+    def create_while(self, parent, cur):
     
         assert self.code[cur:cur+5] == "while" and self.code[cur+5] in key_end
         start = cur
@@ -1142,33 +1088,31 @@ class Treebuilder(object):
         end = self.findend_expression(k)
     
         if self.disp:
-            print "%4d %4d   While        " % (cur, line),
+            print "%4d   While        " % cur,
             print repr(self.code[cur:end+1])
     
-        while_ = col.While(parent, cur=cur, line=line)
+        while_ = col.While(parent, cur=cur)
     
         if self.code[k] == "(":
             k += 1
             while self.code[k] in " \t":
                 k += 1
     
-        cur, line = self.create_expression(while_, k, line)
+        cur = self.create_expression(while_, k)
         cur += 1
     
         cur += 1
         while self.code[cur] in " \t":
             cur += 1
     
-        block = col.Block(while_, cur=cur, line=line)
-    
-        end, line = self.fill_codeblock(block, cur, line)
+        end = self.create_codeblock(while_, cur)
     
         while_.code = self.code[start:end+1]
     
-        return end, line
+        return end
     
     
-    def create_switch(self, parent, cur, line):
+    def create_switch(self, parent, cur):
     
         assert self.code[cur:cur+6] == "switch" and\
                 self.code[cur+6] in " \t("
@@ -1180,18 +1124,16 @@ class Treebuilder(object):
         end = self.findend_expression(k)
     
         if self.disp:
-            print "%4d %4d   Switch       " % (cur, line),
+            print "%4d   Switch       " % cur,
             print repr(self.code[cur:end+1])
     
-        switch = col.Switch(parent, cur=cur, line=line)
+        switch = col.Switch(parent, cur=cur)
     
-        self.create_expression(switch, k, line, end)
+        self.create_expression(switch, k, end)
     
         k = end+1
     
         while self.code[k] in " \t\n;,":
-            if self.code[k] == "\n":
-                line += 1
             k += 1
     
         while self.code[k:k+4] == "case" and self.code[k+4] in " \t(":
@@ -1205,104 +1147,89 @@ class Treebuilder(object):
             end = self.findend_expression(k)
     
             if self.disp:
-                print "%4d %4d   Case         " % (cur, line),
+                print "%4d   Case         " % cur,
                 print repr(self.code[cur:end+1])
     
-            case = col.Case(switch, cur=cur, line=line)
+            case = col.Case(switch, cur=cur)
     
-            cur, line = self.create_expression(case, k, line, end)
+            cur = self.create_expression(case, k, end)
     
             k = cur+1
             while self.code[k] in " \t;,\n":
-                if self.code[k] == "\n":
-                    line += 1
                 k += 1
     
-            block = col.Block(case, cur=k, line=line)
-    
-            k, line = self.fill_codeblock(block, k, line)
+            k = self.create_codeblock(case, k)
     
         if self.code[k:k+9] == "otherwise" and self.code[k+9] in " \t(,;\n":
     
             cur = k
     
             if self.disp:
-                print "%4d %4d   Otherwise    " % (cur, line),
+                print "%4d   Otherwise    " % cur,
                 print repr(self.code[cur:cur+10])
     
-            otherwise = col.Otherwise(switch, cur=cur, line=line)
+            otherwise = col.Otherwise(switch, cur=cur)
     
             k += 9
             while self.code[k] in " \t\n;,":
-                if self.code[k] == "\n":
-                    line += 1
                 k += 1
     
-            block = col.Block(otherwise, cur=k, line=line)
+            k = self.create_codeblock(otherwise, k)
     
-            k, line = self.fill_codeblock(block, k, line)
-    
-        return k, line
+        return k
     
     
     
-    def create_try(self, parent, cur, line):
+    def create_try(self, parent, cur):
         assert self.code[cur:cur+3] == "try" and self.code[cur+3] in key_end
     
         if self.disp:
-            print "%4d %4d   Try          " % (cur, line),
+            print "%4d   Try          " % cur,
             print repr(self.code[cur:cur+3])
     
         start = cur
     
-        tryblock = col.Tryblock(parent, cur=cur, line=line)
+        tryblock = col.Tryblock(parent, cur=cur)
     
         try_ = col.Try(tryblock)
     
         cur += 3
         while self.code[cur] in " \t\n,;":
-            if self.code[cur] == "\n":
-                line += 1
             cur += 1
     
-        block = col.Block(try_, cur=cur, line=line)
-        cur, line = self.fill_codeblock(block, cur, line)
+        cur = self.create_codeblock(try_, cur)
     
         try_.code = self.code[start:cur]
     
         assert self.code[cur:cur+5] == "catch" and self.code[cur+5] in key_end
     
-        catch_ = col.Catch(tryblock, cur=cur, line=line)
+        catch_ = col.Catch(tryblock, cur=cur)
     
         start_ = cur
         cur += 5
         while self.code[cur] in " \t\n,;":
-            if self.code[cur] == "\n":
-                line += 1
             cur += 1
     
-        block = col.Block(catch_, cur=cur, line=line)
-        cur, line = self.fill_codeblock(block, cur, line)
+        cur = self.create_codeblock(catch_, cur)
     
         catch_.code = self.code[start_:cur]
         tryblock.code = self.code[start:cur]
     
-        return cur, line
+        return cur
     
     
     
-    def create_cell(self, node, cur, line):
+    def create_cell(self, node, cur):
         assert self.code[cur] == "{"
     
         end = self.findend_cell(cur)
         if self.disp:
-            print "%4s %4s     Cell       " % (cur, line),
+            print "%4d     Cell       " % cur,
             print repr(self.code[cur:end+1])
     
         L = self.iterate_list(cur)
-        cell = col.Cell(node, cur=cur, line=line, code=self.code[cur:end+1])
+        cell = col.Cell(node, cur=cur, code=self.code[cur:end+1])
     
-        inter = -1
         for array in L:
     
             if array:
@@ -1313,17 +1240,13 @@ class Treebuilder(object):
     
             for start,end in array:
     
-                self.create_expression(cell, start, line, end)
-    
-                if inter != -1:
-                    line += self.code.count("\n", inter, start)
-    
-                inter = end-1
-    
-        return self.findend_cell(cur), line
+                self.create_expression(cell, start, end)
     
     
-    def create_variable(self, parent, cur, line):
+        return self.findend_cell(cur)
+    
+    
+    def create_variable(self, parent, cur):
     
         k = cur
         if self.code[k] == "@":
@@ -1352,17 +1275,17 @@ class Treebuilder(object):
             if self.code[end] == "(":
     
                 end = self.findend_paren(end)
-                node = col.Cget(parent, name, cur=cur, line=line,
+                node = col.Cget(parent, name, cur=cur,
                         code=self.code[cur:end+1])
     
                 if self.disp:
-                    print "%4d %4d     Cget       " % (cur, line),
+                    print "%4d     Cget       " % cur,
                     print repr(self.code[cur:end+1])
     
                 n_fields = 0
                 while self.code[k] == "{":
     
-                    cur, line = self.fill_cell(node, k, line)
+                    cur = self.fill_cell(node, k)
                     k = cur+1
                     while self.code[k] in " \t":
                         k += 1
@@ -1373,24 +1296,24 @@ class Treebuilder(object):
     
                 assert self.code[k] == "("
     
-                cur, line = self.create_list(node, k, line)
+                cur = self.create_list(node, k)
     
                 node["n_fields"] = n_fields
                 node["n_args"] = len(node) - n_fields
     
             else:
                 end = self.findend_cell(k)
-                node = col.Cvar(parent, name, cur=cur, line=line,
+                node = col.Cvar(parent, name, cur=cur,
                         code=self.code[cur:end+1])
     
                 if self.disp:
-                    print "%4d %4d     Cvar       " % (cur, line),
+                    print "%4d     Cvar       " % cur,
                     print repr(self.code[cur:end+1])
     
                 num = 0
                 while self.code[k] == "{":
     
-                    cur, line = self.fill_cell(node, k, line)
+                    cur = self.fill_cell(node, k)
                     k = cur+1
                     while self.code[k] in " \t":
                         k += 1
@@ -1410,27 +1333,27 @@ class Treebuilder(object):
                 value = self.code[start:end]
 
                 if self.disp:
-                    print "%4d %4d     Sget        " %\
-                            (cur, line),
+                    print "%4d     Sget        " %\
+                            cur,
                     print repr(self.code[cur:end])
 
-                node = col.Sget(parent, name, value, cur=cur, line=line,
+                node = col.Sget(parent, name, value, cur=cur,
                         code=self.code[cur:end], pointer=1)
 
-                last, line = self.create_list(node, k, line)
+                last = self.create_list(node, k)
                 cur = end
 
             else:
         
                 if self.disp:
-                    print "%4d %4d     Get        " %\
-                            (cur, line),
+                    print "%4d     Get        " %\
+                            cur,
                     print repr(self.code[cur:end+1])
         
-                node = col.Get(parent, name, cur=cur, line=line,
+                node = col.Get(parent, name, cur=cur,
                         code=self.code[cur:end+1])
         
-                last, line = self.create_list(node, k, line)
+                last = self.create_list(node, k)
                 cur = last
     
     
@@ -1445,7 +1368,7 @@ class Treebuilder(object):
                 end = self.findend_paren(k)
     
                 if self.disp:
-                    print "%4d %4d     Nget       " % (cur, line),
+                    print "%4d     Nget       " % cur,
                     print repr(self.code[cur:end+1])
     
                 k += 1
@@ -1453,10 +1376,10 @@ class Treebuilder(object):
                 while self.code[k] in " \t":
                     k += 1
     
-                node = col.Nget(parent, name, cur=cur, line=line,
+                node = col.Nget(parent, name, cur=cur,
                         code=self.code[cur:end+1])
     
-                cur, line = self.create_expression(node, k, line)
+                cur = self.create_expression(node, k)
     
     
             elif self.code[k] in letters:
@@ -1476,18 +1399,18 @@ class Treebuilder(object):
     
                     end = self.findend_paren(j)
                     if self.disp:
-                        print "%4d %4d     Fget       " % (cur, line),
+                        print "%4d     Fget       " % cur,
                         print repr(self.code[cur:end+1])
     
     
                     node = col.Fget(parent, name, cur=cur,
-                            line=line, value=value, code=self.code[cur:end+1])
+                            value=value, code=self.code[cur:end+1])
     
                     j += 1
                     while self.code[j] in " \t":
                         j += 1
     
-                    cur, line = self.create_expression(node, j, line)
+                    cur = self.create_expression(node, j)
     
                     node.create_declare()
     
@@ -1495,11 +1418,11 @@ class Treebuilder(object):
                 else:
     
                     if self.disp:
-                        print "%4d %4d     Fvar       " % (cur, line),
+                        print "%4d     Fvar       " % cur,
                         print repr(self.code[cur:last])
     
                     node = col.Fvar(parent, name, value=value,
-                            cur=cur, line=line, code=self.code[cur:last])
+                            cur=cur, code=self.code[cur:last])
     
                     cur = last-1
     
@@ -1510,10 +1433,10 @@ class Treebuilder(object):
         else:
     
             if self.disp:
-                print "%4d %4d     Var        " % (cur, line),
+                print "%4d     Var        " % cur,
                 print repr(self.code[cur:last])
     
-            node = col.Var(parent, name, cur=cur, line=line,
+            node = col.Var(parent, name, cur=cur,
                     code=self.code[cur:last])
     
             cur = last-1
@@ -1521,62 +1444,61 @@ class Treebuilder(object):
         while self.code[cur] in " \t":
             cur += 1
     
-        return cur, line
+        return cur
     
     
-    def create_comment(self, parent, cur, line):
+    def create_comment(self, parent, cur):
     
         assert parent.cls == "Block"
         assert self.code[cur] == "%"
     
         end = self.findend_comment(cur)
-        line += self.code.count("\n", cur, end+1)
     
         if self.comments:
-            return end, line
+            return end
     
         if self.disp:
-            print "%4d %4d   Comment      " % (cur, line),
+            print "%4d   Comment      " % cur,
             print repr(self.code[cur:end+1])
     
         if self.code[cur+1] == "{":
-            comment = col.Bcomment(parent, self.code[cur+2:end-1], cur=cur, line=line)
+            comment = col.Bcomment(parent, self.code[cur+2:end-1], cur=cur)
         else:
             k = cur-1
             while self.code[k] in " \t":
                 k -= 1
             if self.code[k] == "\n":
-                comment = col.Lcomment(parent, self.code[cur+1:end], cur=cur, line=line)
+                comment = col.Lcomment(parent, self.code[cur+1:end], cur=cur)
             else:
-                comment = col.Ecomment(parent, self.code[cur+1:end], cur=cur, line=line)
+                comment = col.Ecomment(parent, self.code[cur+1:end], cur=cur)
     
         comment.code = self.code[cur:end+1]
     
-        return end, line
+        return end
     
     
-    def create_string(self, parent, cur, line):
+    def create_string(self, parent, cur):
     
         end = self.findend_string(cur)
         assert "\n" not in self.code[cur:end]
-        col.String(parent, self.code[cur+1:end], cur=cur, line=line,
+        col.String(parent, self.code[cur+1:end], cur=cur,
                 code=self.code[cur:end+1])
     
         if self.disp:
-            print "%4d %4d   String " % (cur, line),
+            print "%4d   String " % cur,
             print repr(self.code[cur:end+1])
     
-        return end, line
+        return end
     
     
-    def create_list(self, parent, cur, line):
+    def create_list(self, parent, cur):
     
         assert self.code[cur] in "({"
     
         end = cur
         for vector in self.iterate_comma_list(cur):
             for start,end in vector:
-                _, line = self.create_expression(parent, start, line, end)
+                self.create_expression(parent, start, end)
     
         end += 1
         while self.code[end] in " \t":
@@ -1584,11 +1506,11 @@ class Treebuilder(object):
     
         assert self.code[end] in ")}"
     
-        return end, line
+        return end
     
     
     
-    def create_number(self, node, start, line):
+    def create_number(self, node, start):
     
         assert self.code[start] in digits or\
                 self.code[start] == "." and self.code[start+1] in digits
@@ -1626,17 +1548,17 @@ class Treebuilder(object):
             if self.code[k] in "ij":
     
                 k += 1
-                node = col.Imag(node, number, cur=start, line=line,
+                node = col.Imag(node, number, cur=start,
                         code=self.code[start:last+1])
                 if self.disp:
-                    print "%4d %4d     Imag       " % (start, line),
+                    print "%4d     Imag       " % (start),
                     print repr(self.code[start:last+1])
     
             else:
-                node = col.Float(node, number, cur=start, line=line,
+                node = col.Float(node, number, cur=start,
                         code=self.code[start:last+1])
                 if self.disp:
-                    print "%4d %4d     Float      " % (start, line),
+                    print "%4d     Float      " % (start),
                     print repr(self.code[start:last+1])
     
         elif integer:
@@ -1645,53 +1567,53 @@ class Treebuilder(object):
     
             if self.code[k] in "ij":
     
-                node = col.Imag(node, self.code[start:k], cur=start, line=line,
+                node = col.Imag(node, self.code[start:k], cur=start,
                         code=self.code[start:last+1])
                 k += 1
                 if self.disp:
-                    print "%4d %4d     Imag       " % (start, line),
+                    print "%4d     Imag       " % (start),
                     print repr(self.code[start:last+1])
     
             else:
-                node = col.Int(node, self.code[start:k], cur=start, line=line,
+                node = col.Int(node, self.code[start:k], cur=start,
                         code=self.code[start:last+1])
                 if self.disp:
-                    print "%4d %4d     Int        " % (start, line),
+                    print "%4d     Int        " % (start),
                     print repr(self.code[start:last+1])
     
         else:
     
             if self.code[k] in "ij":
     
-                node = col.Imag(node, self.code[start:k], cur=start, line=line,
+                node = col.Imag(node, self.code[start:k], cur=start,
                         code=self.code[start:last+1])
                 k += 1
                 if self.disp:
-                    print "%4d %4d     Imag       " % (start, line),
+                    print "%4d     Imag       " % (start),
                     print repr(self.code[start:last+1])
     
             else:
-                node = col.Float(node, self.code[start:k], cur=start, line=line,
+                node = col.Float(node, self.code[start:k], cur=start,
                         code=self.code[start:k])
                 if self.disp:
-                    print "%4d %4d     Float      " % (start, line),
+                    print "%4d     Float      " % (start),
                     print repr(self.code[start:last+1])
     
-        return k-1, line
+        return k-1
     
-    def create_lambda(self, node, cur, line, eq_loc):
+    def create_lambda(self, node, cur, eq_loc):
     
         assert self.code[cur] in letters
         assert self.code[eq_loc] == "="
     
         if self.disp:
-            print "%4d %4d   Assign       " %\
-                    (cur, line),
+            print "%4d   Assign       " %\
+                    cur,
             print repr(self.code[cur:self.code.find("\n", cur)])
     
-        assign = col.Assign(node, cur=cur, line=line, backend="func_lambda")
+        assign = col.Assign(node, cur=cur, backend="func_lambda")
     
-        _, line = self.create_assign_variable(assign, cur, line, eq_loc)
+        self.create_assign_variable(assign, cur, eq_loc)
         assign[0].declare.type = "func_lambda"
         assign[0].type = "func_lambda"
     
@@ -1699,13 +1621,13 @@ class Treebuilder(object):
         while self.code[k] in " \t":
             k += 1
     
-        line, end = self.create_lambda_func(assign, k, line)
+        end = self.create_lambda_func(assign, k)
         assign.code = self.code[cur:end+1]
     
-        return line, end
+        return end
     
     
-    def create_lambda_func(self, node, cur, line):
+    def create_lambda_func(self, node, cur):
     
         assert self.code[cur] == "@"
     
@@ -1723,8 +1645,7 @@ class Treebuilder(object):
         end = self.findend_expression(end)
     
         if self.disp:
-            print "%4d %4d   Lambda       " %\
-                    (cur, line),
+            print "%4d   Lambda       " % cur,
             print repr(self.code[cur:end+1])
     
         if node.cls == "Assign":
@@ -1740,7 +1661,7 @@ class Treebuilder(object):
                 i += 1
             name = name + "%d" % i
     
-        func = col.Func(program, name, cur=cur, line=line, code=self.code[cur:end+1])
+        func = col.Func(program, name, cur=cur, code=self.code[cur:end+1])
     
         declares = col.Declares(func)
         returns = col.Returns(func)
@@ -1752,7 +1673,7 @@ class Treebuilder(object):
     
         assert self.code[k] == "("
     
-        cur, line = self.create_list(params, k, line)
+        cur = self.create_list(params, k)
     
         cur += 1
         while self.code[cur] in " \t":
@@ -1762,7 +1683,7 @@ class Treebuilder(object):
         assign = col.Assign(block)
         var = col.Var(assign, "_retval")
     
-        cur, line = self.create_expression(assign, cur, line, end=end)
+        cur = self.create_expression(assign, cur, end=end)
 
         for n in utils.flatten(assign[1]):
             if (n.cls in ("Get", "Cget", "Var", "Fvar", "Fget",
@@ -1784,10 +1705,10 @@ class Treebuilder(object):
     
         lamb.reference = func
 
-        return cur, line
+        return cur
     
     
-    def create_expression(self, node, start, line, end=None, start_opr=None):
+    def create_expression(self, node, start, end=None, start_opr=None):
     
         if self.code[start:start+3] == "...":
             start = self.findend_dots(start)
@@ -1798,19 +1719,19 @@ class Treebuilder(object):
         if self.code[start] == ":":
     
             if self.disp:
-                print "%4s %4s     Expression " % (start, line),
+                print "%4d     Expression " % (start),
                 print repr(self.code[start:start+1])
-                print "%4s %4s     All        " % (start, line),
+                print "%4d     All        " % (start),
                 print repr(self.code[start:start+1])
     
-            col.All(node, cur=start, line=line, code=self.code[start])
-            return start, line
+            col.All(node, cur=start, code=self.code[start])
+            return start
     
         if end is None:
             end = self.findend_expression(start)
     
         if self.disp:
-            print "%4s %4s     Expression " % (start, line),
+            print "%4d     Expression " % (start),
             print repr(self.code[start:end+1])
     
         assert self.code[start] in expression_start
@@ -1888,13 +1809,12 @@ class Treebuilder(object):
     
                 node = self.retrieve_operator(opr)(node)
                 node.cur = start
-                node.line = line
                 node.code = self.code[starts[0]:ends[-1]+1]
     
                 for s,e in zip(starts, ends):
-                    self.create_expression(node, s, line, e, opr)
+                    self.create_expression(node, s, e, opr)
     
-                return end, line
+                return end
     
     
         # All operators removed at this point!
@@ -1906,12 +1826,12 @@ class Treebuilder(object):
     
             if self.code[start] == "-":
     
-                node = col.Neg(node, cur=start, line=line, code=self.code[start:end+1])
+                node = col.Neg(node, cur=start, code=self.code[start:end+1])
                 start += 1
     
             if self.code[start] == "~":
     
-                node = col.Not(node, cur=start, line=line, code=self.code[start:end+1])
+                node = col.Not(node, cur=start, code=self.code[start:end+1])
                 start += 1
     
             while self.code[start] in " \t":
@@ -1920,14 +1840,13 @@ class Treebuilder(object):
         # Postfixes
         if self.code[end] == "'" and not self.code[start] == "'":
             if self.code[end-1] == ".":
-                node = col.Ctranspose(node, cur=start, line=line,
+                node = col.Ctranspose(node, cur=start,
                         code=self.code[start:end+1])
                 end -= 2
             else:
-                node = col.Transpose(node, cur=start, line=line,
+                node = col.Transpose(node, cur=start,
                         code=self.code[start:end+1])
                 node.cur = start
-                node.line = line
                 node.code = self.code[start:end+1]
                 end -= 1
     
@@ -1938,7 +1857,7 @@ class Treebuilder(object):
         if self.code[start] == "(":
             assert self.code[end] == ")"
     
-            node = col.Paren(node, cur=start, line=line, code=self.code[start:end+1])
+            node = col.Paren(node, cur=start, code=self.code[start:end+1])
     
             start += 1
             while self.code[start] in " \t":
@@ -1948,18 +1867,18 @@ class Treebuilder(object):
             while self.code[end] in " \t":
                 end -= 1
     
-            return self.create_expression(node, start, line, end)
+            return self.create_expression(node, start, end)
     
         # Reserved keywords
         elif self.code[start:start+3] == "end" and\
                 self.code[start+3] in " \t" + expression_end:
-                    node = col.End(node, cur=start, line=line, code=self.code[start:start+3])
+                    node = col.End(node, cur=start, code=self.code[start:start+3])
     
         elif self.code[start:start+6] == "return" and self.code[start+6] in " ,;\n":
-            node = col.Return(node, cur=start, line=line, code=self.code[start:start+6])
+            node = col.Return(node, cur=start, code=self.code[start:start+6])
     
         elif self.code[start:start+5] == "break" and self.code[start+5] in " ,;\n":
-            node = col.Break(node, cur=start, line=line, code=self.code[start:start+5])
+            node = col.Break(node, cur=start, code=self.code[start:start+5])
     
     
         # Rest
@@ -1968,24 +1887,24 @@ class Treebuilder(object):
             assert self.code[end] == "'"
             assert "\n" not in self.code[start:end]
     
-            col.String(node, self.code[start+1:end], cur=start, line=line,
+            col.String(node, self.code[start+1:end], cur=start,
                     code=self.code[start:end+1])
     
         elif self.code[start] in digits or\
                 self.code[start] == "." and self.code[start+1] in digits:
-            cur, line = self.create_number(node, start, line)
+            cur = self.create_number(node, start)
     
         elif self.code[start] == "[":
-            cur, line = self.create_matrix(node, start, line)
+            cur = self.create_matrix(node, start)
     
         elif self.code[start] == "{":
-            cur, line = self.create_cell(node, start, line)
+            cur = self.create_cell(node, start)
     
         else:
             assert self.code[start] in letters+"@"
-            cur, line = self.create_variable(node, start, line)
+            cur = self.create_variable(node, start)
     
-        return END, line
+        return END
     
     
     def retrieve_operator(self, opr):
@@ -2458,9 +2377,10 @@ function x = cgsolve(A, b)
 x = A(b);
 end
     """
-    tree = utils.build(code, True)
+    program = utils.build(code, True)
 
-    print tree.summary()
-    print tree.translate_tree()
+    print program.summary()
+    program.translate_tree()
+    print program[1]
     print code
 

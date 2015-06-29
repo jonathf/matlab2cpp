@@ -19,10 +19,12 @@ The value '%(file)s' will be substituted with the name of the file.
 armadillo = ({}, "#include <armadillo>", "")
 namespace_arma = ({}, "using namespace arma ;", "")
 
-span = ({}, '#include "%(file)s"',
-"""arma::uvec span(int a, int step, int b)
+span = ({}, '',
+"""
+template <typename T>
+inline arma::rowvec<typename T::elem_type> span(int a, int step, int b)
 {
-arma::uvec s((arma::uword)0);
+arma::rowvec<typename T::elem_type> s((arma::rowvec<typename T::elem_type>) 0);
 int n = (b - a + 1) / step;
 if (n < 0)
 {
@@ -36,7 +38,7 @@ s(ii) = step * ii + a;
 return s;
 }""")
 
-nextpow2 = ({}, '#include "%(file)s"',
+nextpow2 = ({}, '',
 """inline int nextpow2(int n)
 {
 n = abs(n);
@@ -50,14 +52,14 @@ p++;
 return p;
 }""")
 
-length = ({}, '#include "%(file)s"',
+length = ({}, '',
 """template<typename T1>
 arma::uword length(const T1& A)
 {
 return T1.n_elem;
 }""")
 
-hankel = ({}, '#include "%(file)s"',
+hankel = ({}, '',
 """template<typename T1, typename T2>
 inline arma::Mat<typename T1::elem_type> hankel(const T1& c, const T2& r)
 {
@@ -84,15 +86,17 @@ retval.submat(2+nr-i-1, nc-1, i-1, i-1) = arma::trans(r.cols(2-1, nc-nr+i-1));
 return retval;
 }""")
 
-srow = ({}, '#include "%(file)s"',
+srow = ({}, '',
 """""")
-scol = ({}, '#include "%(file)s"',
+scol = ({}, '',
 """""")
-smat = ({}, '#include "%(file)s"',
+smat = ({}, '',
 """""")
-scube = ({}, '#include "%(file)s"',
+scube = ({}, '',
 """""")
 
 interp1 = ({}, "#include <matlib/interpolation.hpp>", "")
 
-call = ({}, "", "")
+hpp = ({}, '#include "%(file)s.hpp"', "")
+ipp = ({}, '#include "%(file)s.ipp"', "")
+

@@ -1,7 +1,6 @@
 import datatype as dt
-import snippets
+import inlines as inl
 import reference as ref
-import collection
 
 
 class Node(object):
@@ -40,8 +39,8 @@ reference of references, and so on."""
     program = ref.Program_reference()
     "A reference to program ancestor."
 
-    line = ref.Line_reference()
-    "A refrence to the first child of a Block."
+    project = ref.Project_reference()
+    "A reference to root node."
 
     group = ref.Group_reference()
     """A reference to the first ancestor where the datatype does not
@@ -78,7 +77,7 @@ is reserved in Python, so the name `cls` is used instead."""
     name = ref.Property_reference("name")
     """The name of the node."""
 
-    line = ref.Recursive_property_reference("line")
+    line = ref.Line_reference()
     """The codeline number in original code where this node was concived."""
 
     cur = ref.Recursive_property_reference("cur")
@@ -152,15 +151,15 @@ type : str, None
 
     def include(self, name, **kws):
 
-        include_code, library_code = snippets.retrieve(self, name, **kws)
+        include_code, library_code = inl.retrieve(self, name, **kws)
 
         includes = self.program[0]
         if include_code not in includes.names:
             collection.Include(includes, include_code, value=includes.value)
 
-        library = self.program.parent[0]
-        if library_code not in library:
-            collection.Snippet(library, library_code)
+        inlines = self.program[2]
+        if library_code not in inlines:
+            collection.Inline(inlines, library_code)
 
     def warning(self, msg):
         utils.create_error(self, msg, True)
@@ -215,3 +214,4 @@ type : str, None
 
 
 import utils
+import collection

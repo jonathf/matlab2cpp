@@ -331,36 +331,28 @@ def Ctranspose(node):
 
 def Colon(node):
 
-    parent = node.parent
+    node.include("span")
+
+    if node.group.cls in ("Get", "Cget", "Nget", "Fget", "Sget",
+                "Set", "Cset", "Nset", "Fset", "Sset"):
+        node.type = "urowvec"
+
+    elif node.group.cls in ("Matrix",) and node.group.num:
+        node.type = "urowvec"
+        node.mem = node.group.mem
+
+    elif node.group.cls in ("Assign",) and node.group[0].num:
+        node.type = "urowvec"
+        node.mem = node.group[0].mem
+
+    else:
+        node.type = "irowvec"
 
     if len(node) == 2:
+        args = "(%(0)s, 1, %(1)s)"
+    elif len(node) == 3:
+        args = "(%(0)s, %(1)s, %(2)s)"
+    else:
+        return "", ":", ""
 
-        if parent["class"] in ("Get", "Cget", "Nget", "Fget", "Sget",
-                "Set", "Cset", "Nset", "Fset", "Sset") and parent.num:
-            node.type = "uvec"
-            return "span(%(0)s-1, %(1)s-1)"
-
-        elif node.parent["class"] == "Assign" and not parent.mem:
-            node.type = "ivec"
-            return "span(%(0)s, %(1)s)"
-
-        node.type = "ivec"
-        return "span(%(0)s, %(1)s)"
-
-
-    if len(node) == 3:
-
-        if parent["class"] in ("Get", "Cget", "Nget", "Fget", "Sget",
-                "Set", "Cset", "Nset", "Fset", "Sset") and parent.num:
-            node.type = "uvec"
-            return "span(%(0)s-1, %(1)s, %(2)s-1)"
-
-        elif node.parent["class"] == "Assign" and not parent.mem:
-            node.type = "ivec"
-            return "span(%(0)s, %(1)s, %(2)s)"
-
-        node.type = "ivec"
-        return "span(%(0)s, %(1)s, %(2)s)"
-
-
-    return "", ":", ""
+    return "m2cpp::<%(type)s>span"+args

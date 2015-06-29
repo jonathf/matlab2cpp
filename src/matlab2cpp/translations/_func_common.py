@@ -39,7 +39,7 @@ def type_string(node):
 def Returns(node):
 
     if node.backend == "func_return":
-        return "%(0)s"
+        return "", "" 
 
     if node.backend == "func_returns":
         out = ""
@@ -135,4 +135,11 @@ def Func(node):
     if node.backend == "func_lambda":
 
         return ""#// placeholder for %(name)s"
+
+Main = """int main(int argc, char* argv[])
+{
+%(0)s
+%(3)s
+return 0 ;
+}"""
 

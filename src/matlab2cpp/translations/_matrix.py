@@ -65,6 +65,10 @@ def Vector(node):
         nodes = [str(n) for n in node]
 
     node.value = ""
+    if len(nodes) == 0:
+        return ""
+    elif len(nodes) == 1:
+        return "%(0)s"
     return reduce(lambda x,y: ("arma::join_rows(%s, %s)" % (x, y)), nodes)
 
 

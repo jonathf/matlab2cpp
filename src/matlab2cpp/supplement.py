@@ -281,18 +281,22 @@ PREFIX = """# Supplement file
 """
 
 
-def set_variables(program, types):
+def set_variables(program, types_f={}, types_s={}, types_i=[]):
     """
 Insert the scope variable types into the node-tree.
 
 Args:
     program (Program): Node-tree representation of program
-    types (dict): Nested dictionary as provided in the supplement `.py` file.
+    types_f (dict): Nested dictionary where outer keys are function names, inner
+        keys are name of variables and inner values are datatype name.
+    types_s (dict): Nested dictionary where outer keys are struct names, inner
+        keys are name of variables and inner values are datatype name.
+    types_i (list): List of included statements.
 
 Example:
     >>> prog = mc.build("function f(a,b); c=4; end")
-    >>> types = {"f": {"a":"int", "b":"vec", "c":"float"}}
-    >>> mc.set_variables(prog, types)
+    >>> types_f = {"f": {"a":"int", "b":"vec", "c":"float"}}
+    >>> mc.set_variables(prog, types_f=types_f)
     >>> print mc.translate(prog)
     #include <armadillo>
     using namespace arma ;
@@ -304,62 +308,64 @@ Example:
     }
 """
 
-    includes = program[0]
-    structs = program[1]
-    for name in types.keys():
+    includes, funcs, inlines, structs, headers, log = program
 
-        if name in program.names[2:]:
+    # Functions
+    for name in types_f.keys():
 
-            types_ = types[name]
-            func = program[program.names.index(name)]
+        if name in funcs.names:
+
+            types = types_f[name]
+            func = funcs[funcs.names.index(name)]
             declares, returns, params = func[0], func[1], func[2]
 
-            for key in types_.keys():
+            for key in types.keys():
 
                 if key in declares.names:
 
                     if key in returns.names:
                         var = returns[returns.names.index(key)]
-                        var.type = types_[key]
+                        var.type = types[key]
 
                     var = declares[declares.names.index(key)]
-                    var.type = types_[key]
+                    var.type = types[key]
 
                 elif key in params.names:
                     var = params[params.names.index(key)]
-                    var.type = types_[key]
+                    var.type = types[key]
 
-        elif name in structs.names:
 
-            types_ = types[name]
+    # Structs
+    for name in types_s.keys():
+
+        if name in structs.names:
+
+            types = types_s[name]
             struct = structs[structs.names.index(name)]
 
-            for key in types_.keys():
+            for key in types.keys():
 
                 if key in struct.names:
 
                     var = struct[struct.names.index(key)]
 
                     if var.cls == "Counter":
-                        var.value = str(types_[key])
+                        var.value = str(types[key])
                     else:
-                        var.type = types_[key]
+                        var.type = types[key]
 
                 else:
-                    var = collection.Declare(struct, key)
-                    var.backend = "struct"
-                    var.type = types_[key]
+                    var = collection.Declare(struct, key, backend="struct",
+                        type=types[key])
 
-        elif name == "_include_libraries":
 
-            for key in types[name]:
+    # Includes
+    for key in types_i:
 
-                if key[0] == key[-1] and key[0] in ("'",'"'):
-                    key = key[1:-1]
+        if key not in includes.names:
+            collection.Include(includes, key)
 
-                if key not in includes.names:
-                    collection.Include(includes, key)
-
+        
 
 
 def get_variables(program):
@@ -369,9 +375,10 @@ Retrieve scope variables from node-tree
 Args:
     program (Program): Node-tree representaiton of program
 
-Returns: types (dict), suggestions (dict)
+Returns: types_f (dict), types_s (dict), types_i (list), suggest (dict)
     Nested dictionaries as provided in the supplement `.py` file.
-    One for the types set, and one for suggestions.
+    Respectively for function types, struct types, include types and suggested
+    types.
 
 Example:
     >>> prog = mc.build("function f(); a=1; b='s'; end")
@@ -379,12 +386,17 @@ Example:
     >>> print suggestions
     {'f': {'a': 'int', 'b': 'string'}}
 """
-    types = {}
-    suggestions = {}
-    for func in program[2:]:
 
-        types[func["name"]] = types_ = {}
-        suggestions[func["name"]] = suggestions_ = {}
+    includes, funcs, inlines, structs, headers, log = program
+
+    # functions
+    types_f = {}
+    suggest = {}
+
+    for func in funcs:
+
+        types_f[func["name"]] = types = {}
+        suggest[func["name"]] = suggest_ = {}
 
         declares, params = func[0], func[2]
         for var in declares[:]+params[:]:
@@ -392,7 +404,7 @@ Example:
             type = var.prop["type"]
             if type == "TYPE":
                 type = ""
-            types_[var["name"]] = type
+            types[var["name"]] = type
 
             if not type:
 
@@ -400,12 +412,14 @@ Example:
                 if type == "TYPE":
                     type = ""
                 if type:
-                    suggestions_[var["name"]] = type
+                    suggest_[var["name"]] = type
 
-    for struct in program[1]:
+    # structs
+    types_s = {}
+    for struct in structs:
 
-        types[struct["name"]] = types_ = {}
-        suggestions[struct["name"]] = suggestions_ = {}
+        types_s[struct["name"]] = types = {}
+        suggest[struct["name"]] = suggest_ = {}
 
         for var in struct:
 
@@ -414,9 +428,9 @@ Example:
                 type = ""
 
             if var.cls == "Counter":
-                types_[var.name] = var.value
+                types[var.name] = var.value
             else:
-                types_[var.name] = type
+                types[var.name] = type
 
             if not type:
 
@@ -424,109 +438,154 @@ Example:
                 if type == "TYPE":
                     type = ""
                 if type:
-                    suggestions_[var["name"]] = type
+                    suggest_[var["name"]] = type
 
-    types["_include_libraries"] = []
-    for include in program[0]:
-        types["_include_libraries"].append(repr(include.name))
-    if not types["_include_libraries"]:
-        del types["_include_libraries"]
+    types_i = []
+    for include in includes:
+        types_i.append(include.name)
 
-    return types, suggestions
+    return types_f, types_s, types_i, suggest
 
 
 
-def str_variables(types, suggestions={}, structs={}, header=True):
+def str_variables(types_f={}, types_s={}, types_i=[], suggest={}, prefix=True):
     """
 Convert a nested dictionary for types, suggestions and structs and use them to
 create a suppliment text ready to be saved.
 
-Args:
-    types (dict): All variables datatypes
-
 Kwargs:
-    suggestions (dict): Suggested datatypes
-    structs (dict): Conentent of structs
+    types_f (dict): Function variables datatypes
+    types_s (dict): Struct variables datatypes
+    types_i (list): Includes in header
+    suggest (dict): Suggested datatypes for types_f and types_s
+    prefix (bool): True if the type explaination should be included
 
 Returns: str
     String representation of suppliment file
 
 Example:
-    >>> types = {"f" : {"a":"int"}, "g" : {"b":""}}
-    >>> suggestions = {"g" : {"b":"float"}}
-    >>> structs = {"c" : {"d":"vec"}}
-    >>> print str_variables(types, suggestions, structs)
-    # Supplement file
-    #
-    # Valid inputs:
-    #
-    # uword   int     float   double cx_double
-    # uvec    ivec    fvec    vec    cx_vec
-    # urowvec irowvec frowvec rowvec cx_rowvec
-    # umat    imat    fmat    mat    cx_mat
-    # ucube   icube   fcube   cube   cx_cube
-    #
-    # char    string  struct  structs func_lambda
-    <BLANKLINE>
-    scope = {}
-    <BLANKLINE>
-    scope["f"] = {
-    "a" : "int",
+    >>> types_f = {"f" : {"a":"int"}, "g" : {"b":""}}
+    >>> types_s = {"c" : {"d":""}}
+    >>> types_i = ["#include <armadillo>"]
+    >>> suggest = {"g" : {"b":"float"}, "c" : {"d":"vec"}}
+    >>> print str_variables(types_f, types_s, types_i, suggest, prefix=False)
+    functions = {
+      "f" : {
+        "a" : "int",
+      }
+      "g" : {
+        "b" : "", # float
+      }
     }
-    <BLANKLINE>
-    scope["g"] = {
-    "b" : "", # float
+    structs = {
+      "c" : {
+        "d" : "", # vec
+      }
     }
-    <BLANKLINE>
-"""
+    includes = [
+      '#include <armadillo>',
+    ]
+    """
 
-    out = "scope = {}\n\n"
+    if prefix:
+        out = PREFIX
+    else:
+        out = ""
 
-    keys = types.keys()
-    keys.sort()
+    if types_f:
 
-    for name in keys:
+        if prefix:
+            out += "\n"
 
-        if name == "_include_libraries":
+        out += "functions = {\n"
 
-            out += 'scope["%s"] = [\n' % name
-            for key in types[name]:
-                out += "  " + key + ",\n"
-            out += "]\n\n"
+        keys = types_f.keys()
+        keys.sort()
 
-        else:
+        for name in keys:
 
-            out += 'scope["%s"] = {\n' % (name)
-            types_ = types[name]
 
-            keys2 = types_.keys()
+            out += '  "%s" : {\n' % (name)
+            types = types_f[name]
+
+            keys2 = types.keys()
             keys2.sort()
-            l = max([len(k) for k in keys2])
+            l = max([len(k) for k in keys2]+[0])+4
 
             for key in keys2:
-                val = types_[key]
+                val = types[key]
+                sug = suggest.get(name, {}).get(key, "")
 
                 if key[:1] == "_":
-                    if key[:4] in ("_aux", "_ret"):
-                        continue
-
-                    if key[-5:] == "_size":
-                        val = val or 100
-                        out += " "*(l-len(key)) + '"%s" : %s,\n' % (key, val)
+                    continue
 
                 elif val:
                     out += " "*(l-len(key)) + '"%s" : "%s",\n' % (key, val)
+
+                elif sug:
+                    out += " "*(l-len(key)) + '"%s" : "", # %s\n' % (key, sug)
+
                 else:
-                    suggest = suggestions.get(name, {}).get(key, "")
-                    if suggest:
-                        out += " "*(l-len(key)) + '"%s" : "", # %s\n' % (key, suggest)
-                    else:
-                        out += " "*(l-len(key)) + '"%s" : "",\n' % (key)
+                    out += " "*(l-len(key)) + '"%s" : "",\n' % (key)
 
-            out += "}\n"
+            out += "  },\n"
 
-    if header:
-        out = PREFIX + "\n" + out
+        out += "}"
+
+    if types_s:
+
+        if types_f or prefix:
+            out += "\n"
+
+        out += "structs = {\n"
+
+        keys = types_s.keys()
+        keys.sort()
+
+        for name in keys:
+
+
+            out += '  "%s" : {\n' % (name)
+            types = types_s[name]
+
+            keys2 = types.keys()
+            keys2.sort()
+            l = max([len(k) for k in keys2])+4
+
+            for key in keys2:
+                val = types[key]
+                sug = suggest.get(name, {}).get(key, "")
+
+                if key[-5:] == "_size":
+                    val = val or 100
+                    out += " "*(l-len(key)) + '"%s" : %s,\n' % (key, val)
+
+                elif val:
+                    out += " "*(l-len(key)) + '"%s" : "%s",\n' % (key, val)
+
+                elif sug:
+                    out += " "*(l-len(key)) + '"%s" : "", # %s\n' % (key, sug)
+
+                else:
+                    out += " "*(l-len(key)) + '"%s" : "",\n' % (key)
+
+            out += "  },\n"
+
+        out += "}"
+
+    if types_i:
+
+        if prefix or types_f or types_s:
+            out += "\n"
+
+        out += "includes = [\n"
+
+        for key in types_i:
+            if key:
+                out += "  '" + key + "',\n"
+
+        out += "]"
+
     return out
 
 if __name__ == "__main__":

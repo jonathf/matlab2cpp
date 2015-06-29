@@ -1,4 +1,5 @@
 import snippets
+import os
 
 def retrieve(node, name, **kws):
 
@@ -8,7 +9,7 @@ def retrieve(node, name, **kws):
     params.update(node.prop)
     params.update(prms)
     params.update(kws)
-    params["file"] = node.program.name + ".h"
+    params["file"] = os.path.basename(node.program.name)
 
     include_code = include_code % params
     library_code = library_code % params

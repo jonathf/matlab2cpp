@@ -1,4 +1,6 @@
 import re
+import time
+from datetime import datetime as date
 
 def add_indenting(text):
 
@@ -60,10 +62,38 @@ def strip(text):
 
     return text
 
+def Project(node):
+    return ""
 
-def Program(tree):
+def Program(node):
+    return ""
 
-    text = "\n\n".join(map(str, tree[:]))
+def Includes(node):
+    return "", "\n", ""
+
+def Headers(node):
+    return "", "\n", ""
+
+def Header(node):
+    func = node.program[1][node.program[1].names.index(node.name)]
+    if func.backend == "func_return":
+        code = func[1][0].type + " " + func.name + "(" +\
+            ", ".join([p.type + " " + p.name for p in func[2]]) + ") ;"
+
+    elif func.backend == "func_returns" and not func[1]:
+        code = "void " + func.name + "(" +\
+            ", ".join([p.type + " " + p.name for p in func[2]]) + ") ;"
+
+    elif func.backend == "func_returns" and func[1]:
+        code = "void " + func.name + "(" +\
+            ", ".join([p.type + " " + p.name for p in func[2]]) + ", " +\
+            ", ".join([p.type + "& " + p.name for p in func[1]]) + ") ;"
+    return code
+
+Include = "%(name)s"
+
+def Funcs(node):
+    text = "\n\n".join(map(str, node[:]))
     text = add_indenting(text)
     text = number_fix(text)
     text = re.sub(r"\n *(\n *)+", r"\n\n", text)
@@ -71,32 +101,7 @@ def Program(tree):
 
     return text
 
-
-def Includes(node):
-
-    out = ""
-    for func in node.program[3:]:
-        if func.backend == "func_return":
-            code = "\n" + func[1][0].type + " " + func.name + "(" +\
-                ", ".join([p.type + " " + p.name for p in func[2]]) + ") ;"
-            out = out + code
-
-        elif func.backend == "func_returns" and not func[1]:
-            code = "\nvoid " + func.name + "(" +\
-                ", ".join([p.type + " " + p.name for p in func[2]]) + ") ;"
-            out = out + code
-
-        elif func.backend == "func_returns" and func[1]:
-            code = "\nvoid " + func.name + "(" +\
-                ", ".join([p.type + " " + p.name for p in func[2]]) + ", " +\
-                ", ".join([p.type + "& " + p.name for p in func[1]]) + ") ;"
-            out = out + code
-    
-    return "", "\n", "\n"+out
-
-Include = "%(name)s"
-
-def Library(node):
+def Inlines(node):
 
     if not node:
         return ""
@@ -117,4 +122,24 @@ namespace m2cpp
     text = add_indenting(text)
     return text
 
-Snippet = "%(name)s"
+Inline = "%(name)s"
+
+Structs = "", "\n\n", ""
+
+def Log(node):
+    if not node.children:
+        return ""
+    ts = time.time()
+    log = "Translated on " +\
+            date.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S\n\n')
+    return log, "\n\n", ""
+
+
+def Error(node):
+    return '''Error [%(line)d,%(cur)d]: %(value)s in %(cls)s
+"%(code)s"'''
+
+def Warning(node):
+    return '''Warning [%(line)d,%(cur)d]: %(value)s in %(cls)s
+"%(code)s"'''
+
