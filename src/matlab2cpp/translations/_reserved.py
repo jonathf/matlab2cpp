@@ -346,17 +346,23 @@ def Get_flipud(node):
 
 def Get_ones(node):
 
-    if node.parent.cls == "Assign" and node.parent[0].type != "TYPE":
+    if node.group.cls == "Assign" and node.group[0].num:
         node.type = node.parent[0].type
 
-    elif len(node) == 1:
-        node.type = "vec"
+    elif node.group.cls == "Matrix" and node.group.num:
+        node.type = node.group.type
+
+    else:
+        node.type = "double"
+
+    if len(node) == 1:
+        node.dim = 1
 
     elif len(node) == 2:
-        node.type = "mat"
+        node.dim = 3
 
     elif len(node) == 3:
-        node.type = "cube"
+        node.dim = 4
 
     if node[0].num and node[0].dim in (1,2):
 
@@ -374,17 +380,23 @@ def Get_ones(node):
 
 def Get_zeros(node):
 
-    if node.parent.cls == "Assign" and node.parent[0].type != "TYPE":
+    if node.group.cls == "Assign" and node.group[0].num:
         node.type = node.parent[0].type
 
-    elif len(node) == 1:
-        node.type = "vec"
+    elif node.group.cls == "Matrix" and node.group.num:
+        node.type = node.group.type
+
+    else:
+        node.type = "double"
+
+    if len(node) == 1:
+        node.dim = 1
 
     elif len(node) == 2:
-        node.type = "mat"
+        node.dim = 3
 
     elif len(node) == 3:
-        node.type = "cube"
+        node.dim = 4
 
     if node[0].num and node[0].dim in (1,2):
 
