@@ -333,26 +333,45 @@ def Colon(node):
 
     node.include("span")
 
-    if node.group.cls in ("Get", "Cget", "Nget", "Fget", "Sget",
+    if node.parent.cls in ("Get", "Cget", "Nget", "Fget", "Sget",
                 "Set", "Cset", "Nset", "Fset", "Sset"):
-        node.type = "urowvec"
+        node.type = "uvec"
 
-    elif node.group.cls in ("Matrix",) and node.group.num:
-        node.type = "urowvec"
-        node.mem = node.group.mem
-
-    elif node.group.cls in ("Assign",) and node.group[0].num:
-        node.type = "urowvec"
-        node.mem = node.group[0].mem
+        if len(node) == 2:
+            args = "(%(0)s-1, 1, %(1)s-1)"
+        elif len(node) == 3:
+            args = "(%(0)s-1, %(1)s, %(2)s-1)"
+        else:
+            return "", ":", ""
 
     else:
-        node.type = "irowvec"
 
-    if len(node) == 2:
-        args = "(%(0)s, 1, %(1)s)"
-    elif len(node) == 3:
-        args = "(%(0)s, %(1)s, %(2)s)"
-    else:
-        return "", ":", ""
+        if node.group.cls in ("Matrix",) and node.group.num:
+            node.type = "urowvec"
+            node.mem = node.group.mem
+
+        elif node.parent.cls in ("Get", "Cget", "Nget", "Fget", "Sget",
+                "Set", "Cset", "Nset", "Fset", "Sset"):
+            if node.parent.cls == "Get" and\
+                    node.parent.backend == node.parent.type:
+                node.type = "irowvec"
+
+            else:
+                node.type = "uvec"
+
+        elif node.group.cls in ("Assign",) and node.group[0].num:
+            node.type = "urowvec"
+            node.mem = node.group[0].mem
+
+        else:
+            node.type = "irowvec"
+
+        if len(node) == 2:
+            args = "(%(0)s, 1, %(1)s)"
+        elif len(node) == 3:
+            args = "(%(0)s, %(1)s, %(2)s)"
+        else:
+            return "", ":", ""
+
 
     return "m2cpp::<%(type)s>span"+args
