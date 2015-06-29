@@ -16,13 +16,11 @@ from utils import translate, qtranslate, qsupplement, build
 def main(args):
 
     builder = Treebuilder(disp=args.disp, comments=args.comments)
-    print "args.comments", args.comments
 
-    paths = os.path.abspath(os.path.dirname(args.filename))
+    paths = [os.path.abspath(os.path.dirname(args.filename))]
 
     if args.disp:
         print "building tree..."
-
 
     filenames = [os.path.abspath(args.filename)]
     stack = []
@@ -87,14 +85,9 @@ def main(args):
 # is formated incorrectly. Change the format or convert with '-r' option to create
 # a new file.""" % filename)
 
-        if program[1][0].cls == "Main":
-
-            if program[2]:
-                program[2].include("ipp")
-
         if program[3]:
             program[3].include("hpp")
-        elif program[4]:
+        elif len(program[4])>1:
             program[4].include("hpp")
 
     if args.disp:
@@ -118,27 +111,29 @@ def main(args):
 
         if funcs[0].cls == "Main":
 
-            if inlines:
-                ipp += str(inlines)
-
             if includes:
                 cpp += str(includes) + "\n\n"
+
+            if inlines:
+                ipp += str(inlines)
 
             cpp += str(funcs)
         
         else:
-            if inlines:
-                ipp += str(inlines) + "\n\n"
 
             if includes:
                 ipp += str(includes) + "\n\n"
+
+            if inlines:
+                ipp += str(inlines) + "\n\n"
 
             ipp += str(funcs)
 
         if structs:
             hpp += str(structs) + "\n\n"
 
-        hpp += str(headers)
+        if len(headers)>1:
+            hpp += str(headers)
 
         log += str(errorlog)
 

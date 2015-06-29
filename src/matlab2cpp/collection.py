@@ -17,9 +17,9 @@ class Project(Node):
                 line=line, code=code, **kws)
 
 class Program(Node):
-    def __init__(self, parent, backend="program", **kws):
+    def __init__(self, parent, name, backend="program", **kws):
         self._program = self
-        Node.__init__(self, parent, backend=backend, **kws)
+        Node.__init__(self, parent, name=name, backend=backend, file=name, **kws)
 
 class Includes(Node):
     def __init__(self, parent, backend="program", **kws):

@@ -86,8 +86,11 @@ is reserved in Python, so the name `cls` is used instead."""
     code = ref.Recursive_property_reference("code")
     """The code that concived this node."""
 
+    file = ref.Recursive_property_reference("file")
+    """Name of the program"""
+
     def __init__(self, parent, name="", backend="unknown", value="",
-            type="TYPE", pointer=0, line=None, cur=None, code=None):
+            type="TYPE", pointer=0, line=None, cur=None, code=None, file=None):
         """
 Parameters
 ----------
@@ -101,7 +104,7 @@ name : str
                 "value":value, "str":"", "name":name,
                 "pointer":pointer, "backend":backend,
                 "line":line, "cur":cur, "code":code,
-                "ret":"",
+                "ret":"", "file":file,
                 "class":self.__class__.__name__}
 
         # Parental relationship
@@ -124,6 +127,10 @@ name : str
     def properties(self):
 
         prop = self.prop.copy()
+        for key in self.prop:
+            if prop[key] is None:
+                prop[key] = self[key]
+
         I = len(self)
         for i in xrange(I):
             prop[str(i)] = prop["-"+str(I-i)] = self[i]["str"]
@@ -154,11 +161,11 @@ type : str, None
         include_code, library_code = inl.retrieve(self, name, **kws)
 
         includes = self.program[0]
-        if include_code not in includes.names:
+        if include_code and include_code not in includes.names:
             collection.Include(includes, include_code, value=includes.value)
 
         inlines = self.program[2]
-        if library_code not in inlines:
+        if library_code and library_code not in inlines:
             collection.Inline(inlines, library_code)
 
     def warning(self, msg):
@@ -173,6 +180,11 @@ type : str, None
     def __getitem__(self, i):
         if isinstance(i, str):
             out = self.prop[i]
+            if out is None:
+                if i == "cls":
+                    return self.cls
+                elif hasattr(self, i):
+                    return getattr(self, i)
             return out
 
         if isinstance(i, Node):
