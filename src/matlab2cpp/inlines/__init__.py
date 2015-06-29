@@ -3,6 +3,10 @@ import os
 
 def retrieve(node, name, **kws):
 
+    if os.path.isfile(name):
+        name = os.path.relpath(name, os.path.dirname(node.program.name))
+        return '#include "%s.ipp"' % name, ""
+
     prms, include_code, library_code = snippets.__dict__.get(name)
 
     params = {}

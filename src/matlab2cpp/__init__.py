@@ -53,6 +53,7 @@ def main(args):
                 if os.path.isfile(path +sep+ unknowns[i] + ".m"):
                     unknowns[i] = unknowns[i] + ".m"
                 if os.path.isfile(path +sep+ unknowns[i]):
+                    program.include(path +sep+ unknowns[i])
                     filenames.append(path +sep+ unknowns.pop(i))
 
         if os.path.isfile(filename + ".py") and not args.reset:
