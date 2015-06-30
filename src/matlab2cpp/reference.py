@@ -12,7 +12,7 @@ groups = [
     "Set", "Cset", "Fset", "Nset", "Sset",
     "Get", "Cget", "Fget", "Nget", "Sget",
     "Statement", "Switch", "Tryblock", "Matrix",
-    "While", "Block", "Node",
+    "While", "Block", "Node", "Transpose", "Ctranspose",
 ]
 nondeclares = ("Program", "Project", "Include", "Includes", "Struct", "Structs")
 structvars = ("Fvar", "Fget", "Fset", "Nget", "Nset", "Sget", "Sset")
@@ -82,8 +82,8 @@ class Group_reference(object):
         if hasattr(instance, "_group"):
             return instance._group
 
-        if instance.cls in groups:
-            group = instance
+        if instance.parent.cls in groups:
+            group = instance.parent
 
         else:
             group = instance.parent.group

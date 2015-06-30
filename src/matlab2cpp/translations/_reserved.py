@@ -346,23 +346,29 @@ def Get_flipud(node):
 
 def Get_ones(node):
 
-    if node.group.cls == "Assign" and node.group[0].num:
-        node.type = node.parent[0].type
-
-    elif node.group.cls == "Matrix" and node.group.num:
-        node.type = node.group.type
-
+    node.type = "uword"
+    dim, mem = node.suggest_datatype()
+    if not (mem is None):
+        node.mem = mem
+        if dim in (1,2):
+            node.dim = dim
     else:
-        node.type = "double"
+        node.mem = 3
 
-    if len(node) == 1:
-        node.dim = 1
+    if dim not in (1,2):
 
-    elif len(node) == 2:
-        node.dim = 3
+        if len(node) == 1:
+            node.dim = 2
 
-    elif len(node) == 3:
-        node.dim = 4
+        elif len(node) == 2:
+            if node[0].cls == "Int" and node[0].value == "1":
+                node.dim = 1
+                return "arma::ones<%(type)s>(%(1)s)"
+            else:
+                node.dim = 3
+
+        if len(node) == 3:
+            node.dim = 4
 
     if node[0].num and node[0].dim in (1,2):
 
@@ -376,27 +382,40 @@ def Get_ones(node):
         if node.dim == 4:
             return "arma::ones<%(type)s>(%(0)s(0), %(0)s(1), %(0)s(2))"
 
+    elif len(node) == 2 and node.dim in (1,2):
+        if node[0].cls == "Int" and node[0].value == "1":
+            return "arma::ones<%(type)s>(%(1)s)"
+        if node[1].cls == "Int" and node[1].value == "1":
+            return "arma::ones<%(type)s>(%(0)s)"
+
     return "arma::ones<%(type)s>(", ", ", ")"
+
 
 def Get_zeros(node):
 
-    if node.group.cls == "Assign" and node.group[0].num:
-        node.type = node.parent[0].type
-
-    elif node.group.cls == "Matrix" and node.group.num:
-        node.type = node.group.type
-
+    node.type = "uword"
+    dim, mem = node.suggest_datatype()
+    if not (mem is None):
+        node.mem = mem
+        if dim in (1,2):
+            node.dim = dim
     else:
-        node.type = "double"
+        node.mem = 3
 
-    if len(node) == 1:
-        node.dim = 1
+    if dim not in (1,2):
 
-    elif len(node) == 2:
-        node.dim = 3
+        if len(node) == 1:
+            node.dim = 2
 
-    elif len(node) == 3:
-        node.dim = 4
+        elif len(node) == 2:
+            if node[0].cls == "Int" and node[0].value == "1":
+                node.dim = 1
+                return "arma::zeros<%(type)s>(%(1)s)"
+            else:
+                node.dim = 3
+
+        if len(node) == 3:
+            node.dim = 4
 
     if node[0].num and node[0].dim in (1,2):
 
@@ -410,7 +429,14 @@ def Get_zeros(node):
         if node.dim == 4:
             return "arma::zeros<%(type)s>(%(0)s(0), %(0)s(1), %(0)s(2))"
 
+    elif len(node) == 2 and node.dim in (1,2):
+        if node[0].cls == "Int" and node[0].value == "1":
+            return "arma::zeros<%(type)s>(%(1)s)"
+        if node[1].cls == "Int" and node[1].value == "1":
+            return "arma::zeros<%(type)s>(%(0)s)"
+
     return "arma::zeros<%(type)s>(", ", ", ")"
+
 
 def Get_round(node):
 

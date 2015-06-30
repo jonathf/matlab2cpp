@@ -177,6 +177,9 @@ type : str, None
     def create_declare(self):
         utils.create_declare(self)
 
+    def suggest_datatype(self):
+        return utils.suggest_datatype(self)
+
     def __getitem__(self, i):
         if isinstance(i, str):
             out = self.prop[i]

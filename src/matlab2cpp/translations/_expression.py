@@ -360,7 +360,10 @@ def Colon(node):
                 node.type = "uvec"
 
         elif node.group.cls in ("Assign",) and node.group[0].num:
-            node.type = "urowvec"
+            if node.group[0].dim == 1:
+                node.type = "uvec"
+            else:
+                node.type = "urowvec"
             node.mem = node.group[0].mem
 
         else:

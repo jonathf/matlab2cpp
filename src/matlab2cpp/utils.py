@@ -362,6 +362,77 @@ def create_declare(node):
     return out
 
 
+def suggest_datatype(node):
+
+    if node.group.cls in ("Transpose", "Ctranspose"):
+
+        dim, mem = suggest_datatype(node.group)
+        if dim == 1:
+            dim = 2
+        elif dim == 2:
+            dim = 2
+        return dim, mem
+
+    elif node.group.cls == "Assign":
+
+        if node.group[0].num:
+            return node.group[0].dim, node.group[0].mem
+
+    elif node.group.cls == "Matrix":
+
+        mems = set([])
+        if node.group.value: # decomposed
+
+            ax0, ax1 = len(node.group), len(node.group[0])
+            if ax0 > 1:
+                if ax1 > 1:
+                    dim = 3
+                else:
+                    dim = 1
+            else:
+                if ax1 > 1:
+                    dim = 2
+                else:
+                    dim = 0
+
+            for vec in node.group:
+                for elem in vec:
+                    if elem.num:
+                        mems.add(elem.mem)
+
+        elif len(node.group) == 1:
+
+            if len(node.group[0]) == 1:
+                return None, None
+
+            dim = 1
+
+            for elem in node.group[0]:
+                if elem.num:
+                    mems.add(elem.mem)
+                    if elem.dim > 1:
+                        dim = 3
+
+            if not mems:
+                return None, None
+
+        elif len(node.group[0]) == 1:
+
+            dim = 2
+
+            for vec in node.group:
+                if vec.num:
+                    mems.append(elem.mem)
+                    if vec.dim not in (0, 2):
+                        dim = 3
+
+        mem = max(*mems)
+
+        return dim, mem
+
+    return None, None
+
+
 def translate(node, opt=None):
     nodes = flatten(node, False, True, False)
     if not (opt is None) and opt.disp:
