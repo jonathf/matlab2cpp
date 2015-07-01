@@ -26,11 +26,11 @@ def type_string(node):
             node.warning("lambda function content not found")
             return "std::function"
 
-    elif type == "struct":
-        return child.name.capitalize()
+    elif node.type == "struct":
+        return "_"+node.name.capitalize()
 
-    elif type == "structs":
-        return child.name.capitalize()
+    elif node.type == "structs":
+        return "_"+node.name.capitalize()
 
 
     return node.type

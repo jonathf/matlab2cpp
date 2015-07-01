@@ -51,17 +51,14 @@ Examples:
     if node.dim == 2:
         out = "arma::trans(" + out + ")"
 
-    elif node.dim > 2:
-        # TODO: multi-index arguments through snippits
-        # out = "vectorise(" + out + ")"
-        pass
-
     if node.dim == 0:
         if node.cls in ("Int", "Float"):
             out = str(int(node.value)-1)
         else:
             out = out + "-1"
         dim = 0
+    elif node.dim > 2:
+        dim = node.dim
     else:
         dim = 1
         if node.cls != "Colon":

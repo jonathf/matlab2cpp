@@ -159,10 +159,10 @@ class Declare_reference(object):
             else:
                 value = instance.value
 
-            if instance not in instance.program[1]:
+            if instance not in instance.program[3]:
                 return instance
 
-            struct = instance.program[1][instance]
+            struct = instance.program[3][instance]
 
             if value not in struct.names:
                 return instance
@@ -170,7 +170,6 @@ class Declare_reference(object):
             return struct[struct.names.index(value)]
 
         elif instance.parent.cls in "Struct":
-
             return instance
 
         else:

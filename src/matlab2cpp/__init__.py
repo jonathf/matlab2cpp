@@ -111,11 +111,15 @@ def main(args):
 
         if funcs[0].cls == "Main":
 
-            if includes:
-                cpp += str(includes) + "\n\n"
-
             if inlines:
+
+                if includes:
+                    ipp += str(includes) + "\n\n"
+
                 ipp += str(inlines)
+
+            elif includes:
+                cpp += str(includes) + "\n\n"
 
             cpp += str(funcs)
         

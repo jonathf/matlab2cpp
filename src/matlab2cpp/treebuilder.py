@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
+import os
 import string
 import utils
 import translations
@@ -140,19 +141,19 @@ class Treebuilder(object):
                         node.backend = func.backend
 
                     # external file in same folder
-                    elif node in self.project:
-                        func = self.project[node][1][0]
-                        node.backend = func.backend
-
-                    # external file in same folder
-                    elif node.name + ".m" in self.project:
-                        func = self.project[self.project.names.index(
-                            node.name+".m")][1][0]
-                        node.backend = func.backend
-
                     else:
-                        func = None
-                        node.translate_node()
+
+                        for program in self.project:
+
+                            if os.path.isfile(program.name) and \
+                                    os.path.basename(program.name) == node.name+".m":
+                                func = self.project[self.project.names.index(
+                                    node.name+".m")][1][0]
+                                node.backend = func.backend
+                                break
+                        else:
+                            func = None
+                            node.translate_node()
 
                     if not (func is None):
                         if node.backend == "func_return":
@@ -161,12 +162,14 @@ class Treebuilder(object):
                             params = func[2]
                             for i in xrange(len(node)):
                                 params[i].suggest = node[i].type
+                                node[i].suggest = params[i].type
 
                         elif node.backend == "func_returns":
                             node.backend = func.backend
                             params = func[2]
 
                             for j in xrange(len(params)):
+                                print params[j].name, node[j].type
                                 params[j].suggest = node[j].type
                                 node[j].suggest = params[j].type
 
@@ -193,7 +196,24 @@ class Treebuilder(object):
                 elif node.cls in ("Fvar", "Cget", "Fget", "Nget", "Colon"):
                     node.translate_node()
 
-                elif node.cls in ("Vector", "Matrix"):
+                elif node.cls == "Vector":
+
+                    if node and node[0].backend == "struct":
+                        declare = node.func[0][
+                                node.func[0].names.index(node[0].name)]
+                        if declare.backend == "structs":
+                            node.backend = "structs"
+
+                    node.type = [n.type for n in node]
+                    node.translate_node()
+
+                elif node.cls == "Matrix":
+
+                    if node[0] and node[0][0].backend == "struct":
+                        declare = node.func[0][
+                                node.func[0].names.index(node[0][0].name)]
+                        if declare.backend == "structs":
+                            node.backend = "structs"
 
                     node.type = [n.type for n in node]
                     node.translate_node()

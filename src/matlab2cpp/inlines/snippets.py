@@ -69,7 +69,7 @@ if (r[0] != c[0])
 {
 //("hankel: differing diagonal element. Using the column one");
 }
-arma::Mat<typename T1::elem_type> retval(nr, nc);
+arma::Mat<typename T1::elem_type> retval(nr, nc) = %(type)s;
 for (int i = 1; i <= std::min(nr, nc); i++)
 {
 retval.submat(1-1, nr-i, i-1, i-1) = c.rows(i-1, nr-1);
@@ -100,3 +100,15 @@ interp1 = ({}, "#include <matlib/interpolation.hpp>", "")
 hpp = ({}, '#include "%(file)s.hpp"', "")
 ipp = ({}, '#include "%(file)s.ipp"', "")
 
+
+extract = ({"struct" : "TYPE"}, '',
+"""template<typename T>
+inline arma::Vec<typename T::elem_type> extract(%(struct)s* s, int n)
+{
+arma::Vec<typename T::elem_type> out = arma::Vec<typename T::elem_type>(n);
+for (int k=0; k<n; k++)
+{
+out(k) = s[k].%(value)s ;
+}
+return out ;
+}""")

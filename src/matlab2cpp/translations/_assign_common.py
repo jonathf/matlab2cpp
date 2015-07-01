@@ -33,6 +33,8 @@ Examples:
 
     if lhs.num and rhs.num:
 
+        # if len(node) == 1 and len(node[0]) == 1 and node[0][0].backend
+
         if (lhs.dim == 2 and rhs.dim == 1) or\
                 (lhs.dim == 1 and rhs.dim == 2):
             out = "arma::trans(%(1)s)"

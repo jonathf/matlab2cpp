@@ -323,7 +323,7 @@ def create_declare(node):
         else:
             value = node.value
 
-        structs = node.program[1]
+        structs = node.program[3]
         assert structs.cls == "Structs"
 
         if node not in structs:
@@ -422,13 +422,15 @@ def suggest_datatype(node):
 
             for vec in node.group:
                 if vec.num:
-                    mems.append(elem.mem)
+                    mems.add(vec.mem)
                     if vec.dim not in (0, 2):
                         dim = 3
 
-        mem = max(*mems)
+        if len(mems) == 1:
+            return dim, mems.pop()
 
-        return dim, mem
+        elif len(mems) > 1:
+            return dim, max(*mems)
 
     return None, None
 

@@ -1,4 +1,5 @@
 import re
+import os
 import time
 from datetime import datetime as date
 
@@ -99,6 +100,9 @@ def Funcs(node):
     text = re.sub(r"\n *(\n *)+", r"\n\n", text)
     text = strip(text)
 
+    if node and node[0].cls == "Main":
+        text = '#include "' + os.path.basename(node.file) + '.ipp"\n\n' + text
+
     return text
 
 def Inlines(node):
@@ -108,9 +112,8 @@ def Inlines(node):
 
     text = "\n\n".join(map(str, node[:]))
 
-    """#ifndef MCONVERT_H
+    text = """#ifndef MCONVERT_H
 #define MCONVERT_H
-#include <armadillo>
 
 namespace m2cpp
 {
@@ -143,3 +146,28 @@ def Warning(node):
     return '''Warning [%(line)d,%(cur)d]: %(value)s in %(cls)s
 "%(code)s"'''
 
+def Struct(node):
+
+    name = "_"+node["name"].capitalize()
+
+    declares = {}
+    for child in node[:]:
+
+        type = child.type
+        if type == "func_lambda":
+            type == "std::function"
+
+        if type == "structs":
+            continue
+
+        if type not in declares:
+            declares[type] = []
+
+        declares[type].append(child)
+
+    out = "struct " + name + "\n{"
+    for key, val in declares.items():
+        out = out + "\n" + key + " " + ", ".join([str(v) for v in val]) + " ;"
+    out = out + "\n} ;"
+
+    return out

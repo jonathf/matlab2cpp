@@ -181,23 +181,26 @@ def Assign(node):
         if rhs.dim == 0:
             return scalar_assign(node)
 
-        elif dim == 1: #vec
+        elif rhs.dim == 1: #vec
             node["rows"] = len(node[1][0])*len(node[1])
             return "%(type)s _%(0)s [] = %(1)s ;\n"+\
                     "%(0)s = %(ctype)s(_%(0)s, %(rows)s, false) ;"
 
-        elif dim == 2: #rowvec
+        elif rhs.dim == 2: #rowvec
             node["cols"] = len(node[1][0])*len(node[1])
             return "%(type)s _%(0)s [] = %(1)s ;\n"+\
                     "%(0)s = %(ctype)s(_%(0)s, %(cols)s, false) ;"
 
-        elif dim == 3: #mat
+        elif rhs.dim == 3: #mat
             node["rows"] = len(node[1][0])
             node["cols"] = len(node[1])
             return "%(type)s _%(0)s [] = %(1)s ;\n"+\
         "%(0)s = %(ctype)s(_%(0)s, %(rows)s, %(cols)s, false) ;"
 
         assert False
+
+    else:
+        node.dim = dim
 
     return default_Assign(node)
 
