@@ -147,8 +147,9 @@ class Treebuilder(object):
 
                             if os.path.isfile(program.name) and \
                                     os.path.basename(program.name) == node.name+".m":
-                                func = self.project[self.project.names.index(
-                                    node.name+".m")][1][0]
+                                func = program[1][0]
+                                # self.project[self.project.names.index(
+                                    # node.name+".m")][1][0]
                                 node.backend = func.backend
                                 break
                         else:
@@ -169,7 +170,6 @@ class Treebuilder(object):
                             params = func[2]
 
                             for j in xrange(len(params)):
-                                print params[j].name, node[j].type
                                 params[j].suggest = node[j].type
                                 node[j].suggest = params[j].type
 
@@ -323,7 +323,7 @@ class Treebuilder(object):
         return program
     
     
-    def create_function(self, program, cur):
+    def create_function(self, parent, cur):
     
         assert self.code[cur:cur+8] == "function"
         assert self.code[cur+8] in key_end+"["
@@ -374,7 +374,7 @@ class Treebuilder(object):
                 print repr(self.code[START:m+1])
     
             name = self.code[k:l+1]
-            func = col.Func(program, name, cur=cur)
+            func = col.Func(parent, name, cur=cur)
             col.Declares(func, code="")
             returns = col.Returns(func, code=self.code[start:end+1])
     
@@ -429,7 +429,7 @@ class Treebuilder(object):
                 end += 1
     
             name = self.code[start:end]
-            func = col.Func(program, name, cur=cur)
+            func = col.Func(parent, name, cur=cur)
     
             col.Declares(func)
             returns = col.Returns(func)
@@ -483,10 +483,10 @@ class Treebuilder(object):
         return cur
 
     
-    def create_main(self, program, cur):
+    def create_main(self, parent, cur):
         "Create main function"
     
-        func = col.Main(program)
+        func = col.Main(parent)
     
         col.Declares(func, backend="func_return")
         col.Returns(func, backend="func_return")
@@ -706,7 +706,7 @@ class Treebuilder(object):
         while self.code[k] in " \t":
             k += 1
     
-        cur_ = self.create_expression(assign, k, end)
+        self.create_expression(assign, k, end)
         assign.name = assign[-1].name
     
         assert len(assign) == 2
@@ -1673,15 +1673,15 @@ class Treebuilder(object):
         else:
             name = "lambda"
     
-        program = node.program
+        funcs = node.program[1]
         name = "_%s" % (name)
-        if name in program.names:
+        if name in funcs.names:
             i = 0
-            while name+"%d" % i in program.names:
+            while name+"%d" % i in funcs.names:
                 i += 1
             name = name + "%d" % i
     
-        func = col.Func(program, name, cur=cur, code=self.code[cur:end+1])
+        func = col.Func(funcs, name, cur=cur, code=self.code[cur:end+1])
     
         declares = col.Declares(func)
         returns = col.Returns(func)

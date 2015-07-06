@@ -15,7 +15,7 @@ reserved = {
 "zeros", "ones", "round", "return", "rand", "floor",
 "clear", "close", "plot", "hold",
 "_conv_to", "_reshape",
-"interp1", "linspace",
+"interp1", "linspace", "varargins",
 }
 
 # Common attribute
@@ -626,3 +626,4 @@ def Get_interp1(node):
 def Get_linspace(node):
     node.type = "rowvec"
     return "arma::linspace<%(type)s>(", ", ", ")"
+
