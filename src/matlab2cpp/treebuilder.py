@@ -303,6 +303,9 @@ class Treebuilder(object):
 
             if self.code[cur] in " \t;\n":
                 pass
+
+            elif self.code[cur] == "%":
+                cur = self.findend_comment(cur)
    
             elif self.code[cur:cur+8] == "function":
                 cur = self.create_function(funcs, cur)
@@ -2393,6 +2396,7 @@ class Treebuilder(object):
 
 if __name__ == "__main__":
     code = """
+% comment
 function x = cgsolve(A, b)
 x = A(b);
 end
