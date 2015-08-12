@@ -3,7 +3,14 @@ from _arma_common import configure_arg
 
 def Get(node):
 
-    assert len(node) in (1,2)
+    if len(node) not in (1,2):
+
+        if not len(node):
+            node.error("Zero arguments in a matrix call")
+        else:
+            node.error("More than two arguments in a matrix call")
+
+        return "%(name)s(", ", ", ")"
 
     # Single argument
     if len(node) == 1:
@@ -43,6 +50,16 @@ def Get(node):
 
 
 def Set(node):
+
+    if len(node) not in (1,2):
+
+        if not len(node):
+            node.error("Zero arguments in a matrix set")
+        else:
+            node.error("More than two arguments in a matrix set")
+
+        return "%(name)s(", ", ", ")"
+
     # Single argument
     if len(node) == 1:
 

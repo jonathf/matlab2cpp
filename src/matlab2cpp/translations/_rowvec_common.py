@@ -3,6 +3,15 @@ from _arma_common import configure_arg
 
 def Get(node):
 
+    if len(node) != 1:
+
+        if not len(node):
+            node.error("Zero arguments in a rowvec call")
+        else:
+            node.error("More than one arguments in a rowvec call")
+
+        return "%(name)s(", ", ", ")"
+
     arg, dim = configure_arg(node[0], 0)
 
     if dim == -1:
@@ -15,6 +24,15 @@ def Get(node):
 
 
 def Set(node):
+
+    if len(node) != 1:
+
+        if not len(node):
+            node.error("Zero arguments in a rowvec set")
+        else:
+            node.error("More than one arguments in a rowvec set")
+
+        return "%(name)s(", ", ", ")"
 
     arg, dim = configure_arg(node[0], 0)
     if dim == 0:

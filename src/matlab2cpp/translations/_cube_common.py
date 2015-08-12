@@ -3,6 +3,16 @@ from _arma_common import configure_arg
 
 def Get(node):
 
+    if len(node) not in (1,2,3):
+
+        if not len(node):
+            node.error("Zero arguments in a cube call")
+        else:
+            node.error("More than three arguments in a cube call")
+
+        return "%(name)s(", ", ", ")"
+
+
     # Single argument
     if len(node) == 1:
 
@@ -78,6 +88,15 @@ def Get(node):
 
 
 def Set(node):
+
+    if len(node) not in (1,2,3):
+
+        if not len(node):
+            node.error("Zero arguments in a cube set")
+        else:
+            node.error("More than three arguments in a cube set")
+
+        return "%(name)s(", ", ", ")"
 
     # Single argument
     if len(node) == 1:
