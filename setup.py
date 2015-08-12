@@ -33,3 +33,6 @@ else:
     mconvert = "cp mconvert.py /usr/local/bin/mconvert"
     print mconvert
     os.system(mconvert)
+    chmod = "chmod 755 /usr/local/bin/mconvert"
+    print chmod
+    os.system(chmod)
