@@ -85,7 +85,7 @@ def Mul(node):
 def Elmul(node):
     if not node.num or node.dim == 0:
         return "", "*", ""
-    return "", "%", ""
+    return "", "__percent__", ""
 
 def Plus(node):
     return "", "+", ""
