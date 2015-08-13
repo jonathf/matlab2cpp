@@ -1044,9 +1044,13 @@ class Treebuilder(object):
             while self.code[cur] in " \t":
                 cur += 1
         self.create_expression(node, cur)
+
+        cur = end+1
     
-        end = self.create_codeblock(node, end+1)
-        node.code = self.code[cur:end+1]
+        end = self.create_codeblock(node, cur)
+        node.code = self.code[cur:end]
+        cur = end
+        print self.code[cur:cur+6]
 
         while self.code[cur:cur+6] == "elseif" and self.code[cur+6] in key_end:
     
@@ -2396,53 +2400,17 @@ class Treebuilder(object):
 
 if __name__ == "__main__":
     code = """
-%%=======================================================================%%
-% Kemal Ozdemir | 28.02.10 | aozdemir@slb.com
-%
-% FX domain extrapolation by using linear prediction theory
-%
-% INPUTS
-% s   : input data
-% p   : predictionorder
-% LA  : number of traces to be extrapolated ahead of the trace
-% LB  : number of traces to be extrapolated behind the last trace
-%
-% OUTPUT
-% se  : extrapolated data
-
-function se = fxExtrapolate1(s, p, LA, LB)
-
-[nt,nx] = size(s);
-
-s   = fft(s);
-se = zeros(nt, nx+LA+LB);
-se(:,LA+1:LA+nx) = s;
-
-for ff  = 1:nt/2+1
-    x =  s(ff,:).';
-    
-    if sum(abs(x)) == 0
-        continue;
-    end
-    a = lpc(x, p);
-    for k=1:LB
-        se(ff,nx+LA+k) = -sum(a(2:p+1).*se(ff,nx+LA+k-1:-1:nx+LA+k-p));
-    end
-    for k=1:LA
-        se(ff,LA-k+1)  = -sum(conj(a(2:p+1)).*se(ff,LA-k+2:LA-k+p+1));
-    end
+if a==1
+b
+elseif a==2
+c
 end
-
-for i = 1:nx+LA+LB
-    se(nt/2+2:nt,i) = conj(se(nt/2:-1:2,i));
-end
-se = ifft(se);
-se = real(se);
     """
     program = utils.build(code, True)
 
+    print
     print program.summary()
     program.translate_tree()
-    print program[1]
+    print program
     print code
 
