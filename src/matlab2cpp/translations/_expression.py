@@ -322,7 +322,7 @@ def All(node):
     else:
         return "span::all"
 
-    node.include("all")
+    node.include("span_all")
 
     return "m2cpp::all(" + arg + ")"
 

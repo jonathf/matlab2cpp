@@ -3,12 +3,14 @@ import os
 
 def retrieve(node, name, **kws):
 
-    # assert name != "hpp"
-
     if os.path.isfile(name):
+
         name = os.path.relpath(name, os.path.dirname(node.program.name))
         include_code = '#include "%s.hpp"' % name
         library_code = ""
+
+        if node.name == name:
+            include_code = ""
 
     else:
 

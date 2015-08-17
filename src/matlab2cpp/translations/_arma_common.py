@@ -42,7 +42,7 @@ Examples:
 
     if node.cls == "All":
 
-        node.include("all")
+        node.include("span_all")
         arg = node.parent.name
 
         if index == 0:

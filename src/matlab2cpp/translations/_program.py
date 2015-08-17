@@ -125,7 +125,8 @@ namespace m2cpp
     text = add_indenting(text)
     return text
 
-Inline = "%(name)s"
+def Inline(node):
+    return "%(name)s"
 
 Structs = "", "\n\n", ""
 

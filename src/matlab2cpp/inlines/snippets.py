@@ -20,8 +20,7 @@ armadillo = ({}, "#include <armadillo>", "")
 namespace_arma = ({}, "using namespace arma ;", "")
 
 span = ({}, '',
-"""
-template <typename T>
+"""template <typename T>
 inline arma::rowvec<typename T::elem_type> span(int a, int step, int b)
 {
 arma::rowvec<typename T::elem_type> s((arma::rowvec<typename T::elem_type>) 0);
@@ -38,7 +37,7 @@ s(ii) = step * ii + a;
 return s;
 }""")
 
-all = ({}, "",
+span_all = ({}, "",
 """inline arma::uvec all(int n)
 {
 arma::uvec out = arma::uvec(n) ;
@@ -121,3 +120,8 @@ out(k) = s[k].%(value)s ;
 }
 return out ;
 }""")
+
+fft = ({}, ""
+"""template<typename T>
+inline arma::<type T::elem_type> 
+""")
