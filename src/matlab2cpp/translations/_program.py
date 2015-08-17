@@ -100,8 +100,8 @@ def Funcs(node):
     text = re.sub(r"\n *(\n *)+", r"\n\n", text)
     text = strip(text)
 
-    if node and node[0].cls == "Main":
-        text = '#include "' + os.path.basename(node.file) + '.ipp"\n\n' + text
+    # if node and node[0].cls == "Main":
+    #     text = '#include "' + os.path.basename(node.file) + '.hpp"\n\n' + text
 
     return text
 

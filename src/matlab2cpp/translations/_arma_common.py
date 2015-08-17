@@ -15,7 +15,7 @@ Examples:
     >>> print mc.qtranslate('x=[1,2]; x(:)')
     int _x [] = {1, 2} ;
     x = irowvec(_x, 2, false) ;
-    x(span::all) ;
+    x(m2cpp::all(x.n_rows)) ;
     >>> print mc.qtranslate('x=[1,2]; x(1)')
     int _x [] = {1, 2} ;
     x = irowvec(_x, 2, false) ;
@@ -41,7 +41,21 @@ Examples:
     out = "%(" + str(index) + ")s"
 
     if node.cls == "All":
-        return "span::all", 1
+
+        node.include("all")
+        arg = node.parent.name
+
+        if index == 0:
+            if node.parent.dim == 1:
+                arg += ".n_cols"
+            else:
+                arg += ".n_rows"
+        elif index == 1:
+            arg += ".n_cols"
+        elif index == 2:
+            arg += ".n_slices"
+        return "m2cpp::all(" + arg + ")", 1
+
     elif node.type == "TYPE":
         return out, -1
 
@@ -52,19 +66,23 @@ Examples:
         out = "arma::trans(" + out + ")"
 
     if node.dim == 0:
-        if node.cls in ("Int", "Float"):
+        if node.cls == "Int":
             out = str(int(node.value)-1)
+        elif node.cls == "Float":
+            out = str(float(node.value)-1)
         else:
             out = out + "-1"
         dim = 0
     elif node.dim > 2:
         dim = node.dim
+        out = out + "-1"
     else:
         dim = 1
         if node.cls != "Colon":
             out = out + "-1"
 
     return out, dim
+
 
 def scalar_assign(node):
     lhs, rhs = node

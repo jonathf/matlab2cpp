@@ -1050,7 +1050,6 @@ class Treebuilder(object):
         end = self.create_codeblock(node, cur)
         node.code = self.code[cur:end]
         cur = end
-        print self.code[cur:cur+6]
 
         while self.code[cur:cur+6] == "elseif" and self.code[cur+6] in key_end:
     

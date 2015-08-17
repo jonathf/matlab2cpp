@@ -85,10 +85,10 @@ def main(args):
 # is formated incorrectly. Change the format or convert with '-r' option to create
 # a new file.""" % filename)
 
-        if program[3]:
-            program[3].include("hpp")
-        elif len(program[4])>1:
-            program[4].include("hpp")
+        # if program[3]:
+        #     program[3].include("hpp")
+        # elif len(program[4])>1:
+        #     program[4].include("hpp")
 
     if args.disp:
         print "configure tree"
@@ -106,38 +106,44 @@ def main(args):
         name = program.name
         includes, funcs, inlines, structs, headers, errorlog = program
 
-        cpp, ipp, hpp, log, py = "", "", "", "", ""
+        cpp, hpp, log, py = "", "", "", ""
 
 
         if funcs[0].cls == "Main":
 
+            if len(headers)>1:
+                hpp += str(headers)
+
             if inlines:
 
                 if includes:
-                    ipp += str(includes) + "\n\n"
+                    cpp += str(includes) + "\n\n"
 
-                ipp += str(inlines)
+                hpp += str(inlines)
 
             elif includes:
                 cpp += str(includes) + "\n\n"
 
             cpp += str(funcs)
+
+            if structs:
+                hpp += str(structs) + "\n\n"
         
         else:
 
             if includes:
-                ipp += str(includes) + "\n\n"
+                hpp += str(includes) + "\n\n"
+
+            if structs:
+                hpp += str(structs) + "\n\n"
 
             if inlines:
-                ipp += str(inlines) + "\n\n"
+                hpp += str(inlines) + "\n\n"
 
-            ipp += str(funcs)
+            if len(headers) > 1:
+                hpp += str(headers) + "\n\n"
 
-        if structs:
-            hpp += str(structs) + "\n\n"
-
-        if len(headers)>1:
-            hpp += str(headers)
+            hpp += str(funcs)
 
         log += str(errorlog)
 
@@ -145,7 +151,7 @@ def main(args):
                 prefix=True)
 
         cpp = cpp.replace("__percent__", "%")
-        ipp = ipp.replace("__percent__", "%")
+        # ipp = ipp.replace("__percent__", "%")
         hpp = hpp.replace("__percent__", "%")
         log = log.replace("__percent__", "%")
         py = py.replace("__percent__", "%")
@@ -154,7 +160,7 @@ def main(args):
             print "Writing files..."
 
         if args.reset:
-            for ext in [".cpp", ".hpp", ".ipp", ".log", ".py"]:
+            for ext in [".cpp", ".hpp", ".log", ".py"]:
                 if os.path.isfile(name+ext):
                     os.remove(name+ext)
 
@@ -163,10 +169,10 @@ def main(args):
             f.write(cpp)
             f.close()
 
-        if ipp:
-            f = open(name+".ipp", "w")
-            f.write(ipp)
-            f.close()
+        # if ipp:
+        #     f = open(name+".ipp", "w")
+        #     f.write(ipp)
+        #     f.close()
 
         if hpp:
             f = open(name+".hpp", "w")

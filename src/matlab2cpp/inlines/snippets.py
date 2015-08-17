@@ -38,6 +38,15 @@ s(ii) = step * ii + a;
 return s;
 }""")
 
+all = ({}, "",
+"""inline arma::uvec all(int n)
+{
+arma::uvec out = arma::uvec(n) ;
+for (arma::uword i=0; i<n; i++)
+out(i) = i ;
+return out ;
+}""")
+
 nextpow2 = ({}, '',
 """inline int nextpow2(int n)
 {
@@ -98,7 +107,7 @@ scube = ({}, '',
 interp1 = ({}, "#include <matlib/interpolation.hpp>", "")
 
 hpp = ({}, '#include "%(file)s.hpp"', "")
-ipp = ({}, '#include "%(file)s.ipp"', "")
+# ipp = ({}, '#include "%(file)s.ipp"', "")
 
 
 extract = ({"struct" : "TYPE"}, '',

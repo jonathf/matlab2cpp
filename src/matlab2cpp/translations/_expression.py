@@ -309,7 +309,23 @@ def Elexp(node):
         out = "pow(" + str(out) + "," + str(child) + ")"
     return out
 
-All = "span::all"
+
+def All(node):
+    arg = node.parent.name
+
+    if len(node.parent) > 0 and node.parent[0] is node:
+        arg += ".n_rows"
+    elif len(node.parent) > 1 and node.parent[1] is node:
+        arg += ".n_cols"
+    elif len(node.parent) > 2 and node.parent[2] is node:
+        arg += ".n_slices"
+    else:
+        return "span::all"
+
+    node.include("all")
+
+    return "m2cpp::all(" + arg + ")"
+
 Neg = "-(", "", ")"
 Not = "not ", "", ""
 
