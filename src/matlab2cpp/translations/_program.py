@@ -110,7 +110,7 @@ def Inlines(node):
     if not node:
         return ""
 
-    text = "\n\n".join(map(str, node[:]))
+    text = "\n\n".join([n.name for n in node])
 
     text = """#ifndef MCONVERT_H
 #define MCONVERT_H
@@ -126,7 +126,7 @@ namespace m2cpp
     return text
 
 def Inline(node):
-    return "%(name)s"
+    return ""
 
 Structs = "", "\n\n", ""
 

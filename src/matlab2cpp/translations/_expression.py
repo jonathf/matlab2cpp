@@ -395,4 +395,4 @@ def Colon(node):
             return "", ":", ""
 
 
-    return "m2cpp::<%(type)s>span"+args
+    return "m2cpp::span<%(type)s>"+args
