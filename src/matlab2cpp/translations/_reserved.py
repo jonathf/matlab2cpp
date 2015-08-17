@@ -530,6 +530,10 @@ def Get_nextpow2(node):
 
 def Get_fft(node):
 
+    node.type = node[0].type
+    if node.mem == 4:
+        node.mem = 3
+
     if len(node) == 1:
         return "arma::fft(%(0)s)"
 
@@ -538,29 +542,15 @@ def Get_fft(node):
 
     elif len(node) == 3:
 
-        if node[2].cls == "Int":
+        if node[0].dim in (1,2):
+            return "arma::fft(%(0)s, %(1)s)"
 
-            if node[2].value == "1":
-
-                if node[1].cls == "Matrix" and len(node[1][0])==0:
-                    return "arma::fft(%(0)s)"
-
-                else:
-                    return "arma::fft(%(0)s, %(1)s)"
-
-            elif node[2].value == "2":
-
-                if node[1].cls == "Matrix" and len(node[1][0])==0:
-                    return "arma::transpose(arma::fft(arma::transpose(%(0)s)))"
-
-                else:
-                    return "arma::transpose(arma::fft(arma::transpose(%(0)s), %(1)s))"
-
-            else:
-                node.error("Third argument in 'fft' should either be '1' or '2'")
-
+        if node[1].cls == "Matrix":
+            node.include("fft")
+            return "m2cpp::fft<" + node[0].type + ">(%(0)s, %(2)s)"
         else:
-            node.warning("Third argument in 'fft' is assumed to be '1'")
+            node.include("fftn")
+            return "m2cpp::fft<" + node[0].type + ">(", ", ", ")"
 
     else:
         node.error("Number of args in 'fft' should be between 1 and 3")
@@ -568,6 +558,9 @@ def Get_fft(node):
     return "arma::fft(", ", ", ")"
 
 def Get_ifft(node):
+
+    node.type = node[0].type
+    node.mem = 4
 
     if len(node) == 1:
         return "arma::ifft(%(0)s)"
@@ -577,29 +570,15 @@ def Get_ifft(node):
 
     elif len(node) == 3:
 
-        if node[2].cls == "Int":
+        if node[0].dim in (1,2):
+            return "arma::ifft(%(0)s, %(1)s)"
 
-            if node[2].value == "1":
-
-                if node[1].cls == "Matrix" and len(node[1][0])==0:
-                    return "arma::ifft(%(0)s)"
-
-                else:
-                    return "arma::ifft(%(0)s, %(1)s)"
-
-            elif node[2].value == "2":
-
-                if node[1].cls == "Matrix" and len(node[1][0])==0:
-                    return "arma::transpose(arma::ifft(arma::transpose(%(0)s)))"
-
-                else:
-                    return "arma::transpose(arma::ifft(arma::transpose(%(0)s), %(1)s))"
-
-            else:
-                node.error("Third argument in 'ifft' should either be '1' or '2'")
-
+        if node[1].cls == "Matrix":
+            node.include("ifft")
+            return "m2cpp::ifft<" + node[0].type + ">(%(0)s, %(2)s)"
         else:
-            node.warning("Third argument in 'ifft' is assumed to be '1'")
+            node.include("ifftn")
+            return "m2cpp::ifft<" + node[0].type + ">(", ", ", ")"
 
     else:
         node.error("Number of args in 'ifft' should be between 1 and 3")

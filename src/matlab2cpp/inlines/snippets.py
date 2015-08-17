@@ -121,7 +121,50 @@ out(k) = s[k].%(value)s ;
 return out ;
 }""")
 
-fft = ({}, ""
-"""template<typename T>
-inline arma::<type T::elem_type> 
+fft = ({}, "",
+"""template <typename T>
+inline arma::cx_mat fft(arma::Mat<typename T::elem_type> X, int dim)
+{
+if (dim == 1)
+X = arma::fft(X) ;
+else
+X = arma::transpose(arma::fft(arma::transpose(X))) ;
+return X ;
+}
+""")
+
+fftn = ({}, "",
+"""template <typename T>
+inline arma::cx_mat fft(arma::Mat<typename T::elem_type> X, int n, int dim)
+{
+if (dim == 1)
+X = arma::fft(X, n) ;
+else
+X = arma::transpose(arma::fft(arma::transpose(X)), n) ;
+return X ;
+}
+""")
+
+ifft = ({}, "",
+"""template <typename T>
+inline arma::Mat<typename T::elem_type> ifft(arma::cx_mat X, int dim)
+{
+if (dim == 1)
+X = arma::ifft(X) ;
+else
+X = arma::transpose(arma::ifft(arma::transpose(X))) ;
+return X ;
+}
+""")
+
+ifftn = ({}, "",
+"""template <typename T>
+inline arma::Mat<typename T::elem_type> ifft(arma::cx_mat X, int n, int dim)
+{
+if (dim == 1)
+X = arma::ifft(X, n) ;
+else
+X = arma::transpose(arma::ifft(arma::transpose(X)), n) ;
+return X ;
+}
 """)
