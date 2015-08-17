@@ -21,9 +21,9 @@ namespace_arma = ({}, "using namespace arma ;", "")
 
 span = ({}, '',
 """template <typename T>
-inline arma::rowvec<typename T::elem_type> span(int a, int step, int b)
+inline arma::Row<typename T::elem_type> span(int a, int step, int b)
 {
-arma::rowvec<typename T::elem_type> s((arma::rowvec<typename T::elem_type>) 0);
+arma::Row<typename T::elem_type> s((arma::Row<typename T::elem_type>) 0);
 int n = (b - a + 1) / step;
 if (n < 0)
 {
@@ -37,13 +37,21 @@ s(ii) = step * ii + a;
 return s;
 }""")
 
-span_all = ({}, "",
-"""inline arma::uvec all(int n)
+uspan = ({}, '',
+"""inline arma::uvec uspan(int a, int step, int b)
 {
-arma::uvec out = arma::uvec(n) ;
-for (arma::uword i=0; i<n; i++)
-out(i) = i ;
-return out ;
+arma::uvec s((arma::uvec) 0);
+int n = (b - a + 1) / step;
+if (n < 0)
+{
+return s;
+}
+s.set_size(n + 1);
+for (int ii = 0; ii <= n; ii++)
+{
+s(ii) = step * ii + a;
+}
+return s;
 }""")
 
 nextpow2 = ({}, '',

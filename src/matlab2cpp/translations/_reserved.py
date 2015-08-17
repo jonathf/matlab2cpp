@@ -354,6 +354,9 @@ def Get_ones(node):
             node.dim = dim
     else:
         node.mem = 3
+    if node.group.cls in ("Get", "Cget", "Fget", "Nget", "Sget", "Set", "Cset",
+            "Fset", "Nset", "Sset"):
+        node.mem = 0
 
     if dim not in (1,2):
 
@@ -401,6 +404,9 @@ def Get_zeros(node):
             node.dim = dim
     else:
         node.mem = 3
+    if node.group.cls in ("Get", "Cget", "Fget", "Nget", "Sget", "Set", "Cset",
+            "Fset", "Nset", "Sset"):
+        node.mem = 0
 
     if dim not in (1,2):
 

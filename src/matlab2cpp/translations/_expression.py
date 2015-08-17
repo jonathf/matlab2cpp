@@ -322,9 +322,9 @@ def All(node):
     else:
         return "span::all"
 
-    node.include("span")
+    node.include("uspan")
 
-    return "m2cpp::span(0, 1, " + arg + ")"
+    return "m2cpp::uspan(0, 1, " + arg + ")"
 
 Neg = "-(", "", ")"
 Not = "not ", "", ""
@@ -349,10 +349,8 @@ def Ctranspose(node):
 
 def Colon(node):
 
-    node.include("span")
-
     if node.parent.cls in ("Get", "Cget", "Nget", "Fget", "Sget",
-                "Set", "Cset", "Nset", "Fset", "Sset"):
+                "Set", "Cset", "Nset", "Fset", "Sset") and node.parent.num:
         node.type = "uvec"
 
         if len(node) == 2:
@@ -362,7 +360,12 @@ def Colon(node):
         else:
             return "", ":", ""
 
+        node.include("uspan")
+        return "m2cpp::uspan"+args
+
     else:
+
+        node.include("span")
 
         if node.group.cls in ("Matrix",) and node.group.num:
             node.type = "urowvec"
@@ -395,4 +398,4 @@ def Colon(node):
             return "", ":", ""
 
 
-    return "m2cpp::span<%(type)s>"+args
+        return "m2cpp::span<%(type)s>"+args
