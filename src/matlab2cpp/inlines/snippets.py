@@ -23,7 +23,7 @@ span = ({}, '',
 """template <typename T>
 inline arma::Row<typename T::elem_type> span(int a, int step, int b)
 {
-arma::Row<typename T::elem_type> s((arma::Row<typename T::elem_type>) 0);
+arma::Row<typename T::elem_type> s;
 int n = (b - a + 1) / step;
 if (n < 0)
 {
@@ -40,7 +40,7 @@ return s;
 uspan = ({}, '',
 """inline arma::uvec uspan(int a, int step, int b)
 {
-arma::uvec s((arma::uvec) 0);
+arma::uvec s;
 int n = (b - a + 1) / step;
 if (n < 0)
 {
@@ -72,7 +72,7 @@ length = ({}, '',
 """template<typename T1>
 arma::uword length(const T1& A)
 {
-return T1.n_elem;
+return A.n_elem;
 }""")
 
 hankel = ({}, '',
@@ -136,7 +136,7 @@ inline arma::cx_mat fft(arma::Mat<typename T::elem_type> X, int dim)
 if (dim == 1)
 X = arma::fft(X) ;
 else
-X = arma::transpose(arma::fft(arma::transpose(X))) ;
+X = arma::trans(arma::fft(arma::trans(X))) ;
 return X ;
 }
 """)
@@ -148,7 +148,7 @@ inline arma::cx_mat fft(arma::Mat<typename T::elem_type> X, int n, int dim)
 if (dim == 1)
 X = arma::fft(X, n) ;
 else
-X = arma::transpose(arma::fft(arma::transpose(X)), n) ;
+X = arma::trans(arma::fft(arma::trans(X)), n) ;
 return X ;
 }
 """)
@@ -160,7 +160,7 @@ inline arma::Mat<typename T::elem_type> ifft(arma::cx_mat X, int dim)
 if (dim == 1)
 X = arma::ifft(X) ;
 else
-X = arma::transpose(arma::ifft(arma::transpose(X))) ;
+X = arma::trans(arma::ifft(arma::trans(X))) ;
 return X ;
 }
 """)
@@ -172,7 +172,7 @@ inline arma::Mat<typename T::elem_type> ifft(arma::cx_mat X, int n, int dim)
 if (dim == 1)
 X = arma::ifft(X, n) ;
 else
-X = arma::transpose(arma::ifft(arma::transpose(X)), n) ;
+X = arma::trans(arma::ifft(arma::trans(X)), n) ;
 return X ;
 }
 """)
