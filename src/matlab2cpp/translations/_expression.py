@@ -322,9 +322,9 @@ def All(node):
     else:
         return "span::all"
 
-    node.include("span_all")
+    node.include("span")
 
-    return "m2cpp::all(" + arg + ")"
+    return "m2cpp::span(0, 1, " + arg + ")"
 
 Neg = "-(", "", ")"
 Not = "not ", "", ""
