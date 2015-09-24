@@ -1,7 +1,4 @@
 import re
-import os
-import time
-from datetime import datetime as date
 
 def add_indenting(text):
 
@@ -72,8 +69,10 @@ def Program(node):
 def Includes(node):
     return "", "\n", ""
 
+
 def Headers(node):
     return "", "\n", ""
+
 
 def Header(node):
     func = node.program[1][node.program[1].names.index(node.name)]
@@ -93,15 +92,13 @@ def Header(node):
 
 Include = "%(name)s"
 
+
 def Funcs(node):
     text = "\n\n".join(map(str, node[:]))
     text = add_indenting(text)
     text = number_fix(text)
     text = re.sub(r"\n *(\n *)+", r"\n\n", text)
     text = strip(text)
-
-    # if node and node[0].cls == "Main":
-    #     text = '#include "' + os.path.basename(node.file) + '.hpp"\n\n' + text
 
     return text
 
@@ -131,21 +128,18 @@ def Inline(node):
 Structs = "", "\n\n", ""
 
 def Log(node):
-    if not node.children:
-        return ""
-    ts = time.time()
-    log = "Translated on " +\
-            date.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S\n\n')
-    return log, "\n\n", ""
+    return "", "\n\n", ""
 
 
 def Error(node):
-    return '''Error [%(line)d,%(cur)d]: %(value)s in %(cls)s
-"%(code)s"'''
+    return '''Error in class %(cls)s on line %(line)d:
+%(code)s
+''' + " "*node.cur + "^\n%(value)s"
 
 def Warning(node):
-    return '''Warning [%(line)d,%(cur)d]: %(value)s in %(cls)s
-"%(code)s"'''
+    return '''Warning in class %(cls)s on line %(line)d:
+%(code)s
+''' + " "*node.cur + "^\n%(value)s"
 
 def Struct(node):
 
@@ -170,5 +164,7 @@ def Struct(node):
     for key, val in declares.items():
         out = out + "\n" + key + " " + ", ".join([str(v) for v in val]) + " ;"
     out = out + "\n} ;"
+
+    out = add_indenting(out)
 
     return out

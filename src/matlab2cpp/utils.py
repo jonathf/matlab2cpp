@@ -1,8 +1,60 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
+"""
+Not all translation is carried out successfully. There are many reasons for
+this. The most basic is to provide the interpreter with invalid Matlab code.
+For example if one provides invalid Matlab code to the interpreter, it will
+create an error:
+
+    >>> print mc.qcpp("a**b")
+    Traceback (most recent call last):
+        ...
+    SyntaxError: line 1 in Matlab code:
+    a**b
+      ^
+    Expected: expression start
+
+The interpreter highlights the line it crashed on and explain as far as it can
+why it crashed. In this example `**` is not a valid operator and the
+interpreter expects an expression after the first `*`.
+
+Beyond the invalid syntax, the interpreter is able to construct a full tree
+representation of the code, which is then converted into C++ code.  The basic
+translation will as far as possible make a full translation. For example:
+
+    >>> print mc.qhpp("function f(x)")
+    #include <armadillo>
+    using namespace arma ;
+    <BLANKLINE>
+    void f(TYPE x)
+    {
+      // Empty block
+    }
+
+Without a context, the variable type of `x` in the function argument is unknown.
+The default data type `TYPE` is therefore used. This obviously isn't correct,
+but is a filler such that the data type can be defined later through for example
+the `.py` file. In addition, the error is logged. The function `mc.qlog` can be
+used to observe this log:
+
+    >>> print mc.qlog("function f(x)")
+    Error in class Var on line 1:
+    function f(x)
+               ^
+    unknown data type
+
+The error specifies the line number, the class of the node, points at the
+location in the line and a short message about what the problem is. This allows
+the user easy access to the problems that program had during translation.
+"""
+
 import translations
 import collection
 import datatype
 import reference
 import supplement
+import re
 
 def flatten(node, ordered=False, reverse=False, inverse=False):
     r"""
@@ -48,7 +100,7 @@ reverse : bool
 
         nodes = [node]
         for node in nodes:
-            nodes.extend(node.children[::1-2*(r^i)])
+            nodes.extend(node.children[::1-2*(r ^ i)])
         out.extend(nodes[::1-2*i])
 
     else:
@@ -104,6 +156,8 @@ def node_summary(node, opt):
             out += repr(node.code[:30]) + " -> " + repr(node.ret[:30]) + "\n"
 
         indent.append(node)
+
+    out = re.sub(r"(\\n){2,}", "", out)
 
     return out
 
@@ -443,7 +497,7 @@ def translate(node, opt=None):
     for node in nodes[::-1]:
         node.translate_node(opt)
 
-    return node.prop["str"]
+    return node
 
 
 def build(code, disp=False, retall=False, suggest=False, comments=False):
@@ -460,17 +514,183 @@ def build(code, disp=False, retall=False, suggest=False, comments=False):
     return tree[0]
 
 
-def qtranslate(code, suggest=True):
-    return translate(build(code, suggest=suggest))
+def qcpp(code, suggest=True):
+    """
+Quick code translation of matlab script to C++ executable.
+It is the simplest way of translating code.
 
-def qsupplement(code, suggest=True):
-    tree = build(code, suggest=suggest, retall=True)
-    types, suggestions = supplement.get_variables(tree[2])
-    return supplement.str_variables(types, suggestions, header=False)
+Args:
+    code (str, Node): A string or tree representation of Matlab code.
 
-def qlogging(code):
-    pass
+Kwargs:
+    suggest (bool): If true, use the suggest engine to guess data types.
+
+Returns:
+    str: Best estimate of script. If code is a module, return an empty string.
+
+Example:
+
+    >>> print mc.qcpp("a = 4; b = 5.; c = 'abc'", suggest=False)
+    #include <armadillo>
+    using namespace arma ;
+    <BLANKLINE>
+    int main(int argc, char* argv[])
+    {
+      TYPE a, b, c ;
+      a = 4 ;
+      b = 5. ;
+      c = "abc" ;
+      return 0 ;
+    }
+    >>> print mc.qcpp("a = 4; b = 5.; c = 'abc'", suggest=True)
+    #include <armadillo>
+    using namespace arma ;
+    <BLANKLINE>
+    int main(int argc, char* argv[])
+    {
+      int a ;
+      double b ;
+      string c ;
+      a = 4 ;
+      b = 5. ;
+      c = "abc" ;
+      return 0 ;
+    }
+    """
+
+    if isinstance(code, str):
+        tree = build(code, suggest=suggest, retall=True)[0]
+        translate(tree)
+    else:
+        tree = code
+        if isinstance(tree, treebuilder.Treebuilder):
+            tree = tree[0]
+
+    out = ""
+    if tree[1] and tree[1][0].name == "main":
+        out += tree[0].str
+        if out:
+            out += "\n\n"
+        out += tree[1].str
+
+        out = out.replace("__percent__", "%")
+
+    return out
+
+
+def qhpp(code, suggest=False):
+    """
+Quick module translation of matlab script to C++ executable.
+It is the simplest way of translating code.
+
+Args:
+    code (str, Node): A string or tree representation of Matlab code.
+
+Kwargs:
+    suggest (bool): If true, use the suggest engine to guess data types.
+
+Returns:
+    str: Best estimate of script. If code is a module, return an empty string.
+
+Example:
+
+    """
+
+    if isinstance(code, str):
+        tree = build(code, suggest=suggest, retall=True)[0]
+        translate(tree)
+
+    else:
+        tree = code
+        if isinstance(tree, treebuilder.Treebuilder):
+            tree = tree[0]
+
+    out = ""
+    if tree[1] and tree[1][0].name == "main":
+
+        if len(tree[4]) > 1:
+            out += tree[4].str + "\n\n"
+
+        if tree[2].str:
+            out += tree[2].str + "\n\n"
+
+        if tree[3].str:
+            out += tree[3].str + "\n\n"
+
+        if out[-2:] == "\n\n":
+            out = out[:-2]
+
+    else:
+        if tree[0]:
+            out += tree[0].str + "\n\n"
+
+        if tree[3].str:
+            out += tree[3].str + "\n\n"
+
+        if tree[2].str:
+            out += tree[2].str + "\n\n"
+
+        if len(tree[4]) > 1:
+            out += tree[4].str + "\n\n"
+
+        out += tree[1].str
+
+    out = out.replace("__percent__", "%")
+
+    return out
+
+
+def qpy(code, suggest=True, prefix=False):
+
+    if isinstance(code, str):
+        tree = build(code, suggest=suggest, retall=True)[0]
+
+    else:
+        tree = code
+        if isinstance(tree, treebuilder.Treebuilder):
+            tree = tree[0]
+
+    tf, ts, ti, sugs = supplement.get_variables(tree)
+    out = supplement.str_variables(tf, ts, ti, sugs, prefix=prefix)
+    out = out.replace("__percent__", "%")
+
+    return out
+
+
+def qlog(code, suggest=False):
+
+    if isinstance(code, str):
+        tree = build(code, suggest=suggest, retall=True)[0]
+        translate(tree)
+
+    else:
+        tree = code
+        if isinstance(tree, treebuilder.Treebuilder):
+            tree = tree[0]
+
+    out = tree[5].str
+    out = out.replace("__percent__", "%")
+
+    return out
+
+def qtree(code, suggest=False):
+
+    if isinstance(code, str):
+        tree = build(code, suggest=suggest, retall=True)[0]
+        translate(tree)
+
+    else:
+        tree = code
+        if isinstance(tree, treebuilder.Treebuilder):
+            tree = tree[0]
+
+    return tree.summary()
 
 
 from node import Node
 import treebuilder
+
+if __name__ == "__main__":
+    import matlab2cpp as mc
+    import doctest
+    doctest.testmod()

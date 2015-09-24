@@ -1,5 +1,6 @@
 from _variables import *
 
+
 def type_string(node):
 
     if node.type == "func_lambda":
@@ -19,7 +20,6 @@ def type_string(node):
                 ret = "void"
                 prm = ", ".join([p.type for p in func[2][:]+func[1][:]])
 
-            
             return "std::function<" + ret + "(" + prm + ")>"
 
         else:
@@ -30,8 +30,8 @@ def type_string(node):
         return "_"+node.name.capitalize()
 
     elif node.type == "structs":
-        return "_"+node.name.capitalize()
 
+        return "_" + node.name.capitalize()
 
     return node.type
 
@@ -72,39 +72,37 @@ def Params(node):
 
 def Declares(node):
 
-    if node.backend == "func_return":
+    if node.backend in ("func_return", "func_returns"):
+
         declares = {}
+        structs = {}
+
         for child in node[:]:
 
             type = type_string(child)
 
             if type not in declares:
                 declares[type] = []
+
             declares[type].append(child)
+
+            if child.backend == "structs":
+                structs[child.name] = child
 
         out = ""
         for key, val in declares.items():
-            out = out + "\n" + key + " " + ", ".join([str(v) for v in val]) + " ;"
 
-        return out[1:]
+            out += "\n" + key + " "
+            for v in val:
 
-    if node.backend == "func_returns":
+                out += str(v)
+                if v.name in structs:
+                    var = structs[v.name].declare
+                    size = var.parent[var.parent.names.index("_size")]
+                    out += "[" + str(size.value) + "]"
+                out += ", "
 
-        declares = {}
-        for child in node[:]:
-
-            if child in node.parent[1]:
-                continue
-
-            type = type_string(child)
-
-            if type not in declares:
-                declares[type] = []
-            declares[type].append(child)
-
-        out = ""
-        for key, val in declares.items():
-            out = out + "\n" + key + " " + ", ".join([str(v) for v in val]) + " ;"
+            out = out[:-2] + " ;"
 
         return out[1:]
 
@@ -128,7 +126,9 @@ def Func(node):
             out = "void %(name)s(%(2)s, %(1)s)\n{\n"
         else:
             out = "void %(name)s(%(2)s%(1)s)\n{\n"
-        out += "%(0)s\n%(3)s\n}"
+        if node[0]:
+            out += "%(0)s\n"
+        out += "%(3)s\n}"
 
         return out
     
@@ -136,9 +136,16 @@ def Func(node):
 
         return ""#// placeholder for %(name)s"
 
-Main = """int main(int argc, char* argv[])
+def Main(node):
+    if node[0]:
+        return """int main(int argc, char* argv[])
 {
 %(0)s
+%(3)s
+return 0 ;
+}"""
+    return """int main(int argc, char* argv[])
+{
 %(3)s
 return 0 ;
 }"""

@@ -2,19 +2,17 @@ Matlab2cpp is a semi-automatic tool for converting code from Matlab to C++.
 
 Note that it is not meant as a complete tool for creating runnable C++ code.
 For example, the `eval`-function will not be supported because there is no
-general way to implement it in C++.
-Instead the program is aimed as support tool, which aims at speed up the
-conversion process as much as possible for a user that needs to convert Matlab
-programs by hand anyway.
-The software does this by converting the basic structures of the
-Matlab-program (functions, branches, loops, etc.), adds
-variable declarations, and for some lower level code, do a complete
-translation.
-Any problem the program encounters will be written in a log-file.
+general way to implement it in C++.  Instead the program is aimed as a support
+tool, which aims at speed up the conversion process as much as possible for
+a user that needs to convert Matlab programs by hand anyway.  The software does
+this by converting the basic structures of the Matlab-program (functions,
+branches, loops, etc.), adds variable declarations, and for some simple code, do
+a complete translation.  Any problem the program encounters will be written in
+a log-file.
 
-Currently, the code will not convert the large library collection
-of functions that Matlab currently possesses.
-However, there is no reason for the code not to support these features in time.
+Currently, the code will not convert the large library collection of functions
+that Matlab currently possesses.  However, there is no reason for the code not
+to support these features in time.
 
 Installation
 ------------
@@ -38,17 +36,17 @@ Windows:::
     > Python setup.py install
 
 The executable mconvert.py can freely be copied or be added to
-environmental variables manually (with or without the `.py` extendtion).
+environmental variables manually (with or without the `.py` extension).
 
 
 
 Example
 -------
 
-Assuming Linux installation and ´mconvert´ available in path.
+Assuming Linux installation and `mconvert` available in path.
 Code works analogous in Mac and Windows.
 
-Consider the following code snippet in the file ´example.m´: ::
+Consider a file `example.m` with the following content: ::
 
     function y=f(x)
         y = x+4
@@ -58,14 +56,13 @@ Consider the following code snippet in the file ´example.m´: ::
         f(x)
     end
 
-Run conversion on the file:
+Run conversion on the file: ::
 
     $ mconvert example.m
 
-This will create three files: `example.m.cpp`, `example.m.py` and
-`example.m.log`.
+This will create two files: `example.m.hpp` and `example.m.py`.
 
-In example.m.cpp, the translated C++ code is placed. It looks as
+In example.m.hpp, the translated C++ code is placed. It looks as
 follows: ::
 
     #include <armadillo>
@@ -85,10 +82,10 @@ follows: ::
       f(x) ;
     }
 
-Matlab doesn't declare variables explicitly, so
-Matlab2cpp is not able to do a complete translation.
-To create a full conversion, the variables must be declared.
-Declarations can be done in the file `example.m.py`: ::
+Matlab doesn't declare variables explicitly, so Matlab2cpp is unable to complete
+the translation.  To create a full conversion, the variables must be declared.
+Declarations can be done in the file `example.m.py`. After the first run, it
+will look as follows: ::
 
     # Supplement file
     #
@@ -100,49 +97,56 @@ Declarations can be done in the file `example.m.py`: ::
     # umat    imat    fmat    mat    cx_mat
     # ucube   icube   fcube   cube   cx_cube
     #
-    # func_lambda
-    # char
+    # char    string  struct  structs func_lambda
 
-    scope = {}
+    functions = {
+      "g" : {
+        "x" : "",
+      },
+      "g" : {
+        "y" : "",
+        "x" : "",
+      },
+    }
+    includes = [
+      '#include <armadillo>',
+      'using namespace arma ;',
+    ]
 
-    g = scope["g"] = {}
-    g["y"] = ""
-    g["x"] = ""
-
-    f = scope["f"] = {}
-    f["y"] = ""
-    f["x"] = ""
-
-It is then possible to declare variables by inserting type names
-into the respective empty strings.
-
-However, some times it is possible to guess some of the variable
-types from context.
-To use suggestions, run conversion with the `-s` flag:
+In addition to defining includes at the bottom, it is possible to declare
+variables manually by inserting type names into the respective empty strings.
+However, some times it is possible to guess some of the variable types from
+context.  To let the software try to guess variable types, run conversion with
+the `-s` flag: ::
 
     $ mconvert example.m -s
 
-The file `example.m.py` will then automatically be filled with
-types from context: ::
+The file `example.m.py` will then automatically be populated with data types
+from context: ::
 
 
     # ...
 
-    scope = {}
-
-    g = scope["g"] = {}
-    g["x"] = "irowvec"
-
-    f = scope["f"] = {}
-    f["y"] = "irowvec"
-    f["x"] = "irowvec"
+    functions = {
+      "g" : {
+        "x" : "irowvec",
+      },
+      "g" : {
+        "y" : "irowvec",
+        "x" : "irowvec",
+      },
+    }
+    includes = [
+      '#include <armadillo>',
+      'using namespace arma ;',
+    ]
 
 It will not always be sucsessful and some of the types might in
 some cases be wrong.  It is therefore also possible to adjust these
-values at any time.
+values manually at any time.
 
 Having run the conversion with the variables converted, creates a
-new output for `example.m.cpp`: ::
+new output for `example.m.hpp`: ::
 
     #include <armadillo>
     using namespace arma ;
@@ -162,5 +166,5 @@ new output for `example.m.cpp`: ::
       f(x) ;
     }
 
-The file `example.m.log` will contain a list of errors and warnings
-created during conversion.
+This is valid and runnable C++ code.
+For such a small example, no manual adjustments were necesarry.

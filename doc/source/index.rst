@@ -1,7 +1,6 @@
-
+==========
 Matlab2cpp
 ==========
-
 
 
 Introduction
@@ -11,42 +10,48 @@ Introduction
 .. include:: ../../README.md
 
 
-
 User interaction
 ================
 
+.. automodule:: matlab2cpp.__init__
 
-The simplest way to interact with the `Matlab2cpp`-toolbox is to use the
-`mconvert` frontend.
-As noted in the introduction, the script automatically creates three files with
-extensions `.cpp`, `.py` and `.log`.
-In the next subsection, the behavior of `mconvert` will be discussed.
-In the sections after, the behavior of the `.py` and the `.log`.
 
 .. autoprogram:: mconvert:parser
     :prog: mconvert
 
-
-The supplement configuration (`.py`-file)
------------------------------------------
+Configuring datatypes
+---------------------
 
 .. automodule:: matlab2cpp.supplement
 
+Error log
+---------
 
-Translation report (`.log`-file)
---------------------------------
-
-.. automodule:: matlab2cpp.translations._error_log
+.. automodule:: matlab2cpp.utils
 
 
 Application programming interface
 =================================
 
+.. automodule:: matlab2cpp.treebuilder
+
+qcpp -- Script translation
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: matlab2cpp.qcpp
+
+qhpp -- Headers and module
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: matlab2cpp.qcpp
+
+qpy -- Headers and module
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: matlab2cpp.qpy
 
 Building node-tree
 ------------------
-
-.. automodule:: matlab2cpp.treebuilder
 
 Treebuilder class
 ~~~~~~~~~~~~~~~~~

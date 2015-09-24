@@ -2,22 +2,18 @@
 # encoding: utf-8
 
 """
-Translate Matlab to C++ has a few challenges.
-One of those challenges is how variable types are handled:
-In C++ all variables have to be explicitly declared, while in Matlab they are
-declared implicitly at creation.
-When translating between, there are many variables where the data types are
-unknown and impossible for the Matlab2cpp software to translate.
-How to translate the behavior of an integer is vastly different from an float
-matrix.
+Translate Matlab to C++ has a few challenges.  One of those challenges is how
+variable types are handled: In C++ all variables have to be explicitly declared,
+while in Matlab they are declared implicitly at creation.  When translating
+between the two languages, there are many variables where the data types are
+unknown and impossible for the Matlab2cpp software to translate.  How to
+translate the behavior of an integer is vastly different from an float matrix.
 
-In practice, the program will not automatically assign datatype.
-The result is an fairly incomplete program and datatypes get a default
-dummy datatype `TYPE`.
+In practice, the program will not automatically assign datatype.  The result is
+an fairly incomplete program and datatypes get a default dummy datatype `TYPE`.
 For example:
 
-    >>> print mc.qtranslate(
-    ...     "function c=f(); a = 4; b = 4.; c = a+b", suggest=False)
+    >>> print mc.qhpp("function c=f(); a = 4; b = 4.; c = a+b", suggest=False)
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
@@ -30,56 +26,57 @@ For example:
       return c ;
     }
 
-To aid in the process of translation, `mconvert` automatically creates a
-supplement file.
-The name of the name of the file is the same as the source file, but with a
-`.py` extension.
-This file will also be imported (as a python script) each time `mconvert` is
-executed.
-For example:
+To aid in the process of translation, `mconvert` automatically creates
+a supplement file.  The name of the name of the file is the same as the source
+file, but with a `.py` extension.  This file will also be imported (as a python
+script) each time `mconvert` is executed.  For example:
 
-    >>> print mc.qsupplement(
+    >>> print mc.qpy(
     ...     "function c=f(); a = 4; b = 4.; c = a+b", suggest=False)
-    scope = {}
-    <BLANKLINE>
-    f = scope["f"] = {}
-    f["a"] = "" # int
-    f["c"] = ""
-    f["b"] = "" # double
+    functions = {
+      "f" : {
+        "a" : "", # int
+        "b" : "", # double
+        "c" : "",
+      },
+    }
+    includes = [
+      '#include <armadillo>',
+      'using namespace arma ;',
+    ]
 
 To the right of the type assignment, the program will add a suggestion to aid
-the user.
-The next time the `mconvert`-script is run, the inserted values will be imported
-and used.
+the user.  The next time the `mconvert`-script is run, the inserted values will
+be imported and used.
 
 The user can automatically populate it to some degree by using the `-s` or
-`--suggestions` flag (or using the `suggest=True` flat).
-For example:
+`--suggestions` flag (or using the `suggest=True` flag).  For example:
 
-    >>> print mc.qsupplement(
-    ...     "function c=f(); a = 4; b = 4.; c = a+b", suggest=True)
-    scope = {}
-    <BLANKLINE>
-    f = scope["f"] = {}
-    f["a"] = "int"
-    f["b"] = "double"
-    f["c"] = "double"
+    >>> print mc.qpy("function c=f(); a = 4; b = 4.; c = a+b", suggest=True)
+    functions = {
+      "f" : {
+        "a" : "int",
+        "b" : "double",
+        "c" : "double",
+      },
+    }
+    includes = [
+      '#include <armadillo>',
+      'using namespace arma ;',
+    ]
 
-The suggestions are created through an iterative process.
-The variable `a` and `b` get assigned the datatypes `int` and `double` because
-of the direct assignment of variable.
-After this, the process starts over and tries to find other variables that
-suggestion could fill out for.
-In the case of the `c` variable, the assignment on the right were and addition
-between `int` and `double`.
-To not loose precision, it then chooses to keep `double`, which is passed on to
-the `c` variable.
-In practice the suggestions can potentially fill in all datatypes automatically
-in large programs, and often quite intelligently.
+The suggestions are created through an iterative process.  The variable `a` and
+`b` get assigned the datatypes `int` and `double` because of the direct
+assignment of variable.  After this, the process starts over and tries to find
+other variables that suggestion could fill out for.  In the case of the `c`
+variable, the assignment on the right were and addition between `int` and
+`double`.  To not loose precision, it then chooses to keep `double`, which is
+passed on to the `c` variable.  In practice the suggestions can potentially fill
+in all datatypes automatically in large programs, and often quite intelligently.
 
 The resulting program will have the following complete form:
 
-    >>> print mc.qtranslate(
+    >>> print mc.qhpp(
     ...     "function c=f(); a = 4; b = 4.; c = a+b", suggest=True)
     #include <armadillo>
     using namespace arma ;
@@ -97,17 +94,15 @@ The resulting program will have the following complete form:
 Variable types
 --------------
 
-The supplement file consists in practice of only variable `scope` which is a
-nested dictionary.
-The outer shell of scope has string keys that reference the name of each
-function, and declared struct and cells.
-The values are dictionaries that represents the inner shell.
-The inner shell has string keys that refer to the local variable names string
-values that represents the variable type.
+The supplement file consists in practice of only variable `scope` which is
+a nested dictionary.  The outer shell of scope has string keys that reference
+the name of each function, and declared struct and cells.  The values are
+dictionaries that represents the inner shell.  The inner shell has string keys
+that refer to the local variable names string values that represents the
+variable type.
 
-The options for valid variable types are listed in the supplement file.
-They can be roughly split into two groups: **numerical** and **non-numerical**
-types.
+The options for valid variable types are listed in the supplement file.  They
+can be roughly split into two groups: **numerical** and **non-numerical** types.
 The numerical types are as follows:
 
 +--------------+--------------+---------+---------+----------+------------+
@@ -126,8 +121,7 @@ The numerical types are as follows:
 
 Values along the horizontal axis represents the amount of memory reserved per
 element, and the along the vertical axis represents the various number of
-dimensions.
-The names are equivalent to the ones in the Armadillo package.
+dimensions.  The names are equivalent to the ones in the Armadillo package.
 
 The non-numerical types are as follows:
 
@@ -144,10 +138,9 @@ Anonymous/Lambda functions
 --------------------------
 
 In addition to normal function, Matlab have support for anonymous function
-through the name prefix `@`.
-For example:
+through the name prefix `@`.  For example:
 
-    >>> print mc.qtranslate("function f(); g = @(x) x^2; g(4)", suggest=True)
+    >>> print mc.qhpp("function f(); g = @(x) x^2; g(4)", suggest=True)
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
@@ -158,110 +151,115 @@ For example:
       g(4) ;
     }
 
-The translator creates an C++11 lambda function equivalently functionality.
-To achieve this, the translator creates an extra function in the node-tree.
-The name of the function is the same as assigned variable with a `_`-prefix (and
-a number postfix, if name is taken).
-The information about this function dictate the behaviour of the output
-The supplement file have the following form:
+The translator creates an C++11 lambda function with equivalent functionality.
+To achieve this, the translator creates an extra function in the node-tree.  The
+name of the function is the same as assigned variable with a `_`-prefix (and
+a number postfix, if name is taken).  The information about this function
+dictate the behaviour of the output The supplement file have the following form:
 
-    >>> print mc.qsupplement("function f(); g = @(x) x^2; g(4)", suggest=True)
-    scope = {}
-    <BLANKLINE>
-    _g = scope["_g"] = {}
-    _g["x"] = "int"
-    <BLANKLINE>
-    f = scope["f"] = {}
-    f["g"] = "func_lambda"
+    >>> print mc.qpy("function f(); g = @(x) x^2; g(4)", suggest=True)
+    functions = {
+      "_g" : {
+              "x" : "int",
+      },
+      "f" : {
+        "g" : "func_lambda",
+      },
+    }
+    includes = [
+      '#include <armadillo>',
+      'using namespace arma ;',
+    ]
 
-The function `g` is a variable inside `f`'s function scope.
-It has the datatype `func_lambda` to indicate that it should be handled as a
-function.
-The associated function scope `_g` contains the variables inside the definition
-of the anonymous function.
+The function `g` is a variable inside `f`'s function scope.  It has the datatype
+`func_lambda` to indicate that it should be handled as a function.  The
+associated function scope `_g` contains the variables inside the definition of
+the anonymous function.
 
 Data structures and structure arrays
 ------------------------------------
 
 Data structures in Matlab can be constructed explicitly through the
-`struct`-function.
-However, they can also be constructed implicitly by direct assignment.
-For example will `a.b=4` create a `struct` with name `a` that has one field `b`.
-When translating such a snippet, it creates a C++-struct, such that 
+`struct`-function.  However, they can also be constructed implicitly by direct
+assignment.  For example will `a.b=4` create a `struct` with name `a` that has
+one field `b`.  When translating such a snippet, it creates a C++-struct, such
+that 
 
-    >>> print mc.qtranslate("function f(); a.b = 4.", suggest=True)
+    >>> print mc.qhpp("function f(); a.b = 4.", suggest=True)
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
-    struct A
+    struct _A
     {
       double b ;
     } ;
     <BLANKLINE>
     void f()
     {
-      A a ;
+      _A a ;
       a.b = 4. ;
     }
 
 In the suppliment file, the local variable `a` will be assigned as a `struct`.
 In addition, since the struct has content, the suppliment file creates a new
-section for the new struct.
-It will have the following form:
+section for structs.  It will have the following form:
 
-    >>> print mc.qsupplement("function f(); a.b = 4.", suggest=True)
-    scope = {}
-    <BLANKLINE>
-    a = scope["a"] = {}
-    a["b"] = "double"
-    <BLANKLINE>
-    f = scope["f"] = {}
-    f["a"] = "struct"
+    >>> print mc.qpy("function f(); a.b = 4.", suggest=True)
+    functions = {
+      "f" : {
+        "a" : "struct",
+      },
+    }
+    structs = {
+      "a" : {
+        "b" : "double",
+      },
+    }
+    includes = [
+      '#include <armadillo>',
+      'using namespace arma ;',
+    ]
 
 Given that the data structure is in the form of an array, the process is similar
-to a single element.
-There is only two differences.
-In the translation, the struct is declared as an array:
+to a single element.  There is only two differences.  In the translation, the
+struct is declared as an array:
 
-    >>> print mc.qtranslate("function f(); a(1).b = 4.", suggest=True)
+    >>> print mc.qhpp("function f(); a(1).b = 4.", suggest=True)
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
-    struct A
+    struct _A
     {
       double b ;
     } ;
     <BLANKLINE>
     void f()
     {
-      A a[100] ;
-      a(1).b = 4. ;
+      _A a[100] ;
+      a[0].b = 4. ;
     }
 
 The translation assigned reserves 100 pointers for the content of `a`.
 Obviously, there are situations where this isn't enough, and the number should
-be increase.
-This leads to the second difference between structs and struct arrays:
-In struct part of the suppliment file, the number of array elements is set as
-its own variable `_size` and the variable now is donoted as `structs`:
+be increased. To adjust this number, the suppliment file specifies the number of
+elements in the integer `_size`:
 
-    >>> print mc.qsupplement("function f(); a(1).b = 4.", suggest=True)
-    scope = {}
-    <BLANKLINE>
-    scope["_include_libraries"] = [
+    >>> print mc.qpy("function f(); a(1).b = 4.", suggest=True)
+    functions = {
+      "f" : {
+        "a" : "structs",
+      },
+    }
+    structs = {
+      "a" : {
+        "_size" : 100,
+            "b" : "double",
+      },
+    }
+    includes = [
       '#include <armadillo>',
       'using namespace arma ;',
     ]
-    <BLANKLINE>
-    scope["a"] = {
-    "_size" : 100,
-        "b" : "double",
-    }
-    scope["f"] = {
-    "a" : "structs",
-    }
-
-As illustrated the `_size` variable should be an integer.
 """
 
 import collection
@@ -297,7 +295,7 @@ Example:
     >>> prog = mc.build("function f(a,b); c=4; end")
     >>> types_f = {"f": {"a":"int", "b":"vec", "c":"float"}}
     >>> mc.set_variables(prog, types_f=types_f)
-    >>> print mc.translate(prog)
+    >>> print mc.qhpp(prog)
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
@@ -382,8 +380,8 @@ Returns: types_f (dict), types_s (dict), types_i (list), suggest (dict)
 
 Example:
     >>> prog = mc.build("function f(); a=1; b='s'; end")
-    >>> types, suggestions = mc.get_variables(prog)
-    >>> print suggestions
+    >>> types_f, types_s, types_i, suggest = mc.get_variables(prog)
+    >>> print suggest
     {'f': {'a': 'int', 'b': 'string'}}
 """
 
@@ -472,15 +470,15 @@ Example:
     functions = {
       "f" : {
         "a" : "int",
-      }
+      },
       "g" : {
         "b" : "", # float
-      }
+      },
     }
     structs = {
       "c" : {
         "d" : "", # vec
-      }
+      },
     }
     includes = [
       '#include <armadillo>',
@@ -543,7 +541,6 @@ Example:
         keys.sort()
 
         for name in keys:
-
 
             out += '  "%s" : {\n' % (name)
             types = types_s[name]

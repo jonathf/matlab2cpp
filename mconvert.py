@@ -10,8 +10,12 @@ def create_parser():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=dedent("""\
-The front end of the Matlab2cpp toolbox is the `mconvert` script.
-The script takes the following arguments:
+The toolbox frontend of the Matlab2cpp library.  Use this to try to do automatic
+and semi-automatic translation.  The program will create files with the same
+name as the input, but with various extra extensions.  Scripts will receive the
+extension `.cpp`, headers and modules `.hpp`.  A file containing data type and
+header information will be stored in a `.py` file. Any errors will be stored in
+`.log`.
     """))
 
     parser.add_argument("filename",

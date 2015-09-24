@@ -1,6 +1,10 @@
 from _assign_common import Assign
 
-Var = "%(name)s"
+def Var(node):
+    if node.type == "TYPE":
+        node.error("unknown data type")
+    return "%(name)s"
+
 def Fvar(node):
 
     var = node.func[0][node.func[0].names.index(node.name)]
