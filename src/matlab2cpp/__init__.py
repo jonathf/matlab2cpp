@@ -34,7 +34,6 @@ usage, see their respective documentaions. For most intents and puposes,
 
 import supplement
 import utils
-import collection
 
 import time
 from datetime import datetime as date
@@ -44,7 +43,7 @@ import imp
 
 from treebuilder import Treebuilder
 from supplement import set_variables, get_variables, str_variables
-from utils import translate, build, qcpp, qpy, qhpp, qlog, qtree, qscript
+from utils import build, qcpp, qpy, qhpp, qlog, qtree, qscript
 
 
 def main(args):
@@ -128,7 +127,7 @@ a new file.""" % filename)
         print builder.project.summary()
         print "generate translation"
 
-    builder.project.translate_tree(args)
+    builder.project.translate(args)
 
     for program in builder.project:
 
@@ -183,7 +182,7 @@ a new file.""" % filename)
     if args.tree:
         print utils.node_summary(program, args)
     elif args.line:
-        nodes = utils.flatten(program[1], False, False, False)
+        nodes = program[1].flatten(False, False, False)
         for node_ in nodes:
             if node_.line == args.line and node_.cls != "Block":
                 print node_["str"].replace("__percent__", "%")

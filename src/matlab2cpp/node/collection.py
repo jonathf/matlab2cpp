@@ -1,11 +1,8 @@
 """
-All the different kinds of nodes
+All the various different kinds of nodes
 """
 
-from node import Node
-
-## Administrativ part of code ##
-################################
+from frontend import Node
 
 class Project(Node):
     "Head node"
@@ -44,10 +41,6 @@ class Headers(Node):
 class Log(Node):
     def __init__(self, parent, backend="program", **kws):
         Node.__init__(self, parent, backend=backend, **kws)
-
-
-
-
 
 class Header(Node):
     def __init__(self, parent, name, backend="program", **kws):

@@ -79,8 +79,8 @@ def Lambda(node):
         else:
             node.type = declare.type
 
-    expr.translate_tree()
-    lfunc.translate_tree()
+    expr.translate()
+    lfunc.translate()
 
     out = "[" + out[2:] + "] "
     out += "(" + str(lparams) + ") {" + str(expr) + " ; }"

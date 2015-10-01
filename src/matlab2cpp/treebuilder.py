@@ -3,33 +3,33 @@
 
 """
 Translating Matlab code is done in two steps. First the Matlab code is
-interpreted using the `Treebuilder` module. It creates a token tree
-representation of the code where each token is represented by a an unique node.
+interpreted using the `Treebuilder` module. It creates a tree
+representation of the code where each segment of code is represented by a node.
 To observe the node structure it possible to either use `mconvert` with the `-t`
 option, or the python function `mc.qtree`. For example:
 
     >>> print mc.qtree("a = 2+2")
-            Program    program      TYPE    unamed            
-            Includes   program      TYPE                      
+            Program    program      TYPE    unamed
+            Includes   program      TYPE    
             | Include    program      TYPE    #include <armadillo>
             | Include    program      TYPE    using namespace arma ;
-      1   1 Funcs      program      TYPE    unamed            
+      1   1 Funcs      program      TYPE    unamed
       1   1 | Main       func_common  TYPE    main
-      1   1 | | Declares   func_return  TYPE
+      1   1 | | Declares   func_return  TYPE    
       1   1 | | | Var        unknown      TYPE    a
-      1   1 | | Returns    func_return  TYPE
-      1   1 | | Params     func_return  TYPE
-      1   1 | | Block      code_block   TYPE
-      1   1 | | | Assign     unknown      TYPE
+      1   1 | | Returns    func_return  TYPE    
+      1   1 | | Params     func_return  TYPE    
+      1   1 | | Block      code_block   TYPE    
+      1   1 | | | Assign     unknown      TYPE    
       1   1 | | | | Var        unknown      TYPE    a
-      1   5 | | | | Plus       expression   int
-      1   5 | | | | | Int        int          int
-      1   7 | | | | | Int        int          int
-            Inlines    program      TYPE    unamed            
-            Structs    program      TYPE    unamed            
-            Headers    program      TYPE    unamed            
-            Log        program      TYPE    unamed            
-            | Error      program      TYPE    e:0Var
+      1   5 | | | | Plus       expression   int     
+      1   5 | | | | | Int        int          int     
+      1   7 | | | | | Int        int          int     
+            Inlines    program      TYPE    unamed
+            Structs    program      TYPE    unamed
+            Headers    program      TYPE    unamed
+            Log        program      TYPE    unamed
+            | Error      program      TYPE    Var:0
 
 There is quite a lot going on in this picture. First of all, each line
 represents a node. The columns represents repsectively
@@ -72,27 +72,26 @@ upong how the configuration is set up. Intutivly enough, if datatype is set to
 `int`, then the translation handler will follow and also be `int`:
 
     >>> print mc.qtree("a = 2+2", suggest=True)
-            Program    program      TYPE    unamed            
-            Includes   program      TYPE                      
+            Program    program      TYPE    unamed
+            Includes   program      TYPE    
             | Include    program      TYPE    #include <armadillo>
             | Include    program      TYPE    using namespace arma ;
-    1   1 Funcs      program      TYPE    unamed            
-    1   1 | Main       func_common  TYPE    main              
-    1   1 | | Declares   func_return  int                       
-    1   1 | | | Var        int          int     a                 
-    1   1 | | Returns    func_return  TYPE                      
-    1   1 | | Params     func_return  TYPE                      
-    1   1 | | Block      code_block   TYPE                      
-    1   1 | | | Assign     unknown      TYPE                      
-    1   1 | | | | Var        int          int     a                 
-    1   5 | | | | Plus       expression   int                       
-    1   5 | | | | | Int        int          int                       
-    1   7 | | | | | Int        int          int                       
-            Inlines    program      TYPE    unamed            
-            Structs    program      TYPE    unamed            
-            Headers    program      TYPE    unamed            
-            Log        program      TYPE    unamed            
-            | Error      program      TYPE    e:0Var            
+      1   1 Funcs      program      TYPE    unamed
+      1   1 | Main       func_common  TYPE    main
+      1   1 | | Declares   func_return  int     
+      1   1 | | | Var        int          int     a
+      1   1 | | Returns    func_return  TYPE    
+      1   1 | | Params     func_return  TYPE    
+      1   1 | | Block      code_block   TYPE    
+      1   1 | | | Assign     unknown      TYPE    
+      1   1 | | | | Var        int          int     a
+      1   5 | | | | Plus       expression   int     
+      1   5 | | | | | Int        int          int     
+      1   7 | | | | | Int        int          int     
+            Inlines    program      TYPE    unamed
+            Structs    program      TYPE    unamed
+            Headers    program      TYPE    unamed
+            Log        program      TYPE    unamed
 
 In other words, there are for these nodes, multiple translation for depending on
 context. This is important to achieve the desired behavior.
@@ -102,7 +101,7 @@ import os
 import string
 import utils
 import translations
-import collection as col
+from node import collection as col
 import supplement
 
 # Some code constants
@@ -130,7 +129,7 @@ operator2 = (
 string_prefix = " \t\n=><"
 
 class Treebuilder(object):
-    """Convert Matlab-code to Tokentree"""
+    """Convert Matlab-code to Node-tree"""
 
     def __init__(self, disp=False, comments=True, **kws):
         """
@@ -158,7 +157,7 @@ Args:
     text (str): The related rational presented to the user
 
 Example:
-    
+
     >>> builder = mc.Treebuilder()
     >>> prg = builder.load("unnamed.m", "0123456789")
     >>> builder.syntaxerror(7, "example of error")
@@ -208,7 +207,7 @@ Example:
 
         program = self.project[self.project.names.index(name)]
 
-        nodes = utils.flatten(program, False, True, False)
+        nodes = program.flatten(False, True, False)
         # Find if some names should be reserved
         unassigned = {}
         for node in nodes[::-1]:
@@ -241,7 +240,7 @@ Example:
 
     def configure(self, suggest=True, **kws):
 
-        nodes = utils.flatten(self.project, False, True, False)
+        nodes = self.project.flatten(False, True, False)
         while True:
 
             for node in nodes[::-1]:
@@ -286,7 +285,7 @@ Example:
                                 break
                         else:
                             func = None
-                            node.translate_node()
+                            node.translate(only=True)
 
                     if not (func is None):
                         if node.backend == "func_return":
@@ -326,7 +325,7 @@ Example:
                                 params[i].suggest = node[i].type
 
                 elif node.cls in ("Fvar", "Cget", "Fget", "Nget", "Colon"):
-                    node.translate_node()
+                    node.translate(only=True)
 
                 elif node.cls == "Vector":
 
@@ -337,7 +336,7 @@ Example:
                             node.backend = "structs"
 
                     node.type = [n.type for n in node]
-                    node.translate_node()
+                    node.translate(only=True)
 
                 elif node.cls == "Matrix":
 
@@ -348,7 +347,7 @@ Example:
                             node.backend = "structs"
 
                     node.type = [n.type for n in node]
-                    node.translate_node()
+                    node.translate(only=True)
 
                 if node.type == "TYPE":
 

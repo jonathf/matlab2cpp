@@ -262,7 +262,7 @@ elements in the integer `_size`:
     ]
 """
 
-import collection
+from node import collection
 
 
 PREFIX = """# Supplement file

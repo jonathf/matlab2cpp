@@ -40,7 +40,7 @@ a name, which refer to it's scope defined name.  For example:
     >>> print mc.qscript("a = 4", Var=Var)
     __a__ = 4 ;
 
-Since all the code is structured as a token tree, many of the node have node
+Since all the code is structured as a node tree, many of the node have node
 children. The translation is performed leaf-to-root, implying that at the time
 of translation of any node, all of it's children are already translated and
 available in interpolation. The children are indexed by number, counting from 0.
@@ -78,7 +78,7 @@ And this is the full extent of how the system uses string values. However, in
 practice, they are not used much. Instead functions are used. They are defined
 with the same name the class (the software figures the details out what is
 what). This function should always take a single `node` argument which
-represents the current node in the token tree. The function should return either
+represents the current node in the node tree. The function should return either
 a string or tuple in the same way as the directly defined string and tuple are
 define so far. For example, without addressing how one can use `node`, the
 following is equivalent:
