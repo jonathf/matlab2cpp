@@ -33,7 +33,6 @@ usage, see their respective documentaions. For most intents and puposes,
 """
 
 import supplement
-import utils
 
 import time
 from datetime import datetime as date
@@ -43,7 +42,7 @@ import imp
 
 from treebuilder import Treebuilder
 from supplement import set_variables, get_variables, str_variables
-from utils import build, qcpp, qpy, qhpp, qlog, qtree, qscript
+from qfunctions import build, qcpp, qpy, qhpp, qlog, qtree, qscript
 
 
 def main(args):

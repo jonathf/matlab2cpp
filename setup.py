@@ -11,8 +11,9 @@ from distutils.core import setup
 setup(
     name='matlab2cpp',
     version='0.2',
-    packages=['matlab2cpp', 'matlab2cpp.tokens', 'matlab2cpp.translations',
-              'matlab2cpp.testsuite', 'matlab2cpp.inlines'],
+    packages=['matlab2cpp', 'matlab2cpp.node', 'matlab2cpp.tree',
+        'matlab2cpp.translations', 'matlab2cpp.testsuite',
+        'matlab2cpp.inlines'],
     package_dir={'': 'src'},
     url='http://github.com/jonathf/matlab2cpp',
     license='BSD',
