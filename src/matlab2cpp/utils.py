@@ -35,8 +35,8 @@ translation will as far as possible make a full translation. For example:
 Without a context, the variable type of `x` in the function argument is unknown.
 The default data type `TYPE` is therefore used. This obviously isn't correct,
 but is a filler such that the data type can be defined later through for example
-the `.py` file. In addition, the error is logged. The function `mc.qlog` can be
-used to observe this log:
+the `.py` file. The program is awere of this and log error in the log file. The
+function `mc.qlog` can be used to observe this log:
 
     >>> print mc.qlog("function f(x)")
     Error in class Var on line 1:
@@ -44,9 +44,10 @@ used to observe this log:
                ^
     unknown data type
 
-The error specifies the line number, the class of the node, points at the
-location in the line and a short message about what the problem is. This allows
-the user easy access to the problems that program had during translation.
+Like syntax error, the log specifies the line number, points at the cursor
+location and describe the problem at hand.  In addition it also specifies the
+class of the node.  This allows the user easy access to the problems that
+program had during translation.
 """
 
 import translations
@@ -125,7 +126,7 @@ reverse : bool
 
 
 def node_summary(node, opt):
-
+    
     nodes = flatten(node, False, False, False)
     if not (opt is None) and opt.disp:
         print "iterating %d nodes" % len(nodes)
@@ -145,43 +146,49 @@ def node_summary(node, opt):
             indent.pop()
 
         space = "| "*(len(indent)-1)
-        out += "%3d %3d %s%-10s %-12s %-7s %-18s" % \
-                (node.line, node.cur, space, node.cls,
-                        node.backend, node.type, node.name)
-        if node.parent.cls in ("Program", "Project", "Includes"):
-            out += "\n"
-        elif node.parent.cls == "Log":
-            out += repr(node.code[:30]) + " -> " + repr(node.value) + "\n"
+        if not node.line:
+            out += "        %s%-10s %-12s %-7s %-18s" % \
+                (space, node.cls, node.backend, node.type, node.name)
         else:
-            out += repr(node.code[:30]) + " -> " + repr(node.ret[:30]) + "\n"
+            out += "%3d %3d %s%-10s %-12s %-7s %-18s" % \
+                (node.line, node.cur+1, space, node.cls,
+                        node.backend, node.type, node.name)
+        out += "\n"
+
 
         indent.append(node)
 
     out = re.sub(r"(\\n){2,}", "", out)
 
-    return out
+    return out[:-1]
 
 
 def node_translate(node, opt):
 
-    backend = node.backend
-    if backend == "TYPE":
-        backend = "unknown"
+    if node.program.parent.kws.get(node.cls, None):
 
-    target = translations.__dict__["_"+backend]
-    spesific_name = node.cls + "_" + node.name
-
-    if spesific_name in target.__dict__:
-        value = target.__dict__[spesific_name]
-
-    elif node.cls in target.__dict__:
-        value = target.__dict__[node.cls]
+        value = node.program.parent.kws.get(node.cls, None)
 
     else:
-        print node.program.summary()
-        raise KeyError(
-                "Expected to find rule for '%s' in the file '_%s.py'" %\
-                        (node.cls, node.backend))
+
+        backend = node.backend
+        if backend == "TYPE":
+            backend = "unknown"
+
+        target = translations.__dict__["_"+backend]
+        spesific_name = node.cls + "_" + node.name
+
+        if spesific_name in target.__dict__:
+            value = target.__dict__[spesific_name]
+
+        elif node.cls in target.__dict__:
+            value = target.__dict__[node.cls]
+
+        else:
+            print node.program.summary()
+            raise KeyError(
+                    "Expected to find rule for '%s' in the file '_%s.py'" %\
+                            (node.cls, node.backend))
 
 
     if not isinstance(value, (unicode, str, list, tuple)):
@@ -225,7 +232,6 @@ def node_translate(node, opt):
     except:
         raise SyntaxError("interpolation in " + node.backend + "." +\
                 node.cls + " is misbehaving\n'" + value + "'\n"+str(node.prop))
-    # print repr(value)
 
     node.prop["str"] = value
 
@@ -352,16 +358,19 @@ def create_error(node, msg, onlyw=False):
 
     pos = cur-start
 
-    name = "%010d" % cur + node.cls
+    name = node.cls + ":" + str(cur)
+
     errors = node.program[5]
 
-    if name not in errors.names:
-        if onlyw:
-            collection.Warning(errors, name=name,
-                    line=node.line, cur=pos, value=msg, code=code)
-        else:
-            collection.Error(errors, name=name,
-                    line=node.line, cur=pos, value=msg, code=code)
+    if name in errors.names:
+        return
+
+    if onlyw:
+        collection.Warning(errors, name=name,
+                line=node.line, cur=pos, value=msg, code=code)
+    else:
+        collection.Error(errors, name=name,
+                line=node.line, cur=pos, value=msg, code=code)
 
 
 def create_declare(node):
@@ -490,6 +499,10 @@ def suggest_datatype(node):
 
 
 def translate(node, opt=None):
+
+    log = node.program[5]
+    log.children = []
+
     nodes = flatten(node, False, True, False)
     if not (opt is None) and opt.disp:
         print "iterating %d nodes" % len(nodes)
@@ -497,13 +510,17 @@ def translate(node, opt=None):
     for node in nodes[::-1]:
         node.translate_node(opt)
 
+    logs = flatten(log, False, True, False)
+    for node in logs[::-1]:
+        node.translate_node(opt)
+
     return node
 
 
-def build(code, disp=False, retall=False, suggest=False, comments=False):
+def build(code, disp=False, retall=False, suggest=False, comments=False, **kws):
 
     code = code + "\n\n\n\n"
-    tree = treebuilder.Treebuilder(disp=disp, comments=comments)
+    tree = treebuilder.Treebuilder(disp=disp, comments=comments, **kws)
     tree.load("unamed", code)
     tree.configure(2*suggest)
     if retall:
@@ -514,7 +531,7 @@ def build(code, disp=False, retall=False, suggest=False, comments=False):
     return tree[0]
 
 
-def qcpp(code, suggest=True):
+def qcpp(code, suggest=True, **kws):
     """
 Quick code translation of matlab script to C++ executable.
 It is the simplest way of translating code.
@@ -534,7 +551,7 @@ Example:
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
-    int main(int argc, char* argv[])
+    int main(int argc, char** argv)
     {
       TYPE a, b, c ;
       a = 4 ;
@@ -546,7 +563,7 @@ Example:
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
-    int main(int argc, char* argv[])
+    int main(int argc, char** argv)
     {
       int a ;
       double b ;
@@ -559,7 +576,7 @@ Example:
     """
 
     if isinstance(code, str):
-        tree = build(code, suggest=suggest, retall=True)[0]
+        tree = build(code, suggest=suggest, retall=True, **kws)[0]
         translate(tree)
     else:
         tree = code
@@ -685,6 +702,23 @@ def qtree(code, suggest=False):
             tree = tree[0]
 
     return tree.summary()
+
+def qscript(code, suggest=False, **kws):
+
+    if isinstance(code, str):
+        tree = build(code, suggest=suggest, retall=True, **kws)[0]
+        translate(tree)
+    else:
+        tree = code
+        if isinstance(tree, treebuilder.Treebuilder):
+            tree = tree[0]
+
+    out = ""
+    if tree[1] and tree[1][0].name == "main":
+        out = tree[1][0][-1].str
+        out = out.replace("__percent__", "%")
+
+    return out
 
 
 from node import Node

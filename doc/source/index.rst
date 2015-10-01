@@ -29,11 +29,27 @@ Error log
 
 .. automodule:: matlab2cpp.utils
 
+Extending code translations
+===========================
+
+.. automodule:: matlab2cpp.treebuilder
+
+Translation rules
+-----------------
+.. automodule:: matlab2cpp.translations.__init__
+
+The Node node
+-------------
+
+.. automodule:: matlab2cpp.node
+
+Reserved translations
+---------------------
+.. automodule:: matlab2cpp.translations._reserved
 
 Application programming interface
 =================================
 
-.. automodule:: matlab2cpp.treebuilder
 
 qcpp -- Script translation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -61,8 +77,6 @@ Treebuilder class
 
 Translation rules
 -----------------
-
-.. automodule:: matlab2cpp.translations.__init__
 
 
 Node references

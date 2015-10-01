@@ -1,18 +1,19 @@
 Matlab2cpp is a semi-automatic tool for converting code from Matlab to C++.
 
 Note that it is not meant as a complete tool for creating runnable C++ code.
-For example, the `eval`-function will not be supported because there is no
+For example, the `eval`-function can not be supported because there is no
 general way to implement it in C++.  Instead the program is aimed as a support
 tool, which aims at speed up the conversion process as much as possible for
 a user that needs to convert Matlab programs by hand anyway.  The software does
 this by converting the basic structures of the Matlab-program (functions,
 branches, loops, etc.), adds variable declarations, and for some simple code, do
-a complete translation.  Any problem the program encounters will be written in
-a log-file.
+a complete translation.  And any problem the program encounters during
+conversion will be written in a log-file. From there manual conversions can be
+done by hand.
 
 Currently, the code will not convert the large library collection of functions
 that Matlab currently possesses.  However, there is no reason for the code not
-to support these features in time.
+to support these features in time. The extension library is easy to extend.
 
 Installation
 ------------
@@ -31,7 +32,7 @@ As root, run the following command:::
 
 The executable ´mconvert´ is now available from path.
 
-Windows:::
+Windows:
 
     > Python setup.py install
 
@@ -40,8 +41,8 @@ environmental variables manually (with or without the `.py` extension).
 
 
 
-Example
--------
+An illustrating Example
+-----------------------
 
 Assuming Linux installation and `mconvert` available in path.
 Code works analogous in Mac and Windows.
@@ -100,11 +101,11 @@ will look as follows: ::
     # char    string  struct  structs func_lambda
 
     functions = {
-      "g" : {
+      "f" : {
+        "y" : "",
         "x" : "",
       },
       "g" : {
-        "y" : "",
         "x" : "",
       },
     }
@@ -128,11 +129,11 @@ from context: ::
     # ...
 
     functions = {
-      "g" : {
+      "f" : {
+        "y" : "irowvec",
         "x" : "irowvec",
       },
       "g" : {
-        "y" : "irowvec",
         "x" : "irowvec",
       },
     }
@@ -141,12 +142,12 @@ from context: ::
       'using namespace arma ;',
     ]
 
-It will not always be sucsessful and some of the types might in
+It will not always be successful and some of the types might in
 some cases be wrong.  It is therefore also possible to adjust these
 values manually at any time.
 
 Having run the conversion with the variables converted, creates a
-new output for `example.m.hpp`: ::
+new output for `example.m.hpp`:
 
     #include <armadillo>
     using namespace arma ;

@@ -3,16 +3,17 @@ Paren = "(%(0)s)"
 def End(node):
 
     pnode = node
-    while pnode.parent["class"] not in \
+    while pnode.parent.cls not in \
             ("Get", "Cget", "Nget", "Fget", "Sget",
             "Set", "Cset", "Nset", "Fset", "Sset", "Block"):
         pnode = pnode.parent
 
     if pnode.cls == "Block":
+        node.error("Superfluous end-statement")
         return "end"
 
     index = pnode.parent.children.index(pnode)
-    name = pnode = pnode.parent["name"]
+    name = pnode = pnode.parent.name
 
     if index == 0:
         return name + ".n_rows"
@@ -20,6 +21,8 @@ def End(node):
         return name + ".n_cols"
     elif index == 2:
         return name + ".n_slices"
+    else:
+        node.error("end statement in arg>3")
 
 Break = "break"
 
@@ -27,17 +30,21 @@ def Return(node):
     func = node.func
     if func["backend"] == "func_returns":
         return "return"
+
     if func["backend"] == "func_lambda":
         return "return _retval"
 
     return "return " + func[1][0]["name"]
 
 
-
 # simple operators
 def Mul(node):
 
+    if node.type == "TYPE":
+        return "", "*", ""
+
     if not node.num:
+        node.error("non-numerical multiplication %s" % str([n.type for n in node]))
         return "", "*", ""
 
     dim = node[0].dim
@@ -83,11 +90,21 @@ def Mul(node):
     return "", "*", ""
 
 def Elmul(node):
-    if not node.num or node.dim == 0:
+    if node.type == "TYPE":
+        return "", ".*", ""
+
+    if not node.num:
+        node.error("non-numerical multiplication %s" % str([n.type for n in node]))
+        return "", ".*", ""
+
+    if node.dim == 0:
         return "", "*", ""
+
     return "", "__percent__", ""
 
 def Plus(node):
+    if not node.num:
+        node.error("non-numerical addition %s" % str([n.type for n in node]))
     return "", "+", ""
 
 def Minus(node):

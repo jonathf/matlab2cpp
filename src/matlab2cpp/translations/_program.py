@@ -132,12 +132,14 @@ def Log(node):
 
 
 def Error(node):
-    return '''Error in class %(cls)s on line %(line)d:
+    cls = node.name.split(":")[0]
+    return 'Error in class ' + cls + ''' on line %(line)d:
 %(code)s
 ''' + " "*node.cur + "^\n%(value)s"
 
 def Warning(node):
-    return '''Warning in class %(cls)s on line %(line)d:
+    cls = node.name.split(":")[0]
+    return 'Warning in class ' + cls + ''' on line %(line)d:
 %(code)s
 ''' + " "*node.cur + "^\n%(value)s"
 

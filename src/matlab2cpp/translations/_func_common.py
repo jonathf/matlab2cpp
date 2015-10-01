@@ -138,13 +138,13 @@ def Func(node):
 
 def Main(node):
     if node[0]:
-        return """int main(int argc, char* argv[])
+        return """int main(int argc, char** argv)
 {
 %(0)s
 %(3)s
 return 0 ;
 }"""
-    return """int main(int argc, char* argv[])
+    return """int main(int argc, char** argv)
 {
 %(3)s
 return 0 ;

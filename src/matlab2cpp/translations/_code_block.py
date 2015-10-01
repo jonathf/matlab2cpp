@@ -334,7 +334,7 @@ def Tryblock(node):
 Root of try/catch
 
 Args:
-    node (<+type+>): Current position in node-tree
+    node (Tryblock): Current position in node-tree
 
 Return:
     str : Translation of current node.

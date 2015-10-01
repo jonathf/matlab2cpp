@@ -1,105 +1,96 @@
 """
 Given a fully configured node-tree, the job can start to make a translation.
 The translation is the application of a set of translation rules.
+The rules are collected in the folder `translations`, all starting with the
+prefix `_` (to avoid conflicting names with the python interpreter) and a `.py`
+extension indicating that the code just a traditional python script.
 
-Each node then have their own translation rule witch is collected in the module
-`translations`.
-Each translation is a dedicated python function, placed in a script.
-This function is then synonym with `translation rule` and which file it is
-placed in is synonym for `backend`.
-The reason for the structuring in this way is that some nodes (Mostly `Get` and
-`Var`) have multiple translation depending on context.
-If not specified, the translation rule is static and there only exists one.
+Starting with the simplest form of translation is to define a simple string. For
+example:
 
-Simple translations
-~~~~~~~~~~~~~~~~~~~
+    >>> Int = "6"
 
-Each function must have the same name as the class, with capitalized first
-letter.
-All functions takes one argument: the current node in the tree.
-Using information about the tree, the function then returns a translation of the
-current node.
-A basic translation is just a string translation.
-For example, a translation of the `:`-element (not to be confused 
-with the `:`-operator), can be constructed as follows::
+The name `Int` (with capital letter) represents the node the rule is applicable
+for, the right hand side when it is a string, will be used as the translation
+every time `Int` occurs. To illustrate this, consider the following simple
+example:
 
-    def All(node):
-        return "arma::all"
+    >>> print mc.qscript("5")
+    5 ;
 
-Basic placeholders and references
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To implement the new rule we (globally) insert the rule for all instances of
+`Int` as follows:
 
-To simplify notation, it is possible to create placeholder for content.
-The string `%(name)s` for example, holds the nodes name, if it has one.
-For the variable node, this can be used as follows::
+    >>> print mc.qscript("5", Int=Int)
+    6 ;
 
-    def Var(node):
-        return "%(name)s"
+Obviously, this type of translation is very useful except for a very few
+exceptions. First of all, each `int` (and obviously many other nodes) contain
+a value. To represent this value, the translation rule uses string
+interpolation. This can be implemented as follows:
 
-Note that alternative to the placeholder, is to get the variable manually from
-reference.  The reference `"%(name)s"` will be filled up with the content of
-`node.name`.
-This allow for the following equivalent translation for `Var`::
+    >>> Int = "%(value)s+1"
+    >>> print mc.qscript("5", Int=Int)
+    5+1 ;
 
-    def Var(node):
-        return node.name
+There are also other place holder names. For example, variables `Var` have
+a name, which refer to it's scope defined name.  For example:
 
-Reference to node children
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+    >>> Var = "__%(name)s__"
+    >>> print mc.qscript("a = 4", Var=Var)
+    __a__ = 4 ;
 
-Some nodes have children.
-Each translation for each child can be inserted by index.
-The placeholders `%(0)s`, `%(1)s`, ...
-For example, for a multiplication between two children, using placeholder could
-have the following form ::
+Since all the code is structured as a token tree, many of the node have node
+children. The translation is performed leaf-to-root, implying that at the time
+of translation of any node, all of it's children are already translated and
+available in interpolation. The children are indexed by number, counting from 0.
+For example:
 
-    def Mul(node):
-        return "%(0)s * %(1)s"
+    >>> print mc.qscript("2+3")
+    2+3 ;
 
-Alternative to the placeholder, is the direct reference.
-Equivalent multiplication translation could be done as follows:
+Here we have an addition node `Plus`, with two children, both `Int`. They are
+respectively index 0 and 1. We can use this information to manipulate how the
+addition works:
 
-    def Mul(node):
-        return str(node[0]) + " * " + str(node[1])
+    >>> Plus = "%(1)s+%(0)s"
+    >>> print mc.qscript("2+3", Plus=Plus)
+    3+2 ;
 
-Note that indexing returns the child of index directly.
-The `str(node)` is used to get the translation.
+One obvious problem with this approach is that the number of children of node
+might be variable. For example the `Plus` in "2+3" has two children while
+"1+2+3" has three. To address nodes with variable number of node children,
+alternative representation can be used. Instead of defining a string, a tuple of
+three string can be used. They represents prefix, infix and postfix between each
+node child. For example:
 
-Quick tailoring
-~~~~~~~~~~~~~~~
+    >>> Plus = "", "+", ""
 
-The number of children is usually not fixed, but vary on context.
-How many children is given by `len(node)` and code for each case could be
-deviced through branching.
-Unfortunatly, this adds much complexity to each node.
-So instead, it is possible return general rules that can be used on a variable
-number of childre.
-To do so return a tuple of strings in the translation.
-If, for example, three strings are returned, the three strings represents,
-prefix, infix and postfix in bettween each child which is sorted by order.
-For example would a function call could be written as follows ::
+It implies that there should be noting in front, in between each node child,
+a "+" should be used, and nothing at the ends. In practice we get:
 
-    def Get(node):
-        return "%(name)s(", ", ", ")"
+    >>> print mc.qscript("2+3", Plus=Plus)
+    2+3 ;
+    >>> print mc.qscript("1+2+3", Plus=Plus)
+    1+2+3 ;
 
-Given we knew that there where exactly three children, the same code could be
-written:
+And this is the full extent of how the system uses string values. However, in
+practice, they are not used much. Instead functions are used. They are defined
+with the same name the class (the software figures the details out what is
+what). This function should always take a single `node` argument which
+represents the current node in the token tree. The function should return either
+a string or tuple in the same way as the directly defined string and tuple are
+define so far. For example, without addressing how one can use `node`, the
+following is equivalent:
 
-    def Get(node):
-        return "%(name)s(%(0)s, %(1)s, %(2)s)"
-
-More generally, how many elements is returned decides behavior.
-These behaviors are as follows:
-
-=======  =========================================================
-elments  Implication
-=======  =========================================================
-1        Use the string as translation
-2        Prefix and postfix and ignore infix
-3        Prefix, infix and postfix respectively
-4        Prefix, infix1, infix2, infix2, ..., postfix
-N        Prefix, infix1, ..., infix{N-2}, infix{N-2}, ..., postfix
-=======  =========================================================
+    >>> Plus = "", "+", ""
+    >>> print mc.qscript("2+3", Plus=Plus)
+    2+3 ;
+    >>> def Plus(node):
+    ...     return "", "+", ""
+    ...
+    >>> print mc.qscript("2+3", Plus=Plus)
+    2+3 ;
 """
 import glob
 import os
@@ -110,3 +101,8 @@ for name in glob.glob(os.path.dirname(__file__)+sep+"*.py"):
     name = name.split(sep)[-1]
     if name != "__init__":
         exec("import %s" % name[:-3])
+
+if __name__ == "__main__":
+    import doctest
+    import matlab2cpp as mc
+    doctest.testmod()

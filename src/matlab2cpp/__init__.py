@@ -44,7 +44,7 @@ import imp
 
 from treebuilder import Treebuilder
 from supplement import set_variables, get_variables, str_variables
-from utils import translate, build, qcpp, qpy, qhpp, qlog, qtree
+from utils import translate, build, qcpp, qpy, qhpp, qlog, qtree, qscript
 
 
 def main(args):

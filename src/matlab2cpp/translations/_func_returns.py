@@ -30,6 +30,3 @@ def Assigns(node):
         indices = ["(%"+str(d)+")s" for d in xrange(len(node))]
         return "%(name)s(" + ", ".join(indices[:-1]) + ") ;\n"
 
-
-def Get(node):
-    return "", ", ", ""

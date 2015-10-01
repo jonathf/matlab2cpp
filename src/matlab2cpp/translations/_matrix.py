@@ -74,6 +74,11 @@ def Vector(node):
 
 def Matrix(node):
 
+    m = len(node[0])
+    if any([len(n)-m for n in node]):
+        shape = str([len(n) for n in node])
+        node.error("shape missmatch %s" % shape)
+
     dims = {n.dim for n in node}
 
     if None in dims:

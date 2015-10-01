@@ -23,14 +23,33 @@ def Fvar(node):
     return "%(name)s.%(value)s"
 
 def Cvar(node):
-#      node.typeerror()
+    "a{b}"
+
+    if node.type == "TYPE":
+        node.declare.type = "cell"
+    elif node.type != "cell":
+        node.error("Behaves like cell, not %s" % node.type)
+        node.suggest = "cell"
+
     return "%(name)s{", "}{", "}"
 
 def Set(node):
-#      node.typeerror()
+    if node.type == "TYPE":
+        node.error("unknown data type")
+    elif node.num and node.mem == 0:
+        node.error("scalar are not iterable")
     return "%(name)s(", ", ", ")"
 
 def Cset(node):
+    "a{b}(c) = d"
+
+    if node.type == "TYPE":
+        node.declare.type = "cell"
+
+    elif node.type != "cell":
+        node.error("Behaves like cell, not %s" % node.type)
+        node.suggest = "cell"
+
     n_fields = node["n_fields"]
 
     out = "%(name)s{%("
@@ -59,6 +78,15 @@ def Get(node):
     return "%(name)s(", ", ", ")"
 
 def Cget(node):
+    "a{b}(c)"
+
+    if node.type == "TYPE":
+        node.declare.type = "cell"
+
+    elif node.type != "cell":
+        node.error("Behaves like cell, not %s" % node.type)
+        node.suggest = "cell"
+
     n_fields = node["n_fields"]
 
     out = "%(name)s{%("
