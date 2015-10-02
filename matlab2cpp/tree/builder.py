@@ -13,7 +13,7 @@ import iterate
 import assign
 import codeblock
 
-class Treebuilder(object):
+class Builder(object):
     """Convert Matlab-code to Node-tree"""
 
     def __init__(self, disp=False, comments=True, **kws):
@@ -43,7 +43,7 @@ Args:
 
 Example:
 
-    >>> builder = mc.Treebuilder()
+    >>> builder = mc.Builder()
     >>> prg = builder.load("unnamed.m", "0123456789")
     >>> builder.syntaxerror(7, "example of error")
     Traceback (most recent call last):

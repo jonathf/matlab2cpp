@@ -7,7 +7,7 @@ retrieve and manipulate the state of the nodes.
 
 To illustrate both nodes and relationship we introduce the following example:
 
-    >>> builder = mc.Treebuilder()
+    >>> builder = mc.Builder()
     >>> program = builder.load("unnamed", "function y=f(x); y=x+4")
     >>> mc.set_variables(program, {"f" : {"x": "int", "y": "double"}})
     >>> builder.configure()

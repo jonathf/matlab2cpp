@@ -1,6 +1,6 @@
 """
 Translating Matlab code is done in two steps. First the Matlab code is
-interpreted using the `Treebuilder` module. It creates a tree
+interpreted using the `Builder` module. It creates a tree
 representation of the code where each segment of code is represented by a node.
 To observe the node structure it possible to either use `mconvert` with the `-t`
 option, or the python function `mc.qtree`. For example:
@@ -94,7 +94,7 @@ In other words, there are for these nodes, multiple translation for depending on
 context. This is important to achieve the desired behavior.
 """
 
-from builder import Treebuilder
+from builder import Builder
 
 if __name__ == "__main__":
     import matlab2cpp as mc

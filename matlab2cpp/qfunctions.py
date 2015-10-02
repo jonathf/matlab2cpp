@@ -53,7 +53,7 @@ import supplement
 def build(code, disp=False, retall=False, suggest=False, comments=False, **kws):
 
     code = code + "\n\n\n\n"
-    tree = treebuilder.Treebuilder(disp=disp, comments=comments, **kws)
+    tree = Builder(disp=disp, comments=comments, **kws)
     tree.load("unamed", code)
     tree.configure(2*suggest)
     if retall:
@@ -113,7 +113,7 @@ Example:
         tree.translate()
     else:
         tree = code
-        if isinstance(tree, treebuilder.Treebuilder):
+        if isinstance(tree, Builder):
             tree = tree[0]
 
     out = ""
@@ -152,7 +152,7 @@ Example:
 
     else:
         tree = code
-        if isinstance(tree, treebuilder.Treebuilder):
+        if isinstance(tree, Builder):
             tree = tree[0]
 
     out = ""
@@ -197,7 +197,7 @@ def qpy(code, suggest=True, prefix=False):
 
     else:
         tree = code
-        if isinstance(tree, treebuilder.Treebuilder):
+        if isinstance(tree, Builder):
             tree = tree[0]
 
     tf, ts, ti, sugs = supplement.get_variables(tree)
@@ -215,7 +215,7 @@ def qlog(code, suggest=False):
 
     else:
         tree = code
-        if isinstance(tree, treebuilder.Treebuilder):
+        if isinstance(tree, Builder):
             tree = tree[0]
 
     out = tree[5].str
@@ -231,7 +231,7 @@ def qtree(code, suggest=False):
 
     else:
         tree = code
-        if isinstance(tree, treebuilder.Treebuilder):
+        if isinstance(tree, Builder):
             tree = tree[0]
 
     return tree.summary()
@@ -243,7 +243,7 @@ def qscript(code, suggest=False, **kws):
         tree.translate()
     else:
         tree = code
-        if isinstance(tree, treebuilder.Treebuilder):
+        if isinstance(tree, Builder):
             tree = tree[0]
 
     out = ""
@@ -254,7 +254,7 @@ def qscript(code, suggest=False, **kws):
     return out
 
 
-import treebuilder
+from tree import Builder
 
 if __name__ == "__main__":
     import matlab2cpp as mc

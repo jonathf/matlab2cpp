@@ -40,14 +40,14 @@ import os
 from os.path import sep
 import imp
 
-from treebuilder import Treebuilder
+from tree import Builder
 from supplement import set_variables, get_variables, str_variables
 from qfunctions import build, qcpp, qpy, qhpp, qlog, qtree, qscript
 
 
 def main(args):
 
-    builder = Treebuilder(disp=args.disp, comments=args.comments)
+    builder = Builder(disp=args.disp, comments=args.comments)
 
     paths = [os.path.abspath(os.path.dirname(args.filename))]
 
