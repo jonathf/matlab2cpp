@@ -1,6 +1,6 @@
 import re
 
-import matlab2cpp.translations as translations
+import matlab2cpp.rules as rules
 import matlab2cpp.datatype as datatype
 import matlab2cpp.inlines as inlines
 
@@ -146,11 +146,11 @@ def auxillary(node, type, convert):
     swap_var.parent, node.parent = node.parent, swap_var.parent
 
     # generate code
-    swap_var.translate_node()
-    aux_var.translate_node()
+    swap_var.translate_one()
+    aux_var.translate_one()
     if convert:
-        rhs.translate_node()
-    assign.translate_node()
+        rhs.translate_one()
+    assign.translate_one()
 
     if convert:
         assert node.type != swap_var.type
@@ -179,7 +179,7 @@ def resize(node):
     ps = line.parent.children
     line.parent.children = ps[:i] + ps[-1:] + ps[i:-1]
 
-    resize.translate_node(False)
+    resize.translate_one(False)
 
 
 def error(node, msg, onlyw=False):
@@ -374,7 +374,7 @@ def translate_one(node, opt):
         if backend == "TYPE":
             backend = "unknown"
 
-        target = translations.__dict__["_"+backend]
+        target = rules.__dict__["_"+backend]
         spesific_name = node.cls + "_" + node.name
 
         if spesific_name in target.__dict__:

@@ -18,6 +18,16 @@ class Program(Node):
         self._program = self
         Node.__init__(self, parent, name=name, backend=backend, file=name, **kws)
 
+
+        if "sup" not in vars():
+            from matlab2cpp import supplement as sup
+
+        del self.suggest
+        self.suggest = sup.Sstypes()
+        self.ftypes = sup.Ftypes()
+        self.stypes = sup.Stype()
+        self.itypes = sup.Itypes()
+
 class Includes(Node):
     def __init__(self, parent, backend="program", **kws):
         Node.__init__(self, parent, backend=backend, **kws)
@@ -235,4 +245,3 @@ class Nset(Node):
 class Resize(Node):
     def __init__(self, parent, backend="cube_common", **kws):
         Node.__init__(self, parent, backend=backend, **kws)
-

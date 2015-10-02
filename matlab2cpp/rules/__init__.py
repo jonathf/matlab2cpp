@@ -1,9 +1,10 @@
 """
 Given a fully configured node-tree, the job can start to make a translation.
 The translation is the application of a set of translation rules.
-The rules are collected in the folder `translations`, all starting with the
-prefix `_` (to avoid conflicting names with the python interpreter) and a `.py`
-extension indicating that the code just a traditional python script.
+The rules are collected in the folder `rules`. All files contained in the folder
+tarts with the prefix `_` (to avoid conflicting names with the python
+interpreter) and a `.py` extension indicating that the code just a traditional
+python script.
 
 Starting with the simplest form of translation is to define a simple string. For
 example:

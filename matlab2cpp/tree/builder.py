@@ -1,6 +1,6 @@
 from matlab2cpp.node import collection as col
 
-import matlab2cpp.translations as translations
+import matlab2cpp.rules as rules
 
 from matlab2cpp.configure import configure
 
@@ -112,7 +112,7 @@ Example:
         reserved = set([])
         for i in xrange(len(unassigned)-1, -1, -1):
 
-            if unassigned[i] in translations._reserved.reserved:
+            if unassigned[i] in rules._reserved.reserved:
                 reserved.add(unassigned.pop(i))
 
         for node in nodes[::-1]:
@@ -211,3 +211,6 @@ Example:
     def iterate_space_list(self, cur):
         return iterate.space_list(self, cur)
 
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

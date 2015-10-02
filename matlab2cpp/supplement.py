@@ -262,9 +262,6 @@ elements in the integer `_size`:
     ]
 """
 
-from node import collection
-
-
 PREFIX = """# Supplement file
 #
 # Valid inputs:
@@ -277,6 +274,202 @@ PREFIX = """# Supplement file
 #
 # char    string  struct  structs func_lambda
 """
+
+def set_f(node, types):
+
+    funcs = node.program[1]    
+
+    # Functions
+    for name in types.keys():
+
+        if name in funcs.names:
+
+            types = types[name]
+            func = funcs[funcs.names.index(name)]
+            declares, returns, params = func[0], func[1], func[2]
+
+            for key in types.keys():
+
+                if key in declares.names:
+
+                    if key in returns.names:
+                        var = returns[returns.names.index(key)]
+                        var.type = types[key]
+
+                    var = declares[declares.names.index(key)]
+                    var.type = types[key]
+
+                elif key in params.names:
+                    var = params[params.names.index(key)]
+                    var.type = types[key]
+
+def get_f(node):
+
+    funcs = node.program[1]
+
+    types = {}
+
+    for func in funcs:
+
+        types[func["name"]] = types_ = {}
+
+        declares, params = func[0], func[2]
+        for var in declares[:]+params[:]:
+
+            type = var.prop["type"]
+            if type == "TYPE":
+                type = ""
+            types_[var["name"]] = type
+
+            if not type:
+
+                type = var.prop["suggest"]
+                if type == "TYPE":
+                    type = ""
+
+        return types
+
+class Ftypes(object):
+    def __get__(self, instance, owner):
+        return get_f(instance)
+    def __set__(self, instance, value):
+        set_f(instance, value)
+
+
+def get_ss(node):
+
+    funcs = node.program[1]
+    structs = node.program[3]
+
+    suggest = {}
+
+    for func in funcs:
+
+        suggest[func["name"]] = suggest_ = {}
+
+        declares, params = func[0], func[2]
+        for var in declares[:]+params[:]:
+
+            type = var.prop["type"]
+            if type == "TYPE":
+                type = ""
+
+            if not type:
+
+                type = var.prop["suggest"]
+                if type == "TYPE":
+                    type = ""
+                if type:
+                    suggest_[var["name"]] = type
+
+    for struct in structs:
+
+        suggest[struct["name"]] = suggest_ = {}
+
+        for var in struct:
+
+            type = var.prop["type"]
+            if type == "TYPE":
+                type = ""
+
+            if not type:
+
+                type = var.prop["suggest"]
+                if type == "TYPE":
+                    type = ""
+                if type:
+                    suggest_[var["name"]] = type
+
+    return suggest
+
+class Sstypes(object):
+    def __get__(self, instance, owner):
+        return get_ss(instance)
+    def __set__(self, instance, value):
+        raise AttributeError("Suggestions not to be set manually")
+
+
+
+def set_s(node, types):
+
+    structs = node.program[3]
+
+    # Structs
+    for name in types.keys():
+
+        if name in structs.names:
+
+            types = types[name]
+            struct = structs[structs.names.index(name)]
+
+            for key in types.keys():
+
+                if key in struct.names:
+
+                    var = struct[struct.names.index(key)]
+
+                    if var.cls == "Counter":
+                        var.value = str(types[key])
+                    else:
+                        var.type = types[key]
+
+                else:
+                    var = collection.Declare(struct, key, backend="struct",
+                        type=types[key])
+
+
+def get_s(node):
+
+    structs = node.program[3]
+    types_s = {}
+    for struct in structs:
+
+        types_s[struct["name"]] = types = {}
+
+        for var in struct:
+
+            type = var.prop["type"]
+            if type == "TYPE":
+                type = ""
+
+            types[var.name] = type
+
+    return types_s
+
+
+class Stypes(object):
+    def __get__(self, instance, owner):
+        return get_s(instance)
+    def __set__(self, instance, value):
+        set_s(instance, value)
+
+
+def set_i(node, types):
+
+    includes = node.program[0]
+
+    # Includes
+    for key in types:
+
+        if key not in includes.names:
+            collection.Include(includes, key)
+
+
+def get_i(node):
+
+    includes = node.program[0]
+
+    types_i = []
+    for include in includes:
+        types_i.append(include.name)
+
+    return types_i
+
+class Itypes(object):
+    def __get__(self, instance, owner):
+        return get_i(instance)
+    def __set__(self, instance, value):
+        set_i(instance, value)
 
 
 def set_variables(program, types_f={}, types_s={}, types_i=[]):
@@ -305,65 +498,9 @@ Example:
       c = (float) 4 ;
     }
 """
-
-    includes, funcs, inlines, structs, headers, log = program
-
-    # Functions
-    for name in types_f.keys():
-
-        if name in funcs.names:
-
-            types = types_f[name]
-            func = funcs[funcs.names.index(name)]
-            declares, returns, params = func[0], func[1], func[2]
-
-            for key in types.keys():
-
-                if key in declares.names:
-
-                    if key in returns.names:
-                        var = returns[returns.names.index(key)]
-                        var.type = types[key]
-
-                    var = declares[declares.names.index(key)]
-                    var.type = types[key]
-
-                elif key in params.names:
-                    var = params[params.names.index(key)]
-                    var.type = types[key]
-
-
-    # Structs
-    for name in types_s.keys():
-
-        if name in structs.names:
-
-            types = types_s[name]
-            struct = structs[structs.names.index(name)]
-
-            for key in types.keys():
-
-                if key in struct.names:
-
-                    var = struct[struct.names.index(key)]
-
-                    if var.cls == "Counter":
-                        var.value = str(types[key])
-                    else:
-                        var.type = types[key]
-
-                else:
-                    var = collection.Declare(struct, key, backend="struct",
-                        type=types[key])
-
-
-    # Includes
-    for key in types_i:
-
-        if key not in includes.names:
-            collection.Include(includes, key)
-
-        
+    set_f(program, types_f)
+    set_s(program, types_s)
+    set_i(program, types_i)
 
 
 def get_variables(program):
@@ -385,66 +522,11 @@ Example:
     {'f': {'a': 'int', 'b': 'string'}}
 """
 
-    includes, funcs, inlines, structs, headers, log = program
-
-    # functions
-    types_f = {}
-    suggest = {}
-
-    for func in funcs:
-
-        types_f[func["name"]] = types = {}
-        suggest[func["name"]] = suggest_ = {}
-
-        declares, params = func[0], func[2]
-        for var in declares[:]+params[:]:
-
-            type = var.prop["type"]
-            if type == "TYPE":
-                type = ""
-            types[var["name"]] = type
-
-            if not type:
-
-                type = var.prop["suggest"]
-                if type == "TYPE":
-                    type = ""
-                if type:
-                    suggest_[var["name"]] = type
-
-    # structs
-    types_s = {}
-    for struct in structs:
-
-        types_s[struct["name"]] = types = {}
-        suggest[struct["name"]] = suggest_ = {}
-
-        for var in struct:
-
-            type = var.prop["type"]
-            if type == "TYPE":
-                type = ""
-
-            if var.cls == "Counter":
-                types[var.name] = var.value
-            else:
-                types[var.name] = type
-
-            if not type:
-
-                type = var.prop["suggest"]
-                if type == "TYPE":
-                    type = ""
-                if type:
-                    suggest_[var["name"]] = type
-
-    types_i = []
-    for include in includes:
-        types_i.append(include.name)
-
+    types_f = get_f(program)
+    types_s = get_s(program)
+    types_i = get_i(program)
+    suggest = get_ss(program)
     return types_f, types_s, types_i, suggest
-
-
 
 def str_variables(types_f={}, types_s={}, types_i=[], suggest={}, prefix=True):
     """
@@ -584,6 +666,9 @@ Example:
         out += "]"
 
     return out
+
+from node import collection
+
 
 if __name__ == "__main__":
     import matlab2cpp as mc

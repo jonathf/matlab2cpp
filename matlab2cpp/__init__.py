@@ -7,9 +7,9 @@ The simplest way to interact with the `Matlab2cpp`-toolbox is to use the
 extensions containing translations and/or meta-information.
 Even though `mconvert` is sufficient for performing all code translation, many
 of the examples in this manual are done through a python interface, since some
-of the python functionallity also will be discussed.  Given that `Matlab2cpp` is
-properly installed on your system, the python library is available in Python's
-path.  For the examples, the module is assumed imported as
+of the python functionallity also will be discussed.  Given that `Matlab2cpp`
+is properly installed on your system, the python library is available in
+Python's path.  For the examples, the module is assumed imported as
 
     >>> import matlab2cpp as mc
 
@@ -32,14 +32,13 @@ usage, see their respective documentaions. For most intents and puposes,
 `mconvert` creates files with the same content as these quick functions creates.
 """
 
-import supplement
-
 import time
 from datetime import datetime as date
 import os
 from os.path import sep
 import imp
 
+import supplement
 from tree import Builder
 from supplement import set_variables, get_variables, str_variables
 from qfunctions import build, qcpp, qpy, qhpp, qlog, qtree, qscript
@@ -178,8 +177,15 @@ a new file.""" % filename)
 
     program = builder[0]
 
-    if args.tree:
-        print utils.node_summary(program, args)
+    if args.tree_full:
+        print program.node_summary(args)
+
+    elif args.tree:
+        if program[1][0].cls == "Main":
+            print program[1][0][3].node_summary(args)
+        else:
+            print program[1].node_summary(args)
+
     elif args.line:
         nodes = program[1].flatten(False, False, False)
         for node_ in nodes:

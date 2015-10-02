@@ -1,7 +1,5 @@
 import os
-
 import supplement
-
 
 def configure(self, suggest=True, **kws):
 
