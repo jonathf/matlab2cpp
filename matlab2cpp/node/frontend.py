@@ -66,8 +66,11 @@ name : str
         """
 Generate a summary of the tree structure with some meta-information.
 
-    Returns:
-	str: Summary on format
+Returns:
+	str: Summary of the node tree
+
+See also:
+    `mc.qtree`
         """
         return backend.summary(self, args)
 

@@ -55,6 +55,9 @@ __all__ += qfunctions.__all__
 from tree import *
 __all__ += tree.__all__
 
+from node import *
+__all__ += node.__all__
+
 
 def main(args):
     """

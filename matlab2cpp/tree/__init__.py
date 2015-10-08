@@ -92,6 +92,25 @@ upong how the configuration is set up. Intutivly enough, if datatype is set to
 
 In other words, there are for these nodes, multiple translation for depending on
 context. This is important to achieve the desired behavior.
+
+Modules
+~~~~~~~
+
+builder
+
+assign          
+branches
+codeblock
+expression
+findend
+functions
+identify
+iterate
+misc
+variables
+
+constants
+
 """
 
 import matlab2cpp as mc

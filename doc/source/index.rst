@@ -13,11 +13,24 @@ Introduction
 User interaction
 ================
 
-.. automodule:: matlab2cpp.__init__
-
+.. automodule:: matlab2cpp
 
 .. autoprogram:: mconvert:parser
     :prog: mconvert
+
+
+
+Quick functions
+---------------
+.. automodule:: matlab2cpp.qfunctions
+
+.. autofunction:: matlab2cpp.build
+.. autofunction:: matlab2cpp.qcpp
+.. autofunction:: matlab2cpp.qhpp
+.. autofunction:: matlab2cpp.qpy
+.. autofunction:: matlab2cpp.qlog
+.. autofunction:: matlab2cpp.qtree
+.. autofunction:: matlab2cpp.qscript
 
 Configuring datatypes
 ---------------------
@@ -32,7 +45,7 @@ Error log
 Extending code translations
 ===========================
 
-.. automodule:: matlab2cpp.treebuilder
+.. automodule:: matlab2cpp.tree
 
 Translation rules
 -----------------
@@ -50,24 +63,19 @@ Reserved translations
 Application programming interface
 =================================
 
-
-qcpp -- Script translation
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: matlab2cpp.qcpp
-
-qhpp -- Headers and module
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Quick translations
+------------------
 
 .. autofunction:: matlab2cpp.qcpp
 
-qpy -- Headers and module
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. autofunction:: matlab2cpp.qhpp
 
 .. autofunction:: matlab2cpp.qpy
 
 Building node-tree
 ------------------
+
+.. automodule:: matlab2cpp.tree
 
 Treebuilder class
 ~~~~~~~~~~~~~~~~~
