@@ -1,11 +1,5 @@
-import matlab2cpp.datatype as dt
-import matlab2cpp.inlines as inl
-import matlab2cpp.reference as ref
-
-
-class Node(object):
-    """
-General definition of a token representation of code component.
+r"""
+General definition of a node representation of code segment.
 
 During translation an instance of the current state in form of a Node will be
 provided. It has a set of properties and module functions that can be used to
@@ -13,11 +7,11 @@ retrieve and manipulate the state of the nodes.
 
 To illustrate both nodes and relationship we introduce the following example:
 
-    >>> builder = mc.Treebuilder()
+    >>> builder = mc.Builder()
     >>> program = builder.load("unnamed", "function y=f(x); y=x+4")
     >>> mc.set_variables(program, {"f" : {"x": "int", "y": "double"}})
     >>> builder.configure()
-    >>> program.translate_tree()
+    >>> program.translate()
     >>> print mc.qtree(program)
             Program    program      TYPE    unnamed           
             Includes   program      TYPE                      
@@ -207,182 +201,11 @@ suggest_datatype
 Tree processing
 ~~~~~~~~~~~~~~~
 
-translate_node
-translate_tree
+translate
 summary
-
 """
 
-    backend = ref.Property_reference("backend")
-    cls = ref.Property_reference("class")
-    code = ref.Recursive_property_reference("code")
-    cur = ref.Recursive_property_reference("cur")
-    dim = dt.Dim()
-    file = ref.Recursive_property_reference("file")
-    line = ref.Line_reference()
-    mem = dt.Mem()
-    name = ref.Property_reference("name")
-    names = ref.Names()
-    num = dt.Num()
-    pointer = ref.Property_reference("pointer")
-    ret = ref.Property_reference("ret")
-    str = ref.Property_reference("str")
-    suggest = dt.Suggest()
-    type = dt.Type()
-    value = ref.Property_reference("value")
-
-    func = ref.Func_reference()
-    program = ref.Program_reference()
-    project = ref.Project_reference()
-    group = ref.Group_reference()
-    declare = ref.Declare_reference()
-
-    def __init__(self, parent, name="", backend="unknown", value="",
-            type="TYPE", pointer=0, line=None, cur=None, code=None, file=None):
-        """
-Parameters
-----------
-parent : Node
-    Node parent in the token tree
-name : str
-    Optional name of the node
-        """
-        self.children = []
-        self.prop = {"type":type, "suggest":type,
-                "value":value, "str":"", "name":name,
-                "pointer":pointer, "backend":backend,
-                "line":line, "cur":cur, "code":code,
-                "ret":"", "file":file,
-                "class":self.__class__.__name__}
-
-        # Parental relationship
-        self.parent = parent
-
-        if not (self is parent):
-            parent.children.append(self)
-
-
-    def summary(self):
-        """
-Generate a summary of the tree structure with some meta-information.
-
-    Returns:
-	str: Summary on format
-        """
-        return utils.node_summary(self, None)
-
-
-    def translate_tree(self, opt=None):
-        """Generate code"""
-
-        utils.translate(self, opt)
-
-    def properties(self):
-
-        prop = self.prop.copy()
-        for key in self.prop:
-            if prop[key] is None:
-                prop[key] = self[key]
-
-        I = len(self)
-        for i in xrange(I):
-            prop[str(i)] = prop["-"+str(I-i)] = self[i]["str"]
-        return prop
-
-    def translate_node(self, opt=None):
-        utils.node_translate(self, opt)
-
-
-    def auxiliary(self, type=None, convert=False):
-        """Create a auxiliary variablele and
-move actual calcuations to own line.
-
-Parameters
-----------
-type : str, None
-    If provided, auxiliary variable type will be converted
-        """
-        utils.create_auxillary(self, type, convert)
-
-
-    def resize(self):
-        utils.create_resize(self)
-
-
-    def include(self, name, **kws):
-
-        include_code, library_code = inl.retrieve(self, name, **kws)
-
-        includes = self.program[0]
-        if include_code and include_code not in includes.names:
-            collection.Include(includes, include_code, value=includes.value)
-
-        inlines = self.program[2]
-        if library_code and library_code not in inlines:
-            collection.Inline(inlines, library_code)
-
-    def warning(self, msg):
-        utils.create_error(self, msg, True)
-
-    def error(self, msg):
-        utils.create_error(self, msg, False)
-
-    def create_declare(self):
-        utils.create_declare(self)
-
-    def suggest_datatype(self):
-        return utils.suggest_datatype(self)
-
-    def __getitem__(self, i):
-        if isinstance(i, str):
-            out = self.prop[i]
-            if out is None:
-                if i == "cls":
-                    return self.cls
-                elif hasattr(self, i):
-                    return getattr(self, i)
-            return out
-
-        if isinstance(i, Node):
-            i = self.names.index(i.name)
-
-        return self.children[i]
-
-    def __contains__(self, i):
-        if isinstance(i, str):
-            return i in self.names
-        return i.name in self.names
-
-    def __setitem__(self, key, val):
-        self.prop[key] = val
-
-    def __hasitem__(self, key):
-        return key in self.prop
-
-    def __len__(self):
-        return len(self.children)
-
-    def __str__(self):
-        return self.prop["str"]
-
-    def __add__(self, val):
-        return str(self)+str(val)
-
-    def __radd__(self, val):
-        return str(val)+str(val)
-
-    def __iter__(self):
-        return self.children.__iter__()
-
-    def append(self, node):
-        node.children.append(node)
-
-    def pop(self, index):
-        return self.children.pop(index)
-
-
-import matlab2cpp.utils
-import matlab2cpp.collection
+from frontend import Node
 
 if __name__ == "__main__":
     import doctest

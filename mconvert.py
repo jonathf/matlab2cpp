@@ -31,6 +31,10 @@ is formated as follows:
 The indentation represents the tree structure.
             """)
 
+    parser.add_argument("-T", "--tree-full", action="store_true",
+            help="""\
+Same as -t, but the full node tree, not only code related.""")
+
     parser.add_argument("-s", '--suggest', action="store_true",
             help="""\
 Automatically populate the `<filename>.py` file with datatype with suggestions

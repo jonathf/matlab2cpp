@@ -10,10 +10,11 @@ from distutils.core import setup
 
 setup(
     name='matlab2cpp',
-    version='0.2',
-    packages=['matlab2cpp', 'matlab2cpp.translations',
-              'matlab2cpp.testsuite', 'matlab2cpp.inlines'],
-    package_dir={'': 'src'},
+    version='0.3',
+    packages=['matlab2cpp', 'matlab2cpp/node', 'matlab2cpp/tree',
+        'matlab2cpp/rules', 'matlab2cpp/testsuite',
+        'matlab2cpp/inlines'],
+    # package_dir={'': ''},
     url='http://github.com/jonathf/matlab2cpp',
     license='BSD',
     author="Jonathan Feinberg",
@@ -30,8 +31,7 @@ if system == "Windows":
 
 else:
 
-    mconvert = "cp mconvert.py /usr/local/bin/mconvert"
-    print mconvert
+    mconvert = "cp -v mconvert.py /usr/local/bin/mconvert"
     os.system(mconvert)
     chmod = "chmod 755 /usr/local/bin/mconvert"
     print chmod

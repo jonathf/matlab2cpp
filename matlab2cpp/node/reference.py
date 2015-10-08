@@ -1,8 +1,8 @@
 """
-Each node has a set of node attributes that allows for quick access to node
-properties and other nodes of interest.
-For example, if the node has a name, it can be referred to by `node.name`.
-Another example is to access the parent node by `node.parent`.
+Each node has a set of attributes that allows for quick access to properties and
+other node of interest.  For example, if `node` has a name, it can be referred
+to by `node.name`.  Another example is to access the parent node by
+`node.parent`.
 
 Note that, if a reference does not exist, the node itself will be returned.
 """
@@ -14,6 +14,7 @@ groups = [
     "Statement", "Switch", "Tryblock", "Matrix",
     "While", "Block", "Node", "Transpose", "Ctranspose",
 ]
+
 nondeclares = ("Program", "Project", "Include", "Includes", "Struct", "Structs")
 structvars = ("Fvar", "Fget", "Fset", "Nget", "Nset", "Sget", "Sset")
 
@@ -40,6 +41,8 @@ class Recursive_property_reference(object):
         a = instance.prop[self.name]
         if not (a is None):
             return a
+
+        assert not (instance is instance.parent)
 
         a = Recursive_property_reference.__get__(self, instance.parent, owner)
         instance.prop[self.name] = a

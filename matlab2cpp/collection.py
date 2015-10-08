@@ -1,20 +1,17 @@
 """
-All the different kinds of nodes
+All the various different kinds of nodes
 """
 
 from node import Node
 
-## Administrativ part of code ##
-################################
-
 class Project(Node):
     "Head node"
     def __init__(self, backend="program", name="project",
-            cur=0, line=0, code="", **kws):
+            cur=0, line=0, code="", file="42", **kws):
         self.parent = self
         self._program = self
         Node.__init__(self, self, name=name, backend=backend, cur=cur,
-                line=line, code=code, **kws)
+                line=line, code=code, file=file, **kws)
 
 class Program(Node):
     def __init__(self, parent, name, backend="program", **kws):
@@ -44,10 +41,6 @@ class Headers(Node):
 class Log(Node):
     def __init__(self, parent, backend="program", **kws):
         Node.__init__(self, parent, backend=backend, **kws)
-
-
-
-
 
 class Header(Node):
     def __init__(self, parent, name, backend="program", **kws):
@@ -242,4 +235,3 @@ class Nset(Node):
 class Resize(Node):
     def __init__(self, parent, backend="cube_common", **kws):
         Node.__init__(self, parent, backend=backend, **kws)
-
