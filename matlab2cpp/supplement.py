@@ -262,6 +262,8 @@ elements in the integer `_size`:
     ]
 """
 
+import node as node_
+
 PREFIX = """# Supplement file
 #
 # Valid inputs:
@@ -284,24 +286,24 @@ def set_f(node, types):
 
         if name in funcs.names:
 
-            types = types[name]
+            types_ = types[name]
             func = funcs[funcs.names.index(name)]
-            declares, returns, params = func[0], func[1], func[2]
+            declares, returns, params = func[:3]
 
-            for key in types.keys():
+            for key in types_.keys():
 
                 if key in declares.names:
 
                     if key in returns.names:
                         var = returns[returns.names.index(key)]
-                        var.type = types[key]
+                        var.type = types_[key]
 
                     var = declares[declares.names.index(key)]
-                    var.type = types[key]
+                    var.type = types_[key]
 
                 elif key in params.names:
                     var = params[params.names.index(key)]
-                    var.type = types[key]
+                    var.type = types_[key]
 
 def get_f(node):
 
@@ -414,7 +416,7 @@ def set_s(node, types):
                         var.type = types[key]
 
                 else:
-                    var = collection.Declare(struct, key, backend="struct",
+                    var = node_.collection.Declare(struct, key, backend="struct",
                         type=types[key])
 
 
@@ -452,7 +454,7 @@ def set_i(node, types):
     for key in types:
 
         if key not in includes.names:
-            collection.Include(includes, key)
+            node_.collection.Include(includes, key)
 
 
 def get_i(node):
@@ -486,8 +488,7 @@ Args:
 
 Example:
     >>> prog = mc.build("function f(a,b); c=4; end")
-    >>> types_f = {"f": {"a":"int", "b":"vec", "c":"float"}}
-    >>> mc.set_variables(prog, types_f=types_f)
+    >>> prog.ftypes = {"f": {"a":"int", "b":"vec", "c":"float"}}
     >>> print mc.qhpp(prog)
     #include <armadillo>
     using namespace arma ;
@@ -517,8 +518,7 @@ Returns: types_f (dict), types_s (dict), types_i (list), suggest (dict)
 
 Example:
     >>> prog = mc.build("function f(); a=1; b='s'; end")
-    >>> types_f, types_s, types_i, suggest = mc.get_variables(prog)
-    >>> print suggest
+    >>> print prog.suggest
     {'f': {'a': 'int', 'b': 'string'}}
 """
 
@@ -666,8 +666,6 @@ Example:
         out += "]"
 
     return out
-
-from node import collection
 
 
 if __name__ == "__main__":

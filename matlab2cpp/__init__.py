@@ -7,7 +7,7 @@ The simplest way to interact with the `Matlab2cpp`-toolbox is to use the
 extensions containing translations and/or meta-information.
 Even though `mconvert` is sufficient for performing all code translation, many
 of the examples in this manual are done through a python interface, since some
-of the python functionallity also will be discussed.  Given that `Matlab2cpp`
+of the python functionality also will be discussed.  Given that `Matlab2cpp`
 is properly installed on your system, the python library is available in
 Python's path.  For the examples, the module is assumed imported as
 
@@ -23,12 +23,12 @@ Function    Description
 `mc.qhpp`   Quick code translation of matlab module files into C++ header
             content, or header files for runnable scripts.
 `mc.qpy`    Quick extraction of variable and header meta information and
-            creation of suppliment file content.
+            creation of supplement file content.
 `mc.qlog`   Quick creation of error log.
 =========   =================================================================
 
 Each function can take a string as input and output.  However, for more advanced
-usage, see their respective documentaions. For most intents and puposes,
+usage, see their respective documentations. For most intents and purposes,
 `mconvert` creates files with the same content as these quick functions creates.
 """
 
@@ -38,83 +38,106 @@ import os
 from os.path import sep
 import imp
 
+import node
+import tree
 import supplement
-from tree import Builder
-from supplement import set_variables, get_variables, str_variables
-from qfunctions import build, qcpp, qpy, qhpp, qlog, qtree, qscript
+import qfunctions
+import collection
+import inlines
+import configure
+import rules
+
+__all__ = ["main"]
+
+from qfunctions import *
+__all__ += qfunctions.__all__
+
+from tree import *
+__all__ += tree.__all__
 
 
 def main(args):
+    """
+Initiate the interpretation and conversion process.
 
-    builder = Builder(disp=args.disp, comments=args.comments)
+Args:
+    args (ArgumentParser): arguments parsed through mconvert
+    """
 
-    paths = [os.path.abspath(os.path.dirname(args.filename))]
+    builder = tree.builder.Builder(disp=args.disp, comments=args.comments)
 
-    if args.disp:
-        print "building tree..."
+    if os.path.isfile(args.filename):
 
-    filenames = [os.path.abspath(args.filename)]
-    stack = []
-    while filenames:
-
-        filename = filenames.pop(0)
-        assert os.path.isfile(filename)
-
-        if filename in stack:
-            continue
+        paths = [os.path.abspath(os.path.dirname(args.filename))]
 
         if args.disp:
-            print "loading", filename
+            print "building tree..."
 
-        stack.append(filename)
+        filenames = [os.path.abspath(args.filename)]
+        stack = []
+        while filenames:
 
-        f = open(filename, "rU")
-        code = f.read()
-        f.close()
+            filename = filenames.pop(0)
+            assert os.path.isfile(filename)
 
-        program = builder.load(filename, code)
+            if filename in stack:
+                continue
 
-        unknowns = builder.get_unknowns(filename)
+            if args.disp:
+                print "loading", filename
 
-        for i in xrange(len(unknowns)-1, -1, -1):
+            stack.append(filename)
 
-            for path in paths:
-                if os.path.isfile(path + sep + unknowns[i] + ".m"):
-                    unknowns[i] = unknowns[i] + ".m"
-                if os.path.isfile(path + sep + unknowns[i]):
-                    program.include(path + sep + unknowns[i])
-                    filenames.append(path + sep + unknowns.pop(i))
+            f = open(filename, "rU")
+            code = f.read()
+            f.close()
 
-        if os.path.isfile(filename + ".py") and not args.reset:
+            program = builder.load(filename, code)
+            unknowns = builder.get_unknowns(filename)
 
-            try:
-                cfg = imp.load_source("cfg", filename + ".py")
+            for i in xrange(len(unknowns)-1, -1, -1):
 
-                types_f, types_s, types_i, suggest =\
-                    get_variables(builder.project[-1])
-                for name in types_f.keys():
+                for path in paths:
+                    if os.path.isfile(path + sep + unknowns[i] + ".m"):
+                        unknowns[i] = unknowns[i] + ".m"
+                    if os.path.isfile(path + sep + unknowns[i]):
+                        program.include(path + sep + unknowns[i])
+                        filenames.append(path + sep + unknowns.pop(i))
 
-                    if name in cfg.functions:
-                        for key in cfg.functions[name].keys():
-                            types_f[name][key] = cfg.functions[name][key]
+            if os.path.isfile(filename + ".py") and not args.reset:
 
-                for name in types_s.keys():
+                try:
+                    cfg = imp.load_source("cfg", filename + ".py")
 
-                    if name in cfg.structs:
-                        for key in cfg.structs[name].keys():
-                            types_s[name][key] = cfg.structs[name][key]
+                    types_f, types_s, types_i, suggest =\
+                        supplement.get_variables(builder.project[-1])
+                    for name in types_f.keys():
 
-                for key in cfg.includes:
-                    if key not in types_i:
-                        types_i.append(key)
+                        if name in cfg.functions:
+                            for key in cfg.functions[name].keys():
+                                types_f[name][key] = cfg.functions[name][key]
 
-                set_variables(program, types_f, types_s, types_i)
+                    for name in types_s.keys():
 
-            except:
-                raise ImportError("""Suplliment file:
-%s.py
-is formated incorrectly. Change the format or convert with '-r' option to create
-a new file.""" % filename)
+                        if name in cfg.structs:
+                            for key in cfg.structs[name].keys():
+                                types_s[name][key] = cfg.structs[name][key]
+
+                    for key in cfg.includes:
+                        if key not in types_i:
+                            types_i.append(key)
+
+                    supplement.set_variables(program, types_f, types_s, types_i)
+
+                except:
+                    raise ImportError("""Supplement file:
+    %s.py
+    is formated incorrectly. Change the format or convert with '-r' option to create
+    a new file.""" % filename)
+
+    else:
+
+        program = builder.load("unnamed", args.filename)
 
     if args.disp:
         print "configure tree"
@@ -131,10 +154,10 @@ a new file.""" % filename)
 
         name = program.name
 
-        cpp = qcpp(program)
-        hpp = qhpp(program)
-        py = qpy(program, prefix=True)
-        log = qlog(program)
+        cpp = qfunctions.qcpp(program)
+        hpp = qfunctions.qhpp(program)
+        py = qfunctions.qpy(program, prefix=True)
+        log = qfunctions.qlog(program)
 
         if hpp and cpp:
             cpp = '#include "%s.hpp"\n' % name + cpp
@@ -178,13 +201,13 @@ a new file.""" % filename)
     program = builder[0]
 
     if args.tree_full:
-        print program.node_summary(args)
+        print program.summary(args)
 
     elif args.tree:
         if program[1][0].cls == "Main":
-            print program[1][0][3].node_summary(args)
+            print program[1][0][3].summary(args)
         else:
-            print program[1].node_summary(args)
+            print program[1].summary(args)
 
     elif args.line:
         nodes = program[1].flatten(False, False, False)

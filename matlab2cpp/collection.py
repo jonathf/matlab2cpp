@@ -2,31 +2,21 @@
 All the various different kinds of nodes
 """
 
-from frontend import Node
+from node import Node
 
 class Project(Node):
     "Head node"
     def __init__(self, backend="program", name="project",
-            cur=0, line=0, code="", **kws):
+            cur=0, line=0, code="", file="42", **kws):
         self.parent = self
         self._program = self
         Node.__init__(self, self, name=name, backend=backend, cur=cur,
-                line=line, code=code, **kws)
+                line=line, code=code, file=file, **kws)
 
 class Program(Node):
     def __init__(self, parent, name, backend="program", **kws):
         self._program = self
         Node.__init__(self, parent, name=name, backend=backend, file=name, **kws)
-
-
-        if "sup" not in vars():
-            from matlab2cpp import supplement as sup
-
-        del self.suggest
-        self.suggest = sup.Sstypes()
-        self.ftypes = sup.Ftypes()
-        self.stypes = sup.Stype()
-        self.itypes = sup.Itypes()
 
 class Includes(Node):
     def __init__(self, parent, backend="program", **kws):

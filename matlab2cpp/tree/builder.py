@@ -1,8 +1,4 @@
-from matlab2cpp.node import collection as col
-
-import matlab2cpp.rules as rules
-
-from matlab2cpp.configure import configure
+import matlab2cpp as mc
 
 import expression
 import functions
@@ -27,8 +23,30 @@ class Builder(object):
 
         self.disp = disp
         self.comments = comments
-        self.project = col.Project()
+        self.project = mc.collection.Project()
         self.project.kws = kws
+
+
+    def load(self, name, code):
+        """
+    Load a Matlab code into the node tree.
+
+    Will throw and exception if module loaded without the `folder` option.
+
+    Args:
+        name (str):
+            Name of program (usually valid filename).
+        code (str):
+            Matlab code to be loaded
+        """
+
+        if self.disp:
+            print "loading", name
+
+        self.code = code + "\n\n\n"
+        self.create_program(name)
+        return self.project[-1]
+
 
     def __getitem__(self, i):
         return self.project[i]
@@ -67,26 +85,6 @@ Example:
         out += "Expected: " + text
         raise SyntaxError(out)
 
-    def load(self, name, code):
-        """
-    Load a Matlab code into the node tree.
-
-    Will throw and exception if module loaded without the `folder` option.
-
-    Args:
-        name (str):
-            Name of program (usually valid filename).
-        code (str):
-            Matlab code to be loaded
-        """
-
-        if self.disp:
-            print "loading", name
-
-        self.code = code + "\n\n\n"
-        self.create_program(name)
-        return self.project[-1]
-
 
     def get_unknowns(self, name):
 
@@ -112,7 +110,7 @@ Example:
         reserved = set([])
         for i in xrange(len(unassigned)-1, -1, -1):
 
-            if unassigned[i] in rules._reserved.reserved:
+            if unassigned[i] in mc.rules._reserved.reserved:
                 reserved.add(unassigned.pop(i))
 
         for node in nodes[::-1]:
@@ -123,7 +121,7 @@ Example:
         return unassigned
 
     def configure(self, suggest=True, **kws):
-        configure(self, suggest, **kws)
+        mc.configure.configure(self, suggest, **kws)
 
 
     def create_program(self, name):
@@ -143,7 +141,7 @@ Example:
 
 
     def create_codeblock(self, parent, start):
-        return codeblock.newblock(self, parent, start)
+        return codeblock.codeblock(self, parent, start)
 
 
     def create_assigns(self, parent, cur, eq_loc):

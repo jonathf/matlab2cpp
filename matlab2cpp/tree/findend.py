@@ -3,6 +3,7 @@ Rutines for performing look-aheads to find end character.
 """
 
 import constants as c
+import identify
 
 def expression(self, start):
     "find end of expresion"
@@ -19,7 +20,7 @@ def expression(self, start):
         elif self.code[k] == "[":
             k = matrix(self, k)
 
-        elif self.code[k] == "'" and self.is_string(k):
+        elif self.code[k] == "'" and identify.string(self, k):
             k = string(self, k)
 
         elif self.code[k] == "{":
@@ -71,7 +72,7 @@ def expresion_space(self, start):
             k = last = matrix(self, k)
 
         elif self.code[k] == "'":
-            if self.is_string(k):
+            if identify.string(self, k):
                 k = last = string(self, k)
             else:
                 last = k
@@ -127,7 +128,7 @@ def matrix(self, start):
 
     k = start+1
 
-    if self.is_space_delimited(start):
+    if identify.space_delimited(self, start):
 
         # Ignore first string occurence
         while self.code[k] in " \t":
@@ -163,7 +164,7 @@ def matrix(self, start):
             elif self.code[k] == "%":
                 k = comment(self, k)
 
-            elif self.code[k] == "'" and self.is_string(k):
+            elif self.code[k] == "'" and identify.string(self, k):
                 k = string(self, k)
 
             k += 1
@@ -239,7 +240,7 @@ def paren(self, start):
         elif self.code[k:k+3] == "...":
             k = dots(self, k)
 
-        elif self.code[k] == "'" and self.is_string(k):
+        elif self.code[k] == "'" and identify.string(self, k):
             k = string(self, k)
 
         elif self.code[k] == "[":
@@ -265,7 +266,7 @@ def cell(self, start):
         if self.code[k] == "%":
             self.syntaxerror(k, "no comment in cell group")
 
-        elif self.code[k] == "'" and self.is_string(k):
+        elif self.code[k] == "'" and identify.string(self, k):
             k = string(self, k)
         elif self.code[k] == "(":
             k = paren(self, k)

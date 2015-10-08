@@ -2,8 +2,7 @@
 Interpretors that didn't fit other places
 """
 
-from matlab2cpp.node import collection as col
-
+import matlab2cpp
 import constants as c
 import findend
 
@@ -47,14 +46,14 @@ def number(self, node, start):
         if self.code[k] in "ij":
 
             k += 1
-            node = col.Imag(node, number, cur=start,
+            node = matlab2cpp.collection.Imag(node, number, cur=start,
                     code=self.code[start:last+1])
             if self.disp:
                 print "%4d     Imag       " % (start),
                 print repr(self.code[start:last+1])
 
         else:
-            node = col.Float(node, number, cur=start,
+            node = matlab2cpp.collection.Float(node, number, cur=start,
                     code=self.code[start:last+1])
             if self.disp:
                 print "%4d     Float      " % (start),
@@ -66,7 +65,7 @@ def number(self, node, start):
 
         if self.code[k] in "ij":
 
-            node = col.Imag(node, self.code[start:k], cur=start,
+            node = matlab2cpp.collection.Imag(node, self.code[start:k], cur=start,
                     code=self.code[start:last+1])
             k += 1
             if self.disp:
@@ -74,7 +73,7 @@ def number(self, node, start):
                 print repr(self.code[start:last+1])
 
         else:
-            node = col.Int(node, self.code[start:k], cur=start,
+            node = matlab2cpp.collection.Int(node, self.code[start:k], cur=start,
                     code=self.code[start:last+1])
             if self.disp:
                 print "%4d     Int        " % (start),
@@ -84,7 +83,7 @@ def number(self, node, start):
 
         if self.code[k] in "ij":
 
-            node = col.Imag(node, self.code[start:k], cur=start,
+            node = matlab2cpp.collection.Imag(node, self.code[start:k], cur=start,
                     code=self.code[start:last+1])
             k += 1
             if self.disp:
@@ -92,7 +91,7 @@ def number(self, node, start):
                 print repr(self.code[start:last+1])
 
         else:
-            node = col.Float(node, self.code[start:k], cur=start,
+            node = matlab2cpp.collection.Float(node, self.code[start:k], cur=start,
                     code=self.code[start:k])
             if self.disp:
                 print "%4d     Float      " % (start),
@@ -108,7 +107,7 @@ def string(self, parent, cur):
     if  "\n" in self.code[cur:end]:
         self.syntaxerror(cur, "no line-feed character in string")
 
-    col.String(parent, self.code[cur+1:end], cur=cur,
+    matlab2cpp.collection.String(parent, self.code[cur+1:end], cur=cur,
             code=self.code[cur:end+1])
 
     if self.disp:
@@ -155,15 +154,15 @@ def comment(self, parent, cur):
         print repr(self.code[cur:end+1])
 
     if self.code[cur+1] == "{":
-        comment = col.Bcomment(parent, self.code[cur+2:end-1], cur=cur)
+        comment = matlab2cpp.collection.Bcomment(parent, self.code[cur+2:end-1], cur=cur)
     else:
         k = cur-1
         while self.code[k] in " \t":
             k -= 1
         if self.code[k] == "\n":
-            comment = col.Lcomment(parent, self.code[cur+1:end], cur=cur)
+            comment = matlab2cpp.collection.Lcomment(parent, self.code[cur+1:end], cur=cur)
         else:
-            comment = col.Ecomment(parent, self.code[cur+1:end], cur=cur)
+            comment = matlab2cpp.collection.Ecomment(parent, self.code[cur+1:end], cur=cur)
 
     comment.code = self.code[cur:end+1]
 
@@ -181,7 +180,7 @@ def matrix(self, node, cur):
         print repr(self.code[cur:end+1])
 
     L = self.iterate_list(cur)
-    matrix = col.Matrix(node, cur=cur, code=self.code[cur:end+1])
+    matrix = matlab2cpp.collection.Matrix(node, cur=cur, code=self.code[cur:end+1])
 
     for array in L:
 
@@ -191,7 +190,7 @@ def matrix(self, node, cur):
         else:
             start = cur
 
-        vector = col.Vector(matrix, cur=start,
+        vector = matlab2cpp.collection.Vector(matrix, cur=start,
                 code=self.code[start:end+1])
 
         if self.disp:
@@ -207,7 +206,7 @@ def matrix(self, node, cur):
         if self.disp:
             print "%4d     Vector     " % cur,
             print repr("")
-        vector = col.Vector(matrix, cur=cur, code="")
+        vector = matlab2cpp.collection.Vector(matrix, cur=cur, code="")
 
 
     return findend.matrix(self, cur)
@@ -224,7 +223,7 @@ def cell(self, node, cur):
         print repr(self.code[cur:end+1])
 
     L = self.iterate_list(cur)
-    cell = col.Cell(node, cur=cur, code=self.code[cur:end+1])
+    cell = matlab2cpp.collection.Cell(node, cur=cur, code=self.code[cur:end+1])
 
     for array in L:
 

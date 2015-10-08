@@ -2,8 +2,7 @@
 Variable interpretor
 """
 
-from matlab2cpp.node import collection as col
-
+import matlab2cpp
 import constants as c
 import findend
 
@@ -34,7 +33,7 @@ def assign(self, node, cur, end=None):
         if self.code[end] == "(":
 
             end = findend.paren(self, end)
-            node = col.Cset(node, name, cur=cur,
+            node = matlab2cpp.collection.Cset(node, name, cur=cur,
                     code=self.code[cur:end+1])
 
             if self.disp:
@@ -63,7 +62,7 @@ def assign(self, node, cur, end=None):
 
         else:
             end = findend.cell(self, k)
-            node = col.Cvar(node, name, cur=cur,
+            node = matlab2cpp.collection.Cvar(node, name, cur=cur,
                     code=self.code[cur:end+1])
 
             if self.disp:
@@ -97,7 +96,7 @@ def assign(self, node, cur, end=None):
                         cur,
                 print repr(self.code[cur:end])
 
-            node = col.Sset(node, name, value, cur=cur,
+            node = matlab2cpp.collection.Sset(node, name, value, cur=cur,
                     code=self.code[cur:end], pointer=1)
 
             last = self.create_list(node, k)
@@ -110,7 +109,7 @@ def assign(self, node, cur, end=None):
                         cur,
                 print repr(self.code[cur:end+1])
 
-            node = col.Set(node, name, cur=cur,
+            node = matlab2cpp.collection.Set(node, name, cur=cur,
                     code=self.code[cur:end+1])
 
             last = self.create_list(node, k)
@@ -135,7 +134,7 @@ def assign(self, node, cur, end=None):
                 print repr(self.code[cur:end+1])
 
 
-            node = col.Nset(node, name)
+            node = matlab2cpp.collection.Nset(node, name)
             node.cur = cur
             node.code = self.code[cur:end+1]
 
@@ -162,7 +161,7 @@ def assign(self, node, cur, end=None):
                     print "%4d     Fset       " % cur,
                     print repr(self.code[cur:end+1])
 
-                node = col.Fset(node, name, value=value, cur=cur,
+                node = matlab2cpp.collection.Fset(node, name, value=value, cur=cur,
                         code=self.code[cur:end+1])
 
                 cur = self.create_list(node, j)
@@ -174,7 +173,7 @@ def assign(self, node, cur, end=None):
                     print "%4d     Fvar       " % cur,
                     print repr(self.code[cur:last+1])
 
-                node = col.Fvar(node, name, value=value, cur=cur,
+                node = matlab2cpp.collection.Fvar(node, name, value=value, cur=cur,
                         code=self.code[cur:last+1])
 
                 cur = last
@@ -186,7 +185,7 @@ def assign(self, node, cur, end=None):
             print repr(self.code[cur:last])
 
 
-        node = col.Var(node, name, cur=cur,
+        node = matlab2cpp.collection.Var(node, name, cur=cur,
                 code=self.code[cur:last])
 
         cur = last-1
@@ -225,7 +224,7 @@ def variable(self, parent, cur):
         if self.code[end] == "(":
 
             end = findend.paren(self, end)
-            node = col.Cget(parent, name, cur=cur,
+            node = matlab2cpp.collection.Cget(parent, name, cur=cur,
                     code=self.code[cur:end+1])
 
             if self.disp:
@@ -254,7 +253,7 @@ def variable(self, parent, cur):
 
         else:
             end = findend.cell(self, k)
-            node = col.Cvar(parent, name, cur=cur,
+            node = matlab2cpp.collection.Cvar(parent, name, cur=cur,
                     code=self.code[cur:end+1])
 
             if self.disp:
@@ -288,7 +287,7 @@ def variable(self, parent, cur):
                         cur,
                 print repr(self.code[cur:end])
 
-            node = col.Sget(parent, name, value, cur=cur,
+            node = matlab2cpp.collection.Sget(parent, name, value, cur=cur,
                     code=self.code[cur:end], pointer=1)
 
             last = self.create_list(node, k)
@@ -301,7 +300,7 @@ def variable(self, parent, cur):
                         cur,
                 print repr(self.code[cur:end+1])
 
-            node = col.Get(parent, name, cur=cur,
+            node = matlab2cpp.collection.Get(parent, name, cur=cur,
                     code=self.code[cur:end+1])
 
             last = self.create_list(node, k)
@@ -327,7 +326,7 @@ def variable(self, parent, cur):
             while self.code[k] in " \t":
                 k += 1
 
-            node = col.Nget(parent, name, cur=cur,
+            node = matlab2cpp.collection.Nget(parent, name, cur=cur,
                     code=self.code[cur:end+1])
 
             cur = self.create_expression(node, k)
@@ -354,7 +353,7 @@ def variable(self, parent, cur):
                     print repr(self.code[cur:end+1])
 
 
-                node = col.Fget(parent, name, cur=cur,
+                node = matlab2cpp.collection.Fget(parent, name, cur=cur,
                         value=value, code=self.code[cur:end+1])
 
                 j += 1
@@ -372,7 +371,7 @@ def variable(self, parent, cur):
                     print "%4d     Fvar       " % cur,
                     print repr(self.code[cur:last])
 
-                node = col.Fvar(parent, name, value=value,
+                node = matlab2cpp.collection.Fvar(parent, name, value=value,
                         cur=cur, code=self.code[cur:last])
 
                 cur = last-1
@@ -387,7 +386,7 @@ def variable(self, parent, cur):
             print "%4d     Var        " % cur,
             print repr(self.code[cur:last])
 
-        node = col.Var(parent, name, cur=cur,
+        node = matlab2cpp.collection.Var(parent, name, cur=cur,
                 code=self.code[cur:last])
 
         cur = last-1

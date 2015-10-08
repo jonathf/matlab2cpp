@@ -27,9 +27,9 @@ def Cvar(node):
 
     if node.type == "TYPE":
         node.declare.type = "cell"
+
     elif node.type != "cell":
         node.error("Behaves like cell, not %s" % node.type)
-        node.suggest = "cell"
 
     return "%(name)s{", "}{", "}"
 
@@ -48,7 +48,6 @@ def Cset(node):
 
     elif node.type != "cell":
         node.error("Behaves like cell, not %s" % node.type)
-        node.suggest = "cell"
 
     n_fields = node["n_fields"]
 
@@ -85,7 +84,6 @@ def Cget(node):
 
     elif node.type != "cell":
         node.error("Behaves like cell, not %s" % node.type)
-        node.suggest = "cell"
 
     n_fields = node["n_fields"]
 

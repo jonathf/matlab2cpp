@@ -2,8 +2,7 @@
 Expression interpretor
 """
 
-from matlab2cpp.node import collection as col
-
+import matlab2cpp
 import findend
 import identify
 import constants as c
@@ -43,7 +42,7 @@ Returns:
             print "%4d     All        " % (start),
             print repr(self.code[start:start+1])
 
-        col.All(node, cur=start, code=self.code[start])
+        matlab2cpp.collection.All(node, cur=start, code=self.code[start])
         return start
 
     if end is None:
@@ -127,12 +126,12 @@ Returns:
 
         if len(ends)>1:
 
-            node = self.retrieve_operator(opr)(node)
+            node = retrieve_operator(self, opr)(node)
             node.cur = start
             node.code = self.code[starts[0]:ends[-1]+1]
 
             for s,e in zip(starts, ends):
-                self.create(node, s, e, opr)
+                create(self, node, s, e, opr)
 
             return end
 
@@ -146,12 +145,12 @@ Returns:
 
         if self.code[start] == "-":
 
-            node = col.Neg(node, cur=start, code=self.code[start:end+1])
+            node = matlab2cpp.collection.Neg(node, cur=start, code=self.code[start:end+1])
             start += 1
 
         if self.code[start] == "~":
 
-            node = col.Not(node, cur=start, code=self.code[start:end+1])
+            node = matlab2cpp.collection.Not(node, cur=start, code=self.code[start:end+1])
             start += 1
 
         while self.code[start] in " \t":
@@ -160,11 +159,11 @@ Returns:
     # Postfixes
     if self.code[end] == "'" and not self.code[start] == "'":
         if self.code[end-1] == ".":
-            node = col.Ctranspose(node, cur=start,
+            node = matlab2cpp.collection.Ctranspose(node, cur=start,
                     code=self.code[start:end+1])
             end -= 2
         else:
-            node = col.Transpose(node, cur=start,
+            node = matlab2cpp.collection.Transpose(node, cur=start,
                     code=self.code[start:end+1])
             node.cur = start
             node.code = self.code[start:end+1]
@@ -178,7 +177,7 @@ Returns:
         if self.code[end] != ")":
             self.syntaxerror(end, "parenthesis end")
 
-        node = col.Paren(node, cur=start, code=self.code[start:end+1])
+        node = matlab2cpp.collection.Paren(node, cur=start, code=self.code[start:end+1])
 
         start += 1
         while self.code[start] in " \t":
@@ -193,13 +192,13 @@ Returns:
     # Reserved keywords
     elif self.code[start:start+3] == "end" and\
             self.code[start+3] in " \t" + c.e_end:
-                node = col.End(node, cur=start, code=self.code[start:start+3])
+                node = matlab2cpp.collection.End(node, cur=start, code=self.code[start:start+3])
 
     elif self.code[start:start+6] == "return" and self.code[start+6] in " ,;\n":
-        node = col.Return(node, cur=start, code=self.code[start:start+6])
+        node = matlab2cpp.collection.Return(node, cur=start, code=self.code[start:start+6])
 
     elif self.code[start:start+5] == "break" and self.code[start+5] in " ,;\n":
-        node = col.Break(node, cur=start, code=self.code[start:start+5])
+        node = matlab2cpp.collection.Break(node, cur=start, code=self.code[start:start+5])
 
 
     # Rest
@@ -210,7 +209,7 @@ Returns:
         if "\n" in self.code[start:end]:
             self.syntaxerror(end, "non line-feed characters in string")
 
-        col.String(node, self.code[start+1:end], cur=start,
+        matlab2cpp.collection.String(node, self.code[start+1:end], cur=start,
                 code=self.code[start:end+1])
 
     elif self.code[start] in c.digits or\
@@ -234,26 +233,24 @@ Returns:
 
 def retrieve_operator(self, opr):
 
-    if opr == "^":      return col.Exp
-    elif opr == ".^":   return col.Elexp
-    elif opr == "\\":   return col.Leftmatrixdivision
-    elif opr == ".\\":  return col.Leftelementdivision
-    elif opr == "/":    return col.Matrixdivision
-    elif opr == "./":   return col.Elementdivision
-    elif opr == "*":    return col.Mul
-    elif opr == ".*":   return col.Elmul
-    elif opr == "+":    return col.Plus
-    elif opr == "-":    return col.Minus
-    elif opr == ":":    return col.Colon
-    elif opr == "<":    return col.Lt
-    elif opr == "<=":   return col.Le
-    elif opr == ">":    return col.Gt
-    elif opr == ">=":   return col.Ge
-    elif opr == "==":   return col.Eq
-    elif opr == "~=":   return col.Ne
-    elif opr == "&":    return col.Band
-    elif opr == "|":    return col.Bor
-    elif opr == "&&":   return col.Land
-    elif opr == "||":   return col.Lor
-
-
+    if opr == "^":      return matlab2cpp.collection.Exp
+    elif opr == ".^":   return matlab2cpp.collection.Elexp
+    elif opr == "\\":   return matlab2cpp.collection.Leftmatrixdivision
+    elif opr == ".\\":  return matlab2cpp.collection.Leftelementdivision
+    elif opr == "/":    return matlab2cpp.collection.Matrixdivision
+    elif opr == "./":   return matlab2cpp.collection.Elementdivision
+    elif opr == "*":    return matlab2cpp.collection.Mul
+    elif opr == ".*":   return matlab2cpp.collection.Elmul
+    elif opr == "+":    return matlab2cpp.collection.Plus
+    elif opr == "-":    return matlab2cpp.collection.Minus
+    elif opr == ":":    return matlab2cpp.collection.Colon
+    elif opr == "<":    return matlab2cpp.collection.Lt
+    elif opr == "<=":   return matlab2cpp.collection.Le
+    elif opr == ">":    return matlab2cpp.collection.Gt
+    elif opr == ">=":   return matlab2cpp.collection.Ge
+    elif opr == "==":   return matlab2cpp.collection.Eq
+    elif opr == "~=":   return matlab2cpp.collection.Ne
+    elif opr == "&":    return matlab2cpp.collection.Band
+    elif opr == "|":    return matlab2cpp.collection.Bor
+    elif opr == "&&":   return matlab2cpp.collection.Land
+    elif opr == "||":   return matlab2cpp.collection.Lor

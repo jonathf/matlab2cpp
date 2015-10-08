@@ -48,20 +48,22 @@ program had during translation.
 """
 
 import supplement
+import tree
 
+__all__ = ["build", "qcpp", "qhpp", "qpy", "qlog", "qtree", "qscript"]
 
 def build(code, disp=False, retall=False, suggest=False, comments=False, **kws):
 
     code = code + "\n\n\n\n"
-    tree = Builder(disp=disp, comments=comments, **kws)
-    tree.load("unamed", code)
-    tree.configure(2*suggest)
+    tree_ = tree.builder.Builder(disp=disp, comments=comments, **kws)
+    tree_.load("unamed", code)
+    tree_.configure(2*suggest)
     if retall:
-        return tree
-    if tree[0][1][0].name == "main":
-        out = tree[0][1][0][3]
+        return tree_
+    if tree_[0][1][0].name == "main":
+        out = tree_[0][1][0][3]
         return out
-    return tree[0]
+    return tree_[0][1]
 
 
 def qcpp(code, suggest=True, **kws):
@@ -109,19 +111,20 @@ Example:
     """
 
     if isinstance(code, str):
-        tree = build(code, suggest=suggest, retall=True, **kws)[0]
-        tree.translate()
+        tree_ = build(code, suggest=suggest, retall=True, **kws)[0]
+
+        tree_.translate()
     else:
-        tree = code
-        if isinstance(tree, Builder):
-            tree = tree[0]
+        tree_ = code
+        if isinstance(tree_, tree.builder.Builder):
+            tree_ = tree_[0]
 
     out = ""
-    if tree[1] and tree[1][0].name == "main":
-        out += tree[0].str
+    if tree_[1] and tree_[1][0].name == "main":
+        out += tree_[0].str
         if out:
             out += "\n\n"
-        out += tree[1].str
+        out += tree_[1].str
 
         out = out.replace("__percent__", "%")
 
@@ -147,43 +150,48 @@ Example:
     """
 
     if isinstance(code, str):
-        tree = build(code, suggest=suggest, retall=True)[0]
-        tree.translate()
+        tree_ = build(code, suggest=suggest, retall=True)[0]
+        tree_.translate()
 
     else:
-        tree = code
-        if isinstance(tree, Builder):
-            tree = tree[0]
+        tree_ = code
+        if isinstance(tree_, tree.builder.Builder):
+            tree_ = tree_[0]
+        else:
+            tree_ = tree_.program
+
+    if not tree_.str:
+        tree_.translate()
 
     out = ""
-    if tree[1] and tree[1][0].name == "main":
+    if tree_[1] and tree_[1][0].name == "main":
 
-        if len(tree[4]) > 1:
-            out += tree[4].str + "\n\n"
+        if len(tree_[4]) > 1:
+            out += tree_[4].str + "\n\n"
 
-        if tree[2].str:
-            out += tree[2].str + "\n\n"
+        if tree_[2].str:
+            out += tree_[2].str + "\n\n"
 
-        if tree[3].str:
-            out += tree[3].str + "\n\n"
+        if tree_[3].str:
+            out += tree_[3].str + "\n\n"
 
         if out[-2:] == "\n\n":
             out = out[:-2]
 
     else:
-        if tree[0]:
-            out += tree[0].str + "\n\n"
+        if tree_[0]:
+            out += tree_[0].str + "\n\n"
 
-        if tree[3].str:
-            out += tree[3].str + "\n\n"
+        if tree_[3].str:
+            out += tree_[3].str + "\n\n"
 
-        if tree[2].str:
-            out += tree[2].str + "\n\n"
+        if tree_[2].str:
+            out += tree_[2].str + "\n\n"
 
-        if len(tree[4]) > 1:
-            out += tree[4].str + "\n\n"
+        if len(tree_[4]) > 1:
+            out += tree_[4].str + "\n\n"
 
-        out += tree[1].str
+        out += tree_[1].str
 
     out = out.replace("__percent__", "%")
 
@@ -193,14 +201,16 @@ Example:
 def qpy(code, suggest=True, prefix=False):
 
     if isinstance(code, str):
-        tree = build(code, suggest=suggest, retall=True)[0]
+        tree_ = build(code, suggest=suggest, retall=True)[0]
 
     else:
-        tree = code
-        if isinstance(tree, Builder):
-            tree = tree[0]
+        tree_ = code
+        if isinstance(tree_, tree.builder.Builder):
+            tree_ = tree_[0]
+        else:
+            tree_ = tree_.program
 
-    tf, ts, ti, sugs = supplement.get_variables(tree)
+    tf, ts, ti, sugs = supplement.get_variables(tree_)
     out = supplement.str_variables(tf, ts, ti, sugs, prefix=prefix)
     out = out.replace("__percent__", "%")
 
@@ -210,15 +220,17 @@ def qpy(code, suggest=True, prefix=False):
 def qlog(code, suggest=False):
 
     if isinstance(code, str):
-        tree = build(code, suggest=suggest, retall=True)[0]
-        tree.translate()
+        tree_ = build(code, suggest=suggest, retall=True)[0]
+        tree_.translate()
 
     else:
-        tree = code
-        if isinstance(tree, Builder):
-            tree = tree[0]
+        tree_ = code
+        if isinstance(tree_, tree.builder.Builder):
+            tree_ = tree_[0]
+        else:
+            tree_ = tree_.program
 
-    out = tree[5].str
+    out = tree_[5].str
     out = out.replace("__percent__", "%")
 
     return out
@@ -226,35 +238,37 @@ def qlog(code, suggest=False):
 def qtree(code, suggest=False):
 
     if isinstance(code, str):
-        tree = build(code, suggest=suggest, retall=True)[0]
-        tree.translate()
+        tree_ = build(code, suggest=suggest, retall=True)[0]
+        tree_.translate()
 
     else:
-        tree = code
-        if isinstance(tree, Builder):
-            tree = tree[0]
+        tree_ = code
+        if isinstance(tree_, tree.builder.Builder):
+            tree_ = tree_[0]
+        else:
+            tree_ = tree_.program
 
-    return tree.summary()
+    return tree_.summary()
 
 def qscript(code, suggest=False, **kws):
 
     if isinstance(code, str):
-        tree = build(code, suggest=suggest, retall=True, **kws)[0]
-        tree.translate()
+        tree_ = build(code, suggest=suggest, retall=True, **kws)[0]
+        tree_.translate()
     else:
-        tree = code
-        if isinstance(tree, Builder):
-            tree = tree[0]
+        tree_ = code
+        if isinstance(tree_, tree.builder.Builder):
+            tree_ = tree_[0]
+        else:
+            tree_ = tree_.program
 
     out = ""
-    if tree[1] and tree[1][0].name == "main":
-        out = tree[1][0][-1].str
+    if tree_[1] and tree_[1][0].name == "main":
+        out = tree_[1][0][-1].str
         out = out.replace("__percent__", "%")
 
     return out
 
-
-from tree import Builder
 
 if __name__ == "__main__":
     import matlab2cpp as mc

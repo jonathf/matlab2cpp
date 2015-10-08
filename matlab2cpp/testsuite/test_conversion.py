@@ -1,12 +1,16 @@
 import matlab2cpp
 import tempfile
 import os
+from subprocess import Popen, PIPE
 
 def convert(m_code):
     "Convert m-code to cpp-code using matlab2cpp w/suggestions"
     filename = tempfile.mkstemp(suffix=".m", text=True)[1]
     with open(filename, "w") as f:
         f.write(m_code)
+
+    out = Popen(["mconvert", filename], stdout=PIPE).communicate()[0]
+
     out = str(matlab2cpp.main(filename, True))
     os.remove(filename)
     return out

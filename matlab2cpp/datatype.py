@@ -13,15 +13,15 @@ node.mem` can often be useful, since they contain direct information about that
 information.
 
 Example:
-    >>> node = mc.collection.Var("name", type="ivec")
+    >>> node = mc.collection.Var(None, "name", type="ivec")
     >>> print node.type
     ivec
     >>> print node.dim, node.mem
-    (1, 1)
+    1 1
 
 These nodes also support dynamic rewriting of the datatype.
 Continuing our example:
-    >>> node.dim = 2
+    >>> node.dim = 3
     >>> print node.type
     imat
     >>> node.mem = 4
@@ -32,6 +32,8 @@ Note that the datatype are locally defined.
 If you want to change the global datatype, change the local attributes of
 `node.declare`.
 """
+
+import supplement
 
 dim0 = {"int", "float", "double", "uword", "cx_double"}
 dim1 = {"ivec", "fvec", "uvec", "vec", "cx_vec"}
@@ -246,4 +248,13 @@ class Type(object):
 class Suggest(object):
 
     def __set__(self, instance, value):
+        if value == "TYPE":
+            return
         instance.declare.prop["suggest"] = value
+    def __get__(self, instance, owner):
+        return supplement.get_ss(instance)
+
+if __name__ == "__main__":
+    import matlab2cpp as mc
+    import doctest
+    doctest.testmod()

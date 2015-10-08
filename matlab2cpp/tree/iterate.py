@@ -10,8 +10,8 @@ import identify
 def list(self, start):
 
     if identify.space_delimited(self, start):
-        return space_list(start)
-    return comma_list(start)
+        return space_list(self, start)
+    return comma_list(self, start)
 
 
 def comma_list(self, start):

@@ -1,12 +1,7 @@
 import re
 
-import matlab2cpp.rules as rules
-import matlab2cpp.datatype as datatype
-import matlab2cpp.inlines as inlines
-
 import reference
-import collection
-
+import matlab2cpp
 
 def flatten(node, ordered=False, reverse=False, inverse=False):
 
@@ -62,14 +57,21 @@ def summary(node, opt):
         while indent and not (node.parent is indent[-1]):
             indent.pop()
 
+        if node.type == "TYPE":
+            type = node.declare.prop.get("suggest", "TYPE")
+            if type != "TYPE":
+                type = "(" + type + ")"
+        else:
+            type = node.type
+
         space = "| "*(len(indent)-1)
         if not node.line:
             out += "        %s%-10s %-12s %-7s %s" % \
-                (space, node.cls, node.backend, node.type, node.name)
+                (space, node.cls, node.backend, type, node.name)
         else:
             out += "%3d %3d %s%-10s %-12s %-7s %s" % \
                 (node.line, node.cur+1, space, node.cls,
-                        node.backend, node.type, node.name)
+                        node.backend, type, node.name)
         out += "\n"
 
 
@@ -89,9 +91,9 @@ def auxillary(node, type, convert):
 
     if not isinstance(type, str):
         if isinstance(type[0], int):
-            type = datatype.get_name(*type)
+            type = matlab2cpp.datatype.get_name(*type)
         else:
-            type = datatype.common_strict(type)
+            type = matlab2cpp.datatype.common_strict(type)
 
     # if type == "TYPE":
     #     return node
@@ -118,20 +120,20 @@ def auxillary(node, type, convert):
 
     # Create Assign
     if matrix_mode:
-        assign = collection.Assign(block, type=type, backend="matrix")
+        assign = matlab2cpp.collection.Assign(block, type=type, backend="matrix")
     else:
-        assign = collection.Assign(block, type=type)
+        assign = matlab2cpp.collection.Assign(block, type=type)
 
     # Return value
-    aux_var = collection.Var(assign, var, backend=type, type=type)
+    aux_var = matlab2cpp.collection.Var(assign, var, backend=type, type=type)
     aux_var.create_declare()
 
     if convert:
-        rhs = collection.Get(assign, "_conv_to", type=type)
+        rhs = matlab2cpp.collection.Get(assign, "_conv_to", type=type)
     else:
         rhs = assign
 
-    swap_var = collection.Var(rhs, var, type=type)
+    swap_var = matlab2cpp.collection.Var(rhs, var, type=type)
     swap_var.declare.type = type
 
     # Place Assign correctly in Block
@@ -172,7 +174,7 @@ def resize(node):
     while line.parent.cls != "Block":
         line = line.parent
 
-    resize = collection.Resize(line.parent, name=node.name, type=type)
+    resize = matlab2cpp.collection.Resize(line.parent, name=node.name, type=type)
 
     i = line.parent.children.index(line)
 
@@ -211,10 +213,10 @@ def error(node, msg, onlyw=False):
         return
 
     if onlyw:
-        collection.Warning(errors, name=name,
+        matlab2cpp.collection.Warning(errors, name=name,
                 line=node.line, cur=pos, value=msg, code=code)
     else:
-        collection.Error(errors, name=name,
+        matlab2cpp.collection.Error(errors, name=name,
                 line=node.line, cur=pos, value=msg, code=code)
 
 
@@ -235,7 +237,7 @@ def create_declare(node):
         assert structs.cls == "Structs"
 
         if node not in structs:
-            struct = collection.Struct(structs, name=node.name)
+            struct = matlab2cpp.collection.Struct(structs, name=node.name)
         else:
             struct = structs[node]
 
@@ -247,13 +249,13 @@ def create_declare(node):
         if node.cls in ("Sset", "Sget"):
             sname = "_size"
             if sname not in struct.names:
-                collection.Counter(struct, sname, value="100")
+                matlab2cpp.collection.Counter(struct, sname, value="100")
 
-            collection.Var(declares, name=node.name, value=value, type="structs")
+            matlab2cpp.collection.Var(declares, name=node.name, value=value, type="structs")
         else:
-            collection.Var(declares, name=node.name, value=value, type="struct")
+            matlab2cpp.collection.Var(declares, name=node.name, value=value, type="struct")
 
-        return collection.Var(struct, name=value)
+        return matlab2cpp.collection.Var(struct, name=value)
         parent = struct
 
     else:
@@ -265,7 +267,7 @@ def create_declare(node):
         declare.pointer = node.pointer
         return declare
 
-    out = collection.Var(parent, name=node.name,
+    out = matlab2cpp.collection.Var(parent, name=node.name,
             type=node.type, pointer=node.pointer, value=node.value)
     return out
 
@@ -345,6 +347,10 @@ def suggest_datatype(node):
 
 def translate(node, opt=None):
 
+    if node.cls == "Project":
+        map(translate, node)
+        return node
+
     log = node.program[5]
     log.children = []
 
@@ -374,7 +380,7 @@ def translate_one(node, opt):
         if backend == "TYPE":
             backend = "unknown"
 
-        target = rules.__dict__["_"+backend]
+        target = matlab2cpp.rules.__dict__["_"+backend]
         spesific_name = node.cls + "_" + node.name
 
         if spesific_name in target.__dict__:
@@ -393,7 +399,7 @@ def translate_one(node, opt):
     if not isinstance(value, (unicode, str, list, tuple)):
         value = value(node)
 
-    if isinstance(value, (unicode, Node)):
+    if isinstance(value, (unicode, matlab2cpp.node.frontend.Node)):
         value = str(value)
 
     elif value is None:
@@ -437,14 +443,13 @@ def translate_one(node, opt):
 
 def include(node, name, **kws):
 
-    include_code, library_code = inlines.retrieve(node, name, **kws)
+    include_code, library_code = matlab2cpp.inlines.retrieve(node, name, **kws)
 
     includes = node.program[0]
     if include_code and include_code not in includes.names:
-        collection.Include(includes, include_code, value=includes.value)
+        matlab2cpp.collection.Include(includes, include_code, value=includes.value)
 
     inlines_ = node.program[2]
     if library_code and library_code not in inlines_.names:
-        collection.Inline(inlines_, library_code)
+        matlab2cpp.collection.Inline(inlines_, library_code)
 
-from frontend import Node

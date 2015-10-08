@@ -13,12 +13,12 @@ option, or the python function `mc.qtree`. For example:
       1   1 Funcs      program      TYPE    unamed
       1   1 | Main       func_common  TYPE    main
       1   1 | | Declares   func_return  TYPE    
-      1   1 | | | Var        unknown      TYPE    a
+      1   1 | | | Var        unknown      (int)   a
       1   1 | | Returns    func_return  TYPE    
       1   1 | | Params     func_return  TYPE    
       1   1 | | Block      code_block   TYPE    
       1   1 | | | Assign     unknown      TYPE    
-      1   1 | | | | Var        unknown      TYPE    a
+      1   1 | | | | Var        unknown      (int)   a
       1   5 | | | | Plus       expression   int     
       1   5 | | | | | Int        int          int     
       1   7 | | | | | Int        int          int     
@@ -94,9 +94,10 @@ In other words, there are for these nodes, multiple translation for depending on
 context. This is important to achieve the desired behavior.
 """
 
+import matlab2cpp as mc
 from builder import Builder
+__all__ = ["Builder"]
 
 if __name__ == "__main__":
-    import matlab2cpp as mc
     import doctest
     doctest.testmod()

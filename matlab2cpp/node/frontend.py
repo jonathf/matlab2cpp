@@ -1,5 +1,9 @@
-import matlab2cpp.datatype as dt
 import reference as ref
+import backend
+
+import matlab2cpp.datatype as dt
+import matlab2cpp.supplement as sup
+import matlab2cpp
 
 class Node(object):
 
@@ -27,6 +31,10 @@ class Node(object):
     group = ref.Group_reference()
     declare = ref.Declare_reference()
 
+    ftypes = sup.Ftypes()
+    itypes = sup.Itypes()
+    stypes = sup.Stypes()
+
     def __init__(self, parent, name="", backend="unknown", value="",
             type="TYPE", pointer=0, line=None, cur=None, code=None, file=None):
         """
@@ -48,19 +56,24 @@ name : str
         # Parental relationship
         self.parent = parent
 
-        if not (self is parent):
+        if self is self.parent or (not hasattr(parent, "children")):
+            pass
+        else:
             parent.children.append(self)
 
 
-    def summary(self):
+    def summary(self, args=None):
         """
 Generate a summary of the tree structure with some meta-information.
 
     Returns:
 	str: Summary on format
         """
-        return backend.summary(self, None)
+        return backend.summary(self, args)
 
+
+    def configure(self, suggest=False):
+        matlab2cpp.configure.configure(self, suggest)
 
     def translate(self, opt=None, only=False):
         """Generate code"""
@@ -197,4 +210,3 @@ reverse : bool
         """
         return backend.flatten(self, ordered, reverse, inverse)
 
-import backend

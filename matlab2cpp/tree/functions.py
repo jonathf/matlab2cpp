@@ -1,6 +1,5 @@
 
-from matlab2cpp.node import collection as col
-
+import matlab2cpp
 import constants as c
 import findend
 
@@ -11,14 +10,14 @@ def program(self, name):
         print "     Program"
 
     # Create intial nodes
-    program = col.Program(self.project, name=name, cur=0, code=self.code)
-    includes = col.Includes(program, value=name)
-    funcs = col.Funcs(program, name=name)
+    program = matlab2cpp.collection.Program(self.project, name=name, cur=0, code=self.code)
+    includes = matlab2cpp.collection.Includes(program, value=name)
+    funcs = matlab2cpp.collection.Funcs(program, name=name)
 
-    col.Inlines(program, name=name)
-    col.Structs(program, name=name)
-    col.Headers(program, name=name)
-    col.Log(program, name=name)
+    matlab2cpp.collection.Inlines(program, name=name)
+    matlab2cpp.collection.Structs(program, name=name)
+    matlab2cpp.collection.Headers(program, name=name)
+    matlab2cpp.collection.Log(program, name=name)
 
     includes.include("armadillo")
     # Start processing
@@ -52,11 +51,11 @@ def program(self, name):
     return program
 
 
-def create_function(self, parent, cur):
+def function(self, parent, cur):
 
     if self.code[cur:cur+8] != "function":
         self.syntaxerror(cur, "function start")
-    if self.code[cur+8] not in c.key_end+"[":
+    if self.code[cur+8] not in c.k_end+"[":
         self.syntaxerror(cur, "function name or return values")
 
     START = cur
@@ -108,9 +107,9 @@ def create_function(self, parent, cur):
             print repr(self.code[START:m+1])
 
         name = self.code[k:l+1]
-        func = col.Func(parent, name, cur=cur)
-        col.Declares(func, code="")
-        returns = col.Returns(func, code=self.code[start:end+1])
+        func = matlab2cpp.collection.Func(parent, name, cur=cur)
+        matlab2cpp.collection.Declares(func, code="")
+        returns = matlab2cpp.collection.Returns(func, code=self.code[start:end+1])
 
         # multi-return
         if self.code[start] == "[":
@@ -128,7 +127,7 @@ def create_function(self, parent, cur):
                             for a in self.code[s:e+1]]):
                         self.syntaxerror(s, "return value")
 
-                    col.Var(returns, self.code[s:e+1], cur=s,
+                    matlab2cpp.collection.Var(returns, self.code[s:e+1], cur=s,
                             code=self.code[s:e+1])
 
         # single return
@@ -139,7 +138,7 @@ def create_function(self, parent, cur):
                 print "%4d   Return       " % cur,
                 print repr(self.code[start:end+1])
 
-            col.Var(returns, self.code[start:end+1], cur=start,
+            matlab2cpp.collection.Var(returns, self.code[start:end+1], cur=start,
                     code=self.code[start:end+1])
 
 
@@ -165,15 +164,15 @@ def create_function(self, parent, cur):
             end += 1
 
         name = self.code[start:end]
-        func = col.Func(parent, name, cur=cur)
+        func = matlab2cpp.collection.Func(parent, name, cur=cur)
 
-        col.Declares(func)
-        returns = col.Returns(func)
+        matlab2cpp.collection.Declares(func)
+        returns = matlab2cpp.collection.Returns(func)
 
         cur = end
 
     # Parameters
-    params = col.Params(func, cur=cur)
+    params = matlab2cpp.collection.Params(func, cur=cur)
     if self.code[cur] == "(":
 
         end = findend.paren(self, cur)
@@ -187,7 +186,7 @@ def create_function(self, parent, cur):
                     print "%4d   Param        " % cur,
                     print repr(self.code[s:e+1])
 
-                var = col.Var(params, self.code[s:e+1], cur=s,
+                var = matlab2cpp.collection.Var(params, self.code[s:e+1], cur=s,
                         code=self.code[s:e+1])
 
         cur = end
@@ -214,19 +213,19 @@ def create_function(self, parent, cur):
     end = cur
     func.code = self.code[START:end+1]
 
-    col.Header(func.program[4], func.name)
+    matlab2cpp.collection.Header(func.program[4], func.name)
 
     return cur
 
 
-def create_main(self, parent, cur):
+def main(self, parent, cur):
     "Create main function"
 
-    func = col.Main(parent)
+    func = matlab2cpp.collection.Main(parent)
 
-    col.Declares(func, backend="func_return")
-    col.Returns(func, backend="func_return")
-    col.Params(func, backend="func_return")
+    matlab2cpp.collection.Declares(func, backend="func_return")
+    matlab2cpp.collection.Returns(func, backend="func_return")
+    matlab2cpp.collection.Params(func, backend="func_return")
 
     return self.create_codeblock(func, cur)
 
@@ -244,7 +243,7 @@ def lambda_(self, node, cur, eq_loc):
                 cur,
         print repr(self.code[cur:self.code.find("\n", cur)])
 
-    assign = col.Assign(node, cur=cur, backend="func_lambda")
+    assign = matlab2cpp.collection.Assign(node, cur=cur, backend="func_lambda")
 
     self.create_assign_variable(assign, cur, eq_loc)
     assign[0].declare.type = "func_lambda"
@@ -259,7 +258,7 @@ def lambda_(self, node, cur, eq_loc):
 
     return end
 
-def create_lambda_func(self, node, cur):
+def lambda_func(self, node, cur):
 
     if  self.code[cur] != "@":
         self.syntaxerror(cur, "anonymous function indicator (@)")
@@ -296,11 +295,11 @@ def create_lambda_func(self, node, cur):
             i += 1
         name = name + "%d" % i
 
-    func = col.Func(funcs, name, cur=cur, code=self.code[cur:end+1])
+    func = matlab2cpp.collection.Func(funcs, name, cur=cur, code=self.code[cur:end+1])
 
-    declares = col.Declares(func)
-    returns = col.Returns(func)
-    params = col.Params(func)
+    declares = matlab2cpp.collection.Declares(func)
+    returns = matlab2cpp.collection.Returns(func)
+    params = matlab2cpp.collection.Params(func)
 
     k = cur+1
     while self.code[k] in " \t":
@@ -315,9 +314,9 @@ def create_lambda_func(self, node, cur):
     while self.code[cur] in " \t":
         cur += 1
 
-    block = col.Block(func)
-    assign = col.Assign(block)
-    var = col.Var(assign, "_retval")
+    block = matlab2cpp.collection.Block(func)
+    assign = matlab2cpp.collection.Assign(block)
+    var = matlab2cpp.collection.Var(assign, "_retval")
 
     cur = self.create_expression(assign, cur, end=end)
 
@@ -333,10 +332,10 @@ def create_lambda_func(self, node, cur):
     params.backend = "func_lambda"
     declares.backend = "func_lambda"
 
-    var = col.Var(returns, "_retval")
+    var = matlab2cpp.collection.Var(returns, "_retval")
     var.create_declare()
 
-    lamb = col.Lambda(node, name)
+    lamb = matlab2cpp.collection.Lambda(node, name)
     lamb.type = "func_lambda"
 
     lamb.reference = func

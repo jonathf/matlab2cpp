@@ -1,4 +1,4 @@
-from matlab2cpp.node import collection as col
+import matlab2cpp
 
 import findend
 import constants as c
@@ -28,7 +28,7 @@ def multi(self, parent, cur, eq_loc):
     if len(l[0]) == 1:
         return self.create_assign(parent, l[0][0][0], eq_loc)
 
-    assigns = col.Assigns(parent, cur=cur, code=self.code[cur:end+1])
+    assigns = matlab2cpp.collection.Assigns(parent, cur=cur, code=self.code[cur:end+1])
 
     for vector in l:
         for start,stop in vector:
@@ -62,7 +62,7 @@ def single(self, parent, cur, eq_loc):
                 cur,
         print repr(self.code[cur:end+1])
 
-    assign = col.Assign(parent, cur=cur, code=self.code[cur:end+1])
+    assign = matlab2cpp.collection.Assign(parent, cur=cur, code=self.code[cur:end+1])
 
     cur = self.create_assign_variable(assign, cur, eq_loc)
 

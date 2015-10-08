@@ -1,3 +1,7 @@
+"""
+Configuring data types
+"""
+
 import os
 import supplement
 
@@ -42,8 +46,6 @@ def configure(self, suggest=True, **kws):
                         if os.path.isfile(program.name) and \
                                 os.path.basename(program.name) == node.name+".m":
                             func = program[1][0]
-                            # self.project[self.project.names.index(
-                                # node.name+".m")][1][0]
                             node.backend = func.backend
                             break
                     else:
@@ -51,10 +53,13 @@ def configure(self, suggest=True, **kws):
                         node.translate(only=True)
 
                 if not (func is None):
+
                     if node.backend == "func_return":
+
                         node.backend = func.backend
                         node.declare.type = func[1][0].type
                         params = func[2]
+
                         for i in xrange(len(node)):
                             params[i].suggest = node[i].type
                             node[i].suggest = params[i].type
@@ -138,7 +143,6 @@ def configure(self, suggest=True, **kws):
             elif node.cls == "Assign" and node[0].cls != "Set":
                 node[0].suggest = node[1].type
 
-
             elif node.cls == "Neg" and node[0].mem == 0:
                 node.mem = 1
 
@@ -146,22 +150,10 @@ def configure(self, suggest=True, **kws):
 
             complete = True
             for program in self.project:
-                types_f, types_s, types_i, suggests =\
-                        supplement.get_variables(program)
-
-                for s in suggests:
-
-                    if not suggests[s]:
-                        continue
-
-                    if s in types_f:
-                        types_f[s].update(suggests[s])
-                    elif s in types_s:
-                        types_s[s].update(suggests[s])
-
-                    complete = False
-
-                supplement.set_variables(program, types_f, types_s)
+                suggests = program.suggest
+                program.stypes = suggests
+                program.ftypes = suggests
+                complete -= any([any(v) for v in suggests.values()])
 
             if complete:
                 break
@@ -171,4 +163,3 @@ def configure(self, suggest=True, **kws):
 
         else:
             break
-

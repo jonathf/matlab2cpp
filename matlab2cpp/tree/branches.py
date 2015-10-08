@@ -2,8 +2,7 @@
 Iterpretors related to branches, loops and try
 """
 
-from matlab2cpp.node import collection as col
-
+import matlab2cpp
 import constants as c
 import findend
 
@@ -19,9 +18,9 @@ def try_(self, parent, cur):
 
     start = cur
 
-    tryblock = col.Tryblock(parent, cur=cur)
+    tryblock = matlab2cpp.collection.Tryblock(parent, cur=cur)
 
-    try_ = col.Try(tryblock)
+    try_ = matlab2cpp.collection.Try(tryblock)
 
     cur += 3
     while self.code[cur] in " \t\n,;":
@@ -34,7 +33,7 @@ def try_(self, parent, cur):
     if  self.code[cur:cur+5] != "catch" or self.code[cur+5] not in c.k_end:
         self.syntaxerror(cur, "start of catch-block")
 
-    catch_ = col.Catch(tryblock, cur=cur)
+    catch_ = matlab2cpp.collection.Catch(tryblock, cur=cur)
 
     start_ = cur
     cur += 5
@@ -65,7 +64,7 @@ def switch(self, parent, cur):
         print "%4d   Switch       " % cur,
         print repr(self.code[cur:end+1])
 
-    switch = col.Switch(parent, cur=cur)
+    switch = matlab2cpp.collection.Switch(parent, cur=cur)
 
     self.create_expression(switch, k, end)
 
@@ -88,7 +87,7 @@ def switch(self, parent, cur):
             print "%4d   Case         " % cur,
             print repr(self.code[cur:end+1])
 
-        case = col.Case(switch, cur=cur)
+        case = matlab2cpp.collection.Case(switch, cur=cur)
 
         cur = self.create_expression(case, k, end)
 
@@ -106,7 +105,7 @@ def switch(self, parent, cur):
             print "%4d   Otherwise    " % cur,
             print repr(self.code[cur:cur+10])
 
-        otherwise = col.Otherwise(switch, cur=cur)
+        otherwise = matlab2cpp.collection.Otherwise(switch, cur=cur)
 
         k += 9
         while self.code[k] in " \t\n;,":
@@ -133,7 +132,7 @@ def while_(self, parent, cur):
         print "%4d   While        " % cur,
         print repr(self.code[cur:end+1])
 
-    while_ = col.While(parent, cur=cur)
+    while_ = matlab2cpp.collection.While(parent, cur=cur)
 
     if self.code[k] == "(":
         k += 1
@@ -166,7 +165,7 @@ def for_(self, parent, cur):
         print "%4d   For          " % cur,
         print repr(self.code[cur:self.code.find("\n", cur)])
 
-    for_loop = col.For(parent, cur=cur)
+    for_loop = matlab2cpp.collection.For(parent, cur=cur)
 
     cur = cur+3
     while self.code[cur] in "( \t":
@@ -210,7 +209,7 @@ def create_if(self, parent, start):
     if  self.code[start:start+2] != "if" or self.code[start+2] not in c.k_end:
         self.syntaxerror(start, "if branch start")
 
-    branch = col.Branch(parent, cur=start)
+    branch = matlab2cpp.collection.Branch(parent, cur=start)
 
     cur = start
 
@@ -227,7 +226,7 @@ def create_if(self, parent, start):
         print "%4d   If           " % (start),
         print repr(self.code[start:end+1])
 
-    node = col.If(branch, cur=cur)
+    node = matlab2cpp.collection.If(branch, cur=cur)
 
     if self.code[cur] == "(":
         cur += 1
@@ -256,7 +255,7 @@ def create_if(self, parent, start):
             print "%4d   Else if      " % (start),
             print repr(self.code[start:end+1])
 
-        node = col.Elif(branch, cur=start)
+        node = matlab2cpp.collection.Elif(branch, cur=start)
 
         if self.code[cur] == "(":
             cur += 1
@@ -282,7 +281,7 @@ def create_if(self, parent, start):
             print "%4d   Else         " % (start),
             print repr(self.code[start:start+5])
 
-        node = col.Else(branch, cur=start)
+        node = matlab2cpp.collection.Else(branch, cur=start)
 
         end = self.create_codeblock(node, cur)
         node.code = self.code[start:end+1]

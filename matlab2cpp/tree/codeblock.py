@@ -2,15 +2,15 @@
 The main codeblock loop
 """
 
-from matlab2cpp.node import collection as col
+import matlab2cpp
 
 import findend
 import constants as c
 
-def create_codeblock(self, parent, start):
+def codeblock(self, parent, start):
 
     cur = start
-    block = col.Block(parent, cur=cur)
+    block = matlab2cpp.collection.Block(parent, cur=cur)
 
     if self.disp:
         print "%4d Codeblock" % cur
@@ -41,7 +41,7 @@ def create_codeblock(self, parent, start):
 
             else:
 
-                statement = col.Statement(block, cur=cur)
+                statement = matlab2cpp.collection.Statement(block, cur=cur)
 
                 end = findend.expression(self, cur)
                 if self.disp:
@@ -61,7 +61,7 @@ def create_codeblock(self, parent, start):
                 print "%4d   Statement    " % cur,
                 print repr(self.code[cur:end+1])
 
-            statement = col.Statement(block, cur=cur,
+            statement = matlab2cpp.collection.Statement(block, cur=cur,
                     code=self.code[cur:end+1])
 
             cur = self.create_string(statement, cur)
@@ -129,7 +129,7 @@ def create_codeblock(self, parent, start):
                     print "%4d   Statement    " % cur,
                     print repr(self.code[cur:end+1])
 
-                statement = col.Statement(block, cur=cur,
+                statement = matlab2cpp.collection.Statement(block, cur=cur,
                         code=self.code[cur:end+1])
 
                 cur = self.create_expression(statement,

@@ -42,6 +42,8 @@ class Recursive_property_reference(object):
         if not (a is None):
             return a
 
+        assert not (instance is instance.parent)
+
         a = Recursive_property_reference.__get__(self, instance.parent, owner)
         instance.prop[self.name] = a
 
