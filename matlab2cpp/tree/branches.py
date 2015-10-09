@@ -14,6 +14,7 @@ def try_(self, parent, cur):
 
     if self.disp:
         print "%4d   Try          " % cur,
+        print "%-20s" % "branches.try_",
         print repr(self.code[cur:cur+3])
 
     start = cur
@@ -62,6 +63,7 @@ def switch(self, parent, cur):
 
     if self.disp:
         print "%4d   Switch       " % cur,
+        print "%-20s" % "branches.switch",
         print repr(self.code[cur:end+1])
 
     switch = matlab2cpp.collection.Switch(parent, cur=cur)
@@ -85,6 +87,7 @@ def switch(self, parent, cur):
 
         if self.disp:
             print "%4d   Case         " % cur,
+            print "%-20s" % "branches.switch",
             print repr(self.code[cur:end+1])
 
         case = matlab2cpp.collection.Case(switch, cur=cur)
@@ -103,6 +106,7 @@ def switch(self, parent, cur):
 
         if self.disp:
             print "%4d   Otherwise    " % cur,
+            print "%-20s" % "branches.switch",
             print repr(self.code[cur:cur+10])
 
         otherwise = matlab2cpp.collection.Otherwise(switch, cur=cur)
@@ -130,6 +134,7 @@ def while_(self, parent, cur):
 
     if self.disp:
         print "%4d   While        " % cur,
+        print "%-20s" % "branches.while_",
         print repr(self.code[cur:end+1])
 
     while_ = matlab2cpp.collection.While(parent, cur=cur)
@@ -163,7 +168,8 @@ def for_(self, parent, cur):
 
     if self.disp:
         print "%4d   For          " % cur,
-        print repr(self.code[cur:self.code.find("\n", cur)])
+        print repr(self.code[cur:self.code.find("\n", cur)]),
+        print "branches.for_"
 
     for_loop = matlab2cpp.collection.For(parent, cur=cur)
 
@@ -204,7 +210,7 @@ def for_(self, parent, cur):
     return end
 
 
-def create_if(self, parent, start):
+def if_(self, parent, start):
 
     if  self.code[start:start+2] != "if" or self.code[start+2] not in c.k_end:
         self.syntaxerror(start, "if branch start")
@@ -224,6 +230,7 @@ def create_if(self, parent, start):
 
     if self.disp:
         print "%4d   If           " % (start),
+        print "%-20s" % "branches.if_",
         print repr(self.code[start:end+1])
 
     node = matlab2cpp.collection.If(branch, cur=cur)
@@ -253,6 +260,7 @@ def create_if(self, parent, start):
 
         if self.disp:
             print "%4d   Else if      " % (start),
+            print "%-20s" % "branches.if_",
             print repr(self.code[start:end+1])
 
         node = matlab2cpp.collection.Elif(branch, cur=start)
@@ -279,6 +287,7 @@ def create_if(self, parent, start):
 
         if self.disp:
             print "%4d   Else         " % (start),
+            print "%-20s" % "branches.if_",
             print repr(self.code[start:start+5])
 
         node = matlab2cpp.collection.Else(branch, cur=start)

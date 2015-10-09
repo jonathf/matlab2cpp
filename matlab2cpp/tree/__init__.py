@@ -1,9 +1,9 @@
 """
-Translating Matlab code is done in two steps. First the Matlab code is
-interpreted using the `Builder` module. It creates a tree
-representation of the code where each segment of code is represented by a node.
-To observe the node structure it possible to either use `mconvert` with the `-t`
-option, or the python function `mc.qtree`. For example:
+Translating Matlab code is done in two steps. Here we are going to look at the
+first step: interpreting the Matlab code using the `mc.Builder` class.  The
+class creates a tree representation of the code where each segment of code is
+represented by a node.  To observe the node structure it possible to either use
+`mconvert` with the `-t` option, or the python function `mc.qtree`. For example: ::
 
     >>> print mc.qtree("a = 2+2")
             Program    program      TYPE    unamed
@@ -29,7 +29,7 @@ option, or the python function `mc.qtree`. For example:
             | Error      program      TYPE    Var:0
 
 There is quite a lot going on in this picture. First of all, each line
-represents a node. The columns represents repsectively
+represents a node. The columns represents respectively
 
 +---------------------+-------------------------------------+
 | line number         | Matlab code line number (if any)    |
@@ -95,22 +95,24 @@ context. This is important to achieve the desired behavior.
 
 Modules
 ~~~~~~~
+builder     Contains the Builder class that is used to convert Matlab code into
+            node tree representation.
+constants   A collection of usefull constants used by various interpretation
+            rules.
 
-builder
+Support Modules
+~~~~~~~~~~~~~~~
 
-assign          
-branches
-codeblock
-expression
-findend
-functions
-identify
-iterate
-misc
-variables
-
-constants
-
+assign          Variable assignment
+branches        If-tests, loops, try-blocks, etc.
+codeblock       Content of any codeblock
+expression      Content of any expression
+findend         Find end of various code structures
+functions       Functions, both explicit and lambda
+identify        Look-aheads functions to determine context
+iterate         Anything list-related
+misc            Stuff that didn't fit anywhere else
+variables       Any type of variable
 """
 
 import matlab2cpp as mc

@@ -1,5 +1,8 @@
 """
 Quick functions collection of frontend tools for performing code translation.
+Each of the function `qcpp`, `qhpp`, `qpy` and `qlog` are directly related to
+the functionality of the `mconvert` script. The name indicate the file extension
+that the script will create.
 
 Functions
 ~~~~~~~~~
@@ -387,14 +390,21 @@ Each line will typically look as follows: ::
 
       1  10 | | | Var        unknown      TYPE    y
 
-The first number represents code line in the Matlab file the node was taken from
-(if appropriate). The second number represents the cursor position on the same
-line. The vertical bars and the following indentation represents tree structure.
-Children of a node is indented with two spaces. All siblings will have the same
-level of indentation. The first string is the node type. The second string is
-the rule used to translate the node. The third string is the datatype of the
-node. Parenthesis will suround the string if the type is only suggested. The
-last string is the name of the node (if appropriate).
+The items represtents respectively
+
++---------------------+-------------------------------------+
+| line number         | Matlab code line number (if any)    |
++---------------------+-------------------------------------+
+| cursor number       | Matlab code cursor number (if any)  |
++---------------------+-------------------------------------+
+| node class          | The node categorization type        |
++---------------------+-------------------------------------+
+| translation handler | The rule used for translation       |
++---------------------+-------------------------------------+
+| datatype            | The data type of the node           |
++---------------------+-------------------------------------+
+| node name           | Name of the node (if any)           |
++---------------------+-------------------------------------+
 
 Args:
     code (str, Builder, Node): Representation of the node tree.
@@ -437,8 +447,8 @@ Example:
             | Error      program      TYPE    Plus:19
 
 See also:
-    `mc.node`
     `mc.tree`
+    `mc.node`
     """
 
     if isinstance(code, str):

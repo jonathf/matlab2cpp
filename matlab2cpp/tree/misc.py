@@ -50,6 +50,7 @@ def number(self, node, start):
                     code=self.code[start:last+1])
             if self.disp:
                 print "%4d     Imag       " % (start),
+                print "%-20s" % "misc.number",
                 print repr(self.code[start:last+1])
 
         else:
@@ -57,6 +58,7 @@ def number(self, node, start):
                     code=self.code[start:last+1])
             if self.disp:
                 print "%4d     Float      " % (start),
+                print "%-20s" % "misc.number",
                 print repr(self.code[start:last+1])
 
     elif integer:
@@ -70,6 +72,7 @@ def number(self, node, start):
             k += 1
             if self.disp:
                 print "%4d     Imag       " % (start),
+                print "%-20s" % "misc.number",
                 print repr(self.code[start:last+1])
 
         else:
@@ -77,6 +80,7 @@ def number(self, node, start):
                     code=self.code[start:last+1])
             if self.disp:
                 print "%4d     Int        " % (start),
+                print "%-20s" % "misc.number",
                 print repr(self.code[start:last+1])
 
     else:
@@ -88,6 +92,7 @@ def number(self, node, start):
             k += 1
             if self.disp:
                 print "%4d     Imag       " % (start),
+                print "%-20s" % "misc.number",
                 print repr(self.code[start:last+1])
 
         else:
@@ -95,6 +100,7 @@ def number(self, node, start):
                     code=self.code[start:k])
             if self.disp:
                 print "%4d     Float      " % (start),
+                print "%-20s" % "misc.number",
                 print repr(self.code[start:last+1])
 
     return k-1
@@ -112,6 +118,7 @@ def string(self, parent, cur):
 
     if self.disp:
         print "%4d   String " % cur,
+        print "%-20s" % "misc.string",
         print repr(self.code[cur:end+1])
 
     return end
@@ -151,6 +158,7 @@ def comment(self, parent, cur):
 
     if self.disp:
         print "%4d   Comment      " % cur,
+        print "%-20s" % "misc.comment",
         print repr(self.code[cur:end+1])
 
     if self.code[cur+1] == "{":
@@ -177,6 +185,7 @@ def matrix(self, node, cur):
     end = findend.matrix(self, cur)
     if self.disp:
         print "%4d     Matrix     " % cur,
+        print "%-20s" % "misc.matrix",
         print repr(self.code[cur:end+1])
 
     L = self.iterate_list(cur)
@@ -195,6 +204,7 @@ def matrix(self, node, cur):
 
         if self.disp:
             print "%4d     Vector     " % (start),
+            print "%-20s" % "misc.matrix",
             print repr(self.code[start:end+1])
 
         for start,end in array:
@@ -205,6 +215,7 @@ def matrix(self, node, cur):
 
         if self.disp:
             print "%4d     Vector     " % cur,
+            print "%-20s" % "misc.matrix",
             print repr("")
         vector = matlab2cpp.collection.Vector(matrix, cur=cur, code="")
 
@@ -220,6 +231,7 @@ def cell(self, node, cur):
     end = findend.cell(self, cur)
     if self.disp:
         print "%4d     Cell       " % cur,
+        print "%-20s" % "misc.cell",
         print repr(self.code[cur:end+1])
 
     L = self.iterate_list(cur)

@@ -38,6 +38,7 @@ def assign(self, node, cur, end=None):
 
             if self.disp:
                 print "%4d     Cset       " % cur,
+                print "%-20s" % "variables.assign",
                 print repr(self.code[cur:end+1])
 
             n_fields = 0
@@ -67,6 +68,7 @@ def assign(self, node, cur, end=None):
 
             if self.disp:
                 print "%4d     Cvar       " % cur,
+                print "%-20s" % "variables.assign",
                 print repr(self.code[cur:end+1])
 
             num = 0
@@ -94,6 +96,7 @@ def assign(self, node, cur, end=None):
             if self.disp:
                 print "%4d     Sset        " %\
                         cur,
+                print "%-20s" % "variables.assign",
                 print repr(self.code[cur:end])
 
             node = matlab2cpp.collection.Sset(node, name, value, cur=cur,
@@ -107,6 +110,7 @@ def assign(self, node, cur, end=None):
             if self.disp:
                 print "%4d     Set        " %\
                         cur,
+                print "%-20s" % "variables.assign",
                 print repr(self.code[cur:end+1])
 
             node = matlab2cpp.collection.Set(node, name, cur=cur,
@@ -131,6 +135,7 @@ def assign(self, node, cur, end=None):
 
             if self.disp:
                 print "%4d     Nset       " % cur,
+                print "%-20s" % "variables.assign",
                 print repr(self.code[cur:end+1])
 
 
@@ -159,6 +164,7 @@ def assign(self, node, cur, end=None):
                 end = findend.paren(self, j)
                 if self.disp:
                     print "%4d     Fset       " % cur,
+                    print "%-20s" % "variables.assign",
                     print repr(self.code[cur:end+1])
 
                 node = matlab2cpp.collection.Fset(node, name, value=value, cur=cur,
@@ -171,6 +177,7 @@ def assign(self, node, cur, end=None):
 
                 if self.disp:
                     print "%4d     Fvar       " % cur,
+                    print "%-20s" % "variables.assign",
                     print repr(self.code[cur:last+1])
 
                 node = matlab2cpp.collection.Fvar(node, name, value=value, cur=cur,
@@ -182,6 +189,7 @@ def assign(self, node, cur, end=None):
     else:
         if self.disp:
             print "%4d     Var        " % cur,
+            print "%-20s" % "variables.assign",
             print repr(self.code[cur:last])
 
 
@@ -229,6 +237,7 @@ def variable(self, parent, cur):
 
             if self.disp:
                 print "%4d     Cget       " % cur,
+                print "%-20s" % "variables.variable",
                 print repr(self.code[cur:end+1])
 
             n_fields = 0
@@ -258,6 +267,7 @@ def variable(self, parent, cur):
 
             if self.disp:
                 print "%4d     Cvar       " % cur,
+                print "%-20s" % "variables.variable",
                 print repr(self.code[cur:end+1])
 
             num = 0
@@ -285,6 +295,7 @@ def variable(self, parent, cur):
             if self.disp:
                 print "%4d     Sget        " %\
                         cur,
+                print "%-20s" % "variables.variable",
                 print repr(self.code[cur:end])
 
             node = matlab2cpp.collection.Sget(parent, name, value, cur=cur,
@@ -298,6 +309,7 @@ def variable(self, parent, cur):
             if self.disp:
                 print "%4d     Get        " %\
                         cur,
+                print "%-20s" % "variables.variable",
                 print repr(self.code[cur:end+1])
 
             node = matlab2cpp.collection.Get(parent, name, cur=cur,
@@ -319,6 +331,7 @@ def variable(self, parent, cur):
 
             if self.disp:
                 print "%4d     Nget       " % cur,
+                print "%-20s" % "variables.variable",
                 print repr(self.code[cur:end+1])
 
             k += 1
@@ -350,6 +363,7 @@ def variable(self, parent, cur):
                 end = findend.paren(self, j)
                 if self.disp:
                     print "%4d     Fget       " % cur,
+                    print "%-20s" % "variables.variable",
                     print repr(self.code[cur:end+1])
 
 
@@ -369,6 +383,7 @@ def variable(self, parent, cur):
 
                 if self.disp:
                     print "%4d     Fvar       " % cur,
+                    print "%-20s" % "variables.variable",
                     print repr(self.code[cur:last])
 
                 node = matlab2cpp.collection.Fvar(parent, name, value=value,
@@ -384,6 +399,7 @@ def variable(self, parent, cur):
 
         if self.disp:
             print "%4d     Var        " % cur,
+            print "%-20s" % "variables.variable",
             print repr(self.code[cur:last])
 
         node = matlab2cpp.collection.Var(parent, name, cur=cur,

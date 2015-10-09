@@ -163,3 +163,5 @@ def configure(self, suggest=True, **kws):
 
         else:
             break
+
+    program[-1].children = []

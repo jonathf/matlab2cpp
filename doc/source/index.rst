@@ -18,8 +18,6 @@ User interaction
 .. autoprogram:: mconvert:parser
     :prog: mconvert
 
-
-
 Quick functions
 ---------------
 .. automodule:: matlab2cpp.qfunctions
@@ -31,6 +29,20 @@ Quick functions
 .. autofunction:: matlab2cpp.qlog
 .. autofunction:: matlab2cpp.qtree
 .. autofunction:: matlab2cpp.qscript
+
+
+Creating node tree
+===================
+
+.. automodule:: matlab2cpp.tree
+
+Builder class
+-------------
+
+.. automodule:: matlab2cpp.tree.builder
+
+.. autoclass:: matlab2cpp.tree.builder.Builder
+
 
 Configuring datatypes
 ---------------------

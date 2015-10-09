@@ -13,7 +13,8 @@ def codeblock(self, parent, start):
     block = matlab2cpp.collection.Block(parent, cur=cur)
 
     if self.disp:
-        print "%4d Codeblock" % cur
+        print "%4d Codeblock  " % cur,
+        print "%-20s" % "codeblock.codeblock"
 
     while True:
 
@@ -46,6 +47,7 @@ def codeblock(self, parent, start):
                 end = findend.expression(self, cur)
                 if self.disp:
                     print "%4d   Statement    " % cur,
+                    print "%-20s" % "codeblock.codeblock",
                     print repr(self.code[cur:end+1])
 
                 statement.code = self.code[cur:end+1]
@@ -59,6 +61,7 @@ def codeblock(self, parent, start):
             end = findend.string(self, cur)
             if self.disp:
                 print "%4d   Statement    " % cur,
+                print "%-20s" % "codeblock.codeblock",
                 print repr(self.code[cur:end+1])
 
             statement = matlab2cpp.collection.Statement(block, cur=cur,
@@ -127,6 +130,7 @@ def codeblock(self, parent, start):
                 end = findend.expression(self, cur)
                 if self.disp:
                     print "%4d   Statement    " % cur,
+                    print "%-20s" % "codeblock.codeblock",
                     print repr(self.code[cur:end+1])
 
                 statement = matlab2cpp.collection.Statement(block, cur=cur,

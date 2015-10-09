@@ -76,6 +76,8 @@ arma::uword length(const T1& A)
 return A.n_elem;
 }""")
 
+myinclude = ({"code":"", "header":""}, '%(header)s', "%(code)s")
+
 hankel = ({}, '',
 """template<typename T1, typename T2>
 inline arma::Mat<typename T1::elem_type> hankel(const T1& c, const T2& r)

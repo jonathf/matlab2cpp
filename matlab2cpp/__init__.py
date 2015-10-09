@@ -95,7 +95,8 @@ Args:
             code = f.read()
             f.close()
 
-            program = builder.load(filename, code)
+            builder.load(filename, code)
+            program = builder[-1]
             unknowns = builder.get_unknowns(filename)
 
             for i in xrange(len(unknowns)-1, -1, -1):

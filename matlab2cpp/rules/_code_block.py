@@ -515,10 +515,10 @@ Examples:
     b ;
     }
     """
-
     var, range = node[:2]
 
-    if range["class"] == "Colon":
+    if range.cls == "Colon":
+
         if len(range) == 2:
             start, stop = range
             step = "1"

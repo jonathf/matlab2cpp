@@ -27,8 +27,9 @@ def multi(self, parent, cur, eq_loc):
     end = findend.expression(self, j)
 
     if self.disp:
-        print "%4d   Assigns      " %\
+        print "%4d   Assigns    " %\
                 cur,
+        print "%-20s" % "assign.multi",
         print repr(self.code[cur:end+1])
 
     l = self.iterate_list(cur)
@@ -66,8 +67,9 @@ def single(self, parent, cur, eq_loc):
     end = findend.expression(self, j)
 
     if self.disp:
-        print "%4d   Assign       " %\
+        print "%4d   Assign     " %\
                 cur,
+        print "%-20s" % "assign.single",
         print repr(self.code[cur:end+1])
 
     assign = matlab2cpp.collection.Assign(parent, cur=cur, code=self.code[cur:end+1])

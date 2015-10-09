@@ -148,11 +148,11 @@ def auxillary(node, type, convert):
     swap_var.parent, node.parent = node.parent, swap_var.parent
 
     # generate code
-    swap_var.translate_one()
-    aux_var.translate_one()
+    swap_var.translate(only=True)
+    aux_var.translate(only=True)
     if convert:
-        rhs.translate_one()
-    assign.translate_one()
+        rhs.translate(only=True)
+    assign.translate(only=True)
 
     if convert:
         assert node.type != swap_var.type

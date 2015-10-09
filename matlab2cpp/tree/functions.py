@@ -7,7 +7,8 @@ import findend
 def program(self, name):
 
     if self.disp:
-        print "     Program"
+        print "     Program    ",
+        print "functions.program"
 
     # Create intial nodes
     program = matlab2cpp.collection.Program(self.project, name=name, cur=0, code=self.code)
@@ -36,9 +37,6 @@ def program(self, name):
             cur = self.create_function(funcs, cur)
 
         else:
-            if self.disp:
-                print "%4d Script" % cur
-
             self.create_main(funcs, cur)
             break
 
@@ -104,6 +102,7 @@ def function(self, parent, cur):
 
         if self.disp:
             print "%4d Function       " % cur,
+            print "%-20s" % "functions.function",
             print repr(self.code[START:m+1])
 
         name = self.code[k:l+1]
@@ -121,6 +120,7 @@ def function(self, parent, cur):
 
                     if self.disp:
                         print "%4d   Return       " % cur,
+                        print "%-20s" % "functions.function",
                         print repr(self.code[s:e+1])
 
                     if not any([a in c.letters+c.digits+"_@" \
@@ -157,6 +157,7 @@ def function(self, parent, cur):
 
         if self.disp:
             print "%4d Function       " % cur,
+            print "%-20s" % "functions.function",
             print repr(self.code[START:m+1])
 
         end = start+1
@@ -184,6 +185,7 @@ def function(self, parent, cur):
 
                 if self.disp:
                     print "%4d   Param        " % cur,
+                    print "%-20s" % "functions.function",
                     print repr(self.code[s:e+1])
 
                 var = matlab2cpp.collection.Var(params, self.code[s:e+1], cur=s,
@@ -221,6 +223,10 @@ def function(self, parent, cur):
 def main(self, parent, cur):
     "Create main function"
 
+    if self.disp:
+        print "%4d Main       " % cur,
+        print "functions.main"
+
     func = matlab2cpp.collection.Main(parent)
 
     matlab2cpp.collection.Declares(func, backend="func_return")
@@ -241,7 +247,8 @@ def lambda_(self, node, cur, eq_loc):
     if self.disp:
         print "%4d   Assign       " %\
                 cur,
-        print repr(self.code[cur:self.code.find("\n", cur)])
+        print repr(self.code[cur:self.code.find("\n", cur)]),
+        print "functions.lambda_"
 
     assign = matlab2cpp.collection.Assign(node, cur=cur, backend="func_lambda")
 
@@ -280,6 +287,7 @@ def lambda_func(self, node, cur):
 
     if self.disp:
         print "%4d   Lambda       " % cur,
+        print "%-20s" % "functions.lambda_func",
         print repr(self.code[cur:end+1])
 
     if node.cls == "Assign":

@@ -1,3 +1,92 @@
+"""
+Iterating through Matlab code always starts with constructing a builder: ::
+
+    >>> builder = mc.Builder()
+
+This is an empty shell without any content. To give it content, we supply it
+with code: ::
+
+    >>> builder.load("file1.m", "a = 4")
+
+The function saves the code locally as `builder.code` and initiate the
+`create_program` method with index 0. The various `create_*` are then called and
+used to populate the node tree. The code is considered static, instead the
+index, which refer to the postion in the code is increased to move forward in
+the code. The various constructors uses the support modules in the `mc.tree` to
+build a full toke tree.  The result is as follows: ::
+
+    >>> print builder
+            Project    program      TYPE    project
+            | Program    program      TYPE    file1.m
+            | | Includes   program      TYPE    
+            | | | Include    program      TYPE    #include <armadillo>
+            | | | Include    program      TYPE    using namespace arma ;
+      1   1 | | Funcs      program      TYPE    file1.m
+      1   1 | | | Main       func_common  TYPE    main
+      1   1 | | | | Declares   func_return  TYPE    
+      1   1 | | | | | Var        unknown      TYPE    a
+      1   1 | | | | Returns    func_return  TYPE    
+      1   1 | | | | Params     func_return  TYPE    
+      1   1 | | | | Block      code_block   TYPE    
+      1   1 | | | | | Assign     unknown      TYPE    
+      1   1 | | | | | | Var        unknown      TYPE    a
+      1   5 | | | | | | Int        int          int     
+            | | Inlines    program      TYPE    file1.m
+            | | Structs    program      TYPE    file1.m
+            | | Headers    program      TYPE    file1.m
+            | | Log        program      TYPE    file1.m
+
+If is possible to get a detailed output of how this process is done, by turning
+the `disp` flag on: ::
+
+    >>> builder = mc.Builder(disp=True)
+    >>> builder.load("file1.m", "a = 4")
+    loading file1.m
+         Program     functions.program
+       0 Main        functions.main
+       0 Codeblock   codeblock.codeblock 
+       0   Assign      assign.single        'a = 4'
+       0     Var         variables.assign     'a'
+       4     Expression  expression.create    '4'
+       4     Int         misc.number          '4'
+
+This printout lists the core Matlab translation. In the four columns the first
+is the index to the postion in the Matlab code, the second is the node created,
+the third is the file and function where the node was created, and lastly the
+fourth column is a code snippet from the Matlab code. This allows for quick
+diagnostics about where an error in interpretation might have accoured.
+
+Note that the tree above for the most part doesn't have any relevant data types
+configure. To configure datatypes, use the `configure` method: ::
+
+    >>> builder.configure(suggest=True)
+    >>> print builder
+            Project    program      TYPE    project
+            | Program    program      TYPE    file1.m
+            | | Includes   program      TYPE    
+            | | | Include    program      TYPE    #include <armadillo>
+            | | | Include    program      TYPE    using namespace arma ;
+      1   1 | | Funcs      program      TYPE    file1.m
+      1   1 | | | Main       func_common  TYPE    main
+      1   1 | | | | Declares   func_return  int     
+      1   1 | | | | | Var        int          int     a
+      1   1 | | | | Returns    func_return  TYPE    
+      1   1 | | | | Params     func_return  TYPE    
+      1   1 | | | | Block      code_block   TYPE    
+      1   1 | | | | | Assign     unknown      TYPE    
+      1   1 | | | | | | Var        int          int     a
+      1   5 | | | | | | Int        int          int     
+            | | Inlines    program      TYPE    file1.m
+            | | Structs    program      TYPE    file1.m
+            | | Headers    program      TYPE    file1.m
+            | | Log        program      TYPE    file1.m
+
+Multiple program can be loaded into the same builder. This allows for building
+of projects that involves multiple files.
+Multiple program can be loaded into the same builder. This allows for building
+of projects that involves multiple files
+"""
+
 import matlab2cpp as mc
 
 import expression
@@ -10,7 +99,13 @@ import assign
 import codeblock
 
 class Builder(object):
-    """Convert Matlab-code to Node-tree"""
+    """
+Convert Matlab-code to a tree of nodes.
+
+Methods
+~~~~~~~
+load        Load code with a given name
+    """
 
     def __init__(self, disp=False, comments=True, **kws):
         """
@@ -45,11 +140,17 @@ class Builder(object):
 
         self.code = code + "\n\n\n"
         self.create_program(name)
-        return self.project[-1]
+        # return self.project[-1]
 
+    def configure(self, suggest=True, **kws):
+        mc.configure.configure(self, suggest, **kws)
 
     def __getitem__(self, i):
         return self.project[i]
+
+    def __str__(self):
+        return self.project.summary()
+        
 
     def syntaxerror(self, cur, text):
         """
@@ -119,10 +220,6 @@ Example:
                 node.backend = "reserved"
 
         return unassigned
-
-    def configure(self, suggest=True, **kws):
-        mc.configure.configure(self, suggest, **kws)
-
 
     def create_program(self, name):
         return functions.program(self, name)
