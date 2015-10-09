@@ -1,5 +1,11 @@
 """
 Variable interpretor
+
+Functions
+~~~~~~~~~
+assign      Variable left side of an assignment
+variable    Variable not on the left side of an assignment
+cell_arg    Argument of a cell call
 """
 
 import matlab2cpp
@@ -8,6 +14,37 @@ import findend
 
 
 def assign(self, node, cur, end=None):
+    """
+Variable left side of an assignment
+
+Args:
+    self (Builder): Code constructor
+    node (Node): Parent node
+    cur (int): Current position in code
+
+Kwargs:
+    end (int, optional): End of variable
+
+Returns:
+	int : End of variable
+
+Example:
+    >>> builder = mc.Builder(True)
+    >>> builder.load("unnamed", "a = 4")
+    loading unnamed
+         Program     functions.program
+       0 Main        functions.main
+       0 Codeblock   codeblock.codeblock 
+       0   Assign      assign.single        'a = 4'
+       0     Var         variables.assign     'a'
+       4     Expression  expression.create    '4'
+       4     Int         misc.number          '4'
+    >>> print mc.qtree(builder, core=True)
+      1   1 Block      code_block   TYPE    
+      1   1 Assign     unknown      TYPE    
+      1   1 | Var        unknown      TYPE    a
+      1   5 | Int        int          int     
+    """
 
     if  self.code[cur] not in c.letters:
         self.syntaxerror(cur, "assign variable name")
@@ -203,6 +240,35 @@ def assign(self, node, cur, end=None):
 
 
 def variable(self, parent, cur):
+    """
+Variable not on the left side of an assignment
+
+Args:
+    self (Builder): Code constructor
+    node (Node): Parent node
+    cur (int): Current position in code
+
+Kwargs:
+    end (int, optional): End of variable
+
+Returns:
+	int : End of variable
+
+Example:
+    >>> builder = mc.Builder(True)
+    >>> builder.load("unnamed", "a")
+    loading unnamed
+         Program     functions.program
+       0 Main        functions.main
+       0 Codeblock   codeblock.codeblock 
+       0   Statement     codeblock.codeblock  'a'
+       0     Expression  expression.create    'a'
+       0     Var         variables.variable   'a'
+    >>> print mc.qtree(builder, core=True)
+      1   1 Block      code_block   TYPE    
+      1   1 Statement  code_block   TYPE    
+      1   1 | Var        unknown      TYPE    a
+    """
 
     k = cur
     if self.code[k] == "@":
@@ -273,7 +339,7 @@ def variable(self, parent, cur):
             num = 0
             while self.code[k] == "{":
 
-                cur = self.iterate_cell(node, k)
+                cur = cell_arg(self, node, k)
                 k = cur+1
                 while self.code[k] in " \t":
                     k += 1
@@ -412,3 +478,65 @@ def variable(self, parent, cur):
 
     return cur
 
+
+def cell_arg(self, cset, cur):
+    """
+Argument of a cell call. Support function to `assign` and `variable`.
+
+Args:
+    self (Builder): Code constructor
+    cset (Node): Parent node
+    cur (int): Current position in code
+
+Returns:
+	int : End of argument
+
+Example:
+    >>> builder = mc.Builder(True)
+    >>> builder.load("unnamed", "a{b}")
+    loading unnamed
+         Program     functions.program
+       0 Main        functions.main
+       0 Codeblock   codeblock.codeblock 
+       0   Statement     codeblock.codeblock  'a{b}'
+       0     Expression  expression.create    'a{b}'
+       0     Cvar        variables.variable   'a{b}'
+       2     Expression  expression.create    'b'
+       2     Var         variables.variable   'b'
+    >>> print mc.qtree(builder, core=True)
+      1   1 Block      code_block   TYPE    
+      1   1 Statement  code_block   TYPE    
+      1   1 | Cvar       cell         TYPE    a
+      1   3 | | Var        unknown      TYPE    b
+    """
+
+    if self.code[cur] != "{":
+        self.syntaxerror(cur, "Curly start")
+
+    cur = cur+1
+
+    while True:
+
+        if self.code[cur] == "}":
+            return cur
+
+        elif self.code[cur] in c.e_start:
+
+            cur = self.create_expression(cset, cur)
+
+            cur += 1
+            while self.code[cur] in " \t":
+                cur += 1
+
+            return cur
+
+        elif self.code[cur] == " ":
+            pass
+
+        cur += 1
+
+
+if __name__ == "__main__":
+    import matlab2cpp as mc
+    import doctest
+    doctest.testmod()

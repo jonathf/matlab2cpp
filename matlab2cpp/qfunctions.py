@@ -20,7 +20,7 @@ qscript     Create core script converions of code or token tree
 
 import supplement
 import tree
-import node
+import matlab2cpp
 
 __all__ = ["build", "qcpp", "qhpp", "qpy", "qlog", "qtree", "qscript"]
 
@@ -382,7 +382,7 @@ See alse:
 
     return out
 
-def qtree(code, suggest=False):
+def qtree(code, suggest=False, core=False):
     """
 Summarize the node tree with relevant information, where each line represents
 a node.
@@ -411,6 +411,7 @@ Args:
 
 Kwargs:
     suggest (bool): Use suggestion engine where appropriate.
+    core (bool): Unly display nodes generated from Matlab code directly.
 
 Returns:
 	str: A summary of the node tree.
@@ -460,9 +461,12 @@ See also:
         if isinstance(tree_, tree.builder.Builder):
             tree_ = tree_[0]
 
-    if isinstance(tree_, node.Node):
-        raise KeyError(
-                "Argument code should be string, Builder or Node")
+    if core:
+        if tree_.cls == "Program":
+            if tree_[1] and tree_[1][0].name == "main":
+                tree_ = tree_[1][0][-1]
+            else:
+                tree_ = tree_[1]
 
     return tree_.summary()
 
@@ -496,6 +500,7 @@ Example:
         tree_ = code
         if isinstance(tree_, tree.builder.Builder):
             tree_ = tree_[0]
+        tree_.translate()
 
     out = ""
     if tree_.cls == "Program":
@@ -503,6 +508,9 @@ Example:
             out = tree_[1][0][-1].str
         else:
             out = tree_[1].str
+    else:
+        out = tree_.str
+
 
     out = out.replace("__percent__", "%")
 

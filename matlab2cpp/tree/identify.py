@@ -1,11 +1,29 @@
 """
 Rutines for identifying code structure.
+
+Functions
+~~~~~~~~~
+space_delimiter     Check if mid-expression space-delimiter
+string              Check if at string start
+space_delimited     Check if list is space-delimited
 """
 
 import constants as c
 import findend
 
 def space_delimiter(self, start):
+    """
+Check if mid-expression space-delimiter. This already assumes that position is
+in the middle of a space delimited list. Use `space_delimited` to check if
+a list is space or comma delimited.
+
+Args:
+    self (Builder): Code constructor
+    start (int): Current position in code
+
+Returns:
+	bool: True if whitespace character classifies as a delimiter
+    """
 
     if self.code[start] not in " \t":
         self.syntaxerror(start, "space delimiter")
@@ -37,6 +55,16 @@ def space_delimiter(self, start):
 
 
 def string(self, k):
+    """
+Check if at string start
+
+Args:
+    self (Builder): Code constructor
+    k (int): Current position in code
+
+Returns:
+	bool: True if character classifies as start of string.
+    """
 
     if self.code[k] != "'":
         self.syntaxerror(k, "start of string character (')")
@@ -60,6 +88,16 @@ def string(self, k):
 
 
 def space_delimited(self, start):
+    """
+Check if list is space-delimited
+
+Args:
+    self (Builder): Code constructor
+    start (int): Current position in code
+
+Returns:
+	bool: True if list consists of whitespace delimiters
+    """
 
     if  self.code[start] not in c.l_start:
         self.syntaxerror(start, "list start")
@@ -99,7 +137,7 @@ def space_delimited(self, start):
             k = findend.dots(self, k)
 
         elif self.code[k] in " \t":
-            if self.is_space_delimiter(k):
+            if space_delimiter(self, k):
                 return True
             while self.code[k+1] in " \t":
                 k += 1

@@ -40,8 +40,56 @@ Builder class
 -------------
 
 .. automodule:: matlab2cpp.tree.builder
-
 .. autoclass:: matlab2cpp.tree.builder.Builder
+
+Functions
+---------
+.. automodule:: matlab2cpp.tree.functions
+.. autofunction:: matlab2cpp.tree.functions.program
+.. autofunction:: matlab2cpp.tree.functions.function
+.. autofunction:: matlab2cpp.tree.functions.main
+.. autofunction:: matlab2cpp.tree.functions.lambda_
+.. autofunction:: matlab2cpp.tree.functions.lamba_func
+
+Codeblock
+---------
+.. automodule:: matlab2cpp.tree.codeblock
+.. autofunction:: matlab2cpp.tree.codeblock.codeblock
+
+Branches
+--------
+.. automodule:: matlab2cpp.tree.branches
+.. autofunction:: matlab2cpp.tree.branches.for_
+.. autofunction:: matlab2cpp.tree.branches.if_
+.. autofunction:: matlab2cpp.tree.branches.while_
+.. autofunction:: matlab2cpp.tree.branches.switch_
+.. autofunction:: matlab2cpp.tree.branches.try_
+
+Assignments
+-----------
+.. automodule:: matlab2cpp.tree.assign
+.. autofunction:: matlab2cpp.tree.assign.multi
+.. autofunction:: matlab2cpp.tree.assign.single
+
+Variables
+---------
+.. automodule:: matlab2cpp.tree.variable
+.. autofunction:: matlab2cpp.tree.variable.assign
+.. autofunction:: matlab2cpp.tree.variable.variable
+.. autofunction:: matlab2cpp.tree.variable.cell_arg
+
+Miscellaneous
+-------------
+.. automodule:: matlab2cpp.tree.misc
+.. autofunction:: matlab2cpp.tree.misc.number
+.. autofunction:: matlab2cpp.tree.misc.string
+.. autofunction:: matlab2cpp.tree.misc.list
+.. autofunction:: matlab2cpp.tree.misc.comment
+.. autofunction:: matlab2cpp.tree.misc.matrix
+.. autofunction:: matlab2cpp.tree.misc.cell
+
+
+
 
 
 Configuring datatypes

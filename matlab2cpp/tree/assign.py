@@ -3,8 +3,8 @@ Assignment
 
 functions
 ~~~~~~~~~
-single
-multi
+single      Assignment with single return
+multi       Assignment with multiple returns
 """
 import matlab2cpp
 
@@ -12,10 +12,41 @@ import findend
 import constants as c
 
 def multi(self, parent, cur, eq_loc):
+    """
+Assignment with multiple return
+
+Args:
+    self (Builder): Code constructor.
+    parent (Node): Parent node
+    cur (int): Current position in code
+    eq_loc (int): position of the assignment marker ('='-sign)
+
+Returns:
+	int: Index to end of assignment
+
+Example:
+    >>> builder = mc.Builder(True)
+    >>> builder.load("unnamed", "[a,b] = c")
+    loading unnamed
+         Program     functions.program
+       0 Main        functions.main
+       0 Codeblock   codeblock.codeblock 
+       0   Assigns     assign.multi         '[a,b] = c'
+       1     Var         variables.assign     'a'
+       3     Var         variables.assign     'b'
+       8     Expression  expression.create    'c'
+       8     Var         variables.variable   'c'
+    >>> print mc.qtree(builder, core=True)
+      1   1 Block      code_block   TYPE    
+      1   1 Assigns    code_block   TYPE    c
+      1   2 | Var        unknown      TYPE    a
+      1   4 | Var        unknown      TYPE    b
+      1   9 | Var        unknown      TYPE    c
+    """
 
     if  self.code[cur] != "[":
         self.syntaxerror(cur, "multi-assign start")
-    if  self.code[eq_loc] == "=":
+    if  self.code[eq_loc] != "=":
         self.syntaxerror(cur, "assignment sign (=)")
 
     j = eq_loc+1
@@ -55,6 +86,35 @@ def multi(self, parent, cur, eq_loc):
 
 
 def single(self, parent, cur, eq_loc):
+    """
+Assignment with single return.
+
+Args:
+    self (Builder): Code constructor
+    parent (Node): Parent node
+    cur (int): Current position in code
+    eq_loc (int): position of the assignment marker ('='-sign)
+
+Returns:
+	int: Index to end of assignment
+
+Example:
+    >>> builder = mc.Builder(True)
+    >>> builder.load("unnamed", "a=b")
+    loading unnamed
+         Program     functions.program
+       0 Main        functions.main
+       0 Codeblock   codeblock.codeblock 
+       0   Assign      assign.single        'a=b'
+       0     Var         variables.assign     'a'
+       2     Expression  expression.create    'b'
+       2     Var         variables.variable   'b'
+    >>> print mc.qtree(builder, core=True)
+      1   1 Block      code_block   TYPE    
+      1   1 Assign     unknown      TYPE    b
+      1   1 | Var        unknown      TYPE    a
+      1   3 | Var        unknown      TYPE    b
+    """
 
     if  self.code[cur] not in c.letters:
         self.syntaxerror(cur, "assignment start")
@@ -100,3 +160,7 @@ def single(self, parent, cur, eq_loc):
 
     return end
 
+if __name__ == "__main__":
+    import matlab2cpp as mc
+    import doctest
+    doctest.testmod()

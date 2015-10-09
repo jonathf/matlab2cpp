@@ -1,5 +1,14 @@
 """
 Interpretors that didn't fit other places
+
+Functions
+~~~~~~~~~
+number          Verbatim number
+string          Verbatim string
+list            A list (both comma or space delimited)
+comment         Comments on any form
+matrix          Verbatim matrices
+cell            Verbatim cells
 """
 
 import matlab2cpp
@@ -8,6 +17,32 @@ import findend
 
 
 def number(self, node, start):
+    """
+Verbatim number
+
+Args:
+    self (Builder): Code constructor
+    node (Node): Parent node
+    start (int): Current position in code
+
+Returns:
+	int : End of number
+
+Example:
+    >>> builder = mc.Builder(True)
+    >>> builder.load("unnamed", "42.")
+    loading unnamed
+         Program     functions.program
+       0 Main        functions.main
+       0 Codeblock   codeblock.codeblock 
+       0   Statement     codeblock.codeblock  '42.'
+       0     Expression  expression.create    '42.'
+       0     Float       misc.number          '42.'
+    >>> print mc.qtree(builder, core=True)
+      1   1 Block      code_block   TYPE    
+      1   1 Statement  code_block   TYPE    
+      1   1 | Float      double       double  
+    """
 
     if not (self.code[start] in c.digits or\
             self.code[start] == "." and self.code[start+1] in c.digits):
@@ -107,6 +142,31 @@ def number(self, node, start):
 
 
 def string(self, parent, cur):
+    """
+Verbatim string
+
+Args:
+    self (Builder): Code constructor
+    parent (Node): Parent node
+    start (int): Current position in code
+
+Returns:
+	int : End of string
+
+Example:
+    >>> builder = mc.Builder(True)
+    >>> builder.load("unnamed", "'abc'")
+    loading unnamed
+         Program     functions.program
+       0 Main        functions.main
+       0 Codeblock   codeblock.codeblock 
+       0   Statement     codeblock.codeblock  "'abc'"
+       0     String  misc.string          "'abc'"
+    >>> print mc.qtree(builder, core=True)
+      1   1 Block      code_block   TYPE    
+      1   1 Statement  code_block   TYPE    
+      1   1 | String     string       string  
+    """
 
     end = findend.string(self, cur)
 
@@ -117,7 +177,7 @@ def string(self, parent, cur):
             code=self.code[cur:end+1])
 
     if self.disp:
-        print "%4d   String " % cur,
+        print "%4d     String " % cur,
         print "%-20s" % "misc.string",
         print repr(self.code[cur:end+1])
 
@@ -125,6 +185,41 @@ def string(self, parent, cur):
 
 
 def list(self, parent, cur):
+    """
+A list (both comma or space delimited)
+
+Args:
+    self (Builder): Code constructor
+    parent (Node): Parent node
+    cur (int): Current position in code
+
+Returns:
+	int : End of list
+
+Example:
+    >>> builder = mc.Builder(True)
+    >>> builder.load("unnamed", "[2 -3]")
+    loading unnamed
+         Program     functions.program
+       0 Main        functions.main
+       0 Codeblock   codeblock.codeblock 
+       0   Statement     codeblock.codeblock  '[2 -3]'
+       0     Expression  expression.create    '[2 -3]'
+       0     Matrix      misc.matrix          '[2 -3]'
+       1     Vector      misc.matrix          '2 -3'
+       1     Expression  expression.create    '2'
+       1     Int         misc.number          '2'
+       3     Expression  expression.create    '-3'
+       4     Int         misc.number          '3'
+    >>> print mc.qtree(builder, core=True)
+      1   1 Block      code_block   TYPE    
+      1   1 Statement  code_block   TYPE    
+      1   1 | Matrix     matrix       TYPE    
+      1   2 | | Vector     matrix       TYPE    
+      1   2 | | | Int        int          int     
+      1   4 | | | Neg        expression   TYPE    
+      1   5 | | | | Int        int          int     
+    """
 
     if  self.code[cur] not in "({":
         self.syntaxerror(cur, "start of list character")
@@ -145,6 +240,34 @@ def list(self, parent, cur):
 
 
 def comment(self, parent, cur):
+    """
+Comments on any form
+
+Args:
+    self (Builder): Code constructor
+    parent (Node): Parent node
+    cur (int): Current position in code
+
+Returns:
+	int : End of comment
+
+Example:
+    >>> builder = mc.Builder(True, comments=True)
+    >>> builder.load("unnamed", "4 % comment")
+    loading unnamed
+         Program     functions.program
+       0 Main        functions.main
+       0 Codeblock   codeblock.codeblock 
+       0   Statement     codeblock.codeblock  '4'
+       0     Expression  expression.create    '4'
+       0     Int         misc.number          '4'
+       2   Comment       misc.comment         '% comment'
+    >>> print mc.qtree(builder, core=True)
+      1   1 Block      code_block   TYPE    
+      1   1 Statement  code_block   TYPE    
+      1   1 | Int        int          int     
+      1   3 Ecomment   code_block   TYPE    
+    """
 
     assert parent.cls == "Block"
 
@@ -153,13 +276,13 @@ def comment(self, parent, cur):
 
     end = findend.comment(self, cur)
 
-    if self.comments:
+    if not self.comments:
         return end
 
     if self.disp:
         print "%4d   Comment      " % cur,
         print "%-20s" % "misc.comment",
-        print repr(self.code[cur:end+1])
+        print repr(self.code[cur:end])
 
     if self.code[cur+1] == "{":
         comment = matlab2cpp.collection.Bcomment(parent, self.code[cur+2:end-1], cur=cur)
@@ -178,6 +301,56 @@ def comment(self, parent, cur):
 
 
 def matrix(self, node, cur):
+    """
+Verbatim matrices
+
+Args:
+    self (Builder): Code constructor
+    node (Node): Parent node
+    cur (int): Current position in code
+
+Returns:
+	int : End of matrix
+
+Example:
+    >>> builder = mc.Builder(True)
+    >>> builder.load("unnamed", "[[1 2] [3 4]]")
+    loading unnamed
+         Program     functions.program
+       0 Main        functions.main
+       0 Codeblock   codeblock.codeblock 
+       0   Statement     codeblock.codeblock  '[[1 2] [3 4]]'
+       0     Expression  expression.create    '[[1 2] [3 4]]'
+       0     Matrix      misc.matrix          '[[1 2] [3 4]]'
+       1     Vector      misc.matrix          '[1 2] [3 4]'
+       1     Expression  expression.create    '[1 2]'
+       1     Matrix      misc.matrix          '[1 2]'
+       2     Vector      misc.matrix          '1 2'
+       2     Expression  expression.create    '1'
+       2     Int         misc.number          '1'
+       4     Expression  expression.create    '2'
+       4     Int         misc.number          '2'
+       7     Expression  expression.create    '[3 4]'
+       7     Matrix      misc.matrix          '[3 4]'
+       8     Vector      misc.matrix          '3 4'
+       8     Expression  expression.create    '3'
+       8     Int         misc.number          '3'
+      10     Expression  expression.create    '4'
+      10     Int         misc.number          '4'
+    >>> print mc.qtree(builder, core=True)
+      1   1 Block      code_block   TYPE    
+      1   1 Statement  code_block   TYPE    
+      1   1 | Matrix     matrix       TYPE    
+      1   2 | | Vector     matrix       TYPE    
+      1   2 | | | Matrix     matrix       TYPE    
+      1   3 | | | | Vector     matrix       TYPE    
+      1   3 | | | | | Int        int          int     
+      1   5 | | | | | Int        int          int     
+      1   8 | | | Matrix     matrix       TYPE    
+      1   9 | | | | Vector     matrix       TYPE    
+      1   9 | | | | | Int        int          int     
+      1  11 | | | | | Int        int          int     
+    """
 
     if  self.code[cur] != "[":
         self.syntaxerror(cur, "bracket start")
@@ -224,6 +397,38 @@ def matrix(self, node, cur):
 
 
 def cell(self, node, cur):
+    """
+Verbatim cells
+
+Args:
+    self (Builder): Code constructor
+    node (Node): Parent node
+    cur (int): Current position in code
+
+Returns:
+	int : End of cell
+
+Example:
+    >>> builder = mc.Builder(True)
+    >>> builder.load("unnamed", "{1, 2}")
+    loading unnamed
+         Program     functions.program
+       0 Main        functions.main
+       0 Codeblock   codeblock.codeblock 
+       0   Statement     codeblock.codeblock  '{1, 2}'
+       0     Expression  expression.create    '{1, 2}'
+       0     Cell        misc.cell            '{1, 2}'
+       1     Expression  expression.create    '1'
+       1     Int         misc.number          '1'
+       4     Expression  expression.create    '2'
+       4     Int         misc.number          '2'
+    >>> print mc.qtree(builder, core=True)
+      1   1 Block      code_block   TYPE    
+      1   1 Statement  code_block   TYPE    
+      1   1 | Cell       cell         TYPE    
+      1   2 | | Int        int          int     
+      1   5 | | Int        int          int     
+    """
 
     if  self.code[cur] != "{":
         self.syntaxerror(cur, "curly braces")
@@ -253,29 +458,7 @@ def cell(self, node, cur):
     return findend.cell(self, cur)
 
 
-def cell_arg(self, cset, cur):
-
-    if  self.code[cur] == "{":
-        self.syntaxerror(cur, "Curly start")
-
-    cur = cur+1
-
-    while True:
-
-        if self.code[cur] == "}":
-            return cur
-
-        elif self.code[cur] in c.e_start:
-
-            cur = self.create_expression(cset, cur)
-
-            cur += 1
-            while self.code[cur] in " \t":
-                cur += 1
-
-            return cur
-
-        elif self.code[cur] == " ":
-            pass
-
-        cur += 1
+if __name__ == "__main__":
+    import matlab2cpp as mc
+    import doctest
+    doctest.testmod()

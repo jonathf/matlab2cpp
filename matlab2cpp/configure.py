@@ -164,4 +164,5 @@ def configure(self, suggest=True, **kws):
         else:
             break
 
-    program[-1].children = []
+    for program in self.project:
+        program[-1].children = []

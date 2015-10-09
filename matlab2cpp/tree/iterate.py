@@ -1,5 +1,11 @@
 """
 Rutines for iterating lists
+
+Functions
+~~~~~~~~~
+list        Iterate over a list
+comma_list  Iterate over a comma separated list
+space_list  Iterate over a space delimited list
 """
 
 import constants as c
@@ -8,6 +14,16 @@ import identify
 
 
 def list(self, start):
+    """
+Iterate over a list
+
+Args:
+    self (Builder): Code constructor
+    start (int): Current position in code
+
+Returns:
+	list : A list of 2-tuples that represents index start and end for each expression in list
+    """
 
     if identify.space_delimited(self, start):
         return space_list(self, start)
@@ -15,6 +31,16 @@ def list(self, start):
 
 
 def comma_list(self, start):
+    """
+Iterate over a comma separated list
+
+Args:
+    self (Builder): Code constructor
+    start (int): Current position in code
+
+Returns:
+	list : A list of 2-tuples that represents index start and end for each expression in list
+    """
 
     if  self.code[start] not in c.l_start:
         self.syntaxerror(start, "list start")
@@ -68,6 +94,16 @@ def comma_list(self, start):
 
 
 def space_list(self, start):
+    """
+Iterate over a space delimited list
+
+Args:
+    self (Builder): Code constructor
+    start (int): Current position in code
+
+Returns:
+	list : A list of 2-tuples that represents index start and end for each expression in list
+    """
 
     if  self.code[start] not in c.l_start:
         self.syntaxerror(start, "start of list")

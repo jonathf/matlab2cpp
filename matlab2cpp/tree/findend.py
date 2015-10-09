@@ -1,12 +1,32 @@
 """
-Rutines for performing look-aheads to find end character.
+Look-ahead routines to find end character.
+
+functions
+~~~~~~~~~
+expression          Find end of expression (non-space delimited)
+expression_space    Find end of expression (space delimited)
+matrix              Find end of matrix construction
+string              Find end of string
+comment             Find end of comment
+dots                Find continuation of expression after ellipse
+paren               Find matching parenthesis
+cell                Find matching cell-parenthesis
 """
 
 import constants as c
 import identify
 
 def expression(self, start):
-    "find end of expresion"
+    """
+Find end of expression (non-space delimited)
+
+Args:
+    self (Builder): Code constructor
+    start (int): current position in code
+
+Returns:
+	int: index location of end of expression
+    """
 
     if  self.code[start] not in c.e_start:
         self.syntaxerror(start, "expression start")
@@ -56,8 +76,17 @@ def expression(self, start):
     return k
 
 
-def expresion_space(self, start):
-    "find end of expression in a space separated list"
+def expression_space(self, start):
+    """
+Find end of expression (space delimited)
+
+Args:
+    self (Builder): Code constructor
+    start (int): current position in code
+
+Returns:
+	int: index location of end of expression
+    """
 
     if  self.code[start] not in c.e_start:
         self.syntaxerror(start, "expression start")
@@ -104,7 +133,7 @@ def expresion_space(self, start):
 
         elif self.code[k] in " \t":
 
-            if self.is_space_delimiter(k):
+            if identify.space_delimiter(self, k):
                 return last
             while self.code[k+1] in " \t+-~":
                 k += 1
@@ -121,7 +150,16 @@ def expresion_space(self, start):
 
 
 def matrix(self, start):
-    "find index to end of matrix"
+    """
+Find end of matrix construction
+
+Args:
+    self (Builder): Code constructor
+    start (int): current position in code
+
+Returns:
+	int: index location of end of matrix
+    """
 
     if  self.code[start] != "[":
         self.syntaxerror(start, "matrix start ([)")
@@ -130,7 +168,7 @@ def matrix(self, start):
 
     if identify.space_delimited(self, start):
 
-        # Ignore first string occurence
+        # Ignore first string occurrence
         while self.code[k] in " \t":
             k += 1
         if self.code[k] == "'":
@@ -171,7 +209,16 @@ def matrix(self, start):
 
 
 def string(self, start):
-    "find end of string"
+    """
+Find end of string
+
+Args:
+    self (Builder): Code constructor
+    start (int): current position in code
+
+Returns:
+	int: index location of end of string
+    """
 
     if self.code[start] != "'":
         self.syntaxerror(start, "start of string (')")
@@ -180,10 +227,6 @@ def string(self, start):
     if k == -1:
         self.syntaxerror(start, "matching end of string (')")
 
-#          while self.code[k-1] == "\\" and self.code[k-2] != "\\":
-#              k = self.code.find("'", k+1)
-#              assert k != -1
-
     if self.code.find("\n", start, k) != -1:
         self.syntaxerror(start, "non line-feed character in string")
 
@@ -191,12 +234,21 @@ def string(self, start):
 
 
 def comment(self, start):
-    "find index to end of comment"
+    """
+Find end of comment
+
+Args:
+    self (Builder): Code constructor
+    start (int): current position in code
+
+Returns:
+	int: index location of end of comment
+    """
 
     if self.code[start] != "%":
         self.syntaxerror(start, "comment start")
 
-    # blockcomment
+    # block comment
     if self.code[start+1] == "{":
         eoc = self.code.find("%}", start+2)
 
@@ -205,7 +257,7 @@ def comment(self, start):
 
         return eoc+1
 
-    # Linecomment
+    # Line comment
     eoc = self.code.find("\n", start)
     if eoc <= -1:
         self.syntaxerror(start, "comment end")
@@ -213,7 +265,16 @@ def comment(self, start):
 
 
 def dots(self, start):
-    "find end of multi-line initiator"
+    """
+Find continuation of expression after ellipse
+
+Args:
+    self (Builder): Code constructor
+    start (int): current position in code
+
+Returns:
+	int: index location of end of ellipse
+    """
 
     if self.code[start:start+3] != "...":
         self.syntaxerror(start, "three dots (...)")
@@ -226,7 +287,16 @@ def dots(self, start):
 
 
 def paren(self, start):
-    "find matching parenthesis"
+    """
+Find matching parenthesis
+
+Args:
+    self (Builder): Code constructor
+    start (int): current position in code
+
+Returns:
+	int: index location of matching parenthesis
+    """
 
     if self.code[start] != "(":
         self.syntaxerror(start, "start parenthesis")
@@ -256,7 +326,17 @@ def paren(self, start):
 
 
 def cell(self, start):
-    "find matching curly parenthesis"
+    """
+Find matching cell-parenthesis
+
+Args:
+    self (Builder): Code constructor
+    start (int): current position in code
+
+Returns:
+	int: index location of matching cell-parenthesis
+    """
+
     if  self.code[start] != "{":
         self.syntaxerror(start, "start of cell ({)")
 

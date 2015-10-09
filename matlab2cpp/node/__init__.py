@@ -211,5 +211,5 @@ __all__ = ["Node"]
 
 if __name__ == "__main__":
     import doctest
-    import __init__ as mc
+    import matlab2cpp as mc
     doctest.testmod()

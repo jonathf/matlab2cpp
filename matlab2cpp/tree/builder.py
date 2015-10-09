@@ -11,7 +11,7 @@ with code: ::
 The function saves the code locally as `builder.code` and initiate the
 `create_program` method with index 0. The various `create_*` are then called and
 used to populate the node tree. The code is considered static, instead the
-index, which refer to the postion in the code is increased to move forward in
+index, which refer to the position in the code is increased to move forward in
 the code. The various constructors uses the support modules in the `mc.tree` to
 build a full toke tree.  The result is as follows: ::
 
@@ -51,10 +51,10 @@ the `disp` flag on: ::
        4     Int         misc.number          '4'
 
 This printout lists the core Matlab translation. In the four columns the first
-is the index to the postion in the Matlab code, the second is the node created,
+is the index to the position in the Matlab code, the second is the node created,
 the third is the file and function where the node was created, and lastly the
 fourth column is a code snippet from the Matlab code. This allows for quick
-diagnostics about where an error in interpretation might have accoured.
+diagnostics about where an error in interpretation might have occurred.
 
 Note that the tree above for the most part doesn't have any relevant data types
 configure. To configure datatypes, use the `configure` method: ::
@@ -82,9 +82,25 @@ configure. To configure datatypes, use the `configure` method: ::
             | | Log        program      TYPE    file1.m
 
 Multiple program can be loaded into the same builder. This allows for building
-of projects that involves multiple files.
-Multiple program can be loaded into the same builder. This allows for building
-of projects that involves multiple files
+of projects that involves multiple files. For example: ::
+
+    >>> builder = mc.Builder()
+    >>> builder.load("a.m", "function y=a(x); y = x+1")
+    >>> builder.load("b.m", "b = a(2)")
+
+The two programs refer to each other through their names. This can the
+suggestion engine use: ::
+
+    >>> builder.configure(suggest=True)
+    >>> print mc.qscript(builder[0])
+    int a(int x)
+    {
+      int y ;
+      y = x+1 ;
+      return y ;
+    }
+    >>> print mc.qscript(builder[1])
+    b = a(2)
 """
 
 import matlab2cpp as mc
@@ -102,9 +118,39 @@ class Builder(object):
     """
 Convert Matlab-code to a tree of nodes.
 
-Methods
-~~~~~~~
-load        Load code with a given name
+Interface methods
+~~~~~~~~~~~~~~~~~
+load            Load code with a given name
+configure       Use assigned values and/or suggestion engine to fill in datatypes.
+syntaxerror     Throw an apropriate SyntaxError for the Matlab code.
+
+Constructor methods
+~~~~~~~~~~~~~~~~~~~
+create_program          The outer shell of the program          functions
+create_function         Explicit functions                      functions
+create_main             Main script                             functions
+create_lambda_          Anonymous function constructor          functions
+create_lambda_func      Anonymous function content              functions
+create_codeblock        The main codeblock loop                 codeblock
+create_for              Try-catch block                         branches
+create_if               If-ifelse-else branch                   branches
+create_while            While loop                              branches
+create_switch           Switch-case branch                      branches
+create_try              Try-catch block                         branches
+create_assigns          Assignment with multiple returns        assign
+create_assign           Assignment with single return           assign
+create_variable         Variable not create_assign              variable
+create_cell_arg         Argument of a cell call                 variable
+create_number           Verbatim number                         misc
+create_string           Verbatim string                         misc
+create_list             A list (both comma or space delimited)  misc
+create_comment          Comments on any form                    misc
+create_matrix           Verbatim matrices                       misc
+create_cell             Verbatim cells                          misc
+create_expression       Expression interpretor                  expression
+iterate_list            Iterate over a list                     iterate
+iterate_comma_list      Iterate over a comma separated list     iterate
+iterate_space_list      Iterate over a space delimited list     iterate
     """
 
     def __init__(self, disp=False, comments=True, **kws):
@@ -145,12 +191,6 @@ load        Load code with a given name
     def configure(self, suggest=True, **kws):
         mc.configure.configure(self, suggest, **kws)
 
-    def __getitem__(self, i):
-        return self.project[i]
-
-    def __str__(self):
-        return self.project.summary()
-        
 
     def syntaxerror(self, cur, text):
         """
@@ -186,7 +226,6 @@ Example:
         out += "Expected: " + text
         raise SyntaxError(out)
 
-
     def get_unknowns(self, name):
 
         program = self.project[self.project.names.index(name)]
@@ -220,6 +259,13 @@ Example:
                 node.backend = "reserved"
 
         return unassigned
+
+    def __getitem__(self, i):
+        return self.project[i]
+
+    def __str__(self):
+        return self.project.summary()
+        
 
     def create_program(self, name):
         return functions.program(self, name)

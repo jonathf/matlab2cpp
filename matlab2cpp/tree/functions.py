@@ -1,3 +1,14 @@
+"""
+Functions, programs and meta-nodes
+
+Functions
+~~~~~~~~~
+program         The outer shell of the program
+function        Explicit functions
+main            Main script
+lambda_         Anonymous function constructor
+lambda_func     Anonymous function content
+"""
 
 import matlab2cpp
 import constants as c
@@ -5,6 +16,44 @@ import findend
 
 
 def program(self, name):
+    """
+The outer shell of the program
+
+Args:
+    self (Builder): Code constructor
+    name (str): Name of the program
+
+Returns:
+	Node: The root node of the constructed node tree
+
+Example:
+    >>> builder = mc.Builder(True)
+    >>> builder.load("unamed", "a")
+    loading unamed
+         Program     functions.program
+       0 Main        functions.main
+       0 Codeblock   codeblock.codeblock 
+       0   Statement     codeblock.codeblock  'a'
+       0     Expression  expression.create    'a'
+       0     Var         variables.variable   'a'
+    >>> print mc.qtree(builder)
+            Program    program      TYPE    unamed
+            Includes   program      TYPE    
+            | Include    program      TYPE    #include <armadillo>
+            | Include    program      TYPE    using namespace arma ;
+      1   1 Funcs      program      TYPE    unamed
+      1   1 | Main       func_common  TYPE    main
+      1   1 | | Declares   func_return  TYPE    
+      1   1 | | Returns    func_return  TYPE    
+      1   1 | | Params     func_return  TYPE    
+      1   1 | | Block      code_block   TYPE    
+      1   1 | | | Statement  code_block   TYPE    
+      1   1 | | | | Var        unknown      TYPE    a
+            Inlines    program      TYPE    unamed
+            Structs    program      TYPE    unamed
+            Headers    program      TYPE    unamed
+            Log        program      TYPE    unamed
+    """
 
     if self.disp:
         print "     Program    ",
@@ -50,6 +99,32 @@ def program(self, name):
 
 
 def function(self, parent, cur):
+    """
+Explicit functions
+
+Args:
+    self (Builder): Code constructor
+    parent (Node): Parent node
+    cur (int): Current position in code
+
+Returns:
+	int : Index to end of function
+
+Example:
+    >>> builder = mc.Builder(True)
+    >>> builder.load("unnamed", "function f(); end")
+    loading unnamed
+         Program     functions.program
+       0 Function        functions.function   'function f()'
+      12 Codeblock   codeblock.codeblock 
+    >>> print mc.qtree(builder, core=True)
+      1   1 Funcs      program      TYPE    unnamed
+      1   1 Func       func_returns TYPE    f
+      1   1 | Declares   func_returns TYPE    
+      1   1 | Returns    func_returns TYPE    
+      1  11 | Params     func_returns TYPE    
+      1  13 | Block      code_block   TYPE    
+    """
 
     if self.code[cur:cur+8] != "function":
         self.syntaxerror(cur, "function start")
@@ -221,7 +296,45 @@ def function(self, parent, cur):
 
 
 def main(self, parent, cur):
-    "Create main function"
+    """
+Main script
+
+Args:
+    self (Builder): Code constructor
+    parent (Node): Parent node
+    cur (int): Current position in code
+
+Returns:
+	int : Index to end of script
+
+Example:
+    >>> builder = mc.Builder(True)
+    >>> builder.load("unnamed", "a")
+    loading unnamed
+         Program     functions.program
+       0 Main        functions.main
+       0 Codeblock   codeblock.codeblock 
+       0   Statement     codeblock.codeblock  'a'
+       0     Expression  expression.create    'a'
+       0     Var         variables.variable   'a'
+    >>> print mc.qtree(builder)
+            Program    program      TYPE    unnamed
+            Includes   program      TYPE    
+            | Include    program      TYPE    #include <armadillo>
+            | Include    program      TYPE    using namespace arma ;
+      1   1 Funcs      program      TYPE    unnamed
+      1   1 | Main       func_common  TYPE    main
+      1   1 | | Declares   func_return  TYPE    
+      1   1 | | Returns    func_return  TYPE    
+      1   1 | | Params     func_return  TYPE    
+      1   1 | | Block      code_block   TYPE    
+      1   1 | | | Statement  code_block   TYPE    
+      1   1 | | | | Var        unknown      TYPE    a
+            Inlines    program      TYPE    unnamed
+            Structs    program      TYPE    unnamed
+            Headers    program      TYPE    unnamed
+            Log        program      TYPE    unnamed
+    """
 
     if self.disp:
         print "%4d Main       " % cur,
@@ -237,6 +350,68 @@ def main(self, parent, cur):
 
 
 def lambda_(self, node, cur, eq_loc):
+    """
+Anonymous function constructor
+
+Args:
+    self (Builder): Code constructor
+    parent (Node): Parent node
+    cur (int): Current position in code
+    eq_loc (int): location of assignment sign ('=')
+
+Returns:
+	int : Index to end of function line
+
+Example:
+    >>> builder = mc.Builder(True)
+    >>> builder.load("unnamed", "f = @(x) 2*x")
+    loading unnamed
+         Program     functions.program
+       0 Main        functions.main
+       0 Codeblock   codeblock.codeblock 
+       0   Assign        'f = @(x) 2*x' functions.lambda_
+       0     Var         variables.assign     'f'
+       4   Lambda        functions.lambda_func '@(x) 2*x'
+       6     Expression  expression.create    'x'
+       6     Var         variables.variable   'x'
+       9     Expression  expression.create    '2*x'
+       9     Expression  expression.create    '2'
+       9     Int         misc.number          '2'
+      11     Expression  expression.create    'x'
+      11     Var         variables.variable   'x'
+    >>> print mc.qtree(builder)
+            Program    program      TYPE    unnamed
+            Includes   program      TYPE    
+            | Include    program      TYPE    #include <armadillo>
+            | Include    program      TYPE    using namespace arma ;
+      1   1 Funcs      program      TYPE    unnamed
+      1   1 | Main       func_common  TYPE    main
+      1   1 | | Declares   func_return  TYPE    
+      1   1 | | | Var        unknown      func_lambda f
+      1   1 | | Returns    func_return  TYPE    
+      1   1 | | Params     func_return  TYPE    
+      1   1 | | Block      code_block   TYPE    
+      1   1 | | | Assign     func_lambda  TYPE    
+      1   1 | | | | Var        unknown      func_lambda f
+      1   1 | | | | Lambda     func_lambda  func_lambda _f
+      1   5 | Func       func_lambda  TYPE    _f
+      1   5 | | Declares   func_lambda  TYPE    
+      1   5 | | | Var        unknown      TYPE    _retval
+      1   5 | | Returns    func_lambda  TYPE    
+      1   5 | | | Var        unknown      TYPE    _retval
+      1   5 | | Params     func_lambda  TYPE    
+      1   7 | | | Var        unknown      TYPE    x
+      1   5 | | Block      code_block   TYPE    
+      1   5 | | | Assign     unknown      TYPE    
+      1   5 | | | | Var        unknown      TYPE    _retval
+      1  10 | | | | Mul        expression   TYPE    
+      1  10 | | | | | Int        int          int     
+      1  12 | | | | | Var        unknown      TYPE    x
+            Inlines    program      TYPE    unnamed
+            Structs    program      TYPE    unnamed
+            Headers    program      TYPE    unnamed
+            Log        program      TYPE    unnamed
+    """
 
     if  self.code[cur] not in c.letters:
         self.syntaxerror(cur, "anonymous function name")
@@ -266,6 +441,17 @@ def lambda_(self, node, cur, eq_loc):
     return end
 
 def lambda_func(self, node, cur):
+    """
+Anonymous function content. Support function of `lambda_`.
+
+Args:
+    self (Builder): Code constructor
+    parent (Node): Parent node
+    cur (int): Current position in code
+
+Returns:
+	int : Index to end of function line
+    """
 
     if  self.code[cur] != "@":
         self.syntaxerror(cur, "anonymous function indicator (@)")
@@ -349,3 +535,8 @@ def lambda_func(self, node, cur):
     lamb.reference = func
 
     return cur
+
+if __name__ == "__main__":
+    import matlab2cpp as mc
+    import doctest
+    doctest.testmod()

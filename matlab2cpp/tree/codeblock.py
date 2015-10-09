@@ -1,5 +1,9 @@
 """
 The main codeblock loop
+
+functions
+~~~~~~~~~
+codeblock       The main codeblock loop
 """
 
 import matlab2cpp
@@ -8,6 +12,41 @@ import findend
 import constants as c
 
 def codeblock(self, parent, start):
+    '''
+If-ifelse-else branch
+
+Args:
+    self (Builder): Code constructor
+    parent (Node): Parent node
+    cur (int): Current position in code
+
+Returns:
+	int: Index to end of codeblock
+
+Example:
+    >>> builder = mc.Builder(True)
+    >>> builder.load("unnamed", "a; 'b'; 3")
+    loading unnamed
+         Program     functions.program
+       0 Main        functions.main
+       0 Codeblock   codeblock.codeblock 
+       0   Statement     codeblock.codeblock  'a'
+       0     Expression  expression.create    'a'
+       0     Var         variables.variable   'a'
+       3   Statement     codeblock.codeblock  "'b'"
+       3     String  misc.string          "'b'"
+       8   Statement     codeblock.codeblock  '3'
+       8     Expression  expression.create    '3'
+       8     Int         misc.number          '3'
+    >>> print mc.qtree(builder, core=True)
+      1   1 Block      code_block   TYPE    
+      1   1 Statement  code_block   TYPE    
+      1   1 | Var        unknown      TYPE    a
+      1   4 Statement  code_block   TYPE    
+      1   4 | String     string       string  
+      1   9 Statement  code_block   TYPE    
+      1   9 | Int        int          int     
+    '''
 
     cur = start
     block = matlab2cpp.collection.Block(parent, cur=cur)
@@ -147,3 +186,8 @@ def codeblock(self, parent, start):
     block.code = self.code[start:cur+1]
     return cur
 
+
+if __name__ == "__main__":
+    import matlab2cpp as mc
+    import doctest
+    doctest.testmod()

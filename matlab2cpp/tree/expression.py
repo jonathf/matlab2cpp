@@ -1,5 +1,9 @@
 """
 Expression interpretor
+
+functions
+~~~~~~~~~
+create          Expression interpretor
 """
 
 import matlab2cpp
@@ -17,12 +21,13 @@ Create expression in three steps:
     3) Identify the remaining singleton
 
 Args:
+    self (Builder): Code constructor.
     node (Node): Reference to the parent node
     start (int): current possition in code
 
 Kwargs:
-    end (int, optional): end of expression
-    start_opr (str, optional): At which operator the recursive process is
+    end (int, optional): end of expression. Required if space-delimited expression.
+    start_opr (str, optional): At which operator the recursive process is. (For internal use)
 
 Returns:
 	int : index to end of the expression
