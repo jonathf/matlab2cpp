@@ -1,7 +1,6 @@
 from _variables import *
 
 def Counter(node):
-    print node.prop
     return "%(name)s = %(value)s"
 
 # def Var(node):

@@ -89,8 +89,6 @@ def Declares(node):
             if child.type == "structs":
                 structs[child.name] = child
 
-        print "structs", structs
-
         out = ""
         for key, val in declares.items():
 

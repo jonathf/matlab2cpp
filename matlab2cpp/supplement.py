@@ -329,7 +329,7 @@ def get_f(node):
                 if type == "TYPE":
                     type = ""
 
-        return types
+    return types
 
 class Ftypes(object):
     def __get__(self, instance, owner):
@@ -433,6 +433,9 @@ def get_s(node):
             type = var.prop["type"]
             if type == "TYPE":
                 type = ""
+
+            if type == "structs":
+                type = var.prop["value"]
 
             types[var.name] = type
 
