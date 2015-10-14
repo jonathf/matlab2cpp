@@ -26,13 +26,13 @@ Requirements:
 
 Linux/Mac:
 
-As root, run the following command:::
+As root, run the following command: ::
 
     $ python setup.py install
 
 The executable ´mconvert´ is now available from path.
 
-Windows:
+Windows: ::
 
     > Python setup.py install
 
@@ -125,7 +125,6 @@ the `-s` flag: ::
 The file `example.m.py` will then automatically be populated with data types
 from context: ::
 
-
     # ...
 
     functions = {
@@ -147,7 +146,7 @@ some cases be wrong.  It is therefore also possible to adjust these
 values manually at any time.
 
 Having run the conversion with the variables converted, creates a
-new output for `example.m.hpp`:
+new output for `example.m.hpp`: ::
 
     #include <armadillo>
     using namespace arma ;

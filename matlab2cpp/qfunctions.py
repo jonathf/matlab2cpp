@@ -1,26 +1,29 @@
 """
 Quick functions collection of frontend tools for performing code translation.
-Each of the function `qcpp`, `qhpp`, `qpy` and `qlog` are directly related to
-the functionality of the `mconvert` script. The name indicate the file extension
-that the script will create.
+Each of the function :py:func:`~matlab2cpp.qcpp`, :py:func:`~matlab2cpp.qhpp`,
+:py:func:`~matlab2cpp.qpy` and :py:func:`~matlab2cpp.qlog` are directly related
+to the functionality of the :program:`mconvert` script. The name indicate the
+file extension that the script will create.  In addition there are the three
+functions :py:func:`~matlab2cpp.qtree` and :py:func:`~matlab2cpp.qscript`. The
+former represents a summary of the created node tree. The latter is a simple
+translation tool that is more of a one-to-one translation.
 
-Functions
-~~~~~~~~~
-
-build       Convert Matlab-code into a token tree
-qcpp        Create script-conversion of code or token tree
-qhpp        Create function modules of code or token tree
-qpy         Create supplement file of code or token tree
-qlog        Create error and warning log of code or token tree
-qtree       Create a summary of a token tree representation
-qscript     Create core script converions of code or token tree
-
+==============================  ===========
+Function                        Description
+==============================  ===========
+:py:func:`~matlab2cpp.build`    Build token tree
+:py:func:`~matlab2cpp.qcpp`     Create content of `.cpp` file
+:py:func:`~matlab2cpp.qhpp`     Create content of `.hpp` file
+:py:func:`~matlab2cpp.qpy`      Create content of supplement `.py` file
+:py:func:`~matlab2cpp.qlog`     Create content of `.log` file
+:py:func:`~matlab2cpp.qscript`  Create quick code translation
+:py:func:`~matlab2cpp.qtree`    Create summary of node tree
+==============================  ===========
 
 """
 
 import supplement
 import tree
-import matlab2cpp
 
 __all__ = ["build", "qcpp", "qhpp", "qpy", "qlog", "qtree", "qscript"]
 
@@ -34,17 +37,16 @@ the line it crashed on and explain as far as it can why it crashed.
 
 Args:
     code (str): Code to be interpreted
-
-Kwargs:
     disp (bool): If true, print out diagnostic information while interpreting
     retall (bool): If true, return full token tree instead of only code related.
     suggest (bool): If true, suggestion engine will be used to fill in datatypes.
     comments (bool): If true, comments will be striped away from the solution.
+    **kws: Additional arguments passed to :py:obj:`~matlab2cpp.Builder`.
 
 Returns:
 	Builder,Node: The tree constructor if `retall` is true, else the root node for code.
 
-Example:
+Example use::
     >>> builder = mc.build("a=4", retall=True)
     >>> print isinstance(builder, mc.Builder)
     True
@@ -60,7 +62,10 @@ Example:
     Expected: expression start
 
 See also:
-    `mc.builder`
+    :py:func:`~matlab2cpp.qtree`,
+    :py:class:`~matlab2cpp.Builder`,
+    :py:class:`~matlab2cpp.Node`
+
     """
 
     code = code + "\n\n\n\n"
@@ -78,19 +83,19 @@ See also:
 def qcpp(code, suggest=True, **kws):
     """
 Quick code translation of matlab script to C++ executable. For Matlab modules,
-code that only consists of functions, will be placed in the `mc.hpp`. In most
-cases, the two functions must be used together to create valid runnable code.
+code that only consists of functions, will be placed in the
+:py:func:`~matlab2cpp.qhpp`. In most cases, the two functions must be used
+together to create valid runnable code.
 
 Args:
     code (str, Node, Builder): A string or tree representation of Matlab code.
-
-Kwargs:
     suggest (bool): If true, use the suggest engine to guess data types.
+    **kws: Additional arguments passed to :py:obj:`~matlab2cpp.Builder`.
 
 Returns:
     str: Best estimate of script. If code is a module, return an empty string.
 
-Example:
+Example::
     >>> code = "a = 4; b = 5.; c = 'abc'"
     >>> print mc.qcpp(code, suggest=False)
     #include <armadillo>
@@ -124,8 +129,9 @@ Example:
     True
 
 See also:
-    `mc.qscript`
-    `mc.hpp`
+    :py:func:`~matlab2cpp.qscript`,
+    :py:func:`~matlab2cpp.qhpp`,
+    :py:obj:`~matlab2cpp.Builder`
     """
 
     if isinstance(code, str):
@@ -157,18 +163,18 @@ See also:
 def qhpp(code, suggest=False):
     """
 Quick module translation of Matlab module to C++ library. If the code is
-a script, executable part of the code will be placed in `mc.cpp`.
+a script, executable part of the code will be placed in
+:py:func:`~matlab2cpp.qcpp`.
 
 Args:
     code (str, Node, Builder): A string or tree representation of Matlab code.
-
-Kwargs:
     suggest (bool): If true, use the suggest engine to guess data types.
+    **kws: Additional arguments passed to :py:obj:`~matlab2cpp.Builder`.
 
 Returns:
-    str: Best estimate of script. If code is a module, return an empty string.
+    str: C++ code of module.
 
-Example:
+Example::
     >>> code = "function y=f(x); y=x+1; end; function g(); f(4)"
     >>> print mc.qhpp(code)
     #include <armadillo>
@@ -208,7 +214,8 @@ Example:
     }
 
 See also:
-    `mc.qcpp`
+    :py:func:`~matlab2cpp.qcpp`,
+    :py:class:`~matlab2cpp.Builder`
     """
 
     if isinstance(code, str):
@@ -268,15 +275,13 @@ various variables in various scopes.
 
 Args:
     code (str, Builder, Node): Representation of the node tree.
-
-Kwargs:
     suggest (bool): Use the suggestion engine if appropriate.
     prefix (bool): include a helpful comment in the beginning of the string.
 
 Returns:
 	str: Supplement string
 
-Example:
+Example::
     >>> code = "a = 4; b = 5.; c = 'abc'"
     >>> print mc.qpy(code, suggest=False)
     functions = {
@@ -304,8 +309,8 @@ Example:
     ]
 
 See also:
-    `mc.supplement`
-    `mc.datatype`
+    :py:mod:`~matlab2cpp.supplement`,
+    :py:mod:`~matlab2cpp.datatype`
     """
 
     if isinstance(code, str):
@@ -326,7 +331,7 @@ See also:
     return out
 
 
-def qlog(code, suggest=False):
+def qlog(code, suggest=False, **kws):
     """
 Retrieve all errors and warnings generated through the code translation and
 summarize them into a string. Each entry uses four lines. For example: ::
@@ -342,14 +347,13 @@ code failed. The last line is the error or warning message generated.
 
 Args:
     code (str, Builder, Node): Representation of the node tree.
-
-Kwargs:
     suggest (bool): Use suggestion engine where appropriate.
+    **kws: Additional arguments passed to :py:obj:`~matlab2cpp.Builder`.
 
 Returns:
 	str: A string representation of the log
 
-Example:
+Example::
     >>> print mc.qlog("function f(x); x=4")
     Error in class Var on line 1:
     function f(x); x=4
@@ -362,7 +366,8 @@ Example:
     unknown data type
 
 See alse:
-    `mc.Node.error`
+    :py:func:`~matlab2cpp.Node.error`,
+    :py:func:`~matlab2cpp.Node.warning`
     """
 
     if isinstance(code, str):
@@ -385,37 +390,22 @@ See alse:
 def qtree(code, suggest=False, core=False):
     """
 Summarize the node tree with relevant information, where each line represents
-a node.
-Each line will typically look as follows: ::
+a node.  Each line will typically look as follows::
 
       1  10 | | | Var        unknown      TYPE    y
 
-The items represtents respectively
-
-+---------------------+-------------------------------------+
-| line number         | Matlab code line number (if any)    |
-+---------------------+-------------------------------------+
-| cursor number       | Matlab code cursor number (if any)  |
-+---------------------+-------------------------------------+
-| node class          | The node categorization type        |
-+---------------------+-------------------------------------+
-| translation handler | The rule used for translation       |
-+---------------------+-------------------------------------+
-| datatype            | The data type of the node           |
-+---------------------+-------------------------------------+
-| node name           | Name of the node (if any)           |
-+---------------------+-------------------------------------+
+The content is described in details in :py:mod:`~matlab2cpp.tree`.
 
 Args:
     code (str, Builder, Node): Representation of the node tree.
-
-Kwargs:
     suggest (bool): Use suggestion engine where appropriate.
     core (bool): Unly display nodes generated from Matlab code directly.
+    **kws: Additional arguments passed to :py:obj:`~matlab2cpp.Builder`.
 
 Returns:
 	str: A summary of the node tree.
-Example:
+
+Example::
     >>> print mc.qtree("function y=f(x); y=x+4")
             Program    program      TYPE    unamed
             Includes   program      TYPE    
@@ -448,8 +438,8 @@ Example:
             | Error      program      TYPE    Plus:19
 
 See also:
-    `mc.tree`
-    `mc.node`
+    :py:mod:`matlab2cpp.tree`,
+    :py:mod:`matlab2cpp.node`
     """
 
     if isinstance(code, str):
@@ -472,18 +462,17 @@ See also:
 
 def qscript(code, suggest=False, **kws):
     """
-Perform a full translation (like `mc.qcpp` and `mc.qhpp`), but only focus on the
-object of interest.
+Perform a full translation (like :py:func:`~matlab2cpp.qcpp` and
+:py:func:`~matlab2cpp.qhpp`), but only focus on the object of interest.
 If for example code is provided, then only the code part of the translation will
-be include, without any wrappers. It will be as close to a 1-to-1 translation as
-you can get.
-If a node tree is provided, current node position will be source of translation.
+be include, without any wrappers. It will be as close to a one-to-one
+translation as you can get.  If a node tree is provided, current node position
+will be source of translation.
 
 Args:
     code (str, Builder, Node): Representation of the node tree.
-
-Kwargs:
     suggest (bool): Use suggestion engine where appropriate.
+    **kws: Additional arguments passed to :py:obj:`~matlab2cpp.Builder`.
 
 Returns:
 	str: A code translation in C++.

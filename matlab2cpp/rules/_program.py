@@ -146,6 +146,7 @@ def Warning(node):
 def Struct(node):
 
     name = "_"+node["name"].capitalize()
+    out = "struct " + name + "\n{"
 
     declares = {}
     for child in node[:]:
@@ -162,7 +163,6 @@ def Struct(node):
 
         declares[type].append(child)
 
-    out = "struct " + name + "\n{"
     for key, val in declares.items():
         out = out + "\n" + key + " " + ", ".join([str(v) for v in val]) + " ;"
     out = out + "\n} ;"

@@ -1,10 +1,10 @@
 """
-Iterating through Matlab code always starts with constructing a builder: ::
+Iterating through Matlab code always starts with constructing a builder::
 
     >>> builder = mc.Builder()
 
 This is an empty shell without any content. To give it content, we supply it
-with code: ::
+with code::
 
     >>> builder.load("file1.m", "a = 4")
 
@@ -12,8 +12,9 @@ The function saves the code locally as `builder.code` and initiate the
 `create_program` method with index 0. The various `create_*` are then called and
 used to populate the node tree. The code is considered static, instead the
 index, which refer to the position in the code is increased to move forward in
-the code. The various constructors uses the support modules in the `mc.tree` to
-build a full toke tree.  The result is as follows: ::
+the code. The various constructors uses the support modules in the
+:py:mod:`~matlab2cpp.mc.tree` to build a full toke tree.  The result is as
+follows::
 
     >>> print builder
             Project    program      TYPE    project
@@ -37,7 +38,7 @@ build a full toke tree.  The result is as follows: ::
             | | Log        program      TYPE    file1.m
 
 If is possible to get a detailed output of how this process is done, by turning
-the `disp` flag on: ::
+the `disp` flag on::
 
     >>> builder = mc.Builder(disp=True)
     >>> builder.load("file1.m", "a = 4")
@@ -57,7 +58,7 @@ fourth column is a code snippet from the Matlab code. This allows for quick
 diagnostics about where an error in interpretation might have occurred.
 
 Note that the tree above for the most part doesn't have any relevant data types
-configure. To configure datatypes, use the `configure` method: ::
+configure. To configure datatypes, use the `configure` method::
 
     >>> builder.configure(suggest=True)
     >>> print builder
@@ -82,14 +83,14 @@ configure. To configure datatypes, use the `configure` method: ::
             | | Log        program      TYPE    file1.m
 
 Multiple program can be loaded into the same builder. This allows for building
-of projects that involves multiple files. For example: ::
+of projects that involves multiple files. For example::
 
     >>> builder = mc.Builder()
     >>> builder.load("a.m", "function y=a(x); y = x+1")
     >>> builder.load("b.m", "b = a(2)")
 
 The two programs refer to each other through their names. This can the
-suggestion engine use: ::
+suggestion engine use::
 
     >>> builder.configure(suggest=True)
     >>> print mc.qscript(builder[0])
@@ -100,7 +101,7 @@ suggestion engine use: ::
       return y ;
     }
     >>> print mc.qscript(builder[1])
-    b = a(2)
+    b = a(2) ;
 """
 
 import matlab2cpp as mc
@@ -118,67 +119,69 @@ class Builder(object):
     """
 Convert Matlab-code to a tree of nodes.
 
-Interface methods
-~~~~~~~~~~~~~~~~~
-load            Load code with a given name
-configure       Use assigned values and/or suggestion engine to fill in datatypes.
-syntaxerror     Throw an apropriate SyntaxError for the Matlab code.
++--------------------------------------------+---------------------------------+
+| Method                                     | Description                     |
++============================================+=================================+
+| :py:func:`~matlab2cpp.Builder.configure`   | Use assigned values and         |
+|                                            | suggestion                      |
+|                                            | engine to fill in datatypes     |
++--------------------------------------------+---------------------------------+
+| :py:func:`~matlab2cpp.Builder.load`        | Load code with a given name     |
++--------------------------------------------+---------------------------------+
+| :py:func:`~matlab2cpp.Builder.syntaxerror` | Throw an apropriate SyntaxError |
+|                                            | for the Matlab code             |
++--------------------------------------------+---------------------------------+
 
-Constructor methods
-~~~~~~~~~~~~~~~~~~~
-create_program          The outer shell of the program          functions
-create_function         Explicit functions                      functions
-create_main             Main script                             functions
-create_lambda_          Anonymous function constructor          functions
-create_lambda_func      Anonymous function content              functions
-create_codeblock        The main codeblock loop                 codeblock
-create_for              Try-catch block                         branches
-create_if               If-ifelse-else branch                   branches
-create_while            While loop                              branches
-create_switch           Switch-case branch                      branches
-create_try              Try-catch block                         branches
-create_assigns          Assignment with multiple returns        assign
-create_assign           Assignment with single return           assign
-create_variable         Variable not create_assign              variable
-create_cell_arg         Argument of a cell call                 variable
-create_number           Verbatim number                         misc
-create_string           Verbatim string                         misc
-create_list             A list (both comma or space delimited)  misc
-create_comment          Comments on any form                    misc
-create_matrix           Verbatim matrices                       misc
-create_cell             Verbatim cells                          misc
-create_expression       Expression interpretor                  expression
-iterate_list            Iterate over a list                     iterate
-iterate_comma_list      Iterate over a comma separated list     iterate
-iterate_space_list      Iterate over a space delimited list     iterate
     """
 
     def __init__(self, disp=False, comments=True, **kws):
         """
-   Kwargs:
-        disp (bool):
-            Verbose output while loading code.
-        comments (bool):
-            Include comments in the code interpretation.
+Args:
+    disp (bool):
+        Verbose output while loading code
+    comments (bool):
+        Include comments in the code interpretation
+    **kws: 
+        Optional arguments are passed to :py:mod:`~matlab2cpp.rules`
+
+See also:
+    :py:mod:`~matlab2cpp.rules`
         """
 
         self.disp = disp
         self.comments = comments
         self.project = mc.collection.Project()
         self.project.kws = kws
-
+        self.project.builder = self
 
     def load(self, name, code):
         """
-    Load a Matlab code into the node tree.
+Load a Matlab code into the node tree.
 
-    Will throw and exception if module loaded without the `folder` option.
+Args:
+    name (str): Name of program (usually valid filename).
+    code (str): Matlab code to be loaded
 
-    Args:
-        name (str):
-            Name of program (usually valid filename).
-        code (str):
-            Matlab code to be loaded
+Raises:
+    SyntaxError: Error in the Matlab code.
+
+Example::
+
+    >>> builder = mc.Builder()
+    >>> print builder
+            Project    program      TYPE    project
+    >>> builder.load("unnamed.m", "")
+    >>> print builder
+            Project    program      TYPE    project
+            | Program    program      TYPE    unnamed.m
+            | | Includes   program      TYPE    
+            | | | Include    program      TYPE    #include <armadillo>
+            | | | Include    program      TYPE    using namespace arma ;
+      1   1 | | Funcs      program      TYPE    unnamed.m
+            | | Inlines    program      TYPE    unnamed.m
+            | | Structs    program      TYPE    unnamed.m
+            | | Headers    program      TYPE    unnamed.m
+            | | Log        program      TYPE    unnamed.m
         """
 
         if self.disp:
@@ -186,11 +189,78 @@ iterate_space_list      Iterate over a space delimited list     iterate
 
         self.code = code + "\n\n\n"
         self.create_program(name)
-        # return self.project[-1]
+
 
     def configure(self, suggest=True, **kws):
-        mc.configure.configure(self, suggest, **kws)
+        """
+Configure node tree with datatypes.
 
+Args:
+    suggest (bool): Uses suggestion engine to fill in types
+
+Example::
+
+    >>> builder = mc.Builder()
+    >>> builder.load("unnamed.m", "a=1; b=2.; c='c'")
+    >>> print builder
+            Project    program      TYPE    project
+            | Program    program      TYPE    unnamed.m
+            | | Includes   program      TYPE    
+            | | | Include    program      TYPE    #include <armadillo>
+            | | | Include    program      TYPE    using namespace arma ;
+      1   1 | | Funcs      program      TYPE    unnamed.m
+      1   1 | | | Main       func_common  TYPE    main
+      1   1 | | | | Declares   func_return  TYPE    
+      1   1 | | | | | Var        unknown      TYPE    a
+      1   1 | | | | | Var        unknown      TYPE    b
+      1   1 | | | | | Var        unknown      TYPE    c
+      1   1 | | | | Returns    func_return  TYPE    
+      1   1 | | | | Params     func_return  TYPE    
+      1   1 | | | | Block      code_block   TYPE    
+      1   1 | | | | | Assign     unknown      TYPE    
+      1   1 | | | | | | Var        unknown      TYPE    a
+      1   3 | | | | | | Int        int          int     
+      1   6 | | | | | Assign     unknown      TYPE    
+      1   6 | | | | | | Var        unknown      TYPE    b
+      1   8 | | | | | | Float      double       double  
+      1  12 | | | | | Assign     unknown      TYPE    
+      1  12 | | | | | | Var        unknown      TYPE    c
+      1  14 | | | | | | String     string       string  
+            | | Inlines    program      TYPE    unnamed.m
+            | | Structs    program      TYPE    unnamed.m
+            | | Headers    program      TYPE    unnamed.m
+            | | Log        program      TYPE    unnamed.m
+    >>> builder.configure(suggest=True)
+    >>> print builder
+            Project    program      TYPE    project
+            | Program    program      TYPE    unnamed.m
+            | | Includes   program      TYPE    
+            | | | Include    program      TYPE    #include <armadillo>
+            | | | Include    program      TYPE    using namespace arma ;
+      1   1 | | Funcs      program      TYPE    unnamed.m
+      1   1 | | | Main       func_common  TYPE    main
+      1   1 | | | | Declares   func_return  TYPE    
+      1   1 | | | | | Var        int          int     a
+      1   1 | | | | | Var        double       double  b
+      1   1 | | | | | Var        string       string  c
+      1   1 | | | | Returns    func_return  TYPE    
+      1   1 | | | | Params     func_return  TYPE    
+      1   1 | | | | Block      code_block   TYPE    
+      1   1 | | | | | Assign     unknown      TYPE    
+      1   1 | | | | | | Var        int          int     a
+      1   3 | | | | | | Int        int          int     
+      1   6 | | | | | Assign     unknown      TYPE    
+      1   6 | | | | | | Var        double       double  b
+      1   8 | | | | | | Float      double       double  
+      1  12 | | | | | Assign     unknown      TYPE    
+      1  12 | | | | | | Var        string       string  c
+      1  14 | | | | | | String     string       string  
+            | | Inlines    program      TYPE    unnamed.m
+            | | Structs    program      TYPE    unnamed.m
+            | | Headers    program      TYPE    unnamed.m
+            | | Log        program      TYPE    unnamed.m
+    """
+        mc.configure.configure(self, suggest, **kws)
 
     def syntaxerror(self, cur, text):
         """
@@ -200,7 +270,10 @@ Args:
     cur (int): Current location in the Matlab code
     text (str): The related rational presented to the user
 
-Example:
+Raises:
+    SyntaxError: Error in the Matlab code.
+
+Example::
 
     >>> builder = mc.Builder()
     >>> prg = builder.load("unnamed.m", "0123456789")
@@ -276,8 +349,8 @@ Example:
     def create_main(self, parent, cur):
         return functions.main(self, parent, cur)
 
-    def create_lambda(self, parent, cur, eq_loc):
-        return functions.lambda_(self, parent, cur, eq_loc)
+    def create_lambda_assign(self, parent, cur, eq_loc):
+        return functions.lambda_assign(self, parent, cur, eq_loc)
 
     def create_lambda_func(self, parent, cur):
         return functions.lambda_func(self, parent, cur)
@@ -295,19 +368,19 @@ Example:
 
 
     def create_for(self, parent, cur):
-        return branches.for_(self, parent, cur)
+        return branches.forloop(self, parent, cur)
 
     def create_if(self, parent, start):
-        return branches.if_(self, parent, start)
+        return branches.ifbranch(self, parent, start)
 
     def create_while(self, parent, cur):
-        return branches.while_(self, parent, cur)
+        return branches.whileloop(self, parent, cur)
 
     def create_switch(self, parent, cur):
         return branches.switch(self, parent, cur)
 
     def create_try(self, parent, cur):
-        return branches.try_(self, parent, cur)
+        return branches.trybranch(self, parent, cur)
 
 
     def create_cell(self, node, cur):

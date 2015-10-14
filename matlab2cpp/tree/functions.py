@@ -1,13 +1,21 @@
 """
 Functions, programs and meta-nodes
 
-Functions
-~~~~~~~~~
-program         The outer shell of the program
-function        Explicit functions
-main            Main script
-lambda_         Anonymous function constructor
-lambda_func     Anonymous function content
++----------------------------------------------------+-------------------------+
+| Functions                                          | Description             |
++====================================================+=========================+
+| :py:func:`~matlab2cpp.tree.functions.program`      | Program outer shell     |
++----------------------------------------------------+-------------------------+
+| :py:func:`~matlab2cpp.tree.functions.function`     | Explicit functions      |
++----------------------------------------------------+-------------------------+
+| :py:func:`~matlab2cpp.tree.functions.main`         | Main script             |
++----------------------------------------------------+-------------------------+
+| :py:func:`~matlab2cpp.tree.functions.lambda_assign`| Anonymous function      |
+|                                                    | assignment              |
++----------------------------------------------------+-------------------------+
+| :py:func:`~matlab2cpp.tree.functions.lambda_func`  | Anonymous function      |
+|                                                    | content                 |
++----------------------------------------------------+-------------------------+
 """
 
 import matlab2cpp
@@ -349,7 +357,7 @@ Example:
     return self.create_codeblock(func, cur)
 
 
-def lambda_(self, node, cur, eq_loc):
+def lambda_assign(self, node, cur, eq_loc):
     """
 Anonymous function constructor
 
@@ -369,7 +377,7 @@ Example:
          Program     functions.program
        0 Main        functions.main
        0 Codeblock   codeblock.codeblock 
-       0   Assign        'f = @(x) 2*x' functions.lambda_
+       0   Assign        'f = @(x) 2*x' functions.lambda_assign
        0     Var         variables.assign     'f'
        4   Lambda        functions.lambda_func '@(x) 2*x'
        6     Expression  expression.create    'x'
@@ -423,7 +431,7 @@ Example:
         print "%4d   Assign       " %\
                 cur,
         print repr(self.code[cur:self.code.find("\n", cur)]),
-        print "functions.lambda_"
+        print "functions.lambda_assign"
 
     assign = matlab2cpp.collection.Assign(node, cur=cur, backend="func_lambda")
 
@@ -442,7 +450,7 @@ Example:
 
 def lambda_func(self, node, cur):
     """
-Anonymous function content. Support function of `lambda_`.
+Anonymous function content. Support function of `lambda_assign`.
 
 Args:
     self (Builder): Code constructor

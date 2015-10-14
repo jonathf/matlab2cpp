@@ -3,7 +3,7 @@ Expression interpretor
 
 functions
 ~~~~~~~~~
-create          Expression interpretor
+expression          Expression interpretor
 """
 
 import matlab2cpp
@@ -24,13 +24,42 @@ Args:
     self (Builder): Code constructor.
     node (Node): Reference to the parent node
     start (int): current possition in code
-
-Kwargs:
-    end (int, optional): end of expression. Required if space-delimited expression.
+    end (int, optional): end of expression. Required for space-delimited expression.
     start_opr (str, optional): At which operator the recursive process is. (For internal use)
 
 Returns:
 	int : index to end of the expression
+
+Examples::
+
+    >>> builder = mc.Builder(True)
+    >>> builder.load("unnamed", "a*b+c/d")
+    loading unnamed
+         Program     functions.program
+       0 Main        functions.main
+       0 Codeblock   codeblock.codeblock 
+       0   Statement     codeblock.codeblock  'a*b+c/d'
+       0     Expression  expression.create    'a*b+c/d'
+       0     Expression  expression.create    'a*b'
+       0     Expression  expression.create    'a'
+       0     Var         variables.variable   'a'
+       2     Expression  expression.create    'b'
+       2     Var         variables.variable   'b'
+       4     Expression  expression.create    'c/d'
+       4     Expression  expression.create    'c'
+       4     Var         variables.variable   'c'
+       6     Expression  expression.create    'd'
+       6     Var         variables.variable   'd'
+    >>> print mc.qtree(builder, core=True)
+      1   1 Block      code_block   TYPE    
+      1   1 Statement  code_block   TYPE    
+      1   1 | Plus       expression   TYPE    
+      1   1 | | Mul        expression   TYPE    
+      1   1 | | | Var        unknown      TYPE    a
+      1   3 | | | Var        unknown      TYPE    b
+      1   5 | | Matrixdivision expression   TYPE    
+      1   5 | | | Var        unknown      TYPE    c
+      1   7 | | | Var        unknown      TYPE    d
     """
 
     if self.code[start:start+3] == "...":
@@ -197,7 +226,7 @@ Returns:
         while self.code[end] in " \t":
             end -= 1
 
-        return self.create_expression(node, start, end)
+        return create(self, node, start, end)
 
     # Reserved keywords
     elif self.code[start:start+3] == "end" and\
@@ -264,3 +293,9 @@ def retrieve_operator(self, opr):
     elif opr == "|":    return matlab2cpp.collection.Bor
     elif opr == "&&":   return matlab2cpp.collection.Land
     elif opr == "||":   return matlab2cpp.collection.Lor
+
+
+if __name__ == "__main__":
+    import matlab2cpp as mc
+    import doctest
+    doctest.testmod()

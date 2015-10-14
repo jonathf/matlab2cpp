@@ -86,8 +86,10 @@ def Declares(node):
 
             declares[type].append(child)
 
-            if child.backend == "structs":
+            if child.type == "structs":
                 structs[child.name] = child
+
+        print "structs", structs
 
         out = ""
         for key, val in declares.items():
@@ -97,9 +99,10 @@ def Declares(node):
 
                 out += str(v)
                 if v.name in structs:
-                    var = structs[v.name].declare
-                    size = var.parent[var.parent.names.index("_size")]
-                    out += "[" + str(size.value) + "]"
+                    structs_ = node.program[3]
+                    struct = structs_[structs_.names.index(v.name)]
+                    size = struct[struct.names.index("_size")].value
+                    out += "[%s]" % size
                 out += ", "
 
             out = out[:-2] + " ;"

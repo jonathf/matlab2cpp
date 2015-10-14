@@ -1,11 +1,17 @@
 """
 Rutines for iterating lists
 
-Functions
-~~~~~~~~~
-list        Iterate over a list
-comma_list  Iterate over a comma separated list
-space_list  Iterate over a space delimited list
++------------------------------------------------+-----------------------------+
+| Functions                                      | Description                 |
++================================================+=============================+
+| :py:func:`~matlab2cpp.tree.iterate.list`       | Iterate over a list         |
++------------------------------------------------+-----------------------------+
+| :py:func:`~matlab2cpp.tree.iterate.comma_list` | Iterate over a comma        |
+|                                                | separated list              |
++------------------------------------------------+-----------------------------+
+| :py:func:`~matlab2cpp.tree.iterate.space_list` | Iterate over a space        |
+|                                                | delimited list              |
++------------------------------------------------+-----------------------------+
 """
 
 import constants as c

@@ -1,5 +1,7 @@
 """
-Some valuable common variables and modules.
+Matlab consists of various legal start and end characters depending on context.
+This module is a small collection of constants available to ensure that context
+is defined correctly.
 """
 
 import string

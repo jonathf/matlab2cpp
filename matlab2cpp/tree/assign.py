@@ -1,10 +1,13 @@
 """
-Assignment
+Support functions for identifying assignments.
 
-functions
-~~~~~~~~~
-single      Assignment with single return
-multi       Assignment with multiple returns
++-------------------------------------------+----------------------------------+
+| Function                                  | Description                      |
++===========================================+==================================+
+| :py:func:`~matlab2cpp.tree.assign.single` | Assignment with single return    |
++-------------------------------------------+----------------------------------+
+| :py:func:`~matlab2cpp.tree.assign.multi`  | Assignment with multiple returns |
++-------------------------------------------+----------------------------------+
 """
 import matlab2cpp
 

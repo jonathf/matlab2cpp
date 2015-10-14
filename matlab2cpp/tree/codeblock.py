@@ -1,9 +1,5 @@
 """
 The main codeblock loop
-
-functions
-~~~~~~~~~
-codeblock       The main codeblock loop
 """
 
 import matlab2cpp
@@ -161,7 +157,7 @@ Example:
                 while self.code[j] in " \t":
                     j += 1
                 if self.code[j] == "@":
-                    cur = self.create_lambda(block, cur, eq_loc)
+                    cur = self.create_lambda_assign(block, cur, eq_loc)
                 else:
                     cur = self.create_assign(block, cur, eq_loc)
 

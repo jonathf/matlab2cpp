@@ -4,10 +4,34 @@ All the various different kinds of nodes
 
 from node import Node
 
+__all__ = [
+"All", "Assign", "Assigns", "Band", "Bcomment", "Block", "Bor", "Branch",
+"Break", "Case", "Catch", "Cell", "Cget", "Colon", "Cond", "Condline",
+"Counter", "Cset", "Ctranspose", "Cvar", "Declare", "Declares", "Ecomment",
+"Elementdivision", "Elexp", "Elif", "Elmul", "Else", "End", "Eq", "Error",
+"Exp", "Expr", "Fget", "Float", "For", "Fset", "Func", "Funcs", "Fvar", "Ge",
+"Get", "Gt", "Header", "Headers", "If", "Imag", "Include", "Includes", "Inline",
+"Inlines", "Int", "Lambda", "Land", "Lcomment", "Le", "Leftelementdivision",
+"Leftmatrixdivision", "Log", "Lor", "Lt", "Main", "Matrix", "Matrixdivision",
+"Minus", "Mul", "Ne", "Neg", "Nget", "Not", "Nset", "Opr", "Otherwise",
+"Params", "Paren", "Plus", "Program", "Project", "Resize", "Return", "Returns",
+"Set", "Sget", "Sset", "Statement", "String", "Struct", "Structs", "Switch",
+"Transpose", "Try", "Tryblock", "Var", "Vector", "Warning", "While"
+]
+
 class Project(Node):
-    "Head node"
-    def __init__(self, backend="program", name="project",
-            cur=0, line=0, code="", file="42", **kws):
+    def __init__(self, backend="program", name="project", cur=0, line=0, code="", file="unnamed", **kws):
+        """
+Root of the node tree. Every other node should inherant from this one.
+
+This node should not recieve `parent` argument node during construction.
+
+Children:
+    `Program+`
+
+All keyword arguments are passed to `mc.Node.__init__`.
+    """
+        assert "parent" not in kws
         self.parent = self
         self._program = self
         Node.__init__(self, self, name=name, backend=backend, cur=cur,
@@ -15,11 +39,27 @@ class Project(Node):
 
 class Program(Node):
     def __init__(self, parent, name, backend="program", **kws):
+        """
+Represents one stand-alone script or program. Each child represents the various
+aspects of script/program.
+
+Children:
+    `Includes Funcs Inlines Structs Headers Log`
+
+All keyword arguments are passed to `mc.Node.__init__`.
+    """
         self._program = self
         Node.__init__(self, parent, name=name, backend=backend, file=name, **kws)
 
 class Includes(Node):
     def __init__(self, parent, backend="program", **kws):
+        """
+
+Children:
+    `Includes Funcs Inlines Structs Headers Log`
+
+All keyword arguments are passed to `mc.Node.__init__`.
+    """
         Node.__init__(self, parent, backend=backend, **kws)
 
 class Funcs(Node):

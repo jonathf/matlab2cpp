@@ -3,11 +3,33 @@ Configuring data types
 """
 
 import os
-import supplement
 
 def configure(self, suggest=True, **kws):
 
+    # names = self.project.names
+    # for i in xrange(len(names)):
+    #
+    #     if os.path.sep in names[i]:
+    #         names[i] = names.split(os.path.sep)[-1]
+    #     if names[i][-2:] == ".m":
+    #         names[i] = names[i][:-2]
+    #
+    # for i in xrange(len(names)):
+    #     unknowns = self.get_unknowns(self.project[i].name)
+    #     for unknown in unknowns:
+    #         if unknown in names:
+    #             print "cross match"
+    #
+    #
+
     nodes = self.project.flatten(False, True, False)
+
+    # # run only once
+    # for node in nodes[::-1]:
+    #     pass
+    #
+
+
     while True:
 
         for node in nodes[::-1]:
@@ -43,8 +65,7 @@ def configure(self, suggest=True, **kws):
 
                     for program in self.project:
 
-                        if os.path.isfile(program.name) and \
-                                os.path.basename(program.name) == node.name+".m":
+                        if os.path.basename(program.name) == node.name+".m":
                             func = program[1][0]
                             node.backend = func.backend
                             break
@@ -149,17 +170,15 @@ def configure(self, suggest=True, **kws):
         if suggest:
 
             complete = True
+
             for program in self.project:
                 suggests = program.suggest
                 program.stypes = suggests
                 program.ftypes = suggests
-                complete -= any([any(v) for v in suggests.values()])
+                complete = complete and not any([any(v) for v in suggests.values()])
 
             if complete:
                 break
-
-            if suggest == 1:
-                suggest = 0
 
         else:
             break

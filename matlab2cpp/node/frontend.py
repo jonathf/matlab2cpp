@@ -6,6 +6,8 @@ import matlab2cpp.supplement as sup
 import matlab2cpp
 
 class Node(object):
+    """
+    """
 
     backend = ref.Property_reference("backend")
     cls = ref.Property_reference("class")
@@ -201,15 +203,15 @@ o i : D E F G B C A
  ri : E D B G F C A
 ori : G F E D C B A
 
-Parameters
-----------
-node : Node
-    Root node to start from
-ordered : bool
-    If True, make sure the nodes are hierarcically ordered.
-    If False, nodes are sorted for easy print.
-reverse : bool
-    If True, children are itterated in reverse order.
+Args:
+
+    node (Node): Root node to start from
+    ordered (bool): If True, make sure the nodes are hierarcically ordered.
+    reverse (bool): If True, children are itterated in reverse order.
+    inverse (bool): If True, tree is itterated in reverse order.
+
+Return:
+    list: All nodes in a flatten list.
         """
         return backend.flatten(self, ordered, reverse, inverse)
 

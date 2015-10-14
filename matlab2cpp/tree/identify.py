@@ -1,11 +1,18 @@
 """
 Rutines for identifying code structure.
 
-Functions
-~~~~~~~~~
-space_delimiter     Check if mid-expression space-delimiter
-string              Check if at string start
-space_delimited     Check if list is space-delimited
++------------------------------------------------------+-----------------------+
+| Function                                             | Description           |
++======================================================+=======================+
+| :py:func:`~matlab2cpp.tree.identify.space_delimiter` | Check if at expression|
+|                                                      | space-delimiter       |
++------------------------------------------------------+-----------------------+
+| :py:func:`~matlab2cpp.tree.identify.string`          | Check if at string    |
+|                                                      | start                 |
++------------------------------------------------------+-----------------------+
+| :py:func:`~matlab2cpp.tree.identify.space_delimited` | Check if list is      |
+|                                                      | space-delimited       |
++------------------------------------------------------+-----------------------+
 """
 
 import constants as c

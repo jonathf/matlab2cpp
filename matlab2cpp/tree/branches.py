@@ -1,13 +1,19 @@
 """
 Iterpretors related to branches, loops and try.
 
-Functions
-~~~~~~~~~
-try_        Try-catch block
-switch      Switch-case branch
-while_      While loop
-for_        For loop
-if_         If-ifelse-else branch
++------------------------------------------------+-----------------------------+
+| Function                                       | Description                 |
++================================================+=============================+
+| :py:func:`~matlab2cpp.tree.branches.trybranch` | Try-catch block             |
++------------------------------------------------+-----------------------------+
+| :py:func:`~matlab2cpp.tree.branches.switch`    | Switch-case branch          |
++------------------------------------------------+-----------------------------+
+| :py:func:`~matlab2cpp.tree.branches.whileloop` | While loop                  |
++------------------------------------------------+-----------------------------+
+| :py:func:`~matlab2cpp.tree.branches.forloop`   | For loop                    |
++------------------------------------------------+-----------------------------+
+| :py:func:`~matlab2cpp.tree.branchesifbranch`   | If-ifelse-else branch       |
++------------------------------------------------+-----------------------------+
 """
 
 import matlab2cpp
@@ -15,7 +21,7 @@ import constants as c
 import findend
 
 
-def try_(self, parent, cur):
+def trybranch(self, parent, cur):
     '''
 Try-catch block
 
@@ -38,7 +44,7 @@ Example:
          Program     functions.program
        0 Main        functions.main
        0 Codeblock   codeblock.codeblock 
-       0   Try           branches.try_        'try'
+       0   Try           branches.trybranch   'try'
        6 Codeblock   codeblock.codeblock 
        6   Statement     codeblock.codeblock  'a'
        6     Expression  expression.create    'a'
@@ -65,22 +71,22 @@ Example:
 
     if self.disp:
         print "%4d   Try          " % cur,
-        print "%-20s" % "branches.try_",
+        print "%-20s" % "branches.trybranch",
         print repr(self.code[cur:cur+3])
 
     start = cur
 
     tryblock = matlab2cpp.collection.Tryblock(parent, cur=cur)
 
-    try_ = matlab2cpp.collection.Try(tryblock)
+    trybranch = matlab2cpp.collection.Try(tryblock)
 
     cur += 3
     while self.code[cur] in " \t\n,;":
         cur += 1
 
-    cur = self.create_codeblock(try_, cur)
+    cur = self.create_codeblock(trybranch, cur)
 
-    try_.code = self.code[start:cur]
+    trybranch.code = self.code[start:cur]
 
     if  self.code[cur:cur+5] != "catch" or self.code[cur+5] not in c.k_end:
         self.syntaxerror(cur, "start of catch-block")
@@ -227,7 +233,7 @@ Example:
     return k
 
 
-def while_(self, parent, cur):
+def whileloop(self, parent, cur):
     '''
 While loop
 
@@ -249,7 +255,7 @@ Example:
          Program     functions.program
        0 Main        functions.main
        0 Codeblock   codeblock.codeblock 
-       0   While         branches.while_      'while a'
+       0   While         branches.whileloop   'while a'
        6     Expression  expression.create    'a'
        6     Var         variables.variable   'a'
       10 Codeblock   codeblock.codeblock 
@@ -277,32 +283,32 @@ Example:
 
     if self.disp:
         print "%4d   While        " % cur,
-        print "%-20s" % "branches.while_",
+        print "%-20s" % "branches.whileloop",
         print repr(self.code[cur:end+1])
 
-    while_ = matlab2cpp.collection.While(parent, cur=cur)
+    whileloop = matlab2cpp.collection.While(parent, cur=cur)
 
     if self.code[k] == "(":
         k += 1
         while self.code[k] in " \t":
             k += 1
 
-    cur = self.create_expression(while_, k)
+    cur = self.create_expression(whileloop, k)
     cur += 1
 
     cur += 1
     while self.code[cur] in " \t":
         cur += 1
 
-    end = self.create_codeblock(while_, cur)
+    end = self.create_codeblock(whileloop, cur)
 
-    while_.code = self.code[start:end+1]
+    whileloop.code = self.code[start:end+1]
 
     return end
 
 
 
-def for_(self, parent, cur):
+def forloop(self, parent, cur):
     '''
 For loop
 
@@ -324,7 +330,7 @@ Example:
          Program     functions.program
        0 Main        functions.main
        0 Codeblock   codeblock.codeblock 
-       0   For           'for a = b' branches.for_
+       0   For           'for a = b' branches.forloop
        4     Var         variables.variable   'a'
        8     Expression  expression.create    'b'
        8     Var         variables.variable   'b'
@@ -350,7 +356,7 @@ Example:
     if self.disp:
         print "%4d   For          " % cur,
         print repr(self.code[cur:self.code.find("\n", cur)]),
-        print "branches.for_"
+        print "branches.forloop"
 
     for_loop = matlab2cpp.collection.For(parent, cur=cur)
 
@@ -391,7 +397,7 @@ Example:
     return end
 
 
-def if_(self, parent, start):
+def ifbranch(self, parent, start):
     '''
 If-ifelse-else branch
 
@@ -415,14 +421,14 @@ Example:
          Program     functions.program
        0 Main        functions.main
        0 Codeblock   codeblock.codeblock 
-       0   If            branches.if_         'if a'
+       0   If            branches.ifbranch    'if a'
        3     Expression  expression.create    'a'
        3     Var         variables.variable   'a'
        4 Codeblock   codeblock.codeblock 
        7   Statement     codeblock.codeblock  'b'
        7     Expression  expression.create    'b'
        7     Var         variables.variable   'b'
-       9   Else if       branches.if_         'elseif c'
+       9   Else if       branches.ifbranch    'elseif c'
       16     Expression  expression.create    'c'
       16     Var         variables.variable   'c'
       17 Codeblock   codeblock.codeblock 
@@ -462,7 +468,7 @@ Example:
 
     if self.disp:
         print "%4d   If           " % (start),
-        print "%-20s" % "branches.if_",
+        print "%-20s" % "branches.ifbranch",
         print repr(self.code[start:end+1])
 
     node = matlab2cpp.collection.If(branch, cur=cur)
@@ -492,7 +498,7 @@ Example:
 
         if self.disp:
             print "%4d   Else if      " % (start),
-            print "%-20s" % "branches.if_",
+            print "%-20s" % "branches.ifbranch",
             print repr(self.code[start:end+1])
 
         node = matlab2cpp.collection.Elif(branch, cur=start)
@@ -519,7 +525,7 @@ Example:
 
         if self.disp:
             print "%4d   Else         " % (start),
-            print "%-20s" % "branches.if_",
+            print "%-20s" % "branches.ifbranch",
             print repr(self.code[start:start+5])
 
         node = matlab2cpp.collection.Else(branch, cur=start)

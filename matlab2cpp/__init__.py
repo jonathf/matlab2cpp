@@ -13,23 +13,30 @@ Python's path.  For the examples, the module is assumed imported as
 
     >>> import matlab2cpp as mc
 
+The toolbox is sorted into the following modules:
+
++----------------------------------+--------------------------------------+
+| Module                           | Description                          |
++==================================+======================================+
+| :py:mod:`~matlab2cpp.qfunctions` | Functions for performing simple      |
+|                                  | translations                         |
++----------------------------------+--------------------------------------+
+| :py:mod:`~matlab2cpp.tree`       | Constructing a tree from Matlab code |
++----------------------------------+--------------------------------------+
+| :py:mod:`~matlab2cpp.datatype`   | The various node data types          |
++----------------------------------+--------------------------------------+
+| :py:mod:`~matlab2cpp.node`       | Node behavior                        |
++----------------------------------+--------------------------------------+
+| :py:mod:`~matlab2cpp.collection` | The collcetion of various node       |
++----------------------------------+--------------------------------------+
+| :py:mod:`~matlab2cpp.rule`       | Translation rules                    |
++----------------------------------+--------------------------------------+
+| :py:mod:`~matlab2cpp.inlines`    | Code insertion                       |
++----------------------------------+--------------------------------------+
+
 The simplest way to use the library is to use the quick translation functions.
-They are as follows:
-
-=========   =================================================================
-Function    Description
-=========   =================================================================
-`mc.qcpp`   Quick code translation of scripts into runnable C++ code content.
-`mc.qhpp`   Quick code translation of matlab module files into C++ header
-            content, or header files for runnable scripts.
-`mc.qpy`    Quick extraction of variable and header meta information and
-            creation of supplement file content.
-`mc.qlog`   Quick creation of error log.
-=========   =================================================================
-
-Each function can take a string as input and output.  However, for more advanced
-usage, see their respective documentations. For most intents and purposes,
-`mconvert` creates files with the same content as these quick functions creates.
+They are available through the `mc.qfunctions` module and mirrors the
+functionality offered by the `mconvert` function.
 """
 
 import time
@@ -57,6 +64,9 @@ __all__ += tree.__all__
 
 from node import *
 __all__ += node.__all__
+
+from collection import *
+__all__ += collection.__all__
 
 
 def main(args):
