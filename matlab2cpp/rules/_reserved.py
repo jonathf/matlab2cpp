@@ -16,7 +16,7 @@ reserved = {
 "clear", "close", "plot", "hold",
 "_conv_to", "_reshape",
 "interp1", "linspace", "varargins",
-"sum", "conj",
+"sum", "conj", "real", "imag",
 }
 
 # Common attribute
@@ -623,16 +623,29 @@ def Get_sum(node):
         return "sum(", ", ", ")"
 
     out = arg.str
+    dim = arg.dim-1
 
     if len(node) == 2:
         out = out + ", " + node[1].str
 
     if arg.dim == 2:
+        dim = 0
         out = "arma::strans(" + out + ")"
+
+    node.dim = dim
 
     return "arma::sum(" + out + ")"
 
 
 def Get_conj(node):
     return "arma::conj(", ", ", ")"
+
+def Get_imag(node):
+    return "arma::imag(", ", ", ")"
+
+def Get_real(node):
+    arg = node[0] # <=> %(0)s
+    if arg.mem == 4:
+        node.mem = 3
+    return "arma::real(", ", ", ")"
 

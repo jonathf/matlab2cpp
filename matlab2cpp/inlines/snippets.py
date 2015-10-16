@@ -30,6 +30,7 @@ if (n < 0)
 {
 return s;
 }
+// n = (abs(b-a)+1) / abs(step)
 s.set_size(n + 1);
 for (int ii = 0; ii <= n; ii++)
 {
