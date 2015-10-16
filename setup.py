@@ -12,7 +12,7 @@ setup(
     name='matlab2cpp',
     version='0.3',
     packages=['matlab2cpp', 'matlab2cpp/node', 'matlab2cpp/tree',
-        'matlab2cpp/rules', 'matlab2cpp/testsuite',
+        'matlab2cpp/rules', 'matlab2cpp/testsuite', 'matlab2cpp/supplement',
         'matlab2cpp/inlines'],
     # package_dir={'': ''},
     url='http://github.com/jonathf/matlab2cpp',
