@@ -46,6 +46,15 @@ def Get(node):
             else:
                 node.dim = 0
 
+        if node[0].cls == node[1].cls == "All":
+            return "%(name)s"
+
+        if node[0].cls == "All":
+            return "%(name)s.col(" + arg1 + ")"
+
+        elif node[1].cls == "All":
+            return "%(name)s.row(" + arg0 + ")"
+
         return "%(name)s(" + arg0 + ", " + arg1 + ")"
 
 
@@ -93,5 +102,14 @@ def Set(node):
                 node.dim = 2
             else:
                 node.dim = 0
+
+        if node[0].cls == node[1].cls == "All":
+            return "%(name)s"
+
+        if node[0].cls == "All":
+            return "%(name)s.col(" + arg1 + ")"
+
+        elif node[1].cls == "All":
+            return "%(name)s.row(" + arg0 + ")"
 
         return "%(name)s(" + arg0 + ", " + arg1 + ")"
