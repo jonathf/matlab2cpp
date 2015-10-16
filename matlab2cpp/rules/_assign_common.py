@@ -18,7 +18,7 @@ Examples:
     a = ivec(_a, 2, false) ;
     int _b [] = {1, 2} ;
     b = irowvec(_b, 2, false) ;
-    a = arma::trans(b) ;
+    a = arma::strans(b) ;
     >>> print mc.qtranslate("a=[1,2,2,1]; b=[2,1;1,2]; a=b")
     int _a [] = {1, 2, 2, 1} ;
     a = ivec(_a, 4, false) ;
@@ -37,7 +37,7 @@ Examples:
 
         if (lhs.dim == 2 and rhs.dim == 1) or\
                 (lhs.dim == 1 and rhs.dim == 2):
-            out = "arma::trans(%(1)s)"
+            out = "arma::strans(%(1)s)"
         else:
             out = "%(1)s"
 
