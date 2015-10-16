@@ -7,12 +7,24 @@ Configuring datatypes
 Manual assignment
 -----------------
 .. automodule:: matlab2cpp.supplement
-.. autofunction:: matlab2cpp.supplement.Ftypes
-.. autofunction:: matlab2cpp.supplement.Stypes
-.. autofunction:: matlab2cpp.supplement.Itypes
+
+Anonymous functions
+~~~~~~~~~~~~~~~~~~~
+.. automodule:: matlab2cpp.supplement.functions
+
+Data structures
+~~~~~~~~~~~~~~~
+.. automodule:: matlab2cpp.supplement.structs
+
+Suggestions
+~~~~~~~~~~~
+.. automodule:: matlab2cpp.supplement.suggests
+
+Includes
+~~~~~~~~
+.. automodule:: matlab2cpp.supplement.includes
 
 Suggestion engine
 -----------------
 .. automodule:: matlab2cpp.configure
-.. autofunction:: matlab2cpp.configure.configure
 

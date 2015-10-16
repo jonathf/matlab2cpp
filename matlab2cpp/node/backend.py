@@ -438,7 +438,7 @@ def translate_one(node, opt):
         raise SyntaxError("interpolation in " + node.backend + "." +\
                 node.cls + " is misbehaving\n'" + value + "'\n"+str(node.prop))
 
-    node.prop["str"] = value
+    node.str = value
 
 
 def include(node, name, **kws):

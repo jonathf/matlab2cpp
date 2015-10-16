@@ -1,16 +1,62 @@
 """
-Each node has there own datatype.
-It can be referenced by `node.type` and can be inserted as placeholder through
-`%(type)s`.
-Note however that there are many data types available, both numerical and
-non-numerical.
-For an overview, see `supplement`.
+One of the translation challenges is how each variable type determined. In C++
+all variables have to be explicitly declared, while in Matlab they are declared
+implicitly at creation.  When translating between the two languages, there are
+many variables where the data types are unknown and impossible for the
+Matlab2cpp software to translate.  How to translate the behavior of an integer
+is vastly different from an float matrix.
+
+Variable types
+--------------
+
+Even though not always relevant, all node has it's own datatype.  It can be
+referenced by `node.type` and can be inserted as placeholder through
+`%(type)s`.  Note however that there are many data types available.  The
+options for valid variable types are listed in the supplement file.  They can
+be roughly split into two groups: **numerical** and **non-numerical** types.
+The numerical types are as follows:
+
++---------------+----------------+---------+---------+----------+------------+
+|               | *unsigned int* | *int*   | *float* | *double* | *complex*  |
++===============+================+=========+=========+==========+============+
+| *scalar*      | uword          | int     | float   | double   | cx_complex |
++---------------+----------------+---------+---------+----------+------------+
+| *vector*      | uvec           | ivec    | fvec    | vec      | cx_vec     |
++---------------+----------------+---------+---------+----------+------------+
+| *row\-vector* | urowvec        | irowvec | frowvec | rowvec   | cx_rowvec  |
++---------------+----------------+---------+---------+----------+------------+
+| *matrix*      | umat           | imat    | fmat    | mat      | cx_mat     |
++---------------+----------------+---------+---------+----------+------------+
+| *cube*        | ucube          | icube   | fcube   | cube     | cx_cube    |
++---------------+----------------+---------+---------+----------+------------+
+
+Values along the horizontal axis represents the amount of memory reserved per
+element, and the along the vertical axis represents the various number of
+dimensions.  The names are equivalent to the ones in the Armadillo package.
+
+The non-numerical types are as follows:
+
++---------------+------------------------+
+| Name          | Description            |
++===============+========================+
+| *char*        | Single text character  |
++---------------+------------------------+
+| *string*      | Text string            |
++---------------+------------------------+
+| *struct*      | Struct container       |
++---------------+------------------------+
+| *structs*     | Struct array container |
++---------------+------------------------+
+| *func_lambda* | Anonymous function     |
++---------------+------------------------+
+
+Numerical datatypes
+~~~~~~~~~~~~~~~~~~~
 
 Most of the allowed datatypes are numerical values with varying type-space and
-dimensionality.
-So when addressing a numerical value, the nodes attributes `node.dim` and
-node.mem` can often be useful, since they contain direct information about that
-information.
+dimensionality.  So when addressing a numerical value, the nodes attributes
+`node.dim` and node.mem` can often be useful, since they contain direct
+information about that information.
 
 Example:
     >>> node = mc.collection.Var(None, "name", type="ivec")
@@ -28,9 +74,21 @@ Continuing our example:
     >>> print node.type
     cx_mat
 
-Note that the datatype are locally defined.
-If you want to change the global datatype, change the local attributes of
-`node.declare`.
+The connection between the nummerical values and datatypes is as follows:
+
++-------+-------------+--+-------+--------------+
+| *mem* | Description |  | *dim* | Description  |
++=======+=============+==+=======+==============+
+| 0     | unsiged int |  | 0     | scalar       |
++-------+-------------+--+-------+--------------+
+| 1     | integer     |  | 1     | (col-)vector |
++-------+-------------+--+-------+--------------+
+| 2     | float       |  | 2     | row-vector   |
++-------+-------------+--+-------+--------------+
+| 3     | double      |  | 3     | matrix       |
++-------+-------------+--+-------+--------------+
+| 4     | complex     |  | 4     | cubu         |
++-------+-------------+--+-------+--------------+
 """
 
 import supplement
@@ -252,7 +310,7 @@ class Suggest(object):
             return
         instance.declare.prop["suggest"] = value
     def __get__(self, instance, owner):
-        return supplement.get_ss(instance)
+        return supplement.suggests.get(instance)
 
 if __name__ == "__main__":
     import matlab2cpp as mc

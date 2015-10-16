@@ -1,26 +1,95 @@
 """
-Configuring data types
+Consider the following program where the datatypes are unassigned: ::
+
+    >>> print mc.qhpp("function c=f(); a = 4; b = 4.; c = a+b", suggest=False)
+    #include <armadillo>
+    using namespace arma ;
+    <BLANKLINE>
+    TYPE f()
+    {
+      TYPE a, b, c ;
+      a = 4 ;
+      b = 4. ;
+      c = a+b ;
+      return c ;
+    }
+
+Since all variables are unknown, the program decides to fill in the dummy
+variable `TYPE` for each unknown variable.
+
+The supplement file created by `mconvert` or :py::`~matlab2cpp.qpy` reflects
+all these unknown variables as follows::
+
+    >>> print mc.qpy(
+    ...     "function c=f(); a = 4; b = 4.; c = a+b", suggest=False)
+    functions = {
+      "f" : {
+        "a" : "", # int
+        "b" : "", # double
+        "c" : "",
+      },
+    }
+    includes = [
+      '#include <armadillo>',
+      'using namespace arma ;',
+    ]
+
+To the right of the type assignment, the program will add a suggestion to aid
+the user.  The next time the `mconvert`-script is run, the inserted values will
+be imported and used.
+
+The user can automatically populate the datatypes to some degree by using the
+`-s` or `--suggestions` flag (or using the `suggest=True` flag for `mc.qpy`)::
+
+    >>> print mc.qpy("function c=f(); a = 4; b = 4.; c = a+b", suggest=True)
+    functions = {
+      "f" : {
+        "a" : "int",
+        "b" : "double",
+        "c" : "double",
+      },
+    }
+    includes = [
+      '#include <armadillo>',
+      'using namespace arma ;',
+    ]
+
+The suggestions are created through an iterative process.  The variable `a` and
+`b` get assigned the datatypes `int` and `double` because of the direct
+assignment of variable.  After this, the process starts over and tries to find
+other variables that suggestion could fill out for.  In the case of the `c`
+variable, the assignment on the right were and addition between `int` and
+`double`.  To not loose precision, it then chooses to keep `double`, which is
+passed on to the `c` variable.  In practice the suggestions can potentially fill
+in all datatypes automatically in large programs, and often quite intelligently.
+
+The resulting program will have the following complete form:
+
+    >>> print mc.qhpp(
+    ...     "function c=f(); a = 4; b = 4.; c = a+b", suggest=True)
+    #include <armadillo>
+    using namespace arma ;
+    <BLANKLINE>
+    double f()
+    {
+      int a ;
+      double b, c ;
+      a = 4 ;
+      b = 4. ;
+      c = a+b ;
+      return c ;
+    }
 """
 
 import os
 
 def configure(self, suggest=True, **kws):
+    """
+configure backend
 
-    # names = self.project.names
-    # for i in xrange(len(names)):
-    #
-    #     if os.path.sep in names[i]:
-    #         names[i] = names.split(os.path.sep)[-1]
-    #     if names[i][-2:] == ".m":
-    #         names[i] = names[i][:-2]
-    #
-    # for i in xrange(len(names)):
-    #     unknowns = self.get_unknowns(self.project[i].name)
-    #     for unknown in unknowns:
-    #         if unknown in names:
-    #             print "cross match"
-    #
-    #
+See also:
+    :py:func:`matlab2cpp.Builder.configure <Builder.configure>`
+    """
 
     nodes = self.project.flatten(False, True, False)
 
