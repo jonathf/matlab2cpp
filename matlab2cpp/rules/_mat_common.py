@@ -2,6 +2,18 @@ from _variables import *
 from _arma_common import configure_arg
 
 def Get(node):
+    """
+    Statement
+        Get (a)
+
+    a()
+
+    Assign
+        Var (b)
+        Get (a)
+
+    b = a()
+    """
 
     if len(node) not in (1,2):
 
@@ -55,10 +67,24 @@ def Get(node):
         elif node[1].cls == "All":
             return "%(name)s.row(" + arg0 + ")"
 
+        if dim0 == 0 and dim1 > 0:
+            return "%(name)s.col(" + arg0 + ").rows(" + arg1 + ")"
+
+        elif dim0 > 0 and dim1 == 0:
+            return "%(name)s.row(" + arg0 + ").cols(" + arg1 + ")"
+
         return "%(name)s(" + arg0 + ", " + arg1 + ")"
 
 
 def Set(node):
+    """
+    Assign
+        Set (a)
+            Var (n)
+        Var (b)
+
+    a(n) = b
+    """
 
     if len(node) not in (1,2):
 
@@ -112,4 +138,12 @@ def Set(node):
         elif node[1].cls == "All":
             return "%(name)s.row(" + arg0 + ")"
 
+        if dim0 == 0 and dim1 > 0:
+            node.include("asuvec")
+            arg0 = "m2cpp::asuvec(" + arg0 + ")"
+        elif dim0 > 0 and dim1 == 0:
+            node.include("asuvec")
+            arg1 = "m2cpp::asuvec(" + arg1 + ")"
+
         return "%(name)s(" + arg0 + ", " + arg1 + ")"
+

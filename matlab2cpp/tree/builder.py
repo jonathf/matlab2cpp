@@ -130,7 +130,9 @@ Convert Matlab-code to a tree of nodes.
 +--------------------------------------------+---------------------------------+
 | :py:func:`~matlab2cpp.Builder.syntaxerror` | Throw an apropriate SyntaxError |
 |                                            | for the Matlab code             |
-+--------------------------------------------+---------------------------------+
++--------------------------------------------+--------------------++-----------+
+| :py:func:`~matlab2cpp.Builder.translate`   | Translate tree to C++           |
++--------------------------------------------+--------------------++-----------+
 
     """
 
@@ -261,6 +263,13 @@ Example::
             | | Log        program      TYPE    unnamed.m
     """
         mc.configure.configure(self, suggest, **kws)
+
+    def translate(self):
+        """
+Translate node tree
+        """
+        for program in self.project:
+            program.translate()
 
     def syntaxerror(self, cur, text):
         """

@@ -8,41 +8,43 @@ retrieve and manipulate the state of the nodes.
 To illustrate both nodes and relationship we introduce the following example:
 
     >>> builder = mc.Builder()
-    >>> program = builder.load("unnamed", "function y=f(x); y=x+4")
-    >>> mc.set_variables(program, {"f" : {"x": "int", "y": "double"}})
+    >>> builder.load("unnamed", "function y=f(x); y=x+4")
+    >>> builder[0].ftypes = {"f" : {"x": "int", "y": "double"}}
     >>> builder.configure()
-    >>> program.translate()
-    >>> print mc.qtree(program)
-            Program    program      TYPE    unnamed           
-            Includes   program      TYPE                      
-            | Include    program      TYPE    #include <armadillo>
-            | Include    program      TYPE    using namespace arma ;
-      1   1 Funcs      program      TYPE    unnamed           
-      1   1 | Func       func_return  double  f                 
-      1   1 | | Declares   func_return  double                    
-      1   1 | | | Var        double       double  y                 
-      1   1 | | Returns    func_return  double                    
-      1  10 | | | Var        double       double  y                 
-      1  13 | | Params     func_return  int                       
-      1  14 | | | Var        int          int     x                 
-      1  16 | | Block      code_block   TYPE                      
-      1  18 | | | Assign     unknown      TYPE                      
-      1  18 | | | | Var        double       double  y                 
-      1  20 | | | | Plus       expression   int                       
-      1  20 | | | | | Var        int          int     x                 
-      1  22 | | | | | Int        int          int                       
-            Inlines    program      TYPE    unnamed           
-            Structs    program      TYPE    unnamed           
-            Headers    program      TYPE    unnamed           
-            | Header     program      TYPE    f                 
-            Log        program      TYPE    unnamed           
-    
+    >>> builder.translate()
+    >>> print builder
+            Project    program      TYPE    project
+            | Program    program      TYPE    unnamed
+            | | Includes   program      TYPE
+            | | | Include    program      TYPE    #include <armadillo>
+            | | | Include    program      TYPE    using namespace arma ;
+      1   1 | | Funcs      program      TYPE    unnamed
+      1   1 | | | Func       func_return  double  f
+      1   1 | | | | Declares   func_return  double
+      1   1 | | | | | Var        double       double  y
+      1   1 | | | | Returns    func_return  double
+      1  10 | | | | | Var        double       double  y
+      1  13 | | | | Params     func_return  int
+      1  14 | | | | | Var        int          int     x
+      1  16 | | | | Block      code_block   TYPE
+      1  18 | | | | | Assign     unknown      TYPE
+      1  18 | | | | | | Var        double       double  y
+      1  20 | | | | | | Plus       expression   int
+      1  20 | | | | | | | Var        int          int     x
+      1  22 | | | | | | | Int        int          int
+            | | Inlines    program      TYPE    unnamed
+            | | Structs    program      TYPE    unnamed
+            | | Headers    program      TYPE    unnamed
+            | | | Header     program      TYPE    f
+            | | Log        program      TYPE    unnamed
+
+
 Navigating the tree
 ~~~~~~~~~~~~~~~~~~~
 The program is the root of the tree. To move down from there can be done using
 indexing. All nodes are interable, allowing standard Python movement:
 
-    >>> funcs = program[1]
+    >>> funcs = builder[0][1]
     >>> func = funcs[0]
     >>> assign = func[3][0]
     >>> var_y, plus = assign

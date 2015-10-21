@@ -86,7 +86,7 @@ Returns:
 
         elif self.code[k] == ";":
 
-            if  count:
+            if not count:
                 self.syntaxerror(k, "comma list indicator")
 
             count = False

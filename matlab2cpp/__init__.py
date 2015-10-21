@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
 """
 The simplest way to interact with the `Matlab2cpp`-toolbox is to use the
 `mconvert` frontend.  The script automatically creates files with various
@@ -47,6 +44,7 @@ import imp
 
 import node
 import tree
+
 import supplement
 import qfunctions
 import collection

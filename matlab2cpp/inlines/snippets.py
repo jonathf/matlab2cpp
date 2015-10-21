@@ -25,12 +25,11 @@ span = ({}, '',
 inline arma::Row<typename T::elem_type> span(int a, int step, int b)
 {
 arma::Row<typename T::elem_type> s;
-int n = (b - a + 1) / step;
+int n = (b - a + step) / step;
 if (n < 0)
 {
 return s;
 }
-// n = (abs(b-a)+1) / abs(step)
 s.set_size(n + 1);
 for (int ii = 0; ii <= n; ii++)
 {
@@ -114,6 +113,16 @@ smat = ({}, '',
 """""")
 scube = ({}, '',
 """""")
+
+asuvec = ({}, '',
+"""
+inline arma::uvec asuvec(uword n)
+{
+uvec t(1) ;
+t(0) = n ;
+return t ;
+}
+""")
 
 interp1 = ({}, "#include <matlib/interpolation.hpp>", "")
 
