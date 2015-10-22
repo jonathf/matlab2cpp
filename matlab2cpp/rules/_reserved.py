@@ -651,8 +651,9 @@ def Get_imag(node):
     return "arma::imag(", ", ", ")"
 
 def Get_real(node):
-    arg = node[0] # <=> %(0)s
-    if arg.mem == 4:
+    arg = node[0]
+    if arg.num and arg.mem == 4:
+        node.type = arg.type
         node.mem = 3
     return "arma::real(", ", ", ")"
 
