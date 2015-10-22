@@ -21,10 +21,20 @@ def Vector(node):
     if None in dims or [n for n in node if not n.num]:
         return "", ", ", ""
 
-    if len(node) == 1 and dims == {0}:
-        node.dim = 0
-        node.value = "decomposed"
-        return "", ", ", ""
+    if len(node) == 1:
+
+        if dims == {0}:
+            node.value = "decomposed"
+        else:
+            node.value = ""
+
+        node.dim = list(dims)[0]
+        return "%(0)s"
+
+    elif dims == {1}:
+        node.value = ""
+        node.dim = 1
+        nodes = [str(n) for n in node]
 
     # Decomposed row
     if dims == {0}:
@@ -52,8 +62,9 @@ def Vector(node):
             else:
                 nodes.append(str(node[i]))
 
+
     # Concatenate mats
-    elif dims in ({1}, {3}, {1,3}):
+    elif dims in ({3}, {1,3}):
 
         node.value = ""
         node.dim = 3
@@ -128,7 +139,7 @@ def Matrix(node):
 
     elif dims in ({0,1}, {1}):
 
-        if len(node)>1:
+        if len(node[0])>1:
             node.dim = 3
         else:
             node.dim = 1
