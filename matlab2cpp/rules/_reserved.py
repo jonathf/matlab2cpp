@@ -366,8 +366,11 @@ def Get_ones(node):
 
         elif len(node) == 2:
             if node[0].cls == "Int" and node[0].value == "1":
-                node.dim = 1
+                node.dim = 2
                 return "arma::ones<%(type)s>(%(1)s)"
+            elif node[1].cls == "Int" and node[1].value == "1":
+                node.dim = 1
+                return "arma::ones<%(type)s>(%(0)s)"
             else:
                 node.dim = 3
 
@@ -567,6 +570,10 @@ def Get_fft(node):
 def Get_ifft(node):
 
     node.type = node[0].type
+
+    if not node.num:
+        return "ifft(", ", ", ")"
+
     node.mem = 4
 
     if len(node) == 1:
@@ -617,19 +624,19 @@ def Get_linspace(node):
 def Get_sum(node):
 
     arg = node[0]
-
     if not arg.num or arg.dim == 0:
         node.error("sum over non-array")
         return "sum(", ", ", ")"
 
     out = arg.str
+    node.type = arg.type
     dim = arg.dim-1
 
     if len(node) == 2:
         out = out + ", " + node[1].str
 
     if arg.dim == 2:
-        dim = 0
+        dim = 1
         out = "arma::strans(" + out + ")"
 
     node.dim = dim
