@@ -150,9 +150,6 @@ See also:
 
     out = ""
     if tree_[1] and tree_[1][0].name == "main":
-        out += tree_[0].str
-        if out:
-            out += "\n\n"
         out += tree_[1].str
 
         out = out.replace("__percent__", "%")
@@ -232,7 +229,10 @@ See also:
     if not tree_.str:
         tree_.translate()
 
-    out = ""
+    out = tree_[0].str
+    if out:
+        out += "\n\n"
+
     if tree_[1] and tree_[1][0].name == "main":
 
         if len(tree_[4]) > 1:
@@ -248,8 +248,6 @@ See also:
             out = out[:-2]
 
     else:
-        if tree_[0]:
-            out += tree_[0].str + "\n\n"
 
         if tree_[3].str:
             out += tree_[3].str + "\n\n"

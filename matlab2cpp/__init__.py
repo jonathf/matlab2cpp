@@ -36,6 +36,8 @@ They are available through the `mc.qfunctions` module and mirrors the
 functionality offered by the `mconvert` function.
 """
 
+__version__ = 1.0
+
 import time
 from datetime import datetime as date
 import os
@@ -162,6 +164,9 @@ Args:
 
     builder.project.translate(args)
 
+    t = time.time()
+    stamp = date.fromtimestamp(t).strftime('%Y-%m-%d %H:%M:%S')
+
     for program in builder.project:
 
         name = program.name
@@ -174,11 +179,6 @@ Args:
         if hpp and cpp:
             cpp = '#include "%s.hpp"\n' % name + cpp
 
-        if log:
-            t = time.time()
-            log = "Translated on " +\
-                date.fromtimestamp(t).strftime('%Y-%m-%d %H:%M:%S\n\n') + log
-        
         if args.disp:
             print "Writing files..."
 
@@ -188,16 +188,22 @@ Args:
                     os.remove(name+ext)
 
         if cpp:
+            cpp = "// Automatically translated using Matlab2cpp %d on %s\n\n%s"\
+                    % (__version__, stamp, cpp)
             f = open(name+".cpp", "w")
             f.write(cpp)
             f.close()
 
         if hpp:
+            hpp = "// Automatically translated using Matlab2cpp %d on %s\n\n%s"\
+                    % (__version__, stamp, hpp)
             f = open(name+".hpp", "w")
             f.write(hpp)
             f.close()
 
         if log:
+            log = "Automatically translated using Matlab2cpp %d on %s\n\n%s"\
+                    % (__version__, stamp, log)
             f = open(name+".log", "w")
             f.write(log)
             f.close()
