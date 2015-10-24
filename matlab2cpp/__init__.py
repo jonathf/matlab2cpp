@@ -177,7 +177,7 @@ Args:
         log = qfunctions.qlog(program)
 
         if hpp and cpp:
-            cpp = '#include "%s.hpp"\n' % name + cpp
+            cpp = '#include "%s.hpp"\n\n' % name + cpp
 
         if args.disp:
             print "Writing files..."

@@ -628,20 +628,16 @@ def Get_sum(node):
         node.error("sum over non-array")
         return "sum(", ", ", ")"
 
-    out = arg.str
     node.type = arg.type
-    dim = arg.dim-1
 
-    if len(node) == 2:
-        out = out + ", " + node[1].str
-
-    if arg.dim == 2:
+    if arg.dim == 3:
         dim = 1
-        out = "arma::strans(" + out + ")"
+    else:
+        dim = arg.dim-1
 
     node.dim = dim
 
-    return "arma::sum(" + out + ")"
+    return "arma::sum(", ", ", ")"
 
 
 def Get_conj(node):
