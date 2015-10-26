@@ -630,14 +630,16 @@ def Get_sum(node):
 
     node.type = arg.type
 
-    if arg.dim == 3:
-        dim = 1
+    if arg.dim == 2:
+        dim = 0
+    elif arg.dim == 3:
+        dim = 2
     else:
         dim = arg.dim-1
 
     node.dim = dim
 
-    return "arma::sum(", ", ", ")"
+    return "arma::sum(", ", ", "-1)"
 
 
 def Get_conj(node):
