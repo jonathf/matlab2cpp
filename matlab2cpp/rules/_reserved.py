@@ -633,7 +633,10 @@ def Get_sum(node):
     if arg.dim == 2:
         dim = 0
     elif arg.dim == 3:
-        dim = 2
+        if len(node) == 2 and node[1].cls == "Int" and node[1].value == "2":
+            dim = 1
+        else:
+            dim = 2
     else:
         dim = arg.dim-1
 
