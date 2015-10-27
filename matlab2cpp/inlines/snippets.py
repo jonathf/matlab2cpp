@@ -31,7 +31,7 @@ if (n < 0)
 return s;
 }
 s.set_size(n);
-for (int ii = 0; ii <= n; ii++)
+for (int ii = 0; ii < n; ii++)
 {
 s(ii) = step * ii + a;
 }
@@ -42,12 +42,12 @@ uspan = ({}, '',
 """inline arma::uvec uspan(int a, int step, int b)
 {
 arma::uvec s;
-int n = (b - a + 1) / step;
+int n = (b - a + step) / step;
 if (n < 0)
 {
 return s;
 }
-s.set_size(n + 1);
+s.set_size(n);
 for (int ii = 0; ii < n; ii++)
 {
 s(ii) = step * ii + a;
