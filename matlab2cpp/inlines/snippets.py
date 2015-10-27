@@ -48,7 +48,7 @@ if (n < 0)
 return s;
 }
 s.set_size(n + 1);
-for (int ii = 0; ii <= n; ii++)
+for (int ii = 0; ii < n; ii++)
 {
 s(ii) = step * ii + a;
 }
@@ -80,18 +80,21 @@ myinclude = ({"code":"", "header":""}, '%(header)s', "%(code)s")
 
 hankel = ({}, '',
 """template<typename T1, typename T2>
-inline arma::Mat<typename T1::elem_type> hankel(const T1& c, const T2& r)
+inline arma::Mat<typename T1::elem_type> hankel(const T1& c_, const T2& r_)
 {
-int nc = r.n_elem;
-int nr = c.n_elem;
+typedef typename T1::elem_type eT;
+int nc = c_.n_elem;
+int nr = r_.n_elem;
+const arma::Col<eT> c((eT*)c_.memptr(), nr, 0);
+const arma::Col<eT> r((eT*)r_.memptr(), nc, 0);
 if (r[0] != c[0])
 {
 //("hankel: differing diagonal element. Using the column one");
 }
-arma::Mat<typename T1::elem_type> retval(nr, nc) = %(type)s;
+arma::Mat<typename T1::elem_type> retval(nr, nc);
 for (int i = 1; i <= std::min(nr, nc); i++)
 {
-retval.submat(1-1, nr-i, i-1, i-1) = c.rows(i-1, nr-1);
+retval.submat(0, i-1, nr-i, i-1) = c.rows(i-1, nr-1);
 }
 int tmp = 1;
 if (nc <= nr)
@@ -149,7 +152,7 @@ inline arma::cx_mat fft(arma::Mat<typename T::elem_type> X, int dim)
 if (dim == 1)
 X = arma::fft(X) ;
 else
-X = arma::trans(arma::fft(arma::trans(X))) ;
+X = arma::strans(arma::fft(arma::strans(X))) ;
 return X ;
 }
 """)
@@ -161,7 +164,7 @@ inline arma::cx_mat fft(arma::Mat<typename T::elem_type> X, int n, int dim)
 if (dim == 1)
 X = arma::fft(X, n) ;
 else
-X = arma::trans(arma::fft(arma::trans(X)), n) ;
+X = arma::strans(arma::fft(arma::strans(X)), n) ;
 return X ;
 }
 """)
@@ -173,7 +176,7 @@ inline arma::Mat<typename T::elem_type> ifft(arma::cx_mat X, int dim)
 if (dim == 1)
 X = arma::ifft(X) ;
 else
-X = arma::trans(arma::ifft(arma::trans(X))) ;
+X = arma::strans(arma::ifft(arma::strans(X))) ;
 return X ;
 }
 """)
@@ -185,7 +188,7 @@ inline arma::Mat<typename T::elem_type> ifft(arma::cx_mat X, int n, int dim)
 if (dim == 1)
 X = arma::ifft(X, n) ;
 else
-X = arma::trans(arma::ifft(arma::trans(X)), n) ;
+X = arma::strans(arma::ifft(arma::strans(X)), n) ;
 return X ;
 }
 """)
