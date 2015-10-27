@@ -133,6 +133,9 @@ type : str, None
     def suggest_datatype(self):
         return backend.suggest_datatype(self)
 
+    def wall_clock(self):
+        return backend.wall_clock(self)
+
     def __getitem__(self, i):
         if isinstance(i, str):
             out = self.prop[i]

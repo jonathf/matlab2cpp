@@ -17,6 +17,7 @@ reserved = {
 "_conv_to", "_reshape",
 "interp1", "linspace", "varargins",
 "sum", "conj", "real", "imag",
+"tic", "toc",
 }
 
 # Common attribute
@@ -658,3 +659,18 @@ def Get_real(node):
         node.mem = 3
     return "arma::real(", ", ", ")"
 
+def Var_tic(node):
+    return Get_tic(node)
+
+def Get_tic(node):
+    node.wall_clock()
+    node.type = "string"
+    return "_timer.tic()"
+
+def Var_toc(node):
+    return Get_toc(node)
+
+def Get_toc(node):
+    node.wall_clock()
+    node.type = "string"
+    return "_timer.toc()"

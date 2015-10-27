@@ -453,3 +453,8 @@ def include(node, name, **kws):
     if library_code and library_code not in inlines_.names:
         matlab2cpp.collection.Inline(inlines_, library_code)
 
+
+def wall_clock(node):
+    declares = node.func[0]
+    if "_timer" not in declares:
+        matlab2cpp.collection.Var(declares, name="_timer", type="wall_clock")
