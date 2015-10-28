@@ -144,7 +144,8 @@ inline arma::cx_mat fft(arma::Mat<typename T::elem_type> X, int dim)
 if (dim == 1)
 return arma::fft(X) ;
 else
-return arma::strans(arma::fft(arma::strans(X))) ;
+return 0 ;
+//return arma::strans(arma::fft(arma::strans(X))) ;
 }
 """)
 
@@ -155,7 +156,8 @@ inline arma::cx_mat fft(arma::Mat<typename T::elem_type> X, int n, int dim)
 if (dim == 1)
 return arma::fft(X, n) ;
 else
-return arma::strans(arma::fft(arma::strans(X)), n) ;
+return 0 ;
+//return arma::strans(arma::fft(arma::strans(X)), n) ;
 }
 """)
 
@@ -166,7 +168,8 @@ inline arma::Mat<typename T::elem_type> ifft(arma::cx_mat X, int dim)
 if (dim == 1)
 return arma::ifft(X) ;
 else
-return arma::strans(arma::ifft(arma::strans(X))) ;
+return 0 ;
+//return arma::strans(arma::ifft(arma::strans(X))) ;
 }
 """)
 
@@ -177,6 +180,7 @@ inline arma::Mat<typename T::elem_type> ifft(arma::cx_mat X, int n, int dim)
 if (dim == 1)
 return arma::ifft(X, n) ;
 else
-return arma::strans(arma::ifft(arma::strans(X)), n) ;
+return 0 ;
+//return arma::strans(arma::ifft(arma::strans(X)), n) ;
 }
 """)

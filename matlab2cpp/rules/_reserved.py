@@ -673,4 +673,6 @@ def Var_toc(node):
 def Get_toc(node):
     node.wall_clock()
     node.type = "string"
-    return "_timer.toc()"
+    if node.parent.cls != "Statement":
+        return "_time.toc()"
+    return 'cout << "Ellapsed time = " << _timer.toc() << endl'

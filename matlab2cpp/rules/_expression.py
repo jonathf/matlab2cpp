@@ -128,11 +128,17 @@ def Elementdivision(node):
 
     out = str(node[0])
     mem = node[0].mem
+    if mem<2:
+        mem = 2
 
     for child in node:
-        if child.mem < 2 and mem < 2:
+
+        if child.cls == "Int":
+            out = out + "/" + str(child) + ".0"
+
+        elif mem < 2:
             out = out + "*1./" + str(child)
-            mem = 2
+
         else:
             out = out + "/" + str(child)
         mem = max(mem, child.mem)
@@ -146,11 +152,17 @@ def Leftelementdivision(node):
 
     out = str(node[-1])
     mem = node[-1].mem
+    if mem<2:
+        mem = 2
 
     for child in node[-2::-1]:
+
+        if child.cls == "Int":
+            out = str(child) + ".0/" + out
+
         if child.mem < 2 and mem < 2:
             out = str(child) + "*1./" + out
-            mem = 2
+
         else:
             out = str(child) + "/" + out
     
@@ -168,13 +180,15 @@ def Matrixdivision(node):
 
     if {n.dim for n in node} == {0}:
 
-        for child in node[1:]:
-            if child.mem < 2 and mem < 2:
-                out = out + "*1./" + str(child)
-                mem = 2
-            else:
-                out = out + "/" + str(child)
-            mem = max(mem, child.mem)
+        return Elementdivision(node)
+
+        # for child in node[1:]:
+        #     if child.mem < 2 and mem < 2:
+        #         out = out + "*1./" + str(child)
+        #         mem = 2
+        #     else:
+        #         out = out + "/" + str(child)
+        #     mem = max(mem, child.mem)
 
     else:
 
@@ -245,13 +259,14 @@ def Leftmatrixdivision(node):
 
     if {n.dim for n in node} == {0}:
 
-        for child in node[1:]:
-            if child.mem < 2 and mem < 2:
-                out = str(child) + "*1./" + out
-                mem = 2
-            else:
-                out = out + "/" + str(child)
-            mem = max(mem, child.mem)
+        return Leftelementdivision(node)
+        # for child in node[1:]:
+        #     if child.mem < 2 and mem < 2:
+        #         out = str(child) + "*1./" + out
+        #         mem = 2
+        #     else:
+        #         out = out + "/" + str(child)
+        #     mem = max(mem, child.mem)
 
     else:
 
