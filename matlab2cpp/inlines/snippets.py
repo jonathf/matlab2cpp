@@ -83,10 +83,10 @@ hankel = ({}, '',
 inline arma::Mat<typename T1::elem_type> hankel(const T1& c_, const T2& r_)
 {
 typedef typename T1::elem_type eT;
-int nc = c_.n_elem;
-int nr = r_.n_elem;
+int nc = r_.n_elem;
+int nr = c_.n_elem;
 const arma::Col<eT> c((eT*)c_.memptr(), nr, 0);
-const arma::Col<eT> r((eT*)r_.memptr(), nc, 0);
+const arma::Row<eT> r((eT*)r_.memptr(), nc, 0);
 if (r[0] != c[0])
 {
 //("hankel: differing diagonal element. Using the column one");
@@ -103,19 +103,11 @@ tmp = nr-nc+2;
 }
 for (int i = nr; i >= tmp; i--)
 {
-retval.submat(2+nr-i-1, nc-1, i-1, i-1) = arma::trans(r.cols(2-1, nc-nr+i-1));
+retval.submat(i-1, 2+nr-i-1, i-1, nc-1) = r.cols(1, nc-nr+i-1);
 }
 return retval;
 }""")
 
-srow = ({}, '',
-"""""")
-scol = ({}, '',
-"""""")
-smat = ({}, '',
-"""""")
-scube = ({}, '',
-"""""")
 
 asuvec = ({}, '',
 """

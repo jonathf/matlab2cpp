@@ -73,11 +73,16 @@ def Params(node):
 def Declares(node):
 
     if node.backend in ("func_return", "func_returns"):
+        returns = node.parent[1]
+        print 333, returns.cls
 
         declares = {}
         structs = {}
 
         for child in node[:]:
+
+            if child.name in returns and node.backend == "func_returns":
+                continue
 
             type = type_string(child)
 

@@ -42,7 +42,6 @@ Examples:
 
     if node.cls == "All":
 
-        node.include("uspan")
         arg = node.parent.name
 
         if index == 0:
@@ -54,7 +53,7 @@ Examples:
             arg += ".n_cols"
         elif index == 2:
             arg += ".n_slices"
-        return "m2cpp::uspan(0, 1, " + arg + "-1)", 1
+        return "span(0, " + arg + "-1)", 1
 
     elif node.type == "TYPE":
         return out, -1

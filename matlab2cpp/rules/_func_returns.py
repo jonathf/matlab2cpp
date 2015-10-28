@@ -24,9 +24,13 @@ from _func_common import *
 def Assigns(node):
 
     if node[-1]:
-        indices = ["%("+str(d)+")s" for d in xrange(len(node))]
-        return "%(name)s(" + indices[-1] + ", " + ", ".join(indices[:-1]) + ") ;\n"
-    else:
-        indices = ["(%"+str(d)+")s" for d in xrange(len(node))]
-        return "%(name)s(" + ", ".join(indices[:-1]) + ") ;\n"
+        params = [s.str for s in node[-1]]
+        params = ", ".join(params) + ", "
 
+    else:
+        params = ""
+
+    returns = [s.str for s in node[:-1]]
+    returns = ", ".join(returns)
+
+    return "%(name)s(" + params + returns + ") ;"

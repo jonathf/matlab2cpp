@@ -68,7 +68,7 @@ def Get(node):
 
         elif node[1].cls == "All":
             if dim0:
-                return "%(name)s.rows(" + arg1 + ")"
+                return "%(name)s.rows(" + arg0 + ")"
             return "%(name)s.row(" + arg0 + ")"
 
         if dim0 == 0 and dim1 > 0:
@@ -137,14 +137,19 @@ def Set(node):
             return "%(name)s"
 
         if node[0].cls == "All":
+            if dim1:
+                return "%(name)s.cols(" + arg1 + ")"
             return "%(name)s.col(" + arg1 + ")"
 
         elif node[1].cls == "All":
+            if dim0:
+                return "%(name)s.rows(" + arg0 + ")"
             return "%(name)s.row(" + arg0 + ")"
 
         if dim0 == 0 and dim1 > 0:
             node.include("asuvec")
             arg0 = "m2cpp::asuvec(" + arg0 + ")"
+
         elif dim0 > 0 and dim1 == 0:
             node.include("asuvec")
             arg1 = "m2cpp::asuvec(" + arg1 + ")"

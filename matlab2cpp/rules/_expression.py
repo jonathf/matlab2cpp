@@ -339,9 +339,7 @@ def All(node):
     else:
         return "span::all"
 
-    node.include("uspan")
-
-    return "m2cpp::uspan(0, 1, " + arg + "-1)"
+    return "m2cpp::uspan(0, " + arg + "-1)"
 
 Neg = "-(", "", ")"
 Not = "not ", "", ""
@@ -371,8 +369,7 @@ def Colon(node):
         node.type = "uvec"
 
         if len(node) == 2:
-            node.include("uspan")
-            return "m2cpp::uspan(%(0)s-1, 1, %(1)s-1)"
+            return "span(%(0)s-1, %(1)s-1)"
 
         elif len(node) == 3:
             node.include("uspan")
