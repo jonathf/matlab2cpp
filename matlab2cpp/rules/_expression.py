@@ -124,7 +124,14 @@ Lor     = "", "|", ""
 def Elementdivision(node):
 
     if node.type == "TYPE":
-        return "", "/", ""
+
+        out = str(node[0])
+        for child in node[1:]:
+            if child.cls == "Int":
+                out = out + "/" + str(child) + ".0"
+            else:
+                out = out + "/" + str(child)
+        return out
 
     out = str(node[0])
     mem = node[0].mem
@@ -137,7 +144,7 @@ def Elementdivision(node):
             out = out + "/" + str(child) + ".0"
 
         elif mem < 2:
-            out = out + "*1./" + str(child)
+            out = out + "*1.0/" + str(child)
 
         else:
             out = out + "/" + str(child)
