@@ -397,8 +397,6 @@ def Colon(node):
 
     else:
 
-        node.include("span")
-
         if node.group.cls in ("Matrix",) and node.group.num:
             node.type = "urowvec"
             node.mem = node.group.mem
@@ -429,5 +427,9 @@ def Colon(node):
         else:
             return "", ":", ""
 
+        if node.mem == 0:
+            node.include("uspan")
+            return "m2cpp::uspan"+args
+        node.include("span")
+        return "m2cpp::span"+args
 
-        return "m2cpp::span<%(type)s>"+args

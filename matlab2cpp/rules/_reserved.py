@@ -17,7 +17,7 @@ reserved = {
 "_conv_to", "_reshape",
 "interp1", "linspace", "varargins",
 "sum", "conj", "real", "imag",
-"tic", "toc",
+"tic", "toc", "diag",
 }
 
 # Common attribute
@@ -676,3 +676,6 @@ def Get_toc(node):
     if node.parent.cls != "Statement":
         return "_time.toc()"
     return 'cout << "Ellapsed time = " << _timer.toc() << endl'
+
+def Get_diag(node):
+    return "diagmat(", ", ", ")"
