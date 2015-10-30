@@ -131,7 +131,7 @@ def Elementdivision(node):
     if mem<2:
         mem = 2
 
-    for child in node:
+    for child in node[1:]:
 
         if child.cls == "Int":
             out = out + "/" + str(child) + ".0"
