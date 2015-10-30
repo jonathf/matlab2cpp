@@ -148,7 +148,7 @@ def Elementdivision(node):
 def Leftelementdivision(node):
 
     if node.type == "TYPE":
-        return "", "/", ""
+        return "", "\\", ""
 
     out = str(node[-1])
     mem = node[-1].mem
@@ -251,7 +251,7 @@ def Matrixdivision(node):
 def Leftmatrixdivision(node):
 
     if node.type == "TYPE":
-        return "", "/", ""
+        return "", "\\", ""
 
     out = str(node[0])
     mem = node[0].mem
@@ -272,15 +272,17 @@ def Leftmatrixdivision(node):
 
         for child in node[1:]:
 
-            if child.dim == 3:
+            if child.dim > 0:
                 out = "arma::solve(" + out + ", " + str(child) + ")"
 
             elif child.mem < 2 and mem < 2:
-                out = str(child) + "*1./" + out
+                out = "(" + out + ")*1.0/" + str(child)
+                # out = str(child) + "*1./" + out
                 mem = 2
 
             else:
-                out = str(child) + "/" + out
+                out = "(" + out + ")/" + str(child)
+                # out = str(child) + "/" + out
 
             mem = max(mem, child.mem)
 

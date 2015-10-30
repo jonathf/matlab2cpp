@@ -500,7 +500,7 @@ def Get_floor(node):
     if node[0].mem > 1:
         node.type = (node[0].dim, 1)
 
-    if node.dim == 0:
+    if node[0].dim == 0:
         return "std::floor(%(0)s)"
 
     return "arma::floor(%(0)s)"
