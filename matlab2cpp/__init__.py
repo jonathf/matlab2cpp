@@ -176,10 +176,10 @@ Args:
         py = qfunctions.qpy(program, prefix=True)
         log = qfunctions.qlog(program)
 
-        if hpp and cpp:
-            # cpp = '#include "%s.hpp"\n\n' % name + cpp
-            # cpp = '#include "mconvert.h"\n\n' + cpp
-            cpp = '#include "%s.hpp"\n\n' % os.path.relpath(name) + cpp
+        # if hpp and cpp:
+        #     # cpp = '#include "%s.hpp"\n\n' % name + cpp
+        #     # cpp = '#include "mconvert.h"\n\n' + cpp
+        #     cpp = '#include "%s.hpp"\n\n' % os.path.relpath(name) + cpp
 
         if args.disp:
             print "Writing files..."
@@ -190,16 +190,16 @@ Args:
                     os.remove(name+ext)
 
         if cpp:
-            cpp = "// Automatically translated using Matlab2cpp %d on %s\n\n%s"\
-                    % (__version__, stamp, cpp)
+            cpp = """// Automatically translated using Matlab2cpp %g on %s
+
+%s""" % (__version__, stamp, cpp)
             f = open(name+".cpp", "w")
             f.write(cpp)
             f.close()
 
         if hpp:
-            hpp = """// Automatically translated using Matlab2cpp %d on %s
+            hpp = """// Automatically translated using Matlab2cpp %g on %s
             
-#include "mconvert.h"
 %s
 """\
                     % (__version__, stamp, hpp)
@@ -208,7 +208,7 @@ Args:
             f.close()
 
         if log:
-            log = "Automatically translated using Matlab2cpp %d on %s\n\n%s"\
+            log = "Automatically translated using Matlab2cpp %g on %s\n\n%s"\
                     % (__version__, stamp, log)
             f = open(name+".log", "w")
             f.write(log)

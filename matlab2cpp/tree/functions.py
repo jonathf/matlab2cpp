@@ -78,6 +78,7 @@ Example:
     matlab2cpp.collection.Log(program, name=name)
 
     includes.include("armadillo")
+    includes.include("mconvert")
     # Start processing
 
     cur = 0

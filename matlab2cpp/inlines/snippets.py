@@ -18,6 +18,9 @@ The value '%(file)s' will be substituted with the name of the file.
 
 armadillo = ({}, "#include <armadillo>", "")
 namespace_arma = ({}, "using namespace arma ;", "")
+mconvert = ({}, '#include "mconvert.h"', '')
+splot = ({}, '#include "Splot.h"')
+
 math = ({}, "#include <math>", "")
 
 span = ({}, '',
