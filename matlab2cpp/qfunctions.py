@@ -146,15 +146,30 @@ See also:
             raise KeyError(
         "Argument code should be code string, Builder or Program-node")
 
-    tree_.translate()
+    if not tree_.str:
+        tree_.translate()
+
+    includes, funcs, inlines, structs, headers, log = tree_
 
     out = ""
-    if tree_[1] and tree_[1][0].name == "main":
-        out += tree_[1].str
+
+    if funcs and funcs[0].name == "main":
+
+        if includes.str:
+            out += includes.str + "\n\n"
+
+        if len(headers) > 1:
+            out += headers.str + "\n\n"
+
+        if structs.str:
+            out += structs.str + "\n\n"
+
+        if funcs.str:
+            out += funcs.str + "\n\n"
 
         out = out.replace("__percent__", "%")
 
-    return out
+    return out[:-2]
 
 
 def qhpp(code, suggest=False):
@@ -229,40 +244,28 @@ See also:
     if not tree_.str:
         tree_.translate()
 
-    out = tree_[0].str
-    if out:
-        out += "\n\n"
+    includes, funcs, inlines, structs, headers, log = tree_
 
-    if tree_[1] and tree_[1][0].name == "main":
+    out = ""
 
-        if len(tree_[4]) > 1:
-            out += tree_[4].str + "\n\n"
+    if funcs and funcs[0].name == "main":
+        return out
 
-        if tree_[2].str:
-            out += tree_[2].str + "\n\n"
+    if includes.str:
+        out += includes.str + "\n\n"
 
-        if tree_[3].str:
-            out += tree_[3].str + "\n\n"
+    if len(headers) > 1:
+        out += headers.str + "\n\n"
 
-        if out[-2:] == "\n\n":
-            out = out[:-2]
+    if structs.str:
+        out += structs.str + "\n\n"
 
-    else:
-
-        if tree_[3].str:
-            out += tree_[3].str + "\n\n"
-
-        if tree_[2].str:
-            out += tree_[2].str + "\n\n"
-
-        if len(tree_[4]) > 1:
-            out += tree_[4].str + "\n\n"
-
-        out += tree_[1].str
+    if funcs.str:
+        out += funcs.str + "\n\n"
 
     out = out.replace("__percent__", "%")
 
-    return out
+    return out[:-2]
 
 
 def qpy(code, suggest=True, prefix=False):
