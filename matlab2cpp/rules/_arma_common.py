@@ -40,30 +40,43 @@ Examples:
 
     out = "%(" + str(index) + ")s"
 
+    # the full range ':'
     if node.cls == "All":
 
         arg = node.parent.name
 
+        # first axis
         if index == 0:
+
+            # axis and dim does not match for colvec and rowvec
             if node.parent.dim == 1:
                 arg += ".n_cols"
             else:
                 arg += ".n_rows"
+
+        # second axis
         elif index == 1:
             arg += ".n_cols"
+
+        # third axis
         elif index == 2:
             arg += ".n_slices"
+
         return "span(0, " + arg + "-1)", 1
 
+    # undefined type
     elif node.type == "TYPE":
         return out, -1
 
-    if node.mem > 1 and node.dim == 0:
+    # float point scalar
+    elif node.mem > 1 and node.dim == 0:
         out = "(uword) " + out
 
-    if node.dim == 2:
-        out = "arma::trans(" + out + ")"
+    # rowvec (-> colvec)
+    elif node.dim == 2:
+        out = "arma::strans(" + out + ")"
 
+    # scalar done verbatim
     if node.dim == 0:
         if node.cls == "Int":
             out = str(int(node.value)-1)
@@ -72,9 +85,12 @@ Examples:
         else:
             out = out + "-1"
         dim = 0
+
+    # matrices and cubes 
     elif node.dim > 2:
         dim = node.dim
         out = out + "-1"
+
     else:
         dim = 1
         if node.cls != "Colon":
@@ -84,30 +100,46 @@ Examples:
 
 
 def scalar_assign(node):
+    """
+convert scalar to various array types
+    """
+
+    # left-hand-side and right-hand-side
     lhs, rhs = node
 
     if lhs.mem < rhs.mem:
         node.warning("Type reduction from %s to %s" % (rhs.type, lhs.type))
 
+    # matrix suround are ignored
     if rhs.cls == "Matrix":
         rhs = str(rhs[0][0])
+
     else:
         rhs = "%(1)s"
 
     if lhs.dim == 0:
         pass
+
+    # as colvec
     elif lhs.dim == 1:
         node.include("scol")
         rhs = "m2cpp::scol(" + rhs + ")"
+
+    # as rowvec
     elif lhs.dim == 2:
         node.include("srow")
         rhs = "m2cpp::srow(" + rhs + ")"
+
+    # as matrix
     elif lhs.dim == 3:
         node.include("smat")
         rhs = "m2cpp::smat(" + rhs + ")"
+
+    # as cube
     elif lhs.dim == 4:
         node.include("scube")
         rhs = "m2cpp::scube(" + rhs + ")"
+
     return "%(0)s = " + rhs + " ;"
 
 

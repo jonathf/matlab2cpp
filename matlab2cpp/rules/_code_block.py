@@ -132,7 +132,10 @@ Examples:
     // Empty block
     }
     """
-    return "if (%(0)s)\n{\n%(1)s\n}"
+    return """if (%(0)s)
+{
+%(1)s
+}"""
 
 
 def Elif(node):
@@ -173,7 +176,10 @@ Examples:
     // Empty block
     }
     """
-    return "else if (%(0)s)\n{\n%(1)s\n}"
+    return """else if (%(0)s)
+{
+%(1)s
+}"""
 
 
 def Else(node):
@@ -212,7 +218,10 @@ Examples:
     // Empty block
     }
     """
-    return "else\n{\n%(0)s\n}"
+    return """else
+{
+%(0)s
+}"""
 
 
 def Switch(node):
@@ -249,6 +258,8 @@ Examples:
     """
     if node[0].cls == "Var":
         out = ""
+
+    # create switch variable
     else:
         node.type = node[0].type
         out = "%(type)s _var_%(type)s = %(0)s ;\n"
@@ -287,17 +298,23 @@ Example:
     }
     """
 
+    # first in row
     if node is node.parent[1]:
         out = "if (%(0)s == "
     else:
         out = "else if (%(0)s == "
+
+    # define name
     if node.parent[0].cls == "Var":
         out = out + node.parent[0].name
+
     else:
         node.type = node.parent[0].type
         out += "_var_%(type)s"
+
     out = out + ")\n{\n%(1)s\n}"
     return out
+
 
 def Otherwise(node):
     """
@@ -361,6 +378,7 @@ Examples:
     node.error("Try-statement are currently not supported.")
     return "", "\n", ""
 
+
 def Try(node):
     """Try
 
@@ -376,6 +394,7 @@ Children:
     Block : Try content
     """
     return "try\n{\n", "", "\n}"
+
 
 def Catch(node):
     """
@@ -393,11 +412,14 @@ Children:
     Block : Catch content
     """
     
-    name = node["name"]
+    name = node.name
+
     if not name:
         return "catch (...)\n{\n", "", "\n}"
+
     if name[0] != "@":
         return "catch ("+node.type()+" "+name+")\n{\n", "", "\n}"
+
     return "catch (...)\n{\n", "", "\n}"
 
 
@@ -467,9 +489,11 @@ Examples:
     c = _aux_int_1(2) ;
     """
 
+    # left-hand-side not a variable -> create auxillary variable that is
     if node[-1].cls != "Var":
-        node[-1].auxiliary()
+        return node[-1].auxiliary()
 
+    # split into multiple lines
     out = ""
     for i in xrange(len(node[:-1])):
         i = str(i)
@@ -519,27 +543,37 @@ Examples:
 
     if range.cls == "Colon":
 
+        # <start>:<stop>
         if len(range) == 2:
             start, stop = range
             step = "1"
+        
+        # <start>:<step>:<stop>
         elif len(range) == 3:
             start, step, stop = range
         start, step, stop = map(str, [start, step, stop])
 
+        # return
         out = "for (%(0)s=" + start + \
             "; %(0)s<=" + stop + "; %(0)s"
+
+        # special case for '+= 1'
         if step == "1":
             out += "++"
         else:
             out += "+=" + step
+
         out += ")\n{\n%(2)s\n}"
+
         return out
 
+    # default
     return """for (int _%(0)s=0; _%(0)s<length(%(1)s); _%(0)s++)
 {
 %(0)s = %(1)s[_%(0)s] ;
 %(2)s
 }"""
+
 
 def Bcomment(node):
     """
@@ -557,6 +591,7 @@ Examples:
     """
     return "/*%(value)s*/"
 
+
 def Lcomment(node):
     """
 Line comment
@@ -572,6 +607,7 @@ Examples:
     // comment
     """
     return "//%(value)s"
+
 
 def Ecomment(node):
     """

@@ -1,13 +1,16 @@
 Paren = "(%(0)s)"
 
 def End(node):
+    """The 'end' statement indicating not end of block, but end-of-range."""
 
+    # find context for what end refers to
     pnode = node
     while pnode.parent.cls not in \
             ("Get", "Cget", "Nget", "Fget", "Sget",
             "Set", "Cset", "Nset", "Fset", "Sset", "Block"):
         pnode = pnode.parent
 
+    # end statement only makes sense in certain contexts
     if pnode.cls == "Block":
         node.error("Superfluous end-statement")
         return "end"
@@ -15,6 +18,7 @@ def End(node):
     index = pnode.parent.children.index(pnode)
     name = pnode = pnode.parent.name
 
+    # what end is referring to
     if index == 0:
         return name + ".n_rows"
     elif index == 1:
@@ -34,15 +38,20 @@ def Return(node):
     if func["backend"] == "func_lambda":
         return "return _retval"
 
-    return "return " + func[1][0]["name"]
+    return_value = func[1][0].name
+    return "return " + return_value
 
 
 # simple operators
 def Mul(node):
+    """(Matrix-)multiplication
+    """
 
+    # unknown input
     if node.type == "TYPE":
         return "", "*", ""
 
+    # not numerical
     if not node.num:
         node.error("non-numerical multiplication %s" % str([n.type for n in node]))
         return "", "*", ""
@@ -90,21 +99,32 @@ def Mul(node):
     return "", "*", ""
 
 def Elmul(node):
+    """Element multiplication
+    """
+
+    # unknown input
     if node.type == "TYPE":
         return "", ".*", ""
 
+    # not numerical
     if not node.num:
         node.error("non-numerical multiplication %s" % str([n.type for n in node]))
         return "", ".*", ""
 
+    # scalar multiplication
     if node.dim == 0:
         return "", "*", ""
 
+    # Sclar's multiplication in Armadillo '%' needs special handle because of
+    # interpolation in python
     return "", "__percent__", ""
 
 def Plus(node):
+
+    # non-numerical addition
     if not node.num:
         node.error("non-numerical addition %s" % str([n.type for n in node]))
+
     return "", "+", ""
 
 def Minus(node):
@@ -122,11 +142,17 @@ Bor     = "", "||", ""
 Lor     = "", "|", ""
 
 def Elementdivision(node):
+    """Element wise division
+    """
 
+    # unknown input
     if node.type == "TYPE":
 
+        # default to assume everything scalar
         out = str(node[0])
         for child in node[1:]:
+
+            # force to be float if int in divisor
             if child.cls == "Int":
                 out = out + "/" + str(child) + ".0"
             else:
@@ -134,84 +160,106 @@ def Elementdivision(node):
         return out
 
     out = str(node[0])
+
+    # force float output
     mem = node[0].mem
     if mem<2:
         mem = 2
 
     for child in node[1:]:
 
+        # convert ints to floats
         if child.cls == "Int":
             out = out + "/" + str(child) + ".0"
 
+        # avoid int/uword division
         elif mem < 2:
             out = out + "*1.0/" + str(child)
 
         else:
             out = out + "/" + str(child)
+
         mem = max(mem, child.mem)
+
+    node.mem = mem
 
     return out
 
-def Leftelementdivision(node):
 
+def Leftelementdivision(node):
+    """Left element wise division
+    """
+
+    # unknown input
     if node.type == "TYPE":
         return "", "\\", ""
 
+    # iterate backwards
     out = str(node[-1])
+
+    # force float output
     mem = node[-1].mem
     if mem<2:
         mem = 2
 
     for child in node[-2::-1]:
 
+        # avoid explicit integer division
         if child.cls == "Int":
             out = str(child) + ".0/" + out
 
+        # avoid implicit integer division
         if child.mem < 2 and mem < 2:
-            out = str(child) + "*1./" + out
+            out = str(child) + "*1.0/" + out
 
         else:
             out = str(child) + "/" + out
+
+        mem = max(mem, child.mem)
+
+    node.mem = mem
     
     return out
 
 
 def Matrixdivision(node):
 
+    # unknown input
     if node.type == "TYPE":
         return "", "/", ""
 
+    # start with first element ...
     out = str(node[0])
+
     mem = node[0].mem
     dim = node[0].dim
 
+    # everything scalar -> use element division
     if {n.dim for n in node} == {0}:
 
         return Elementdivision(node)
 
-        # for child in node[1:]:
-        #     if child.mem < 2 and mem < 2:
-        #         out = out + "*1./" + str(child)
-        #         mem = 2
-        #     else:
-        #         out = out + "/" + str(child)
-        #     mem = max(mem, child.mem)
-
     else:
 
+        # ... iterate over the others
         for child in node[1:]:
 
+            # matrix handle
             if child.dim == 3:
                 out = "arma::solve(" + str(child) + ".t(), " + out + ".t()).t()"
 
+            # avoid integer division
             elif child.mem < 2 and mem < 2:
-                out = out + "*1./" + str(child)
+                out = out + "*1.0/" + str(child)
                 mem = 2
 
             else:
                 out = out + "/" + str(child)
+
+            # track memory output
             mem = max(mem, child.mem)
 
+            # assert if division legal in matlab
             if dim == 0:
                 dim = child.dim
 
@@ -255,44 +303,48 @@ def Matrixdivision(node):
 
     return out
 
-def Leftmatrixdivision(node):
 
+def Leftmatrixdivision(node):
+    """Left operator matrix devision
+    """
+
+    # unknown input
     if node.type == "TYPE":
         return "", "\\", ""
 
+    # start with first node ...
     out = str(node[0])
+
     mem = node[0].mem
     dim = node[0].dim
 
+    # everything scalar -> use left element division
     if {n.dim for n in node} == {0}:
-
         return Leftelementdivision(node)
-        # for child in node[1:]:
-        #     if child.mem < 2 and mem < 2:
-        #         out = str(child) + "*1./" + out
-        #         mem = 2
-        #     else:
-        #         out = out + "/" + str(child)
-        #     mem = max(mem, child.mem)
 
     else:
 
+        # ... iterate forwards
         for child in node[1:]:
 
+            # classical array inversion
             if child.dim > 0:
                 out = "arma::solve(" + out + ", " + str(child) + ")"
 
+            # avoid integer division
+            # backwords since left division is reverse
             elif child.mem < 2 and mem < 2:
                 out = "(" + out + ")*1.0/" + str(child)
-                # out = str(child) + "*1./" + out
                 mem = 2
 
+            # backwords since left division is reverse
             else:
                 out = "(" + out + ")/" + str(child)
                 # out = str(child) + "/" + out
 
             mem = max(mem, child.mem)
 
+            # assert division as legal
             if dim == 0:
                 dim = node.dim
 
@@ -339,12 +391,19 @@ def Leftmatrixdivision(node):
 
 
 def Exp(node):
+    """Exponent
+    """
+
     out = str(node[0])
     for child in node[1:]:
-        out = "pow(" + str(out) + "," + str(child) + ")"
+        out = "arma::pow(" + str(out) + "," + str(child) + ")"
+
     return out
 
 def Elexp(node):
+    """Elementwise exponent
+    """
+
     out = str(node[0])
     for child in node[1:]:
         out = "pow(" + str(out) + "," + str(child) + ")"
@@ -352,14 +411,22 @@ def Elexp(node):
 
 
 def All(node):
+    """All ':' element
+    """
     arg = node.parent.name
 
+    # is first arg
     if len(node.parent) > 0 and node.parent[0] is node:
         arg += ".n_rows"
+
+    # is second arg
     elif len(node.parent) > 1 and node.parent[1] is node:
         arg += ".n_cols"
+
+    # is third arg
     elif len(node.parent) > 2 and node.parent[2] is node:
         arg += ".n_slices"
+
     else:
         return "span::all"
 
@@ -369,32 +436,57 @@ Neg = "-(", "", ")"
 Not = "not ", "", ""
 
 def Transpose(node):
+    """(Simple) transpose
+    """
+
+    # unknown datatype
     if not node.num:
-        return "arma::trans(%(0)s)"
+        return "arma::strans(%(0)s)"
+
+    # colvec -> rowvec
     if node[0].dim == 1:
         node.dim = 2
+
+    # rowvec -> colvec
     elif node[0].dim == 2:
         node.dim = 1
-    return "arma::trans(", "", ")"
+
+    return "arma::strans(", "", ")"
 
 def Ctranspose(node):
+    """Complex transpose
+    """
+
+    # unknown input
     if not node.num:
-        return "arma::strans(", "", ")"
-    if node.dim == 2:
-        node.dim = 3
-    elif node.dim == 3:
+        return "arma::trans(", "", ")"
+
+    # colvec -> rowvec
+    if node[0].dim == 1:
         node.dim = 2
-    return "arma::strans(", "", ")"
+
+    # rowvec -> colvec
+    elif node[0].dim == 2:
+        node.dim = 1
+
+    # not complex type
+    if node.mem < 5:
+        return "arma::strans(", "", ")"
+    
+    return "arma::trans(", "", ")"
 
 def Colon(node):
 
+    # context: array argument (must always be uvec)
     if node.parent.cls in ("Get", "Cget", "Nget", "Fget", "Sget",
                 "Set", "Cset", "Nset", "Fset", "Sset") and node.parent.num:
         node.type = "uvec"
 
+        # two arguments
         if len(node) == 2:
-            return "span(%(0)s-1, %(1)s-1)"
+            return "arma::span(%(0)s-1, %(1)s-1)"
 
+        # three arguments
         elif len(node) == 3:
             node.include("uspan")
             return "m2cpp::uspan(%(0)s-1, %(1)s, %(2)s-1)"
@@ -404,39 +496,33 @@ def Colon(node):
 
     else:
 
+        # context: matrix concatination
         if node.group.cls in ("Matrix",) and node.group.num:
-            node.type = "urowvec"
-            node.mem = node.group.mem
+            node.type = "ivec"
 
+        # context: pass to function
         elif node.parent.cls in ("Get", "Cget", "Nget", "Fget", "Sget",
                 "Set", "Cset", "Nset", "Fset", "Sset"):
-            if node.parent.cls == "Get" and\
-                    node.parent.backend == node.parent.type:
-                node.type = "irowvec"
+            node.type = "ivec"
 
-            else:
-                node.type = "uvec"
-
+        # context: assignment
         elif node.group.cls in ("Assign",) and node.group[0].num:
-            if node.group[0].dim == 1:
-                node.type = "uvec"
-            else:
-                node.type = "urowvec"
-            node.mem = node.group[0].mem
+            node.type = "uvec"
 
         else:
-            node.type = "irowvec"
+            node.type = "ivec"
 
+        # <start>:<stop>
         if len(node) == 2:
-            args = "(%(0)s, 1, %(1)s)"
+            return "arma::span(%(0)s, %(1)s)"
+
+        # <start>:<step>:<stop>
         elif len(node) == 3:
             args = "(%(0)s, %(1)s, %(2)s)"
-        else:
-            return "", ":", ""
 
+        # no negative indices
         if node.mem == 0:
-            node.include("uspan")
             return "m2cpp::uspan"+args
-        node.include("span")
+
         return "m2cpp::span"+args
 

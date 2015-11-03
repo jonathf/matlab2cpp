@@ -1,6 +1,8 @@
 import re
 
 def add_indenting(text):
+    """Add identing to text
+    """
 
     lines = text.split("\n")
 
@@ -26,6 +28,13 @@ def add_indenting(text):
 
 
 def number_fix(text):
+    """Code has allot of '-1' statements in indexing. This code substitutes
+explicit number subtractions with the single index equivalent.
+
+Examples:
+    >>> print number_fix("a(8-1, 5-1)")
+    a(7, 4)
+    """
 
     # Cosmetic fix
     for p0,p1,p2 in set(re.findall(r"(([ ,(])(-?\d+)-1)", text)):
@@ -44,7 +53,10 @@ def number_fix(text):
     text = re.sub(r"\+-", r"-", text)
     return text
 
+
 def strip(text):
+    """Remove trailing spaces and linefeeds.
+    """
 
     start = 0
     while text[start] in "\n ":
@@ -68,7 +80,6 @@ def Program(node):
 
 def Includes(node):
     return "", "\n", ""
-
 
 def Headers(node):
     return "", "\n", ""
@@ -170,3 +181,7 @@ def Struct(node):
     out = add_indenting(out)
 
     return out
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

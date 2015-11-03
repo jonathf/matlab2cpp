@@ -3,6 +3,7 @@ from _arma_common import configure_arg
 
 def Get(node):
 
+    # number of argument not legal for cube
     if len(node) not in (1,2,3):
 
         if not len(node):
@@ -17,9 +18,12 @@ def Get(node):
     if len(node) == 1:
 
         arg, dim = configure_arg(node[0], 0)
+
+        # unknown input
         if dim == -1:
             return "%(name)s(%(0)s)"
 
+        # scalar input
         if dim == 0:
             node.dim = 0
 
@@ -32,6 +36,7 @@ def Get(node):
         arg0, dim0 = configure_arg(node[0], 0)
         arg1, dim1 = configure_arg(node[1], 1)
 
+        # unkonwn input
         if -1 in (dim0, dim1):
             return "%(name)s(", ", ", ")"
 
@@ -47,15 +52,18 @@ def Get(node):
             else:
                 node.dim = 0
 
-        node.resize()
+        node = node.resize() # matlab to armadillo fix for cubes
+
         return "_%(name)s(" + arg0 + ", " + arg1 + ")"
 
+    # Triple argument
     elif len(node) == 3:
 
         arg0, dim0 = configure_arg(node[0], 0)
         arg1, dim1 = configure_arg(node[1], 1)
         arg2, dim2 = configure_arg(node[2], 2)
 
+        # unknown arguments
         if -1 in (dim0, dim1, dim2):
             return "%(name)s(", ", ", ")"
 
@@ -63,26 +71,26 @@ def Get(node):
         if dim0:
             if dim1:
                 if dim2:
-                    node.dim = 4
+                    node.dim = 4#cube
                 else:
-                    node.dim = 3
+                    node.dim = 3#matrix
             else:
                 if dim2:
-                    node.dim = 3
+                    node.dim = 3#matrix
                 else:
-                    node.dim = 1
+                    node.dim = 1#colvec
 
         else:
             if dim1:
                 if dim2:
-                    node.dim = 3
+                    node.dim = 3#matrix
                 else:
-                    node.dim = 1
+                    node.dim = 1#colvec
             else:
                 if dim2:
-                    node.dim = 1
+                    node.dim = 1#colvec
                 else:
-                    node.dim = 0
+                    node.dim = 0#scalar
 
         return "%(name)s(" + arg0 + ", " + arg1 + ", " + arg2 + ")"
 
@@ -103,9 +111,11 @@ def Set(node):
 
         arg, dim = configure_arg(node[0], 0)
 
+        # unknown arguments
         if dim == -1:
             return "%(name)s(%(0)s)"
 
+        # if scalar arg, set node as scalar
         if dim == 0:
             node.dim = 0
 
@@ -118,30 +128,34 @@ def Set(node):
         arg0, dim0 = configure_arg(node[0], 0)
         arg1, dim1 = configure_arg(node[1], 1)
 
+        # unknown args
         if -1 in (dim0, dim1):
             return "%(name)s(", ", ", ")"
-        node = node.resize()
+
+        node = node.resize() # matlab to armadillo fix for cubes
 
         # Configure dimensions
         if dim0:
             if dim1:
-                node.dim = 3
+                node.dim = 3#matrix
             else:
-                node.dim = 1
+                node.dim = 1#colvec
         else:
             if dim1:
-                node.dim = 2
+                node.dim = 2#rowvec
             else:
-                node.dim = 0
+                node.dim = 0#scalar
 
         return "%(name)s(" + arg0 + ", " + arg1 + ", 1)"
 
+    # triple argument
     elif len(node) == 3:
 
         arg0, dim0 = configure_arg(node[0], 0)
         arg1, dim1 = configure_arg(node[1], 1)
         arg2, dim2 = configure_arg(node[2], 2)
 
+        # unkown input
         if -1 in (dim0, dim1, dim2):
             return "%(name)s(", ", ", ")"
 
@@ -149,30 +163,33 @@ def Set(node):
         if dim0:
             if dim1:
                 if dim2:
-                    node.dim = 4
+                    node.dim = 4#cube
                 else:
-                    node.dim = 3
+                    node.dim = 3#matrix
             else:
                 if dim2:
-                    node.dim = 3
+                    node.dim = 3#matrix
                 else:
-                    node.dim = 1
+                    node.dim = 1#colvec
 
         else:
             if dim1:
                 if dim2:
-                    node.dim = 3
+                    node.dim = 3#matrix
                 else:
-                    node.dim = 1
+                    node.dim = 1#colvec
             else:
                 if dim2:
-                    node.dim = 1
+                    node.dim = 1#colvec
                 else:
-                    node.dim = 0
+                    node.dim = 0#scaler
 
         return "%(name)s(" + arg0 + ", " + arg1 + ", " + arg2 + ")"
 
 
 def Resize(node):
+    """Special resizing of cube such that properly tranlsation between matlab
+    and armadillo."""
+
     return "%(type)s_%(name)s(%(name)s.memptr(), %(name)s.n_rows, " +\
             "%(name)s.n_cols*%(name)s.n_slices, false) ;"

@@ -34,11 +34,14 @@ from _assign_common import Assign as A
 
 def Lambda(node):
 
+    # lambda function are created as full functions, but referenced to be
+    # written inline
     lfunc = node.reference
     ldeclares, lreturns, lparams, lblock = lfunc
     lnames = lparams.names + ldeclares.names
     expr = lblock[0][1]
 
+    # location for where lambda is created
     func = node.func
     declares, returns, params, block = func
 
@@ -52,15 +55,21 @@ def Lambda(node):
     for node_ in nodes:
         nodes.extend(node_[:])
 
-        if node_["class"] in ["Var", "Cvar", "Fvar",
+        # a variable
+        if node_.cls in ["Var", "Cvar", "Fvar",
                 "Get", "Cget", "Fget", "Nget"]:
             name = node_.name
+
+            # not in lambda scope
             if name not in lnames:
+
+                # defined as a parameter in function
                 if name in params.names:
                     type = params[params.names.index(name)].type
                     node_.type = type
                     node_.declare.type = type
 
+                # declared in function
                 elif name in declares.names:
                     type = declares[declares.names.index(name)].type
                     node_.type = type
@@ -69,6 +78,7 @@ def Lambda(node):
 
     out = ""
 
+    # declare list in lambda function
     for declare in declares:
         if declare not in ldeclares:
             continue
@@ -79,9 +89,11 @@ def Lambda(node):
         else:
             node.type = declare.type
 
+    # translate again where datatypes updated
     expr.translate()
     lfunc.translate()
 
+    # return string
     out = "[" + out[2:] + "] "
     out += "(" + str(lparams) + ") {" + str(expr) + " ; }"
     return out

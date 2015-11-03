@@ -27,20 +27,24 @@ Examples:
     a = arma::vectorise(b) ;
     """
 
+    # left-hand-side and right-hand-side
     lhs, rhs = node
+
+    # unknown datatype
     if "TYPE" in (lhs.type, rhs.type) or lhs.type == rhs.type:
         return "%(0)s = %(1)s ;"
 
+    # numerical
     if lhs.num and rhs.num:
 
-        # if len(node) == 1 and len(node[0]) == 1 and node[0][0].backend
-
+        # mismatch between colvec and rowvec, do transpose
         if (lhs.dim == 2 and rhs.dim == 1) or\
                 (lhs.dim == 1 and rhs.dim == 2):
             out = "arma::strans(%(1)s)"
         else:
             out = "%(1)s"
 
+        # both scalar
         if lhs.dim == 0 and rhs.dim == 0:
 
             if lhs.mem >= rhs.mem:
@@ -49,12 +53,15 @@ Examples:
                 node.warning("Type reduction from %s to %s" %\
                         (rhs.type, lhs.type))
 
+        # fill array with scalar value
         elif lhs.dim > 0 and rhs.dim == 0:
             return scalar_assign(node)
 
+        # dimensions that works just fine
         elif lhs.dim in (1,2) and rhs.dim in (3, 4):
             pass
 
+        # all the ways things are wrong
         elif lhs.dim > 0 and rhs.dim > 0:
 
             if lhs.mem >= rhs.mem:

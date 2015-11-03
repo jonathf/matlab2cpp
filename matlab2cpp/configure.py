@@ -93,12 +93,6 @@ See also:
 
     nodes = self.project.flatten(False, True, False)
 
-    # # run only once
-    # for node in nodes[::-1]:
-    #     pass
-    #
-
-
     while True:
 
         for node in nodes[::-1]:

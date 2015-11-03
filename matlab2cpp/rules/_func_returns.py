@@ -23,6 +23,7 @@ from _func_common import *
 
 def Assigns(node):
 
+    # existence of parameters in function call
     if node[-1]:
         params = [s.str for s in node[-1]]
         params = ", ".join(params) + ", "
