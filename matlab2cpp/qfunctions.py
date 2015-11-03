@@ -324,8 +324,13 @@ See also:
             raise KeyError(
         "Argument code should be code string, Builder or Program-node")
 
-    tf, ts, ti, sugs = supplement.get_variables(tree_)
-    out = supplement.str_variables(tf, ts, ti, sugs, prefix=prefix)
+    ftypes = supplement.functions.get(tree_)
+    stypes = supplement.structs.get(tree_)
+    itypes = supplement.includes.get(tree_)
+    vtypes = supplement.verbatim.get(tree_)
+    suggestions = supplement.suggests.get(tree_)
+
+    out = supplement.str_variables(ftypes, stypes, itypes, suggestions, prefix, vtypes)
     out = out.replace("__percent__", "%")
 
     return out

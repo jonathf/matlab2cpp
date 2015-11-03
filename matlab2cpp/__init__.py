@@ -105,8 +105,61 @@ Args:
             code = f.read()
             f.close()
 
-            builder.load(filename, code)
-            program = builder[-1]
+            if os.path.isfile(filename + ".py") and not args.reset:
+
+                try:
+                    cfg = imp.load_source("cfg", filename + ".py")
+
+                except:
+                    raise ImportError("""Supplement file:
+    %s.py
+    is formated incorrectly. Change the format or convert with '-r' option to create
+    a new file.""" % filename)
+
+                if "verbatims" in cfg.__dict__ and cfg.verbatims:
+                    verbatims = cfg.verbatims
+                    code = supplement.verbatim.set(verbatims, code)
+
+                builder.load(filename, code)
+                program = builder[-1]
+
+                if "functions" in cfg.__dict__:
+
+                    funcs = program.ftypes
+
+                    for name in funcs.keys():
+                        if name in cfg.functions:
+                            for key in cfg.functions[name].keys():
+                                funcs[name][key] = cfg.functions[name][key]
+
+                    program.ftypes = funcs
+
+                if "structs" in cfg.__dict__:
+
+                    structs = program.stypes
+
+                    for name in structs.keys():
+                        if name in cfg.structs:
+                            for key in cfg.structs[name].keys():
+                                structs[name][key] = cfg.structs[name][key]
+
+                    program.stypes = structs
+
+                if "includes" in cfg.__dict__:
+
+                    includes = program.itypes
+
+                    for key in cfg.includes:
+                        if key not in includes:
+                            includes.append(key)
+
+                    program.itypes = includes
+
+            else:
+                builder.load(filename, code)
+                program = builder[-1]
+
+            # add unknown variables to stack if they exists as files
             unknowns = builder.get_unknowns(filename)
 
             for i in xrange(len(unknowns)-1, -1, -1):
@@ -118,40 +171,10 @@ Args:
                         program.include(path + sep + unknowns[i])
                         filenames.append(path + sep + unknowns.pop(i))
 
-            if os.path.isfile(filename + ".py") and not args.reset:
-
-                try:
-                    cfg = imp.load_source("cfg", filename + ".py")
-
-                    types_f, types_s, types_i, suggest =\
-                        supplement.get_variables(builder.project[-1])
-                    for name in types_f.keys():
-
-                        if name in cfg.functions:
-                            for key in cfg.functions[name].keys():
-                                types_f[name][key] = cfg.functions[name][key]
-
-                    for name in types_s.keys():
-
-                        if name in cfg.structs:
-                            for key in cfg.structs[name].keys():
-                                types_s[name][key] = cfg.structs[name][key]
-
-                    for key in cfg.includes:
-                        if key not in types_i:
-                            types_i.append(key)
-
-                    supplement.set_variables(program, types_f, types_s, types_i)
-
-                except:
-                    raise ImportError("""Supplement file:
-    %s.py
-    is formated incorrectly. Change the format or convert with '-r' option to create
-    a new file.""" % filename)
 
     else:
-
-        program = builder.load("unnamed", args.filename)
+        builder.load("unnamed", args.filename)
+        program = builder[-1]
 
     if args.disp:
         print "configure tree"
@@ -176,11 +199,6 @@ Args:
         py = qfunctions.qpy(program, prefix=True)
         log = qfunctions.qlog(program)
 
-        # if hpp and cpp:
-        #     # cpp = '#include "%s.hpp"\n\n' % name + cpp
-        #     # cpp = '#include "mconvert.h"\n\n' + cpp
-        #     cpp = '#include "%s.hpp"\n\n' % os.path.relpath(name) + cpp
-
         if args.disp:
             print "Writing files..."
 
@@ -200,9 +218,7 @@ Args:
         if hpp:
             hpp = """// Automatically translated using Matlab2cpp %g on %s
             
-%s
-"""\
-                    % (__version__, stamp, hpp)
+%s""" % (__version__, stamp, hpp)
             f = open(name+".hpp", "w")
             f.write(hpp)
             f.close()

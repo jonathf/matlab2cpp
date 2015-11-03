@@ -98,7 +98,8 @@ Example:
     return types_f, types_s, types_i, suggest
 
 
-def str_variables(types_f={}, types_s={}, types_i=[], suggest={}, prefix=True):
+def str_variables(types_f={}, types_s={}, types_i=[],
+        suggest={}, prefix=True, types_v={}):
     """
 Convert a nested dictionary for types, suggestions and structs and use them to
 create a suppliment text ready to be saved.
@@ -107,6 +108,7 @@ Kwargs:
     types_f (dict): Function variables datatypes
     types_s (dict): Struct variables datatypes
     types_i (list): Includes in header
+    types_v (dict): Verbatim translations
     suggest (dict): Suggested datatypes for types_f and types_s
     prefix (bool): True if the type explaination should be included
 
@@ -234,6 +236,23 @@ Example:
                 out += "  '" + key + "',\n"
 
         out += "]"
+
+    if types_v:
+
+        if types_f or prefix or types_s or types_i:
+            out += "\n"
+
+        out += "verbatims = {\n"
+
+        keys = types_v.keys()
+        keys.sort()
+        l = max([len(k) for k in keys])+2
+
+        for key in keys:
+            val = types_v[key]
+            out += " "*(l-len(key)) + '"%s" : "%s",\n' % (key, val)
+
+        out += "}"
 
     return out
 

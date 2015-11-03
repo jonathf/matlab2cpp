@@ -1,15 +1,20 @@
 import re
+import matlab2cpp
 
 # in: code, D is dictionary, returns modified code
 def set(D, code):
     for key, value in D.items():
         value = '_' + value.replace('\n', '\n_')
-        code = re.sub(r'^.*' + re.escape(key) + r'.*$', value, code)
+        findterm = r'.*' + re.escape(key) + r'.*'
+        code = re.sub(findterm, value, code)
+
+    print code
+
     return code
         
 #find nodes that contain verbatim
 def get(node):
-    nodes = flatten(node, False, False, False)
+    nodes = node.flatten()
 
     D = {}
     for node in nodes:

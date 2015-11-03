@@ -36,6 +36,7 @@ class Node(object):
     ftypes = sup.Ftypes()
     itypes = sup.Itypes()
     stypes = sup.Stypes()
+    vtypes = sup.Vtypes()
 
     def __init__(self, parent, name="", backend="unknown", value="",
             type="TYPE", pointer=0, line=None, cur=None, code=None, file=None):
