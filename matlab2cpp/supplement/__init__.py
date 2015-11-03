@@ -250,7 +250,10 @@ Example:
 
         for key in keys:
             val = types_v[key]
-            out += " "*(l-len(key)) + '"%s" : "%s",\n' % (key, val)
+            if "\n" in val:
+                out += " "*(l-len(key)) + '"%s" : """%s""",\n' % (key, val)
+            else:
+                out += " "*(l-len(key)) + '"%s" : "%s",\n' % (key, val)
 
         out += "}"
 

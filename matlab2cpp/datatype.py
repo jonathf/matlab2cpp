@@ -5,7 +5,7 @@ implicitly at creation.  When translating between the two languages, there are
 many variables where the data types are unknown and impossible for the
 Matlab2cpp software to translate.  How to translate the behavior of an integer
 is vastly different from an float matrix.
-
+    
 Variable types
 --------------
 
