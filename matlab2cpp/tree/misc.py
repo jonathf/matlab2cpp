@@ -299,7 +299,26 @@ Example:
 
     return end
 
+def verbatim(self, parent, cur):
+    """
+    Verbatim, indicated by _
 
+Args:
+    self (Builder): Code constructor
+    parent (Node): Parent node
+    cur (int): Current position in code
+
+Returns:
+	int : End of verbatim
+    """
+    
+    assert parent.cls == "Block"
+
+    end = findend.verbatim(self, cur)
+    verbatim = matlab2cpp.collection.Verbatim(parent, )
+
+    return end    
+    
 def matrix(self, node, cur):
     """
 Verbatim matrices

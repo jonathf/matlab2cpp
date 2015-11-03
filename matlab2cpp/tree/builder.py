@@ -401,6 +401,10 @@ Example::
     def create_comment(self, parent, cur):
         return misc.comment(self, parent, cur)
 
+    #verbatim node
+    def create_verbatim(self, parent, cur):
+        return misc.verbatim(self, parent, cur)
+    
     def create_string(self, parent, cur):
         return misc.string(self, parent, cur)
 

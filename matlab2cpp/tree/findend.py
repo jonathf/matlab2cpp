@@ -279,6 +279,28 @@ Returns:
         self.syntaxerror(start, "comment end")
     return eoc
 
+#should find the end of verbatim area
+def verbatim(self, start):
+    """
+Find end of verbatim
+
+Arg:
+   self(Builder): Code constructor
+   start (int): current position in code
+
+Returns:
+   int: index location of end of verbatim
+     """
+
+    if self.code[start] != "\n" || self.code[start+1] != "_":
+        self.syntaxerror(start, "verbatim start")
+
+    eoc = start+2
+    #Search for line not starting with \n_ , then return index
+    while True:
+        eoc = self.code.find("\n", eoc)
+        if (self.code[eoc+1] != '_')
+            return endVal
 
 def dots(self, start):
     """
