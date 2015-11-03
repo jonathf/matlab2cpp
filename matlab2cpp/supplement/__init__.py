@@ -34,11 +34,13 @@ import functions
 import suggests
 import structs
 import includes
+import verbatim
 
 from functions import Ftypes
 from suggests import  Sstypes
 from structs import Stypes
 from includes import Itypes
+from verbatim import Vtypes
 
 def set_variables(program, types_f={}, types_s={}, types_i=[]):
     """

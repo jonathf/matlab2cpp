@@ -277,3 +277,7 @@ class Nset(Node):
 class Resize(Node):
     def __init__(self, parent, backend="cube_common", **kws):
         Node.__init__(self, parent, backend=backend, **kws)
+
+class Verbatim(Node):
+    def __init__(self, parent, name, value, backend="verbatim", **kws):
+        Node.__init__(self, parent, name=name, value=value, backend=backend, **kws)
