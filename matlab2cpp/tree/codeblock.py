@@ -63,6 +63,10 @@ Example:
         elif self.code[cur] == "%":
             cur = self.create_comment(block, cur)
 
+        #verbatim \n_
+        elif self.code[cur] == "\n_":
+            cur = self.create_verbatim(block, cur)
+
         elif self.code[cur] == "[":
 
             # Divide between statement and assignment
