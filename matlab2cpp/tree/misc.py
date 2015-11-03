@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 """
 Interpretors that didn't fit other places
 
@@ -315,7 +317,17 @@ Returns:
     assert parent.cls == "Block"
 
     end = findend.verbatim(self, cur)
-    verbatim = matlab2cpp.collection.Verbatim(parent, )
+
+    if self.disp:
+        print "%4d   Verbatim     " % cur,
+        print "%-20s" % "misc.verbatim",
+        print repr(self.code[cur:end+1])
+
+    keys = self.code[cur:end+1].split("___")
+    name = keys[1]
+    value = "\n".join(keys[2:])
+    verbatim = matlab2cpp.collection.Verbatim(parent, name, value, cur=cur,
+            code=self.code[cur:end+1])
 
     return end    
     

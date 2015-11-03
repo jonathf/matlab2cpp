@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 """
 Look-ahead routines to find end character.
 
@@ -292,15 +294,10 @@ Returns:
    int: index location of end of verbatim
      """
 
-    if self.code[start] != "\n" || self.code[start+1] != "_":
+    if self.code[start:start+3] != "___":
         self.syntaxerror(start, "verbatim start")
+    return self.code.find("\n", start)-1
 
-    eoc = start+2
-    #Search for line not starting with \n_ , then return index
-    while True:
-        eoc = self.code.find("\n", eoc)
-        if (self.code[eoc+1] != '_')
-            return endVal
 
 def dots(self, start):
     """

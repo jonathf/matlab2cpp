@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 """
 The main codeblock loop
 """
@@ -63,8 +65,7 @@ Example:
         elif self.code[cur] == "%":
             cur = self.create_comment(block, cur)
 
-        #verbatim \n_
-        elif self.code[cur] == "\n_":
+        elif self.code[cur:cur+3] == "___":
             cur = self.create_verbatim(block, cur)
 
         elif self.code[cur] == "[":

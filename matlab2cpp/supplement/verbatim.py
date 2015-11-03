@@ -1,14 +1,16 @@
+# encoding: utf-8
+
 import re
 import matlab2cpp
 
-# in: code, D is dictionary, returns modified code
+
 def set(D, code):
+
     for key, value in D.items():
-        value = '_' + value.replace('\n', '\n_')
+
+        value = "___" + key + '___' + value.replace('\n', '___')
         findterm = r'.*' + re.escape(key) + r'.*'
         code = re.sub(findterm, value, code)
-
-    print code
 
     return code
         
