@@ -50,16 +50,16 @@ Examples::
        4     Var         variables.variable   'c'
        6     Expression  expression.create    'd'
        6     Var         variables.variable   'd'
-    >>> print mc.qtree(builder, core=True)
-      1   1 Block      code_block   TYPE    
-      1   1 Statement  code_block   TYPE    
-      1   1 | Plus       expression   TYPE    
-      1   1 | | Mul        expression   TYPE    
-      1   1 | | | Var        unknown      TYPE    a
-      1   3 | | | Var        unknown      TYPE    b
-      1   5 | | Matrixdivision expression   TYPE    
-      1   5 | | | Var        unknown      TYPE    c
-      1   7 | | | Var        unknown      TYPE    d
+    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    1 1Block      code_block   TYPE
+    1 1| Statement  code_block   TYPE
+    1 1| | Plus       expression   TYPE
+    1 1| | | Mul        expression   TYPE
+    1 1| | | | Var        unknown      TYPE    a
+    1 3| | | | Var        unknown      TYPE    b
+    1 5| | | Matrixdivisionexpression   TYPE
+    1 5| | | | Var        unknown      TYPE    c
+    1 7| | | | Var        unknown      TYPE    d
     """
 
     if self.code[start:start+3] == "...":

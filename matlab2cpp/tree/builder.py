@@ -16,26 +16,24 @@ the code. The various constructors uses the support modules in the
 :py:mod:`~matlab2cpp.mc.tree` to build a full toke tree.  The result is as
 follows::
 
-    >>> print builder
-            Project    program      TYPE    project
-            | Program    program      TYPE    file1.m
-            | | Includes   program      TYPE    
-            | | | Include    program      TYPE    #include <armadillo>
-            | | | Include    program      TYPE    using namespace arma ;
-      1   1 | | Funcs      program      TYPE    file1.m
-      1   1 | | | Main       func_common  TYPE    main
-      1   1 | | | | Declares   func_return  TYPE    
-      1   1 | | | | | Var        unknown      TYPE    a
-      1   1 | | | | Returns    func_return  TYPE    
-      1   1 | | | | Params     func_return  TYPE    
-      1   1 | | | | Block      code_block   TYPE    
-      1   1 | | | | | Assign     unknown      TYPE    
-      1   1 | | | | | | Var        unknown      TYPE    a
-      1   5 | | | | | | Int        int          int     
-            | | Inlines    program      TYPE    file1.m
-            | | Structs    program      TYPE    file1.m
-            | | Headers    program      TYPE    file1.m
-            | | Log        program      TYPE    file1.m
+    >>> print builder # doctest: +NORMALIZE_WHITESPACE
+       | Project    program      TYPE    project
+       | | Program    program      TYPE    file1.m
+       | | | Includes   program      TYPE
+    1 1| | | Funcs      program      TYPE    file1.m
+    1 1| | | | Main       func_common  TYPE    main
+    1 1| | | | | Declares   func_return  TYPE
+    1 1| | | | | | Var        unknown      TYPE    a
+    1 1| | | | | Returns    func_return  TYPE
+    1 1| | | | | Params     func_return  TYPE
+    1 1| | | | | Block      code_block   TYPE
+    1 1| | | | | | Assign     unknown      TYPE
+    1 1| | | | | | | Var        unknown      TYPE    a
+    1 5| | | | | | | Int        int          int
+       | | | Inlines    program      TYPE    file1.m
+       | | | Structs    program      TYPE    file1.m
+       | | | Headers    program      TYPE    file1.m
+       | | | Log        program      TYPE    file1.m
 
 If is possible to get a detailed output of how this process is done, by turning
 the `disp` flag on::
@@ -61,26 +59,24 @@ Note that the tree above for the most part doesn't have any relevant data types
 configure. To configure datatypes, use the `configure` method::
 
     >>> builder.configure(suggest=True)
-    >>> print builder
-            Project    program      TYPE    project
-            | Program    program      TYPE    file1.m
-            | | Includes   program      TYPE    
-            | | | Include    program      TYPE    #include <armadillo>
-            | | | Include    program      TYPE    using namespace arma ;
-      1   1 | | Funcs      program      TYPE    file1.m
-      1   1 | | | Main       func_common  TYPE    main
-      1   1 | | | | Declares   func_return  int     
-      1   1 | | | | | Var        int          int     a
-      1   1 | | | | Returns    func_return  TYPE    
-      1   1 | | | | Params     func_return  TYPE    
-      1   1 | | | | Block      code_block   TYPE    
-      1   1 | | | | | Assign     unknown      TYPE    
-      1   1 | | | | | | Var        int          int     a
-      1   5 | | | | | | Int        int          int     
-            | | Inlines    program      TYPE    file1.m
-            | | Structs    program      TYPE    file1.m
-            | | Headers    program      TYPE    file1.m
-            | | Log        program      TYPE    file1.m
+    >>> print builder # doctest: +NORMALIZE_WHITESPACE
+       | Project    program      TYPE    project
+       | | Program    program      TYPE    file1.m
+       | | | Includes   program      TYPE
+    1 1| | | Funcs      program      TYPE    file1.m
+    1 1| | | | Main       func_common  TYPE    main
+    1 1| | | | | Declares   func_return  int
+    1 1| | | | | | Var        int          int     a
+    1 1| | | | | Returns    func_return  TYPE
+    1 1| | | | | Params     func_return  TYPE
+    1 1| | | | | Block      code_block   TYPE
+    1 1| | | | | | Assign     unknown      TYPE
+    1 1| | | | | | | Var        int          int     a
+    1 5| | | | | | | Int        int          int
+       | | | Inlines    program      TYPE    file1.m
+       | | | Structs    program      TYPE    file1.m
+       | | | Headers    program      TYPE    file1.m
+       | | | Log        program      TYPE    file1.m
 
 Multiple program can be loaded into the same builder. This allows for building
 of projects that involves multiple files. For example::
@@ -171,19 +167,17 @@ Example::
 
     >>> builder = mc.Builder()
     >>> print builder
-            Project    program      TYPE    project
+      | Project    program      TYPE    project
     >>> builder.load("unnamed.m", "")
-    >>> print builder
-            Project    program      TYPE    project
-            | Program    program      TYPE    unnamed.m
-            | | Includes   program      TYPE    
-            | | | Include    program      TYPE    #include <armadillo>
-            | | | Include    program      TYPE    using namespace arma ;
-      1   1 | | Funcs      program      TYPE    unnamed.m
-            | | Inlines    program      TYPE    unnamed.m
-            | | Structs    program      TYPE    unnamed.m
-            | | Headers    program      TYPE    unnamed.m
-            | | Log        program      TYPE    unnamed.m
+    >>> print builder # doctest: +NORMALIZE_WHITESPACE
+       | Project    program      TYPE    project
+       | | Program    program      TYPE    unnamed.m
+       | | | Includes   program      TYPE
+    1 1| | | Funcs      program      TYPE    unnamed.m
+       | | | Inlines    program      TYPE    unnamed.m
+       | | | Structs    program      TYPE    unnamed.m
+       | | | Headers    program      TYPE    unnamed.m
+       | | | Log        program      TYPE    unnamed.m
         """
 
         if self.disp:
@@ -204,63 +198,59 @@ Example::
 
     >>> builder = mc.Builder()
     >>> builder.load("unnamed.m", "a=1; b=2.; c='c'")
-    >>> print builder
-            Project    program      TYPE    project
-            | Program    program      TYPE    unnamed.m
-            | | Includes   program      TYPE    
-            | | | Include    program      TYPE    #include <armadillo>
-            | | | Include    program      TYPE    using namespace arma ;
-      1   1 | | Funcs      program      TYPE    unnamed.m
-      1   1 | | | Main       func_common  TYPE    main
-      1   1 | | | | Declares   func_return  TYPE    
-      1   1 | | | | | Var        unknown      TYPE    a
-      1   1 | | | | | Var        unknown      TYPE    b
-      1   1 | | | | | Var        unknown      TYPE    c
-      1   1 | | | | Returns    func_return  TYPE    
-      1   1 | | | | Params     func_return  TYPE    
-      1   1 | | | | Block      code_block   TYPE    
-      1   1 | | | | | Assign     unknown      TYPE    
-      1   1 | | | | | | Var        unknown      TYPE    a
-      1   3 | | | | | | Int        int          int     
-      1   6 | | | | | Assign     unknown      TYPE    
-      1   6 | | | | | | Var        unknown      TYPE    b
-      1   8 | | | | | | Float      double       double  
-      1  12 | | | | | Assign     unknown      TYPE    
-      1  12 | | | | | | Var        unknown      TYPE    c
-      1  14 | | | | | | String     string       string  
-            | | Inlines    program      TYPE    unnamed.m
-            | | Structs    program      TYPE    unnamed.m
-            | | Headers    program      TYPE    unnamed.m
-            | | Log        program      TYPE    unnamed.m
+    >>> print builder # doctest: +NORMALIZE_WHITESPACE
+       | Project    program      TYPE    project
+       | | Program    program      TYPE    unnamed.m
+       | | | Includes   program      TYPE
+    1 1| | | Funcs      program      TYPE    unnamed.m
+    1 1| | | | Main       func_common  TYPE    main
+    1 1| | | | | Declares   func_return  TYPE
+    1 1| | | | | | Var        unknown      TYPE    a
+    1 1| | | | | | Var        unknown      TYPE    b
+    1 1| | | | | | Var        unknown      TYPE    c
+    1 1| | | | | Returns    func_return  TYPE
+    1 1| | | | | Params     func_return  TYPE
+    1 1| | | | | Block      code_block   TYPE
+    1 1| | | | | | Assign     unknown      TYPE
+    1 1| | | | | | | Var        unknown      TYPE    a
+    1 3| | | | | | | Int        int          int
+    1 6| | | | | | Assign     unknown      TYPE
+    1 6| | | | | | | Var        unknown      TYPE    b
+    1 8| | | | | | | Float      double       double
+    1 12| | | | | | Assign     unknown      TYPE
+    1 12| | | | | | | Var        unknown      TYPE    c
+    1 14| | | | | | | String     string       string
+       | | | Inlines    program      TYPE    unnamed.m
+       | | | Structs    program      TYPE    unnamed.m
+       | | | Headers    program      TYPE    unnamed.m
+       | | | Log        program      TYPE    unnamed.m
     >>> builder.configure(suggest=True)
-    >>> print builder
-            Project    program      TYPE    project
-            | Program    program      TYPE    unnamed.m
-            | | Includes   program      TYPE    
-            | | | Include    program      TYPE    #include <armadillo>
-            | | | Include    program      TYPE    using namespace arma ;
-      1   1 | | Funcs      program      TYPE    unnamed.m
-      1   1 | | | Main       func_common  TYPE    main
-      1   1 | | | | Declares   func_return  TYPE    
-      1   1 | | | | | Var        int          int     a
-      1   1 | | | | | Var        double       double  b
-      1   1 | | | | | Var        string       string  c
-      1   1 | | | | Returns    func_return  TYPE    
-      1   1 | | | | Params     func_return  TYPE    
-      1   1 | | | | Block      code_block   TYPE    
-      1   1 | | | | | Assign     unknown      TYPE    
-      1   1 | | | | | | Var        int          int     a
-      1   3 | | | | | | Int        int          int     
-      1   6 | | | | | Assign     unknown      TYPE    
-      1   6 | | | | | | Var        double       double  b
-      1   8 | | | | | | Float      double       double  
-      1  12 | | | | | Assign     unknown      TYPE    
-      1  12 | | | | | | Var        string       string  c
-      1  14 | | | | | | String     string       string  
-            | | Inlines    program      TYPE    unnamed.m
-            | | Structs    program      TYPE    unnamed.m
-            | | Headers    program      TYPE    unnamed.m
-            | | Log        program      TYPE    unnamed.m
+    >>> print builder # doctest: +NORMALIZE_WHITESPACE
+       | Project    program      TYPE    project
+       | | Program    program      TYPE    unnamed.m
+       | | | Includes   program      TYPE
+    1 1| | | Funcs      program      TYPE    unnamed.m
+    1 1| | | | Main       func_common  TYPE    main
+    1 1| | | | | Declares   func_return  TYPE
+    1 1| | | | | | Var        int          int     a
+    1 1| | | | | | Var        double       double  b
+    1 1| | | | | | Var        string       string  c
+    1 1| | | | | Returns    func_return  TYPE
+    1 1| | | | | Params     func_return  TYPE
+    1 1| | | | | Block      code_block   TYPE
+    1 1| | | | | | Assign     unknown      TYPE
+    1 1| | | | | | | Var        int          int     a
+    1 3| | | | | | | Int        int          int
+    1 6| | | | | | Assign     unknown      TYPE
+    1 6| | | | | | | Var        double       double  b
+    1 8| | | | | | | Float      double       double
+    1 12| | | | | | Assign     unknown      TYPE
+    1 12| | | | | | | Var        string       string  c
+    1 14| | | | | | | String     string       string
+       | | | Inlines    program      TYPE    unnamed.m
+       | | | Structs    program      TYPE    unnamed.m
+       | | | Headers    program      TYPE    unnamed.m
+       | | | Log        program      TYPE    unnamed.m
     """
         mc.configure.configure(self, suggest, **kws)
 

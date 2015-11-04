@@ -36,14 +36,14 @@ Example:
        8   Statement     codeblock.codeblock  '3'
        8     Expression  expression.create    '3'
        8     Int         misc.number          '3'
-    >>> print mc.qtree(builder, core=True)
-      1   1 Block      code_block   TYPE    
-      1   1 Statement  code_block   TYPE    
-      1   1 | Var        unknown      TYPE    a
-      1   4 Statement  code_block   TYPE    
-      1   4 | String     string       string  
-      1   9 Statement  code_block   TYPE    
-      1   9 | Int        int          int     
+    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    1  1Block      code_block   TYPE
+    1  1| Statement  code_block   TYPE
+    1  1| | Var        unknown      TYPE    a
+    1  4| Statement  code_block   TYPE
+    1  4| | String     string       string
+    1  9| Statement  code_block   TYPE
+    1  9| | Int        int          int
     '''
 
     cur = start

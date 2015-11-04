@@ -68,8 +68,8 @@ See also:
     indent = [node]
     outl = []
 
-    nl = int(math.log10(nodes[-1].line+1))+1
-    nc = int(math.log10(len(nodes[0].code)))+1
+    nl = int(math.log10(nodes[-1].line+1))
+    nc = int(math.log10(len(nodes[0].code) or 1))
 
     for node in nodes:
 
@@ -77,12 +77,12 @@ See also:
 
 
         if node.line:
-            nl_ = int(math.log10(node.line+1))+1
+            nl_ = int(math.log10(node.line))+1
             out += " "*(nl-nl_) + str(node.line) + " "
-            nc_ = int(math.log10(node.cur+1))+1
+            nc_ = int(math.log10(node.cur or 1))+1
             out += " "*(nc-nc_) + str(node.cur+1)
         else:
-            out += " "*(nl+nc+1)
+            out += " "*(nl+nc+2)
 
         # indentation
         while indent and not (node.parent is indent[-1]):
@@ -109,7 +109,7 @@ See also:
 
     out = re.sub(r"(\\n){2,}", "", out)
 
-    return out[:-1]
+    return out
 
 
 def auxillary(node, type, convert):

@@ -39,11 +39,11 @@ Example:
        0     Var         variables.assign     'a'
        4     Expression  expression.create    '4'
        4     Int         misc.number          '4'
-    >>> print mc.qtree(builder, core=True)
-      1   1 Block      code_block   TYPE    
-      1   1 Assign     unknown      TYPE    
-      1   1 | Var        unknown      TYPE    a
-      1   5 | Int        int          int     
+    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    1 1Block      code_block   TYPE
+    1 1| Assign     unknown      TYPE
+    1 1| | Var        unknown      TYPE    a
+    1 5| | Int        int          int
     """
 
     if  self.code[cur] not in c.letters:
@@ -264,10 +264,10 @@ Example:
        0   Statement     codeblock.codeblock  'a'
        0     Expression  expression.create    'a'
        0     Var         variables.variable   'a'
-    >>> print mc.qtree(builder, core=True) #doctest:+NORMALIZE_WHITESPACE
+    >>> print mc.qtree(builder, core=True) #doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Statement  code_block   TYPE
-    1 1| | Var        unknown      TYPE
+    1 1| | Var        unknown      TYPE    a
     """
 
     k = cur
@@ -503,11 +503,11 @@ Example:
        0     Cvar        variables.variable   'a{b}'
        2     Expression  expression.create    'b'
        2     Var         variables.variable   'b'
-    >>> print mc.qtree(builder, core=True)
-      1   1 Block      code_block   TYPE    
-      1   1 Statement  code_block   TYPE    
-      1   1 | Cvar       cell         TYPE    a
-      1   3 | | Var        unknown      TYPE    b
+    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    1 1Block      code_block   TYPE
+    1 1| Statement  code_block   TYPE
+    1 1| | Cvar       cell         TYPE    a
+    1 3| | | Var        unknown      TYPE    b
     """
 
     if self.code[cur] != "{":

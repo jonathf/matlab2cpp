@@ -53,17 +53,17 @@ Example:
       16   Statement     codeblock.codeblock  'b'
       16     Expression  expression.create    'b'
       16     Var         variables.variable   'b'
-    >>> print mc.qtree(builder, core=True)
-      1   1 Block      code_block   TYPE    
-      1   1 Tryblock   code_block   TYPE    
-      1   1 | Try        code_block   TYPE    
-      2   7 | | Block      code_block   TYPE    
-      2   7 | | | Statement  code_block   TYPE    
-      2   7 | | | | Var        unknown      TYPE    a
-      3   9 | Catch      code_block   TYPE    
-      4  17 | | Block      code_block   TYPE    
-      4  17 | | | Statement  code_block   TYPE    
-      4  17 | | | | Var        unknown      TYPE    b
+    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    1  1Block      code_block   TYPE
+    1  1| Tryblock   code_block   TYPE
+    1  1| | Try        code_block   TYPE
+    2  7| | | Block      code_block   TYPE
+    2  7| | | | Statement  code_block   TYPE
+    2  7| | | | | Var        unknown      TYPE    a
+    3  9| | Catch      code_block   TYPE
+    4 17| | | Block      code_block   TYPE
+    4 17| | | | Statement  code_block   TYPE
+    4 17| | | | | Var        unknown      TYPE    b
     '''
 
     if  self.code[cur:cur+3] != "try" or self.code[cur+3] not in c.k_end:
@@ -148,20 +148,20 @@ Example:
       29   Statement     codeblock.codeblock  'd'
       29     Expression  expression.create    'd'
       29     Var         variables.variable   'd'
-    >>> print mc.qtree(builder, core=True)
-      1   1 Block      code_block   TYPE    
-      1   1 Switch     code_block   TYPE    
-      1   8 | Var        unknown      TYPE    a
-      2  10 | Case       code_block   TYPE    
-      2  15 | | Var        unknown      TYPE    b
-      3  19 | | Block      code_block   TYPE    
-      3  19 | | | Statement  code_block   TYPE    
-      3  19 | | | | Var        unknown      TYPE    c
-      4  21 | Case       code_block   TYPE    
-      4  26 | | Var        unknown      TYPE    d
-      5  30 | | Block      code_block   TYPE    
-      5  30 | | | Statement  code_block   TYPE    
-      5  30 | | | | Var        unknown      TYPE    d
+    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    1  1Block      code_block   TYPE
+    1  1| Switch     code_block   TYPE
+    1  8| | Var        unknown      TYPE    a
+    2 10| | Case       code_block   TYPE
+    2 15| | | Var        unknown      TYPE    b
+    3 19| | | Block      code_block   TYPE
+    3 19| | | | Statement  code_block   TYPE
+    3 19| | | | | Var        unknown      TYPE    c
+    4 21| | Case       code_block   TYPE
+    4 26| | | Var        unknown      TYPE    d
+    5 30| | | Block      code_block   TYPE
+    5 30| | | | Statement  code_block   TYPE
+    5 30| | | | | Var        unknown      TYPE    d
     '''
 
     if not (self.code[cur:cur+6] == "switch" and\
@@ -262,13 +262,13 @@ Example:
       10   Statement     codeblock.codeblock  'b'
       10     Expression  expression.create    'b'
       10     Var         variables.variable   'b'
-    >>> print mc.qtree(builder, core=True)
-      1   1 Block      code_block   TYPE    
-      1   1 While      code_block   TYPE    
-      1   7 | Var        unknown      TYPE    a
-      2  11 | Block      code_block   TYPE    
-      2  11 | | Statement  code_block   TYPE    
-      2  11 | | | Var        unknown      TYPE    b
+    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    1  1Block      code_block   TYPE
+    1  1| While      code_block   TYPE
+    1  7| | Var        unknown      TYPE    a
+    2 11| | Block      code_block   TYPE
+    2 11| | | Statement  code_block   TYPE
+    2 11| | | | Var        unknown      TYPE    b
     '''
 
     if  self.code[cur:cur+5] != "while" and self.code[cur+5] not in c.k_end:
@@ -338,14 +338,14 @@ Example:
       12   Statement     codeblock.codeblock  'c'
       12     Expression  expression.create    'c'
       12     Var         variables.variable   'c'
-    >>> print mc.qtree(builder, core=True)
-      1   1 Block      code_block   TYPE    
-      1   1 For        code_block   TYPE    
-      1   5 | Var        unknown      TYPE    a
-      1   9 | Var        unknown      TYPE    b
-      2  13 | Block      code_block   TYPE    
-      2  13 | | Statement  code_block   TYPE    
-      2  13 | | | Var        unknown      TYPE    c
+    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    1  1Block      code_block   TYPE
+    1  1| For        code_block   TYPE
+    1  5| | Var        unknown      TYPE    a
+    1  9| | Var        unknown      TYPE    b
+    2 13| | Block      code_block   TYPE
+    2 13| | | Statement  code_block   TYPE
+    2 13| | | | Var        unknown      TYPE    c
     '''
 
     if  self.code[cur:cur+3] != "for":
@@ -435,19 +435,19 @@ Example:
       20   Statement     codeblock.codeblock  'd'
       20     Expression  expression.create    'd'
       20     Var         variables.variable   'd'
-    >>> print mc.qtree(builder, core=True)
-      1   1 Block      code_block   TYPE    
-      1   1 Branch     code_block   TYPE    
-      1   4 | If         code_block   TYPE    
-      1   4 | | Var        unknown      TYPE    a
-      1   5 | | Block      code_block   TYPE    
-      2   8 | | | Statement  code_block   TYPE    
-      2   8 | | | | Var        unknown      TYPE    b
-      3  10 | Elif       code_block   TYPE    
-      3  17 | | Var        unknown      TYPE    c
-      3  18 | | Block      code_block   TYPE    
-      4  21 | | | Statement  code_block   TYPE    
-      4  21 | | | | Var        unknown      TYPE    d
+    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    1  1Block      code_block   TYPE
+    1  1| Branch     code_block   TYPE
+    1  4| | If         code_block   TYPE
+    1  4| | | Var        unknown      TYPE    a
+    1  5| | | Block      code_block   TYPE
+    2  8| | | | Statement  code_block   TYPE
+    2  8| | | | | Var        unknown      TYPE    b
+    3 10| | Elif       code_block   TYPE
+    3 17| | | Var        unknown      TYPE    c
+    3 18| | | Block      code_block   TYPE
+    4 21| | | | Statement  code_block   TYPE
+    4 21| | | | | Var        unknown      TYPE    d
     '''
 
     if  self.code[start:start+2] != "if" or self.code[start+2] not in c.k_end:

@@ -40,10 +40,10 @@ Example:
        0   Statement     codeblock.codeblock  '42.'
        0     Expression  expression.create    '42.'
        0     Float       misc.number          '42.'
-    >>> print mc.qtree(builder, core=True)
-      1   1 Block      code_block   TYPE    
-      1   1 Statement  code_block   TYPE    
-      1   1 | Float      double       double  
+    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    1 1Block      code_block   TYPE
+    1 1| Statement  code_block   TYPE
+    1 1| | Float      double       double
     """
 
     if not (self.code[start] in c.digits or\
@@ -164,10 +164,10 @@ Example:
        0 Codeblock   codeblock.codeblock 
        0   Statement     codeblock.codeblock  "'abc'"
        0     String  misc.string          "'abc'"
-    >>> print mc.qtree(builder, core=True)
-      1   1 Block      code_block   TYPE    
-      1   1 Statement  code_block   TYPE    
-      1   1 | String     string       string  
+    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    1 1Block      code_block   TYPE
+    1 1| Statement  code_block   TYPE
+    1 1| | String     string       string
     """
 
     end = findend.string(self, cur)
@@ -213,14 +213,14 @@ Example:
        1     Int         misc.number          '2'
        3     Expression  expression.create    '-3'
        4     Int         misc.number          '3'
-    >>> print mc.qtree(builder, core=True)
-      1   1 Block      code_block   TYPE    
-      1   1 Statement  code_block   TYPE    
-      1   1 | Matrix     matrix       TYPE    
-      1   2 | | Vector     matrix       TYPE    
-      1   2 | | | Int        int          int     
-      1   4 | | | Neg        expression   TYPE    
-      1   5 | | | | Int        int          int     
+    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    1 1Block      code_block   TYPE
+    1 1| Statement  code_block   TYPE
+    1 1| | Matrix     matrix       TYPE
+    1 2| | | Vector     matrix       TYPE
+    1 2| | | | Int        int          int
+    1 4| | | | Neg        expression   TYPE
+    1 5| | | | | Int        int          int
     """
 
     if  self.code[cur] not in "({":
@@ -264,11 +264,11 @@ Example:
        0     Expression  expression.create    '4'
        0     Int         misc.number          '4'
        2   Comment       misc.comment         '% comment'
-    >>> print mc.qtree(builder, core=True)
-      1   1 Block      code_block   TYPE    
-      1   1 Statement  code_block   TYPE    
-      1   1 | Int        int          int     
-      1   3 Ecomment   code_block   TYPE    
+    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    1  1Block      code_block   TYPE
+    1  1| Statement  code_block   TYPE
+    1  1| | Int        int          int
+    1  3| Ecomment   code_block   TYPE
     """
 
     assert parent.cls == "Block"
@@ -368,19 +368,19 @@ Example:
        8     Int         misc.number          '3'
       10     Expression  expression.create    '4'
       10     Int         misc.number          '4'
-    >>> print mc.qtree(builder, core=True)
-      1   1 Block      code_block   TYPE    
-      1   1 Statement  code_block   TYPE    
-      1   1 | Matrix     matrix       TYPE    
-      1   2 | | Vector     matrix       TYPE    
-      1   2 | | | Matrix     matrix       TYPE    
-      1   3 | | | | Vector     matrix       TYPE    
-      1   3 | | | | | Int        int          int     
-      1   5 | | | | | Int        int          int     
-      1   8 | | | Matrix     matrix       TYPE    
-      1   9 | | | | Vector     matrix       TYPE    
-      1   9 | | | | | Int        int          int     
-      1  11 | | | | | Int        int          int     
+    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    1  1Block      code_block   TYPE
+    1  1| Statement  code_block   TYPE
+    1  1| | Matrix     matrix       TYPE
+    1  2| | | Vector     matrix       TYPE
+    1  2| | | | Matrix     matrix       TYPE
+    1  3| | | | | Vector     matrix       TYPE
+    1  3| | | | | | Int        int          int
+    1  5| | | | | | Int        int          int
+    1  8| | | | Matrix     matrix       TYPE
+    1  9| | | | | Vector     matrix       TYPE
+    1  9| | | | | | Int        int          int
+    1 11| | | | | | Int        int          int
     """
 
     if  self.code[cur] != "[":
@@ -453,12 +453,12 @@ Example:
        1     Int         misc.number          '1'
        4     Expression  expression.create    '2'
        4     Int         misc.number          '2'
-    >>> print mc.qtree(builder, core=True)
-      1   1 Block      code_block   TYPE    
-      1   1 Statement  code_block   TYPE    
-      1   1 | Cell       cell         TYPE    
-      1   2 | | Int        int          int     
-      1   5 | | Int        int          int     
+    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    1 1Block      code_block   TYPE
+    1 1| Statement  code_block   TYPE
+    1 1| | Cell       cell         TYPE
+    1 2| | | Int        int          int
+    1 5| | | Int        int          int
     """
 
     if  self.code[cur] != "{":

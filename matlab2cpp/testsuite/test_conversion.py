@@ -1,7 +1,28 @@
 import matlab2cpp
 import tempfile
 import os
+import shutil
 from subprocess import Popen, PIPE
+
+
+def setup_module(module):
+
+    path = tempfile.mkdtemp()
+    os.chdir(path)
+    module.path = path
+
+def teardown_module(module):
+
+    shutil.rmtree(module.path)
+
+
+def test_suggestion():
+    pass
+
+
+
+
+
 
 def convert(m_code):
     "Convert m-code to cpp-code using matlab2cpp w/suggestions"
@@ -16,7 +37,7 @@ def convert(m_code):
     return out
 
 
-def test_get_node():
+def _test_get_node():
 
     m_code = """x(:)
 x(1:2:3)
@@ -31,7 +52,7 @@ x(1,1)"""
     assert cpp_code == convert(m_code)
 
 
-def test_array_indexing():
+def _test_array_indexing():
 
     m_code = """x(:) = 1:2:3
 x(1:2:3) = 1:2:3
@@ -54,7 +75,7 @@ x(1,1) = 4"""
     assert cpp_code == convert(m_code)
 
 
-def test_matrix_declaration():
+def _test_matrix_declaration():
 
     m_code = """min([1,2;3,4])
 x = [1,2]
@@ -69,7 +90,7 @@ y = [3;4]
     assert cpp_code == convert(m_code)
 
 
-def test_implicit_matrix():
+def _test_implicit_matrix():
 
     m_code = """min([1 2
 3 4])
@@ -95,7 +116,7 @@ c()]"""
     assert cpp_code == convert(m_code)
 
 
-def test_implicit_transposed():
+def _test_implicit_transposed():
 
     m_code = """a'
 a.'

@@ -131,6 +131,8 @@ def Matrix(node):
 
         # Inline matrices are moved to own lines
         if node.parent.cls not in ("Assign", "Statement"):
+            if node.parent.cls in ("Get", "Set") and node.mem != 0:
+                node.type = (node.dim, 0)
             return str(node.auxiliary())
 
         node.parent.backend = "matrix"

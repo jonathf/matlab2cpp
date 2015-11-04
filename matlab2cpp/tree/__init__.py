@@ -11,28 +11,26 @@ code where each segment of code is represented by a node.  To observe the node
 structure it possible to either use :program:`mconvert` with the `-t` option,
 or the python function :py:func:`~matlab2cpp.qtree`. For example::
 
-    >>> print mc.qtree("a = 2+2")
-            Program    program      TYPE    unamed
-            Includes   program      TYPE    
-            | Include    program      TYPE    #include <armadillo>
-            | Include    program      TYPE    using namespace arma ;
-      1   1 Funcs      program      TYPE    unamed
-      1   1 | Main       func_common  TYPE    main
-      1   1 | | Declares   func_return  TYPE    
-      1   1 | | | Var        unknown      (int)   a
-      1   1 | | Returns    func_return  TYPE    
-      1   1 | | Params     func_return  TYPE    
-      1   1 | | Block      code_block   TYPE    
-      1   1 | | | Assign     unknown      TYPE    
-      1   1 | | | | Var        unknown      (int)   a
-      1   5 | | | | Plus       expression   int     
-      1   5 | | | | | Int        int          int     
-      1   7 | | | | | Int        int          int     
-            Inlines    program      TYPE    unamed
-            Structs    program      TYPE    unamed
-            Headers    program      TYPE    unamed
-            Log        program      TYPE    unamed
-            | Error      program      TYPE    Var:0
+    >>> print mc.qtree("a = 2+2") # doctest: +NORMALIZE_WHITESPACE
+       Program    program      TYPE    unamed
+       | Includes   program      TYPE
+    1 1| Funcs      program      TYPE    unamed
+    1 1| | Main       func_common  TYPE    main
+    1 1| | | Declares   func_return  TYPE
+    1 1| | | | Var        unknown      (int)   a
+    1 1| | | Returns    func_return  TYPE
+    1 1| | | Params     func_return  TYPE
+    1 1| | | Block      code_block   TYPE
+    1 1| | | | Assign     unknown      TYPE
+    1 1| | | | | Var        unknown      (int)   a
+    1 5| | | | | Plus       expression   int
+    1 5| | | | | | Int        int          int
+    1 7| | | | | | Int        int          int
+       | Inlines    program      TYPE    unamed
+       | Structs    program      TYPE    unamed
+       | Headers    program      TYPE    unamed
+       | Log        program      TYPE    unamed
+       | | Error      program      TYPE    Var:0
 
 There is quite a lot going on in this picture. First of all, each line
 represents a node. The columns represents respectively
@@ -85,30 +83,28 @@ that `Int` have the datatype `int`. Others, like the variable `Var` can change
 upon how the configuration is set up. Intuitively enough, if datatype is set to
 `int`, then the translation handler will follow and also be `int`:
 
-    >>> print mc.qtree("a = 2+2", suggest=True)
-            Program    program      TYPE    unamed
-            Includes   program      TYPE    
-            | Include    program      TYPE    #include <armadillo>
-            | Include    program      TYPE    using namespace arma ;
-      1   1 Funcs      program      TYPE    unamed
-      1   1 | Main       func_common  TYPE    main
-      1   1 | | Declares   func_return  int     
-      1   1 | | | Var        int          int     a
-      1   1 | | Returns    func_return  TYPE    
-      1   1 | | Params     func_return  TYPE    
-      1   1 | | Block      code_block   TYPE    
-      1   1 | | | Assign     unknown      TYPE    
-      1   1 | | | | Var        int          int     a
-      1   5 | | | | Plus       expression   int     
-      1   5 | | | | | Int        int          int     
-      1   7 | | | | | Int        int          int     
-            Inlines    program      TYPE    unamed
-            Structs    program      TYPE    unamed
-            Headers    program      TYPE    unamed
-            Log        program      TYPE    unamed
+    >>> print mc.qtree("a = 2+2", suggest=True) # doctest: +NORMALIZE_WHITESPACE
+       Program    program      TYPE    unamed
+       | Includes   program      TYPE
+    1 1| Funcs      program      TYPE    unamed
+    1 1| | Main       func_common  TYPE    main
+    1 1| | | Declares   func_return  int
+    1 1| | | | Var        int          int     a
+    1 1| | | Returns    func_return  TYPE
+    1 1| | | Params     func_return  TYPE
+    1 1| | | Block      code_block   TYPE
+    1 1| | | | Assign     unknown      TYPE
+    1 1| | | | | Var        int          int     a
+    1 5| | | | | Plus       expression   int
+    1 5| | | | | | Int        int          int
+    1 7| | | | | | Int        int          int
+       | Inlines    program      TYPE    unamed
+       | Structs    program      TYPE    unamed
+       | Headers    program      TYPE    unamed
+       | Log        program      TYPE    unamed
 
-In other words, there are for these nodes, multiple translation for depending on
-context. This is important to achieve the desired behavior.
+In other words, there are for these nodes, multiple translation for depending
+on context. This is important to achieve the desired behavior.
 
 +--------------------------------------+---------------------------------------+
 | Module                               | Description                           |

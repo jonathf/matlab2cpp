@@ -44,23 +44,21 @@ Example:
        0   Statement     codeblock.codeblock  'a'
        0     Expression  expression.create    'a'
        0     Var         variables.variable   'a'
-    >>> print mc.qtree(builder)
-            Program    program      TYPE    unamed
-            Includes   program      TYPE    
-            | Include    program      TYPE    #include <armadillo>
-            | Include    program      TYPE    using namespace arma ;
-      1   1 Funcs      program      TYPE    unamed
-      1   1 | Main       func_common  TYPE    main
-      1   1 | | Declares   func_return  TYPE    
-      1   1 | | Returns    func_return  TYPE    
-      1   1 | | Params     func_return  TYPE    
-      1   1 | | Block      code_block   TYPE    
-      1   1 | | | Statement  code_block   TYPE    
-      1   1 | | | | Var        unknown      TYPE    a
-            Inlines    program      TYPE    unamed
-            Structs    program      TYPE    unamed
-            Headers    program      TYPE    unamed
-            Log        program      TYPE    unamed
+    >>> print mc.qtree(builder) # doctest: +NORMALIZE_WHITESPACE
+       Program    program      TYPE    unamed
+       | Includes   program      TYPE
+    1 1| Funcs      program      TYPE    unamed
+    1 1| | Main       func_common  TYPE    main
+    1 1| | | Declares   func_return  TYPE
+    1 1| | | Returns    func_return  TYPE
+    1 1| | | Params     func_return  TYPE
+    1 1| | | Block      code_block   TYPE
+    1 1| | | | Statement  code_block   TYPE
+    1 1| | | | | Var        unknown      TYPE    a
+       | Inlines    program      TYPE    unamed
+       | Structs    program      TYPE    unamed
+       | Headers    program      TYPE    unamed
+       | Log        program      TYPE    unamed
     """
 
     if self.disp:
@@ -126,13 +124,13 @@ Example:
          Program     functions.program
        0 Function        functions.function   'function f()'
       12 Codeblock   codeblock.codeblock 
-    >>> print mc.qtree(builder, core=True)
-      1   1 Funcs      program      TYPE    unnamed
-      1   1 Func       func_returns TYPE    f
-      1   1 | Declares   func_returns TYPE    
-      1   1 | Returns    func_returns TYPE    
-      1  11 | Params     func_returns TYPE    
-      1  13 | Block      code_block   TYPE    
+    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    1  1Funcs      program      TYPE    unnamed
+    1  1| Func       func_returns TYPE    f
+    1  1| | Declares   func_returns TYPE
+    1  1| | Returns    func_returns TYPE
+    1 11| | Params     func_returns TYPE
+    1 13| | Block      code_block   TYPE
     """
 
     if self.code[cur:cur+8] != "function":
@@ -326,23 +324,21 @@ Example:
        0   Statement     codeblock.codeblock  'a'
        0     Expression  expression.create    'a'
        0     Var         variables.variable   'a'
-    >>> print mc.qtree(builder)
-            Program    program      TYPE    unnamed
-            Includes   program      TYPE    
-            | Include    program      TYPE    #include <armadillo>
-            | Include    program      TYPE    using namespace arma ;
-      1   1 Funcs      program      TYPE    unnamed
-      1   1 | Main       func_common  TYPE    main
-      1   1 | | Declares   func_return  TYPE    
-      1   1 | | Returns    func_return  TYPE    
-      1   1 | | Params     func_return  TYPE    
-      1   1 | | Block      code_block   TYPE    
-      1   1 | | | Statement  code_block   TYPE    
-      1   1 | | | | Var        unknown      TYPE    a
-            Inlines    program      TYPE    unnamed
-            Structs    program      TYPE    unnamed
-            Headers    program      TYPE    unnamed
-            Log        program      TYPE    unnamed
+    >>> print mc.qtree(builder) # doctest: +NORMALIZE_WHITESPACE
+       Program    program      TYPE    unnamed
+       | Includes   program      TYPE
+    1 1| Funcs      program      TYPE    unnamed
+    1 1| | Main       func_common  TYPE    main
+    1 1| | | Declares   func_return  TYPE
+    1 1| | | Returns    func_return  TYPE
+    1 1| | | Params     func_return  TYPE
+    1 1| | | Block      code_block   TYPE
+    1 1| | | | Statement  code_block   TYPE
+    1 1| | | | | Var        unknown      TYPE    a
+       | Inlines    program      TYPE    unnamed
+       | Structs    program      TYPE    unnamed
+       | Headers    program      TYPE    unnamed
+       | Log        program      TYPE    unnamed
     """
 
     if self.disp:
@@ -388,38 +384,36 @@ Example:
        9     Int         misc.number          '2'
       11     Expression  expression.create    'x'
       11     Var         variables.variable   'x'
-    >>> print mc.qtree(builder)
-            Program    program      TYPE    unnamed
-            Includes   program      TYPE    
-            | Include    program      TYPE    #include <armadillo>
-            | Include    program      TYPE    using namespace arma ;
-      1   1 Funcs      program      TYPE    unnamed
-      1   1 | Main       func_common  TYPE    main
-      1   1 | | Declares   func_return  TYPE    
-      1   1 | | | Var        unknown      func_lambda f
-      1   1 | | Returns    func_return  TYPE    
-      1   1 | | Params     func_return  TYPE    
-      1   1 | | Block      code_block   TYPE    
-      1   1 | | | Assign     func_lambda  TYPE    
-      1   1 | | | | Var        unknown      func_lambda f
-      1   1 | | | | Lambda     func_lambda  func_lambda _f
-      1   5 | Func       func_lambda  TYPE    _f
-      1   5 | | Declares   func_lambda  TYPE    
-      1   5 | | | Var        unknown      TYPE    _retval
-      1   5 | | Returns    func_lambda  TYPE    
-      1   5 | | | Var        unknown      TYPE    _retval
-      1   5 | | Params     func_lambda  TYPE    
-      1   7 | | | Var        unknown      TYPE    x
-      1   5 | | Block      code_block   TYPE    
-      1   5 | | | Assign     unknown      TYPE    
-      1   5 | | | | Var        unknown      TYPE    _retval
-      1  10 | | | | Mul        expression   TYPE    
-      1  10 | | | | | Int        int          int     
-      1  12 | | | | | Var        unknown      TYPE    x
-            Inlines    program      TYPE    unnamed
-            Structs    program      TYPE    unnamed
-            Headers    program      TYPE    unnamed
-            Log        program      TYPE    unnamed
+    >>> print mc.qtree(builder) # doctest: +NORMALIZE_WHITESPACE
+        Program    program      TYPE    unnamed
+        | Includes   program      TYPE
+    1  1| Funcs      program      TYPE    unnamed
+    1  1| | Main       func_common  TYPE    main
+    1  1| | | Declares   func_return  TYPE
+    1  1| | | | Var        unknown      func_lambdaf
+    1  1| | | Returns    func_return  TYPE
+    1  1| | | Params     func_return  TYPE
+    1  1| | | Block      code_block   TYPE
+    1  1| | | | Assign     func_lambda  TYPE
+    1  1| | | | | Var        unknown      func_lambdaf
+    1  1| | | | | Lambda     func_lambda  func_lambda_f
+    1  5| | Func       func_lambda  TYPE    _f
+    1  5| | | Declares   func_lambda  TYPE
+    1  5| | | | Var        unknown      TYPE    _retval
+    1  5| | | Returns    func_lambda  TYPE
+    1  5| | | | Var        unknown      TYPE    _retval
+    1  5| | | Params     func_lambda  TYPE
+    1  7| | | | Var        unknown      TYPE    x
+    1  5| | | Block      code_block   TYPE
+    1  5| | | | Assign     unknown      TYPE
+    1  5| | | | | Var        unknown      TYPE    _retval
+    1 10| | | | | Mul        expression   TYPE
+    1 10| | | | | | Int        int          int
+    1 12| | | | | | Var        unknown      TYPE    x
+        | Inlines    program      TYPE    unnamed
+        | Structs    program      TYPE    unnamed
+        | Headers    program      TYPE    unnamed
+        | Log        program      TYPE    unnamed
     """
 
     if  self.code[cur] not in c.letters:
