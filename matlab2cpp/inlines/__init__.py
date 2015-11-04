@@ -23,5 +23,7 @@ def retrieve(node, name, **kws):
 
         elif name == "arma":
             include_code = "#include <armadillo>"
+        else:
+            include_code = ""
 
     return include_code, library_code
