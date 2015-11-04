@@ -1,3 +1,4 @@
+import matlab2cpp as mc
 from _arma_common import scalar_assign
 
 def Assign(node):
@@ -83,6 +84,5 @@ Examples:
 
 
 if __name__ == "__main__":
-    import matlab2cpp as mc
     import doctest
     doctest.testmod()

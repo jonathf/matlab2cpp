@@ -4,7 +4,7 @@
 The main codeblock loop
 """
 
-import matlab2cpp
+import matlab2cpp as mc
 
 import findend
 import constants as c
@@ -47,7 +47,7 @@ Example:
     '''
 
     cur = start
-    block = matlab2cpp.collection.Block(parent, cur=cur)
+    block = mc.collection.Block(parent, cur=cur)
 
     if self.disp:
         print "%4d Codeblock  " % cur,
@@ -82,7 +82,7 @@ Example:
 
             else:
 
-                statement = matlab2cpp.collection.Statement(block, cur=cur)
+                statement = mc.collection.Statement(block, cur=cur)
 
                 end = findend.expression(self, cur)
                 if self.disp:
@@ -104,7 +104,7 @@ Example:
                 print "%-20s" % "codeblock.codeblock",
                 print repr(self.code[cur:end+1])
 
-            statement = matlab2cpp.collection.Statement(block, cur=cur,
+            statement = mc.collection.Statement(block, cur=cur,
                     code=self.code[cur:end+1])
 
             cur = self.create_string(statement, cur)
@@ -173,7 +173,7 @@ Example:
                     print "%-20s" % "codeblock.codeblock",
                     print repr(self.code[cur:end+1])
 
-                statement = matlab2cpp.collection.Statement(block, cur=cur,
+                statement = mc.collection.Statement(block, cur=cur,
                         code=self.code[cur:end+1])
 
                 cur = self.create_expression(statement,
@@ -189,6 +189,5 @@ Example:
 
 
 if __name__ == "__main__":
-    import matlab2cpp as mc
     import doctest
     doctest.testmod()

@@ -4,6 +4,7 @@ Each node can then here be nested on top of each other.
 They are static in the sense that there only exists one copy, unaffected by type
 and have the backend fixd to `code_block`.
 """
+import matlab2cpp as mc
 
 def Statement(node):
     """
@@ -627,6 +628,5 @@ Examples:
 
 
 if __name__ == "__main__":
-    import matlab2cpp as mc
     import doctest
     doctest.testmod()

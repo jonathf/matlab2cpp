@@ -16,7 +16,7 @@ Iterpretors related to branches, loops and try.
 +------------------------------------------------+-----------------------------+
 """
 
-import matlab2cpp
+import matlab2cpp as mc
 import constants as c
 import findend
 
@@ -76,9 +76,9 @@ Example:
 
     start = cur
 
-    tryblock = matlab2cpp.collection.Tryblock(parent, cur=cur)
+    tryblock = mc.collection.Tryblock(parent, cur=cur)
 
-    trybranch = matlab2cpp.collection.Try(tryblock)
+    trybranch = mc.collection.Try(tryblock)
 
     cur += 3
     while self.code[cur] in " \t\n,;":
@@ -91,7 +91,7 @@ Example:
     if  self.code[cur:cur+5] != "catch" or self.code[cur+5] not in c.k_end:
         self.syntaxerror(cur, "start of catch-block")
 
-    catch_ = matlab2cpp.collection.Catch(tryblock, cur=cur)
+    catch_ = mc.collection.Catch(tryblock, cur=cur)
 
     start_ = cur
     cur += 5
@@ -179,7 +179,7 @@ Example:
         print "%-20s" % "branches.switch",
         print repr(self.code[cur:end+1])
 
-    switch = matlab2cpp.collection.Switch(parent, cur=cur)
+    switch = mc.collection.Switch(parent, cur=cur)
 
     self.create_expression(switch, k, end)
 
@@ -203,7 +203,7 @@ Example:
             print "%-20s" % "branches.switch",
             print repr(self.code[cur:end+1])
 
-        case = matlab2cpp.collection.Case(switch, cur=cur)
+        case = mc.collection.Case(switch, cur=cur)
 
         cur = self.create_expression(case, k, end)
 
@@ -222,7 +222,7 @@ Example:
             print "%-20s" % "branches.switch",
             print repr(self.code[cur:cur+10])
 
-        otherwise = matlab2cpp.collection.Otherwise(switch, cur=cur)
+        otherwise = mc.collection.Otherwise(switch, cur=cur)
 
         k += 9
         while self.code[k] in " \t\n;,":
@@ -286,7 +286,7 @@ Example:
         print "%-20s" % "branches.whileloop",
         print repr(self.code[cur:end+1])
 
-    whileloop = matlab2cpp.collection.While(parent, cur=cur)
+    whileloop = mc.collection.While(parent, cur=cur)
 
     if self.code[k] == "(":
         k += 1
@@ -358,7 +358,7 @@ Example:
         print repr(self.code[cur:self.code.find("\n", cur)]),
         print "branches.forloop"
 
-    for_loop = matlab2cpp.collection.For(parent, cur=cur)
+    for_loop = mc.collection.For(parent, cur=cur)
 
     cur = cur+3
     while self.code[cur] in "( \t":
@@ -453,7 +453,7 @@ Example:
     if  self.code[start:start+2] != "if" or self.code[start+2] not in c.k_end:
         self.syntaxerror(start, "if branch start")
 
-    branch = matlab2cpp.collection.Branch(parent, cur=start)
+    branch = mc.collection.Branch(parent, cur=start)
 
     cur = start
 
@@ -471,7 +471,7 @@ Example:
         print "%-20s" % "branches.ifbranch",
         print repr(self.code[start:end+1])
 
-    node = matlab2cpp.collection.If(branch, cur=cur)
+    node = mc.collection.If(branch, cur=cur)
 
     if self.code[cur] == "(":
         cur += 1
@@ -501,7 +501,7 @@ Example:
             print "%-20s" % "branches.ifbranch",
             print repr(self.code[start:end+1])
 
-        node = matlab2cpp.collection.Elif(branch, cur=start)
+        node = mc.collection.Elif(branch, cur=start)
 
         if self.code[cur] == "(":
             cur += 1
@@ -528,7 +528,7 @@ Example:
             print "%-20s" % "branches.ifbranch",
             print repr(self.code[start:start+5])
 
-        node = matlab2cpp.collection.Else(branch, cur=start)
+        node = mc.collection.Else(branch, cur=start)
 
         end = self.create_codeblock(node, cur)
         node.code = self.code[start:end+1]
@@ -539,6 +539,5 @@ Example:
 
 
 if __name__ == "__main__":
-    import matlab2cpp as mc
     import doctest
     doctest.testmod()

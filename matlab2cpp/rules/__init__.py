@@ -93,6 +93,8 @@ following is equivalent:
     >>> print mc.qscript("2+3", Plus=Plus)
     2+3 ;
 """
+
+import matlab2cpp as mc
 import glob
 import os
 sep = os.path.sep
@@ -105,5 +107,4 @@ for name in glob.glob(os.path.dirname(__file__)+sep+"*.py"):
 
 if __name__ == "__main__":
     import doctest
-    import matlab2cpp as mc
     doctest.testmod()

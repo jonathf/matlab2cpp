@@ -18,7 +18,7 @@ Functions, programs and meta-nodes
 +----------------------------------------------------+-------------------------+
 """
 
-import matlab2cpp
+import matlab2cpp as mc
 import constants as c
 import findend
 
@@ -68,14 +68,14 @@ Example:
         print "functions.program"
 
     # Create intial nodes
-    program = matlab2cpp.collection.Program(self.project, name=name, cur=0, code=self.code)
-    includes = matlab2cpp.collection.Includes(program, value=name)
-    funcs = matlab2cpp.collection.Funcs(program, name=name)
+    program = mc.collection.Program(self.project, name=name, cur=0, code=self.code)
+    includes = mc.collection.Includes(program, value=name)
+    funcs = mc.collection.Funcs(program, name=name)
 
-    matlab2cpp.collection.Inlines(program, name=name)
-    matlab2cpp.collection.Structs(program, name=name)
-    matlab2cpp.collection.Headers(program, name=name)
-    matlab2cpp.collection.Log(program, name=name)
+    mc.collection.Inlines(program, name=name)
+    mc.collection.Structs(program, name=name)
+    mc.collection.Headers(program, name=name)
+    mc.collection.Log(program, name=name)
 
     includes.include("armadillo")
     includes.include("mconvert")
@@ -190,9 +190,9 @@ Example:
             print repr(self.code[START:m+1])
 
         name = self.code[k:l+1]
-        func = matlab2cpp.collection.Func(parent, name, cur=cur)
-        matlab2cpp.collection.Declares(func, code="")
-        returns = matlab2cpp.collection.Returns(func, code=self.code[start:end+1])
+        func = mc.collection.Func(parent, name, cur=cur)
+        mc.collection.Declares(func, code="")
+        returns = mc.collection.Returns(func, code=self.code[start:end+1])
 
         # multi-return
         if self.code[start] == "[":
@@ -211,7 +211,7 @@ Example:
                             for a in self.code[s:e+1]]):
                         self.syntaxerror(s, "return value")
 
-                    matlab2cpp.collection.Var(returns, self.code[s:e+1], cur=s,
+                    mc.collection.Var(returns, self.code[s:e+1], cur=s,
                             code=self.code[s:e+1])
 
         # single return
@@ -222,7 +222,7 @@ Example:
                 print "%4d   Return       " % cur,
                 print repr(self.code[start:end+1])
 
-            matlab2cpp.collection.Var(returns, self.code[start:end+1], cur=start,
+            mc.collection.Var(returns, self.code[start:end+1], cur=start,
                     code=self.code[start:end+1])
 
 
@@ -249,15 +249,15 @@ Example:
             end += 1
 
         name = self.code[start:end]
-        func = matlab2cpp.collection.Func(parent, name, cur=cur)
+        func = mc.collection.Func(parent, name, cur=cur)
 
-        matlab2cpp.collection.Declares(func)
-        returns = matlab2cpp.collection.Returns(func)
+        mc.collection.Declares(func)
+        returns = mc.collection.Returns(func)
 
         cur = end
 
     # Parameters
-    params = matlab2cpp.collection.Params(func, cur=cur)
+    params = mc.collection.Params(func, cur=cur)
     if self.code[cur] == "(":
 
         end = findend.paren(self, cur)
@@ -272,7 +272,7 @@ Example:
                     print "%-20s" % "functions.function",
                     print repr(self.code[s:e+1])
 
-                var = matlab2cpp.collection.Var(params, self.code[s:e+1], cur=s,
+                var = mc.collection.Var(params, self.code[s:e+1], cur=s,
                         code=self.code[s:e+1])
 
         cur = end
@@ -299,7 +299,7 @@ Example:
     end = cur
     func.code = self.code[START:end+1]
 
-    matlab2cpp.collection.Header(func.program[4], func.name)
+    mc.collection.Header(func.program[4], func.name)
 
     return cur
 
@@ -349,11 +349,11 @@ Example:
         print "%4d Main       " % cur,
         print "functions.main"
 
-    func = matlab2cpp.collection.Main(parent)
+    func = mc.collection.Main(parent)
 
-    matlab2cpp.collection.Declares(func, backend="func_return")
-    matlab2cpp.collection.Returns(func, backend="func_return")
-    matlab2cpp.collection.Params(func, backend="func_return")
+    mc.collection.Declares(func, backend="func_return")
+    mc.collection.Returns(func, backend="func_return")
+    mc.collection.Params(func, backend="func_return")
 
     return self.create_codeblock(func, cur)
 
@@ -434,7 +434,7 @@ Example:
         print repr(self.code[cur:self.code.find("\n", cur)]),
         print "functions.lambda_assign"
 
-    assign = matlab2cpp.collection.Assign(node, cur=cur, backend="func_lambda")
+    assign = mc.collection.Assign(node, cur=cur, backend="func_lambda")
 
     self.create_assign_variable(assign, cur, eq_loc)
     assign[0].declare.type = "func_lambda"
@@ -498,11 +498,11 @@ Returns:
             i += 1
         name = name + "%d" % i
 
-    func = matlab2cpp.collection.Func(funcs, name, cur=cur, code=self.code[cur:end+1])
+    func = mc.collection.Func(funcs, name, cur=cur, code=self.code[cur:end+1])
 
-    declares = matlab2cpp.collection.Declares(func)
-    returns = matlab2cpp.collection.Returns(func)
-    params = matlab2cpp.collection.Params(func)
+    declares = mc.collection.Declares(func)
+    returns = mc.collection.Returns(func)
+    params = mc.collection.Params(func)
 
     k = cur+1
     while self.code[k] in " \t":
@@ -517,9 +517,9 @@ Returns:
     while self.code[cur] in " \t":
         cur += 1
 
-    block = matlab2cpp.collection.Block(func)
-    assign = matlab2cpp.collection.Assign(block)
-    var = matlab2cpp.collection.Var(assign, "_retval")
+    block = mc.collection.Block(func)
+    assign = mc.collection.Assign(block)
+    var = mc.collection.Var(assign, "_retval")
 
     cur = self.create_expression(assign, cur, end=end)
 
@@ -535,10 +535,10 @@ Returns:
     params.backend = "func_lambda"
     declares.backend = "func_lambda"
 
-    var = matlab2cpp.collection.Var(returns, "_retval")
+    var = mc.collection.Var(returns, "_retval")
     var.create_declare()
 
-    lamb = matlab2cpp.collection.Lambda(node, name)
+    lamb = mc.collection.Lambda(node, name)
     lamb.type = "func_lambda"
 
     lamb.reference = func
@@ -546,6 +546,5 @@ Returns:
     return cur
 
 if __name__ == "__main__":
-    import matlab2cpp as mc
     import doctest
     doctest.testmod()

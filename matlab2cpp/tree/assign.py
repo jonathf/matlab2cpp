@@ -9,7 +9,7 @@ Support functions for identifying assignments.
 | :py:func:`~matlab2cpp.tree.assign.multi`  | Assignment with multiple returns |
 +-------------------------------------------+----------------------------------+
 """
-import matlab2cpp
+import matlab2cpp as mc
 
 import findend
 import constants as c
@@ -71,7 +71,7 @@ Example:
     if len(l[0]) == 1:
         return self.create_assign(parent, l[0][0][0], eq_loc)
 
-    assigns = matlab2cpp.collection.Assigns(parent, cur=cur, code=self.code[cur:end+1])
+    assigns = mc.collection.Assigns(parent, cur=cur, code=self.code[cur:end+1])
 
     for vector in l:
         for start,stop in vector:
@@ -135,7 +135,7 @@ Example:
         print "%-20s" % "assign.single",
         print repr(self.code[cur:end+1])
 
-    assign = matlab2cpp.collection.Assign(parent, cur=cur, code=self.code[cur:end+1])
+    assign = mc.collection.Assign(parent, cur=cur, code=self.code[cur:end+1])
 
     cur = self.create_assign_variable(assign, cur, eq_loc)
 
@@ -164,6 +164,5 @@ Example:
     return end
 
 if __name__ == "__main__":
-    import matlab2cpp as mc
     import doctest
     doctest.testmod()

@@ -208,10 +208,10 @@ summary
 """
 
 from frontend import Node
+import matlab2cpp as mc
 
 __all__ = ["Node"]
 
 if __name__ == "__main__":
     import doctest
-    import matlab2cpp as mc
     doctest.testmod()

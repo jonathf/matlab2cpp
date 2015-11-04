@@ -14,17 +14,14 @@ def retrieve(node, name, **kws):
 
     else:
 
-        prms, include_code, library_code = snippets.__dict__.get(name)
+        library_code = ""
+        if name == "Splot":
+            include_code = '#include "Splot.h"'
 
-        params = {}
-        params.update(node.properties())
-        params.update(prms)
-        params.update(kws)
+        elif name == "m2cpp":
+            include_code = '#include "m2cpp.h"'
 
-        include_code = include_code % params
-        library_code = library_code % params
-
-    if node.file in include_code:
-        include_code = include_code.replace(node.file, os.path.basename(node.file))
+        elif name == "arma":
+            include_code = "#include <armadillo>"
 
     return include_code, library_code

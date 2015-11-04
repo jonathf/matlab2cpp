@@ -13,7 +13,7 @@ matrix          Verbatim matrices
 cell            Verbatim cells
 """
 
-import matlab2cpp
+import matlab2cpp as mc
 import constants as c
 import findend
 
@@ -83,7 +83,7 @@ Example:
         if self.code[k] in "ij":
 
             k += 1
-            node = matlab2cpp.collection.Imag(node, number, cur=start,
+            node = mc.collection.Imag(node, number, cur=start,
                     code=self.code[start:last+1])
             if self.disp:
                 print "%4d     Imag       " % (start),
@@ -91,7 +91,7 @@ Example:
                 print repr(self.code[start:last+1])
 
         else:
-            node = matlab2cpp.collection.Float(node, number, cur=start,
+            node = mc.collection.Float(node, number, cur=start,
                     code=self.code[start:last+1])
             if self.disp:
                 print "%4d     Float      " % (start),
@@ -104,7 +104,7 @@ Example:
 
         if self.code[k] in "ij":
 
-            node = matlab2cpp.collection.Imag(node, self.code[start:k], cur=start,
+            node = mc.collection.Imag(node, self.code[start:k], cur=start,
                     code=self.code[start:last+1])
             k += 1
             if self.disp:
@@ -113,7 +113,7 @@ Example:
                 print repr(self.code[start:last+1])
 
         else:
-            node = matlab2cpp.collection.Int(node, self.code[start:k], cur=start,
+            node = mc.collection.Int(node, self.code[start:k], cur=start,
                     code=self.code[start:last+1])
             if self.disp:
                 print "%4d     Int        " % (start),
@@ -124,7 +124,7 @@ Example:
 
         if self.code[k] in "ij":
 
-            node = matlab2cpp.collection.Imag(node, self.code[start:k], cur=start,
+            node = mc.collection.Imag(node, self.code[start:k], cur=start,
                     code=self.code[start:last+1])
             k += 1
             if self.disp:
@@ -133,7 +133,7 @@ Example:
                 print repr(self.code[start:last+1])
 
         else:
-            node = matlab2cpp.collection.Float(node, self.code[start:k], cur=start,
+            node = mc.collection.Float(node, self.code[start:k], cur=start,
                     code=self.code[start:k])
             if self.disp:
                 print "%4d     Float      " % (start),
@@ -175,7 +175,7 @@ Example:
     if  "\n" in self.code[cur:end]:
         self.syntaxerror(cur, "no line-feed character in string")
 
-    matlab2cpp.collection.String(parent, self.code[cur+1:end], cur=cur,
+    mc.collection.String(parent, self.code[cur+1:end], cur=cur,
             code=self.code[cur:end+1])
 
     if self.disp:
@@ -287,15 +287,15 @@ Example:
         print repr(self.code[cur:end])
 
     if self.code[cur+1] == "{":
-        comment = matlab2cpp.collection.Bcomment(parent, self.code[cur+2:end-1], cur=cur)
+        comment = mc.collection.Bcomment(parent, self.code[cur+2:end-1], cur=cur)
     else:
         k = cur-1
         while self.code[k] in " \t":
             k -= 1
         if self.code[k] == "\n":
-            comment = matlab2cpp.collection.Lcomment(parent, self.code[cur+1:end], cur=cur)
+            comment = mc.collection.Lcomment(parent, self.code[cur+1:end], cur=cur)
         else:
-            comment = matlab2cpp.collection.Ecomment(parent, self.code[cur+1:end], cur=cur)
+            comment = mc.collection.Ecomment(parent, self.code[cur+1:end], cur=cur)
 
     comment.code = self.code[cur:end+1]
 
@@ -326,7 +326,7 @@ Returns:
     keys = self.code[cur:end+1].split("___")
     name = keys[1]
     value = "\n".join(keys[2:])
-    verbatim = matlab2cpp.collection.Verbatim(parent, name, value, cur=cur,
+    verbatim = mc.collection.Verbatim(parent, name, value, cur=cur,
             code=self.code[cur:end+1])
 
     return end    
@@ -393,7 +393,7 @@ Example:
         print repr(self.code[cur:end+1])
 
     L = self.iterate_list(cur)
-    matrix = matlab2cpp.collection.Matrix(node, cur=cur, code=self.code[cur:end+1])
+    matrix = mc.collection.Matrix(node, cur=cur, code=self.code[cur:end+1])
 
     for array in L:
 
@@ -403,7 +403,7 @@ Example:
         else:
             start = cur
 
-        vector = matlab2cpp.collection.Vector(matrix, cur=start,
+        vector = mc.collection.Vector(matrix, cur=start,
                 code=self.code[start:end+1])
 
         if self.disp:
@@ -421,7 +421,7 @@ Example:
             print "%4d     Vector     " % cur,
             print "%-20s" % "misc.matrix",
             print repr("")
-        vector = matlab2cpp.collection.Vector(matrix, cur=cur, code="")
+        vector = mc.collection.Vector(matrix, cur=cur, code="")
 
 
     return findend.matrix(self, cur)
@@ -471,7 +471,7 @@ Example:
         print repr(self.code[cur:end+1])
 
     L = self.iterate_list(cur)
-    cell = matlab2cpp.collection.Cell(node, cur=cur, code=self.code[cur:end+1])
+    cell = mc.collection.Cell(node, cur=cur, code=self.code[cur:end+1])
 
     for array in L:
 
@@ -490,6 +490,5 @@ Example:
 
 
 if __name__ == "__main__":
-    import matlab2cpp as mc
     import doctest
     doctest.testmod()

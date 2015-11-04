@@ -8,7 +8,7 @@ variable    Variable not on the left side of an assignment
 cell_arg    Argument of a cell call
 """
 
-import matlab2cpp
+import matlab2cpp as mc
 import constants as c
 import findend
 
@@ -70,7 +70,7 @@ Example:
         if self.code[end] == "(":
 
             end = findend.paren(self, end)
-            node = matlab2cpp.collection.Cset(node, name, cur=cur,
+            node = mc.collection.Cset(node, name, cur=cur,
                     code=self.code[cur:end+1])
 
             if self.disp:
@@ -100,7 +100,7 @@ Example:
 
         else:
             end = findend.cell(self, k)
-            node = matlab2cpp.collection.Cvar(node, name, cur=cur,
+            node = mc.collection.Cvar(node, name, cur=cur,
                     code=self.code[cur:end+1])
 
             if self.disp:
@@ -136,7 +136,7 @@ Example:
                 print "%-20s" % "variables.assign",
                 print repr(self.code[cur:end])
 
-            node = matlab2cpp.collection.Sset(node, name, value, cur=cur,
+            node = mc.collection.Sset(node, name, value, cur=cur,
                     code=self.code[cur:end], pointer=1)
 
             last = self.create_list(node, k)
@@ -150,7 +150,7 @@ Example:
                 print "%-20s" % "variables.assign",
                 print repr(self.code[cur:end+1])
 
-            node = matlab2cpp.collection.Set(node, name, cur=cur,
+            node = mc.collection.Set(node, name, cur=cur,
                     code=self.code[cur:end+1])
 
             last = self.create_list(node, k)
@@ -176,7 +176,7 @@ Example:
                 print repr(self.code[cur:end+1])
 
 
-            node = matlab2cpp.collection.Nset(node, name)
+            node = mc.collection.Nset(node, name)
             node.cur = cur
             node.code = self.code[cur:end+1]
 
@@ -204,7 +204,7 @@ Example:
                     print "%-20s" % "variables.assign",
                     print repr(self.code[cur:end+1])
 
-                node = matlab2cpp.collection.Fset(node, name, value=value, cur=cur,
+                node = mc.collection.Fset(node, name, value=value, cur=cur,
                         code=self.code[cur:end+1])
 
                 cur = self.create_list(node, j)
@@ -217,7 +217,7 @@ Example:
                     print "%-20s" % "variables.assign",
                     print repr(self.code[cur:last+1])
 
-                node = matlab2cpp.collection.Fvar(node, name, value=value, cur=cur,
+                node = mc.collection.Fvar(node, name, value=value, cur=cur,
                         code=self.code[cur:last+1])
 
                 cur = last
@@ -230,7 +230,7 @@ Example:
             print repr(self.code[cur:last])
 
 
-        node = matlab2cpp.collection.Var(node, name, cur=cur,
+        node = mc.collection.Var(node, name, cur=cur,
                 code=self.code[cur:last])
 
         cur = last-1
@@ -264,10 +264,10 @@ Example:
        0   Statement     codeblock.codeblock  'a'
        0     Expression  expression.create    'a'
        0     Var         variables.variable   'a'
-    >>> print mc.qtree(builder, core=True)
-      1   1 Block      code_block   TYPE    
-      1   1 Statement  code_block   TYPE    
-      1   1 | Var        unknown      TYPE    a
+    >>> print mc.qtree(builder, core=True) #doctest:+NORMALIZE_WHITESPACE
+    1 1Block      code_block   TYPE
+    1 1| Statement  code_block   TYPE
+    1 1| | Var        unknown      TYPE
     """
 
     k = cur
@@ -298,7 +298,7 @@ Example:
         if self.code[end] == "(":
 
             end = findend.paren(self, end)
-            node = matlab2cpp.collection.Cget(parent, name, cur=cur,
+            node = mc.collection.Cget(parent, name, cur=cur,
                     code=self.code[cur:end+1])
 
             if self.disp:
@@ -328,7 +328,7 @@ Example:
 
         else:
             end = findend.cell(self, k)
-            node = matlab2cpp.collection.Cvar(parent, name, cur=cur,
+            node = mc.collection.Cvar(parent, name, cur=cur,
                     code=self.code[cur:end+1])
 
             if self.disp:
@@ -364,7 +364,7 @@ Example:
                 print "%-20s" % "variables.variable",
                 print repr(self.code[cur:end])
 
-            node = matlab2cpp.collection.Sget(parent, name, value, cur=cur,
+            node = mc.collection.Sget(parent, name, value, cur=cur,
                     code=self.code[cur:end], pointer=1)
 
             last = self.create_list(node, k)
@@ -378,7 +378,7 @@ Example:
                 print "%-20s" % "variables.variable",
                 print repr(self.code[cur:end+1])
 
-            node = matlab2cpp.collection.Get(parent, name, cur=cur,
+            node = mc.collection.Get(parent, name, cur=cur,
                     code=self.code[cur:end+1])
 
             last = self.create_list(node, k)
@@ -405,7 +405,7 @@ Example:
             while self.code[k] in " \t":
                 k += 1
 
-            node = matlab2cpp.collection.Nget(parent, name, cur=cur,
+            node = mc.collection.Nget(parent, name, cur=cur,
                     code=self.code[cur:end+1])
 
             cur = self.create_expression(node, k)
@@ -433,7 +433,7 @@ Example:
                     print repr(self.code[cur:end+1])
 
 
-                node = matlab2cpp.collection.Fget(parent, name, cur=cur,
+                node = mc.collection.Fget(parent, name, cur=cur,
                         value=value, code=self.code[cur:end+1])
 
                 j += 1
@@ -452,7 +452,7 @@ Example:
                     print "%-20s" % "variables.variable",
                     print repr(self.code[cur:last])
 
-                node = matlab2cpp.collection.Fvar(parent, name, value=value,
+                node = mc.collection.Fvar(parent, name, value=value,
                         cur=cur, code=self.code[cur:last])
 
                 cur = last-1
@@ -468,7 +468,7 @@ Example:
             print "%-20s" % "variables.variable",
             print repr(self.code[cur:last])
 
-        node = matlab2cpp.collection.Var(parent, name, cur=cur,
+        node = mc.collection.Var(parent, name, cur=cur,
                 code=self.code[cur:last])
 
         cur = last-1
@@ -537,6 +537,5 @@ Example:
 
 
 if __name__ == "__main__":
-    import matlab2cpp as mc
     import doctest
     doctest.testmod()

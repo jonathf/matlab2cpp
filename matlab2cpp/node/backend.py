@@ -1,4 +1,5 @@
 import re
+import math
 
 import reference
 import matlab2cpp
@@ -38,10 +39,24 @@ def flatten(node, ordered=False, reverse=False, inverse=False):
 
 
 def summary(node, opt):
+    """
+Backend for creating summary of the node tree.
+See :py:func:`~matlab2cpp.qtree` for behavior.
+
+Args:
+    node (Node): Relative root of the tree
+
+Returns:
+    str: string representation of the node
+
+See also:
+    :py:func:`~matlab2cpp.qtree`
+    """
     
     nodes = flatten(node, False, False, False)
+
     if not (opt is None) and opt.disp:
-        print "iterating %d nodes" % len(nodes)
+        print "iterating over %d nodes" % len(nodes)
 
     
     if not (opt is None) and not (opt.line is None):
@@ -51,31 +66,46 @@ def summary(node, opt):
                 break
 
     indent = [node]
-    out = ""
+    outl = []
+
+    nl = int(math.log10(nodes[-1].line+1))+1
+    nc = int(math.log10(len(nodes[0].code)))+1
+
     for node in nodes:
 
+        out = ""
+
+
+        if node.line:
+            nl_ = int(math.log10(node.line+1))+1
+            out += " "*(nl-nl_) + str(node.line) + " "
+            nc_ = int(math.log10(node.cur+1))+1
+            out += " "*(nc-nc_) + str(node.cur+1)
+        else:
+            out += " "*(nl+nc+1)
+
+        # indentation
         while indent and not (node.parent is indent[-1]):
             indent.pop()
+        out += "| "*(len(indent))
+        indent.append(node)
 
+        out += node.cls.ljust(11)
+        out += node.backend.ljust(13)
+        
+        # define type
         if node.type == "TYPE":
             type = node.declare.prop.get("suggest", "TYPE")
             if type != "TYPE":
                 type = "(" + type + ")"
         else:
             type = node.type
+        out += type.ljust(8)
+        out += node.name
 
-        space = "| "*(len(indent)-1)
-        if not node.line:
-            out += "        %s%-10s %-12s %-7s %s" % \
-                (space, node.cls, node.backend, type, node.name)
-        else:
-            out += "%3d %3d %s%-10s %-12s %-7s %s" % \
-                (node.line, node.cur+1, space, node.cls,
-                        node.backend, type, node.name)
-        out += "\n"
+        outl.append(out)
 
-
-        indent.append(node)
+    out = "\n".join(outl)
 
     out = re.sub(r"(\\n){2,}", "", out)
 

@@ -1,3 +1,4 @@
+import matlab2cpp as mc
 
 def configure_arg(node, index):
     """
@@ -144,6 +145,5 @@ convert scalar to various array types
 
 
 if __name__ == "__main__":
-    import matlab2cpp as mc
     import doctest
     doctest.testmod()

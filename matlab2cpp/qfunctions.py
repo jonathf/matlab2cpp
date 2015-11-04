@@ -24,6 +24,7 @@ Function                        Description
 
 import supplement
 import tree
+import matlab2cpp as mc
 
 __all__ = ["build", "qcpp", "qhpp", "qpy", "qlog", "qtree", "qscript"]
 
@@ -411,36 +412,37 @@ Returns:
 	str: A summary of the node tree.
 
 Example::
-    >>> print mc.qtree("function y=f(x); y=x+4")
-            Program    program      TYPE    unamed
-            Includes   program      TYPE    
-            | Include    program      TYPE    #include <armadillo>
-            | Include    program      TYPE    using namespace arma ;
-      1   1 Funcs      program      TYPE    unamed
-      1   1 | Func       func_return  TYPE    f
-      1   1 | | Declares   func_return  TYPE    
-      1   1 | | | Var        unknown      TYPE    y
-      1   1 | | Returns    func_return  TYPE    
-      1  10 | | | Var        unknown      TYPE    y
-      1  13 | | Params     func_return  TYPE    
-      1  14 | | | Var        unknown      TYPE    x
-      1  16 | | Block      code_block   TYPE    
-      1  18 | | | Assign     unknown      TYPE    
-      1  18 | | | | Var        unknown      TYPE    y
-      1  20 | | | | Plus       expression   TYPE    
-      1  20 | | | | | Var        unknown      TYPE    x
-      1  22 | | | | | Int        int          int     
-            Inlines    program      TYPE    unamed
-            Structs    program      TYPE    unamed
-            Headers    program      TYPE    unamed
-            | Header     program      TYPE    f
-            Log        program      TYPE    unamed
-            | Error      program      TYPE    Var:0
-            | Error      program      TYPE    Var:9
-            | Error      program      TYPE    Var:13
-            | Error      program      TYPE    Var:17
-            | Error      program      TYPE    Var:19
-            | Error      program      TYPE    Plus:19
+    >>> print mc.qtree("function y=f(x); y=x+4") #doctest: +NORMALIZE_WHITESPACE
+        Program    program      TYPE    unamed
+        | Includes   program      TYPE
+        | | Include    program      TYPE    #include <armadillo>
+        | | Include    program      TYPE    #include "mconvert.h"
+        | | Include    program      TYPE    using namespace arma ;
+    1  1| Funcs      program      TYPE    unamed
+    1  1| | Func       func_return  TYPE    f
+    1  1| | | Declares   func_return  TYPE
+    1  1| | | | Var        unknown      TYPE    y
+    1  1| | | Returns    func_return  TYPE
+    1 10| | | | Var        unknown      TYPE    y
+    1 13| | | Params     func_return  TYPE
+    1 14| | | | Var        unknown      TYPE    x
+    1 16| | | Block      code_block   TYPE
+    1 18| | | | Assign     unknown      TYPE
+    1 18| | | | | Var        unknown      TYPE    y
+    1 20| | | | | Plus       expression   TYPE
+    1 20| | | | | | Var        unknown      TYPE    x
+    1 22| | | | | | Int        int          int
+        | Inlines    program      TYPE    unamed
+        | Structs    program      TYPE    unamed
+        | Headers    program      TYPE    unamed
+        | | Header     program      TYPE    f
+        | Log        program      TYPE    unamed
+        | | Error      program      TYPE    Var:0
+        | | Error      program      TYPE    Var:9
+        | | Error      program      TYPE    Var:13
+        | | Error      program      TYPE    Var:17
+        | | Error      program      TYPE    Var:19
+        | | Error      program      TYPE    Plus:1
 
 See also:
     :py:mod:`matlab2cpp.tree`,
@@ -512,6 +514,5 @@ Example:
 
 
 if __name__ == "__main__":
-    import matlab2cpp as mc
     import doctest
     doctest.testmod()

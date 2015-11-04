@@ -6,7 +6,7 @@ functions
 expression          Expression interpretor
 """
 
-import matlab2cpp
+import matlab2cpp as mc
 import findend
 import identify
 import constants as c
@@ -80,7 +80,7 @@ Examples::
             print "%-20s" % "expression.create",
             print repr(self.code[start:start+1])
 
-        matlab2cpp.collection.All(node, cur=start, code=self.code[start])
+        mc.collection.All(node, cur=start, code=self.code[start])
         return start
 
     if end is None:
@@ -184,12 +184,12 @@ Examples::
 
         if self.code[start] == "-":
 
-            node = matlab2cpp.collection.Neg(node, cur=start, code=self.code[start:end+1])
+            node = mc.collection.Neg(node, cur=start, code=self.code[start:end+1])
             start += 1
 
         if self.code[start] == "~":
 
-            node = matlab2cpp.collection.Not(node, cur=start, code=self.code[start:end+1])
+            node = mc.collection.Not(node, cur=start, code=self.code[start:end+1])
             start += 1
 
         while self.code[start] in " \t":
@@ -198,11 +198,11 @@ Examples::
     # Postfixes
     if self.code[end] == "'" and not self.code[start] == "'":
         if self.code[end-1] == ".":
-            node = matlab2cpp.collection.Ctranspose(node, cur=start,
+            node = mc.collection.Ctranspose(node, cur=start,
                     code=self.code[start:end+1])
             end -= 2
         else:
-            node = matlab2cpp.collection.Transpose(node, cur=start,
+            node = mc.collection.Transpose(node, cur=start,
                     code=self.code[start:end+1])
             node.cur = start
             node.code = self.code[start:end+1]
@@ -216,7 +216,7 @@ Examples::
         if self.code[end] != ")":
             self.syntaxerror(end, "parenthesis end")
 
-        node = matlab2cpp.collection.Paren(node, cur=start, code=self.code[start:end+1])
+        node = mc.collection.Paren(node, cur=start, code=self.code[start:end+1])
 
         start += 1
         while self.code[start] in " \t":
@@ -231,13 +231,13 @@ Examples::
     # Reserved keywords
     elif self.code[start:start+3] == "end" and\
             self.code[start+3] in " \t" + c.e_end:
-                node = matlab2cpp.collection.End(node, cur=start, code=self.code[start:start+3])
+                node = mc.collection.End(node, cur=start, code=self.code[start:start+3])
 
     elif self.code[start:start+6] == "return" and self.code[start+6] in " ,;\n":
-        node = matlab2cpp.collection.Return(node, cur=start, code=self.code[start:start+6])
+        node = mc.collection.Return(node, cur=start, code=self.code[start:start+6])
 
     elif self.code[start:start+5] == "break" and self.code[start+5] in " ,;\n":
-        node = matlab2cpp.collection.Break(node, cur=start, code=self.code[start:start+5])
+        node = mc.collection.Break(node, cur=start, code=self.code[start:start+5])
 
 
     # Rest
@@ -248,7 +248,7 @@ Examples::
         if "\n" in self.code[start:end]:
             self.syntaxerror(end, "non line-feed characters in string")
 
-        matlab2cpp.collection.String(node, self.code[start+1:end], cur=start,
+        mc.collection.String(node, self.code[start+1:end], cur=start,
                 code=self.code[start:end+1])
 
     elif self.code[start] in c.digits or\
@@ -272,30 +272,29 @@ Examples::
 
 def retrieve_operator(self, opr):
 
-    if opr == "^":      return matlab2cpp.collection.Exp
-    elif opr == ".^":   return matlab2cpp.collection.Elexp
-    elif opr == "\\":   return matlab2cpp.collection.Leftmatrixdivision
-    elif opr == ".\\":  return matlab2cpp.collection.Leftelementdivision
-    elif opr == "/":    return matlab2cpp.collection.Matrixdivision
-    elif opr == "./":   return matlab2cpp.collection.Elementdivision
-    elif opr == "*":    return matlab2cpp.collection.Mul
-    elif opr == ".*":   return matlab2cpp.collection.Elmul
-    elif opr == "+":    return matlab2cpp.collection.Plus
-    elif opr == "-":    return matlab2cpp.collection.Minus
-    elif opr == ":":    return matlab2cpp.collection.Colon
-    elif opr == "<":    return matlab2cpp.collection.Lt
-    elif opr == "<=":   return matlab2cpp.collection.Le
-    elif opr == ">":    return matlab2cpp.collection.Gt
-    elif opr == ">=":   return matlab2cpp.collection.Ge
-    elif opr == "==":   return matlab2cpp.collection.Eq
-    elif opr == "~=":   return matlab2cpp.collection.Ne
-    elif opr == "&":    return matlab2cpp.collection.Band
-    elif opr == "|":    return matlab2cpp.collection.Bor
-    elif opr == "&&":   return matlab2cpp.collection.Land
-    elif opr == "||":   return matlab2cpp.collection.Lor
+    if opr == "^":      return mc.collection.Exp
+    elif opr == ".^":   return mc.collection.Elexp
+    elif opr == "\\":   return mc.collection.Leftmatrixdivision
+    elif opr == ".\\":  return mc.collection.Leftelementdivision
+    elif opr == "/":    return mc.collection.Matrixdivision
+    elif opr == "./":   return mc.collection.Elementdivision
+    elif opr == "*":    return mc.collection.Mul
+    elif opr == ".*":   return mc.collection.Elmul
+    elif opr == "+":    return mc.collection.Plus
+    elif opr == "-":    return mc.collection.Minus
+    elif opr == ":":    return mc.collection.Colon
+    elif opr == "<":    return mc.collection.Lt
+    elif opr == "<=":   return mc.collection.Le
+    elif opr == ">":    return mc.collection.Gt
+    elif opr == ">=":   return mc.collection.Ge
+    elif opr == "==":   return mc.collection.Eq
+    elif opr == "~=":   return mc.collection.Ne
+    elif opr == "&":    return mc.collection.Band
+    elif opr == "|":    return mc.collection.Bor
+    elif opr == "&&":   return mc.collection.Land
+    elif opr == "||":   return mc.collection.Lor
 
 
 if __name__ == "__main__":
-    import matlab2cpp as mc
     import doctest
     doctest.testmod()

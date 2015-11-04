@@ -94,6 +94,7 @@ The connection between the nummerical values and datatypes is as follows:
 """
 
 import supplement
+import matlab2cpp as mc
 
 dim0 = {"int", "float", "double", "uword", "cx_double"}
 dim1 = {"ivec", "fvec", "uvec", "vec", "cx_vec"}
@@ -316,6 +317,5 @@ class Suggest(object):
         return supplement.suggests.get(instance)
 
 if __name__ == "__main__":
-    import matlab2cpp as mc
     import doctest
     doctest.testmod()
