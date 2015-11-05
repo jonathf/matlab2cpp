@@ -17,7 +17,9 @@ variable type.
 
 import matlab2cpp
 
-PREFIX = """# Supplement file
+PREFIX = """# encoding: utf-8
+#
+# Supplement file
 #
 # Valid inputs:
 #
