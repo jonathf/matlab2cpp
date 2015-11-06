@@ -16,8 +16,33 @@ def teardown_module(module):
     shutil.rmtree(module.path)
 
 
-def test_suggestion():
-    pass
+def test_suggestion_cpp():
+
+    os.chdir(path)
+
+    m_code = """
+a = 1
+b = 2.
+c = '3'
+d = [4, 5]
+    """
+
+    f = open("test.m", "w")
+    f.write(m_code)
+    f.close()
+
+    os.system("mconvert test.m -rs > /dev/null")
+
+    f = open("test.m.cpp", "r")
+    converted_code = f.read()
+    f.close()
+
+    reference_code = """
+    """
+
+    assert converted_code == reference_code
+
+
 
 
 
@@ -130,3 +155,6 @@ a'+'a'+a'
     assert cpp_code == convert(m_code)
 
 
+
+if __name__ == "__main__":
+    os.system("py.test")

@@ -200,9 +200,6 @@ def Matrix(node):
             else:
                 nodes.append(str(node[i]))
 
-    else:
-        return "[", "; ", "]"
-
     return reduce(lambda a,b: ("arma::join_cols(%s, %s)" % (a,b)), nodes)
 
 

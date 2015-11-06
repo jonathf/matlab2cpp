@@ -340,30 +340,29 @@ def suggest_datatype(node):
                     if elem.num:
                         mems.add(elem.mem)
 
+        # rowvec definition
         elif len(node.group) == 1:
 
             if len(node.group[0]) == 1:
                 return None, None
-
-            dim = 1
-
-            for elem in node.group[0]:
-                if elem.num:
-                    mems.add(elem.mem)
-                    if elem.dim > 1:
-                        dim = 3
-
-            if not mems:
-                return None, None
-
-        elif len(node.group[0]) == 1:
 
             dim = 2
 
             for vec in node.group:
                 if vec.num:
                     mems.add(vec.mem)
-                    if vec.dim not in (0, 2):
+                    if vec.dim > 1:
+                        dim = 3
+            
+        # colvec definition
+        elif len(node.group[0]) == 1:
+
+            dim = 1
+
+            for elem in node.group[0]:
+                if elem.num:
+                    mems.add(elem.mem)
+                    if elem.dim not in (0, 2):
                         dim = 3
 
         if len(mems) == 1:
@@ -371,6 +370,10 @@ def suggest_datatype(node):
 
         elif len(mems) > 1:
             return dim, max(*mems)
+
+        else:
+            return None, None
+
 
     return None, None
 

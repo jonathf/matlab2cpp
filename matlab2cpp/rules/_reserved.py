@@ -503,59 +503,55 @@ def Get_zeros(node):
     # set memory type
     if not (mem is None):
         node.mem = mem
-        if dim in (1,2):
-            node.dim = dim
     else:
         node.mem = 3
 
     # reset to uword if arg of array-node
     if node.group.cls in ("Get", "Cget", "Fget", "Nget", "Sget", "Set", "Cset",
-            "Fset", "Nset", "Sset"):
+            "Fset", "Nset", "Sset") and node.group.num:
         node.mem = 0
 
-    # not vector
-    if dim not in (1,2):
+    # one argument
+    if len(node) == 1:
 
-        # single arg creates colvec
-        if len(node) == 1:
-            node.dim = 2
+        # arg input is vector
+        if node[0].num and node[0].dim in (1,2):
 
-        # double argument creates colvec/rowvec/matrix depending on context
-        elif len(node) == 2:
-            if node[0].cls == "Int" and node[0].value == "1":
-                node.dim = 2
-                return "arma::zeros<%(type)s>(%(1)s)"
-            elif node[1].cls == "Int" and node[1].value == "1":
-                node.dim = 1
-                return "arma::zeros<%(type)s>(%(0)s)"
+            # non-trivial variables moved out to own line
+            if node[0].cls != "Var":
+                node[0].auxiliary()
+
+            # indexing arg as input if vector
+            if node.dim in (1,2):
+                return "arma::zeros<%(type)s>(%(0)s(0))"
+            if node.dim == 3:
+                return "arma::zeros<%(type)s>(%(0)s(0), %(0)s(1))"
+            if node.dim == 4:
+                return "arma::zeros<%(type)s>(%(0)s(0), %(0)s(1), %(0)s(2))"
+
+        else:
+
+            # use suggestions or defualts
+            if dim in (1,2,3):
+                node.dim = dim
             else:
-                node.dim = 3
+                node.dim = 1 # default
 
-        # triple arg create cube
-        if len(node) == 3:
-            node.dim = 4
+    # double argument creates colvec/rowvec/matrix depending on context
+    elif len(node) == 2:
 
-    # arg input is vector
-    if node[0].num and node[0].dim in (1,2):
-
-        # non-trivial variables moved out to own line
-        if node[0].cls != "Var":
-            node[0].auxiliary()
-
-        # indexing arg as input if vector
-        if node.dim in (1,2):
-            return "arma::zeros<%(type)s>(%(0)s(0))"
-        if node.dim == 3:
-            return "arma::zeros<%(type)s>(%(0)s(0), %(0)s(1))"
-        if node.dim == 4:
-            return "arma::zeros<%(type)s>(%(0)s(0), %(0)s(1), %(0)s(2))"
-
-    # two args where one vector and other "1" handled specially
-    elif len(node) == 2 and node.dim in (1,2):
         if node[0].cls == "Int" and node[0].value == "1":
+            node.dim = 1
             return "arma::zeros<%(type)s>(%(1)s)"
-        if node[1].cls == "Int" and node[1].value == "1":
+        elif node[1].cls == "Int" and node[1].value == "1":
+            node.dim = 2
             return "arma::zeros<%(type)s>(%(0)s)"
+        else:
+            node.dim = 3
+
+    # triple arg create cube
+    elif len(node) == 3:
+        node.dim = 4
 
     return "arma::zeros<%(type)s>(", ", ", ")"
 
