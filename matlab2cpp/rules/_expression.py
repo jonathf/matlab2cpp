@@ -224,15 +224,11 @@ def Leftelementdivision(node):
 
 def Matrixdivision(node):
 
-    # unknown input
-    if node.type == "TYPE":
-        return "", "/", ""
-
     # start with first element ...
     out = str(node[0])
 
-    mem = node[0].mem
-    dim = node[0].dim
+    mem = node[0].mem or 2
+    dim = node[0].dim or 0
 
     # everything scalar -> use element division
     if {n.dim for n in node} == {0}:
@@ -248,10 +244,13 @@ def Matrixdivision(node):
             if child.dim == 3:
                 out = "arma::solve(" + str(child) + ".t(), " + out + ".t()).t()"
 
+            # integer handle
+            elif child.cls == "Int":
+                out = "out/" + str(child) + ".0"
+
             # avoid integer division
             elif child.mem < 2 and mem < 2:
                 out = out + "*1.0/" + str(child)
-                mem = 2
 
             else:
                 out = out + "/" + str(child)

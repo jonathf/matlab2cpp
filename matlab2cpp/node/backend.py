@@ -346,24 +346,28 @@ def suggest_datatype(node):
             if len(node.group[0]) == 1:
                 return None, None
 
-            dim = 2
-
-            for vec in node.group:
-                if vec.num:
-                    mems.add(vec.mem)
-                    if vec.dim > 1:
-                        dim = 3
+            for elem in node.group[0]:
+                if elem.num:
+                    mems.add(elem.mem)
+            dim = 3
             
         # colvec definition
         elif len(node.group[0]) == 1:
 
-            dim = 1
+            for vec in node.group:
+                if vec[0].num:
+                    mems.add(vec[0].mem)
 
-            for elem in node.group[0]:
-                if elem.num:
-                    mems.add(elem.mem)
-                    if elem.dim not in (0, 2):
-                        dim = 3
+            dim = 3
+
+        else:
+
+            for vec in node.group:
+                for elem in vec:
+                    if elem.num:
+                        mems.add(elem.mem)
+
+            dim = 3
 
         if len(mems) == 1:
             return dim, mems.pop()
