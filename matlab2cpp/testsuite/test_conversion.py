@@ -6,18 +6,25 @@ from subprocess import Popen, PIPE
 
 
 def setup_module(module):
+    """Create temporary folder and save path to module before start
+    """
 
     path = tempfile.mkdtemp()
     os.chdir(path)
     module.path = path
 
 def teardown_module(module):
+    """Remove temporary folder after job is complete
+    """
 
     shutil.rmtree(module.path)
 
 
-def test_suggestion_cpp():
+def test_variable_sugges():
+    """Test basic variable types
+    """
 
+    # change to temporary dir
     os.chdir(path)
 
     m_code = """
@@ -25,6 +32,7 @@ a = 1
 b = 2.
 c = '3'
 d = [4, 5]
+e = [6; 7]
     """
 
     f = open("test.m", "w")
@@ -37,12 +45,130 @@ d = [4, 5]
     converted_code = f.read()
     f.close()
 
-    reference_code = """
-    """
+    # strip header
+    converted_code = "\n\n".join(converted_code.split("\n\n")[1:])
+
+    reference_code = """int main(int argc, char** argv)
+{
+  int a ;
+  double b ;
+  irowvec d ;
+  string c ;
+  ivec e ;
+  a = 1 ;
+  b = 2. ;
+  c = "3" ;
+  int _d [] = {4, 5} ;
+  d = irowvec(_d, 2, false) ;
+  int _e [] = {6, 7} ;
+  e = ivec(_e, 2, false) ;
+  return 0 ;
+}"""
 
     assert converted_code == reference_code
 
 
+
+def test_function_suggestion():
+    """Test suggestion for function with single return
+    """
+
+    # change to temporary dir
+    os.chdir(path)
+
+    m_code = """
+function y=f(x)
+    y = x+2
+end
+function g()
+    x = [1,2,3]
+    y = f(x)
+end
+    """
+
+    f = open("test.m", "w")
+    f.write(m_code)
+    f.close()
+
+    os.system("mconvert test.m -rs > /dev/null")
+
+    f = open("test.m.hpp", "r")
+    converted_code = f.read()
+    f.close()
+
+    # strip header
+    converted_code = "\n\n".join(converted_code.split("\n\n")[1:])
+
+    reference_code = """irowvec f(irowvec x)
+{
+  irowvec y ;
+  y = x+2 ;
+  return y ;
+}
+
+void g()
+{
+  irowvec x, y ;
+  int _x [] = {1, 2, 3} ;
+  x = irowvec(_x, 3, false) ;
+  y = f(x) ;
+}"""
+
+    assert converted_code == reference_code
+
+
+
+def test_functions_suggestion():
+    """Test suggestion for function with multiple returns
+    """
+
+    # change to temporary dir
+    os.chdir(path)
+
+    m_code = """
+function [y,z]=f(a,b)
+    y = a+2
+    z = b-3
+end
+function g()
+    a = [1,2,3]
+    b = [4;5;6]
+    [y,z] = f(a,b)
+end
+    """
+
+    f = open("test.m", "w")
+    f.write(m_code)
+    f.close()
+
+    os.system("mconvert test.m -rs > /dev/null")
+
+    f = open("test.m.hpp", "r")
+    converted_code = f.read()
+    f.close()
+
+    # strip header
+    converted_code = "\n\n".join(converted_code.split("\n\n")[1:])
+
+    reference_code = """void f(irowvec a, ivec b, irowvec& y, ivec& z)
+{
+
+y = a+2 ;
+  z = b-3 ;
+}
+
+void g()
+{
+  ivec b, z ;
+  irowvec a, y ;
+  int _a [] = {1, 2, 3} ;
+  a = irowvec(_a, 3, false) ;
+  int _b [] = {4, 5, 6} ;
+  b = ivec(_b, 3, false) ;
+  f(a, b, y, z) ;
+}"""
+
+    assert converted_code == reference_code
 
 
 
