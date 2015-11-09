@@ -395,7 +395,7 @@ def Exp(node):
 
     out = str(node[0])
     for child in node[1:]:
-        out = "arma::pow(" + str(out) + "," + str(child) + ")"
+        out = "pow(" + str(out) + "," + str(child) + ")"
 
     return out
 
@@ -450,7 +450,11 @@ def Transpose(node):
     elif node[0].dim == 2:
         node.dim = 1
 
-    return "arma::strans(", "", ")"
+    # not complex type
+    if node.mem < 4:
+        return "arma::strans(", "", ")"
+
+    return "arma::trans(", "", ")"
 
 def Ctranspose(node):
     """Complex transpose
@@ -468,10 +472,6 @@ def Ctranspose(node):
     elif node[0].dim == 2:
         node.dim = 1
 
-    # not complex type
-    if node.mem < 5:
-        return "arma::strans(", "", ")"
-    
     return "arma::trans(", "", ")"
 
 def Colon(node):

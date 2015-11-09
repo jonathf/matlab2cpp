@@ -31,7 +31,6 @@ def Declare(node):
 def Var(node):
     return "%(name)s"
 
-
 Var_pi = "datum::pi"
 Var_true = "1"
 Var_false = "0"
@@ -42,7 +41,9 @@ Var_NaN = "datum::nan"
 
 # Special handle of 'i'-variable
 
-Var_i = "cx_complex(0, 1)"
+def Var_i(node):
+    node.type = "cx_double"
+    return "cx_complex(0, 1)"
 
 def Get_abs(node):
     node.type = node[0].type

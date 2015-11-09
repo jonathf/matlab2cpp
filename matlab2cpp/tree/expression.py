@@ -198,11 +198,11 @@ Examples::
     # Postfixes
     if self.code[end] == "'" and not self.code[start] == "'":
         if self.code[end-1] == ".":
-            node = mc.collection.Ctranspose(node, cur=start,
+            node = mc.collection.Transpose(node, cur=start,
                     code=self.code[start:end+1])
             end -= 2
         else:
-            node = mc.collection.Transpose(node, cur=start,
+            node = mc.collection.Ctranspose(node, cur=start,
                     code=self.code[start:end+1])
             node.cur = start
             node.code = self.code[start:end+1]
