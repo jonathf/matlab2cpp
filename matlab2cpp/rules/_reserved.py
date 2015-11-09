@@ -540,12 +540,21 @@ def Get_zeros(node):
     # double argument creates colvec/rowvec/matrix depending on context
     elif len(node) == 2:
 
-        if node[0].cls == "Int" and node[0].value == "1":
+        # use matrix, if suggested
+        if dim == 3:
+            node.dim = 3
+
+        # use colvec if first index is '1'
+        elif node[0].cls == "Int" and node[0].value == "1":
             node.dim = 1
             return "arma::zeros<%(type)s>(%(1)s)"
+
+        # use rowvec if second index is '1'
         elif node[1].cls == "Int" and node[1].value == "1":
             node.dim = 2
             return "arma::zeros<%(type)s>(%(0)s)"
+
+        # default to matrix
         else:
             node.dim = 3
 
