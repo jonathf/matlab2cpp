@@ -9,7 +9,7 @@ through the name prefix `@`.  For example:
     void f()
     {
       std::function<int(int)> g ;
-      g = [] (int x) {pow(x,2) ; } ;
+      g = [] (int x) {arma::pow(x,2) ; } ;
       g(4) ;
     }
 
@@ -38,6 +38,7 @@ The function `g` is a variable inside `f`'s function scope.  It has the datatype
 associated function scope `_g` contains the variables inside the definition of
 the anonymous function.
 """
+import matlab2cpp as mc
 
 def set(node, types):
 
@@ -105,5 +106,4 @@ class Ftypes(object):
 
 if __name__ == "__main__":
     import doctest
-    import matlab2cpp as mc
     doctest.testmod()

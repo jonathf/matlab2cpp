@@ -15,7 +15,7 @@ variable type.
 
 """
 
-import matlab2cpp
+import matlab2cpp as mc
 
 PREFIX = """# encoding: utf-8
 #
@@ -263,7 +263,6 @@ Example:
 
 
 if __name__ == "__main__":
-    import matlab2cpp as mc
     import doctest
     doctest.testmod()
 

@@ -81,7 +81,7 @@ elements in the integer `_size`:
       'using namespace arma ;',
     ]
 """
-import matlab2cpp
+import matlab2cpp as mc
 
 def set(node, types):
 
@@ -107,7 +107,7 @@ def set(node, types):
                         var.type = types[key]
 
                 else:
-                    var = matlab2cpp.collection.Declare(struct, key, backend="struct",
+                    var = mc.collection.Declare(struct, key, backend="struct",
                         type=types[key])
 
 
@@ -143,5 +143,4 @@ class Stypes(object):
 
 if __name__ == "__main__":
     import doctest
-    import matlab2cpp as mc
     doctest.testmod()
