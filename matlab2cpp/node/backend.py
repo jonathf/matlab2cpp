@@ -501,4 +501,4 @@ def plotting(node):
     node.include("SPlot")
     declares = node.func[0]
     if "_plot" not in declares:
-        matlab2cpp.collection.Var(declares, name="_plot", type="plotting")
+        matlab2cpp.collection.Var(declares, name="_plot", type="SPlot")
