@@ -13,11 +13,14 @@ reserved = {
 "transpose", "ctranspose",
 "abs", "nextpow2", "fft", "ifft", "hankel",
 "zeros", "ones", "round", "return", "rand", "floor",
-"clear", "close", "plot", "hold",
+"clear", "close", 
 "_conv_to", "_reshape",
 "interp1", "linspace", "varargins",
 "sum", "conj", "real", "imag",
 "tic", "toc", "diag",
+"figure", "hold", "clf", "cla", "show", "xlabel", "ylabel",
+"title", "plot", "imshow", "imagesc", "wigb", "colorbar",
+"clim", "axis", "grid", "subplot",
 }
 
 # Common attribute
@@ -654,6 +657,7 @@ def Var_close(node):
 def Get_close(node):
     return "// close(", ", ", ")"
 
+"""
 def Var_plot(node):
     return "// plot"
 
@@ -665,6 +669,7 @@ def Var_hold(node):
 
 def Get_hold(node):
     return "// hold(", ", ", ")"
+"""
 
 def Get__conv_to(node):
     return "conv_to<%(type)s>::from(%(0)s)"
@@ -815,7 +820,78 @@ def Get_toc(node):
 def Get_diag(node):
     return "diagmat(", ", ", ")"
 
+"""
+def Get_plot(node):
+    node.plotting()
+    return "_plot.plot(", ", ", ")"
+"""
+
+#SPlot reserved words
+def Get_figure(node):
+    node.plotting()
+    return "_plot.plot(", ", ", ")"
+
+def Var_hold(node):
+    node.plotting()
+    return "_plot.hold(" + ")"
+
+def Get_clf(node):
+    node.plotting()
+    return "_plot.clf(", ", ", ")"
+
+def Get_cla(node):
+    node.plotting()
+    return "_plot.cla(", ", ", ")"
+
+def Get_show(node):
+    node.plotting()
+    return "_plot.show(", ", ", ")"
+
+def Get_xlabel(node):
+    node.plotting()
+    return "_plot.xlabel(", ", ", ")"
+
+def Get_ylabel(node):
+    node.plotting()
+    return "_plot.ylabel(", ", ", ")"
+
+def Get_title(node):
+    node.plotting()
+    return "_plot.title(", ", ", ")"
+
 def Get_plot(node):
     node.plotting()
     return "_plot.plot(", ", ", ")"
 
+def Get_imshow(node):
+    node.plotting()
+    return "_plot.imshow(", ", ", ")"
+
+def Get_imagesc(node):
+    node.plotting()
+    return "_plot.imagesc(", ", ", ")"
+
+#wigb, what is the matlab command? left it out
+def Get_wigb(node):
+    node.plotting()
+    return "_plot.wigb(", ", ", ")"
+
+def Get_colorbar(node):
+    node.plotting()
+    return "_plot.colorbar(", ", ", ")"
+
+def Get_clim(node):
+    node.plotting()
+    return "_plot.clim(", ", ", ")"
+
+def Get_axis(node):
+    node.plotting()
+    return "_plot.axis(", ", ", ")"
+
+def Get_grid(node):
+    node.plotting()
+    return "_plot.grid(", ", ", ")"
+
+def Get_subplot(node):
+    node.plotting()
+    return "_plot.subplot(", ", ", ")"
