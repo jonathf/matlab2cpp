@@ -15,8 +15,8 @@ def retrieve(node, name, **kws):
     else:
 
         library_code = ""
-        if name == "Splot":
-            include_code = '#include "Splot.h"'
+        if name == "SPlot":
+            include_code = '#include "SPlot.h"'
 
         elif name == "m2cpp":
             include_code = '#include "m2cpp.h"'

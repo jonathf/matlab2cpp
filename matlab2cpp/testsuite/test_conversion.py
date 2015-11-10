@@ -20,7 +20,7 @@ def teardown_module(module):
     shutil.rmtree(module.path)
 
 
-def test_variable_sugges():
+def test_variable_suggest():
     """Test basic variable types
     """
 
@@ -50,11 +50,11 @@ e = [6; 7]
 
     reference_code = """int main(int argc, char** argv)
 {
-  int a ;
   double b ;
+  int a ;
   irowvec d ;
-  string c ;
   ivec e ;
+  string c ;
   a = 1 ;
   b = 2. ;
   c = "3" ;
@@ -152,15 +152,14 @@ end
 
     reference_code = """void f(irowvec a, ivec b, irowvec& y, ivec& z)
 {
-
-y = a+2 ;
+  y = a+2 ;
   z = b-3 ;
 }
 
 void g()
 {
-  ivec b, z ;
   irowvec a, y ;
+  ivec b, z ;
   int _a [] = {1, 2, 3} ;
   a = irowvec(_a, 3, false) ;
   int _b [] = {4, 5, 6} ;
@@ -172,115 +171,68 @@ void g()
 
 
 
+def _test_cross_files():
+    """Test suggestion for function with multiple returns
+    """
 
+    # change to temporary dir
+    os.chdir(path)
 
+    x = """
+    """
+    f = open("x.m", "w")
+    f.write(x)
+    f.close()
 
-def convert(m_code):
-    "Convert m-code to cpp-code using matlab2cpp w/suggestions"
-    filename = tempfile.mkstemp(suffix=".m", text=True)[1]
-    with open(filename, "w") as f:
-        f.write(m_code)
+    y = """
+    """
+    f = open("x.m", "w")
+    f.write(x)
+    f.close()
 
-    out = Popen(["mconvert", filename], stdout=PIPE).communicate()[0]
+    z = """
+    """
+    f = open("x.m", "w")
+    f.write(x)
+    f.close()
 
-    out = str(matlab2cpp.main(filename, True))
-    os.remove(filename)
-    return out
+    test = """
+a = x(4)
+b = y(a)
+c = z(b)
+    """
+    f = open("test.m", "w")
+    f.write(m_code)
+    f.close()
 
+    os.system("mconvert test.m -rs > /dev/null")
 
-def _test_get_node():
+    f = open("test.m.hpp", "r")
+    converted_code = f.read()
+    f.close()
 
-    m_code = """x(:)
-x(1:2:3)
-x(1:2:3, :)
-x(:, 1:2:3)
-x(1:2:3, 4)
-x(4, 1:2:3)
-x(1,1)"""
+    # strip header
+    converted_code = "\n\n".join(converted_code.split("\n\n")[1:])
 
-    cpp_code = ""
+    reference_code = """void f(irowvec a, ivec b, irowvec& y, ivec& z)
+{
+  y = a+2 ;
+  z = b-3 ;
+}
 
-    assert cpp_code == convert(m_code)
+void g()
+{
+  irowvec a, y ;
+  ivec b, z ;
+  int _a [] = {1, 2, 3} ;
+  a = irowvec(_a, 3, false) ;
+  int _b [] = {4, 5, 6} ;
+  b = ivec(_b, 3, false) ;
+  f(a, b, y, z) ;
+}"""
 
-
-def _test_array_indexing():
-
-    m_code = """x(:) = 1:2:3
-x(1:2:3) = 1:2:3
-x(1:2:3, :) = 1:2:3
-x(:, 1:2:3) = 1:2:3
-x(1:2:3, 4) = 1:2:3
-x(4, 1:2:3) = 1:2:3
-x(1,1) = 1:2:3
-
-x(:) = 4
-x(1:2:3) = 4
-x(1:2:3, :) = 4
-x(:, 1:2:3) = 4
-x(1:2:3, 4) = 4
-x(4, 1:2:3) = 4
-x(1,1) = 4"""
-
-    cpp_code = ""
-
-    assert cpp_code == convert(m_code)
-
-
-def _test_matrix_declaration():
-
-    m_code = """min([1,2;3,4])
-x = [1,2]
-y = [3;4]
-[1, x, x]
-[[3, 4]; x]
-[[1; 2], y]
-[1; y]"""
-
-    cpp_code = ""
-
-    assert cpp_code == convert(m_code)
-
-
-def _test_implicit_matrix():
-
-    m_code = """min([1 2
-3 4])
-x = [1 2]
-y = [3
-4]
-[1 x x]
-[[3 4]
-x]
-[[1
-2] y]
-[1
-y]
-[1+2]
-[1+ 2]
-[1 +2]
-[1 + 2]
-[a() b()
-c()]"""
-
-    cpp_code = ""
-
-    assert cpp_code == convert(m_code)
-
-
-def _test_implicit_transposed():
-
-    m_code = """a'
-a.'
-a.b'
-a()'
-a'+'a'+a'
-'string' + a'"""
-
-    cpp_code = ""
-
-    assert cpp_code == convert(m_code)
-
+    assert converted_code == reference_code
 
 
 if __name__ == "__main__":
-    os.system("py.test")
+    os.system("py.test --tb short")

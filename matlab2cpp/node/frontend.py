@@ -219,3 +219,6 @@ Return:
         """
         return backend.flatten(self, ordered, reverse, inverse)
 
+    def plotting(self):
+        return backend.plotting(self)
+

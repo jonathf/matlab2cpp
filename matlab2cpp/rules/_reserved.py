@@ -814,3 +814,8 @@ def Get_toc(node):
 
 def Get_diag(node):
     return "diagmat(", ", ", ")"
+
+def Get_plot(node):
+    node.plotting()
+    return "_plot.plot(", ", ", ")"
+

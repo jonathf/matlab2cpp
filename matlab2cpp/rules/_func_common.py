@@ -95,6 +95,10 @@ def Declares(node):
 
     # normal functions
     if node.backend in ("func_return", "func_returns"):
+
+        if not node:
+            return ""
+
         returns = node.parent[1]
 
         declares = {}   # {"int" : ["a", "b"]} -> int a, b ;
@@ -119,7 +123,11 @@ def Declares(node):
 
         # create output
         out = ""
-        for key, val in declares.items():
+        keys = declares.keys()
+        keys.sort()
+        for key in keys:
+            val = declares[key]
+            val.sort()
 
             # datatype
             out += "\n" + key + " "
@@ -175,17 +183,27 @@ return %(1)s ;
 
         # both returns and parameters present
         if len(node[1]) and len(node[2]):
-            return """void %(name)s(%(2)s, %(1)s)
+            if len(node[0])>len(node[1]):
+                return """void %(name)s(%(2)s, %(1)s)
 {
 %(0)s
 %(3)s
 }"""
+            return """void %(name)s(%(2)s, %(1)s)
+{
+%(3)s
+}"""
 
         # one of returns or params missing
-        return """void %(name)s(%(2)s%(1)s)
+        if len(node[0])>len(node[1]):
+            return """void %(name)s(%(2)s%(1)s)
 {
 %(0)s
 %(3)s
+}"""
+        return """void %(name)s(%(2)s%(1)s)
+{
+4%(3)s
 }"""
     
     if node.backend == "func_lambda":
