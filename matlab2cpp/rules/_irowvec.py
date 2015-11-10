@@ -1,3 +1,4 @@
-from _rowvec_common import *
+from variables import *
+from rowvec import Get, Set
 
 Declare = "irowvec %(name)s ;"

@@ -203,11 +203,11 @@ return %(1)s ;
 }"""
         return """void %(name)s(%(2)s%(1)s)
 {
-4%(3)s
+%(3)s
 }"""
     
     if node.backend == "func_lambda":
-        return "// placeholder for %(name)s"
+        return ""
 
 
 def Main(node):

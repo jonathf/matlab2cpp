@@ -9,7 +9,7 @@ through the name prefix `@`.  For example:
     void f()
     {
       std::function<int(int)> g ;
-      g = [] (int x) {arma::pow(x,2) ; } ;
+      g = [] (int x) {pow(x,2) ; } ;
       g(4) ;
     }
 

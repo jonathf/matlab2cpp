@@ -1,3 +1,2 @@
-from _cube_common import *
-
+from cube import Get, Set, Resize
 Declare = "cube = %(name)s ;"
