@@ -18,9 +18,10 @@ reserved = {
 "interp1", "linspace", "varargins",
 "sum", "conj", "real", "imag",
 "tic", "toc", "diag",
-"figure", "hold", "clf", "cla", "show", "xlabel", "ylabel",
+"figure", "clf", "cla", "show", "xlabel", "ylabel", "hold",
 "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
 "clim", "axis", "grid", "subplot",
+"_splot",
 }
 
 # Common attribute
@@ -657,19 +658,6 @@ def Var_close(node):
 def Get_close(node):
     return "// close(", ", ", ")"
 
-"""
-def Var_plot(node):
-    return "// plot"
-
-def Get_plot(node):
-    return "// plot(", ", ", ")"
-
-def Var_hold(node):
-    return "// hold"
-
-def Get_hold(node):
-    return "// hold(", ", ", ")"
-"""
 
 def Get__conv_to(node):
     return "conv_to<%(type)s>::from(%(0)s)"
@@ -820,11 +808,6 @@ def Get_toc(node):
 def Get_diag(node):
     return "diagmat(", ", ", ")"
 
-"""
-def Get_plot(node):
-    node.plotting()
-    return "_plot.plot(", ", ", ")"
-"""
 
 #SPlot reserved words
 def Get_figure(node):
@@ -832,8 +815,26 @@ def Get_figure(node):
     return "_plot.plot(", ", ", ")"
 
 def Var_hold(node):
+    return Get_hold(node)
+
+def Get_hold(node):
     node.plotting()
-    return "_plot.hold(" + ")"
+    if node and node[0].cls == "String":
+
+        if node[0].value == "on":
+            return "_plot.hold(1)"
+
+        if node[0].value == "off":
+            return "_plot.hold(0)"
+
+        node.error('argument must either be "on" or "off"')
+
+        return "_plot.hold(", ", ", ")"
+
+    node.error("hold toggle not supported")
+    return "_plot.hold(", ", ", ")"
+
+
 
 def Get_clf(node):
     node.plotting()
@@ -895,3 +896,6 @@ def Get_grid(node):
 def Get_subplot(node):
     node.plotting()
     return "_plot.subplot(", ", ", ")"
+
+def Get__splot(node):
+    return "_plot.show()"

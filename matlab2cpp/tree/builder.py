@@ -407,6 +407,9 @@ Example::
     def create_number(self, node, start):
         return misc.number(self, node, start)
 
+    def create_reserved(self, node, start):
+        return misc.reserved(self, node, start)
+
 
     def create_variable(self, parent, cur):
         return variables.variable(self, parent, cur)

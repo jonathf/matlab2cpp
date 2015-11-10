@@ -148,6 +148,10 @@ Example:
         elif self.code[cur:cur+5] == "while" and self.code[cur+5] in c.k_end:
             cur = self.create_while(block, cur)
 
+        elif self.code[cur:cur+4] == "hold" and \
+                self.code[cur+4] not in c.letters+c.digits+"_":
+            cur = self.create_reserved(block, cur)
+
         elif self.code[cur] in c.e_start:
             j = findend.expression(self, cur)
 
