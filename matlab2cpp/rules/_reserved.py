@@ -20,7 +20,7 @@ reserved = {
 "tic", "toc", "diag",
 "figure", "clf", "cla", "show", "xlabel", "ylabel", "hold",
 "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
-"clim", "axis", "grid", "subplot",
+"xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
 "_splot",
 }
 
@@ -812,7 +812,7 @@ def Get_diag(node):
 #SPlot reserved words
 def Get_figure(node):
     node.plotting()
-    return "_plot.plot(", ", ", ")"
+    return "_plot.figure(", ", ", ")"
 
 def Var_hold(node):
     return Get_hold(node)
@@ -834,11 +834,15 @@ def Get_hold(node):
     node.error("hold toggle not supported")
     return "_plot.hold(", ", ", ")"
 
-
+def Var_clf(node):
+    return Get_clf(node)
 
 def Get_clf(node):
     node.plotting()
     return "_plot.clf(", ", ", ")"
+
+def Var_cla(node):
+    return Get_cla(node)
 
 def Get_cla(node):
     node.plotting()
@@ -872,18 +876,28 @@ def Get_imagesc(node):
     node.plotting()
     return "_plot.imagesc(", ", ", ")"
 
-#wigb, what is the matlab command? left it out
 def Get_wigb(node):
     node.plotting()
     return "_plot.wigb(", ", ", ")"
+
+def Var_colorbar(node):
+    return Get_colorbar(node)
 
 def Get_colorbar(node):
     node.plotting()
     return "_plot.colorbar(", ", ", ")"
 
-def Get_clim(node):
+def Get_xlim(node):
     node.plotting()
-    return "_plot.clim(", ", ", ")"
+    return "_plot.xlim(", ", ", ")"
+
+def Get_ylim(node):
+    node.plotting()
+    return "_plot.ylim(", ", ", ")"
+
+def Get_caxis(node):
+    node.plotting()
+    return "_plot.caxis(", ", ", ")"
 
 def Get_axis(node):
     node.plotting()
@@ -896,6 +910,10 @@ def Get_grid(node):
 def Get_subplot(node):
     node.plotting()
     return "_plot.subplot(", ", ", ")"
+
+def Get_colormap(node):
+    node.plotting()
+    return "_plot.axis(", ", ", ")"
 
 def Get__splot(node):
     return "_plot.show()"
