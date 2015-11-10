@@ -298,7 +298,8 @@ def Matrixdivision(node):
                 elif child.dim == 4:
                     dim = 4
 
-    node.type = (dim, mem)
+    if not (dim is None) and not (mem is None):
+        node.type = (dim, mem)
 
     return out
 
