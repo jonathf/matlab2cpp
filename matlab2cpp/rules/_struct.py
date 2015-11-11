@@ -1,4 +1,4 @@
-from _variables import *
+from variables import *
 
 def Declare(node):
     name = node["name"]

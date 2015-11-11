@@ -14,6 +14,8 @@ or the python function :py:func:`~matlab2cpp.qtree`. For example::
     >>> print mc.qtree("a = 2+2") # doctest: +NORMALIZE_WHITESPACE
        Program    program      TYPE    unamed
        | Includes   program      TYPE
+       | | Include    program      TYPE    #include <armadillo>
+       | | Include    program      TYPE    using namespace arma ;
     1 1| Funcs      program      TYPE    unamed
     1 1| | Main       func_common  TYPE    main
     1 1| | | Declares   func_return  TYPE
@@ -86,6 +88,8 @@ upon how the configuration is set up. Intuitively enough, if datatype is set to
     >>> print mc.qtree("a = 2+2", suggest=True) # doctest: +NORMALIZE_WHITESPACE
        Program    program      TYPE    unamed
        | Includes   program      TYPE
+       | | Include    program      TYPE    #include <armadillo>
+       | | Include    program      TYPE    using namespace arma ;
     1 1| Funcs      program      TYPE    unamed
     1 1| | Main       func_common  TYPE    main
     1 1| | | Declares   func_return  int

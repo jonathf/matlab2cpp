@@ -1,4 +1,4 @@
-from _variables import *
+from variables import *
 
 Declare = "cx_double %(name)s ;"
 def Ifloat(node):

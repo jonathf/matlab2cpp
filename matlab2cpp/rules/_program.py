@@ -1,5 +1,6 @@
 import re
 import matlab2cpp as mc
+import armadillo as arma
 
 def add_indenting(text):
     """Add identing to text
@@ -58,6 +59,7 @@ Examples:
 def strip(text):
     """Remove trailing spaces and linefeeds.
     """
+    if not text: return text
 
     start = 0
     while text[start] in "\n ":
@@ -77,6 +79,7 @@ def Project(node):
     return ""
 
 def Program(node):
+    arma.include(node)
     return ""
 
 def Includes(node):

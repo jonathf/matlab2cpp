@@ -1,5 +1,4 @@
-from _variables import *
-from _arma_common import configure_arg
+import armadillo as arma
 
 def Get(node):
 
@@ -19,7 +18,7 @@ def Get(node):
         node_ = node[0]
 
 
-    arg, dim = configure_arg(node_, 0)
+    arg, dim = arma.configure_arg(node_, 0)
 
     if dim == -1:
         return "%(name)s(", ", ", ")"
@@ -47,7 +46,7 @@ def Set(node):
         node_ = node[0]
 
 
-    arg, dim = configure_arg(node_, 0)
+    arg, dim = arma.configure_arg(node_, 0)
 
     if dim == 0:
         node.dim = 0

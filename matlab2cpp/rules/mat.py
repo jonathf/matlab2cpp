@@ -1,5 +1,4 @@
-from _variables import *
-from _arma_common import configure_arg
+import armadillo as arma
 
 def Get(node):
     """
@@ -28,7 +27,7 @@ def Get(node):
     # Single argument
     if len(node) == 1:
 
-        arg, dim = configure_arg(node[0], 0)
+        arg, dim = arma.configure_arg(node[0], 0)
 
         # unknown input
         if dim == -1:
@@ -43,8 +42,8 @@ def Get(node):
     # Double argument
     elif len(node) == 2:
 
-        arg0, dim0 = configure_arg(node[0], 0)
-        arg1, dim1 = configure_arg(node[1], 1)
+        arg0, dim0 = arma.configure_arg(node[0], 0)
+        arg1, dim1 = arma.configure_arg(node[1], 1)
 
         # unknown input
         if -1 in (dim0, dim1):
@@ -116,7 +115,7 @@ def Set(node):
     # Single argument
     if len(node) == 1:
 
-        arg, dim = configure_arg(node[0], 0)
+        arg, dim = arma.configure_arg(node[0], 0)
 
         # scalar arg is scalar
         if dim == 0:
@@ -132,8 +131,8 @@ def Set(node):
     # Double argument
     elif len(node) == 2:
 
-        arg0, dim0 = configure_arg(node[0], 0)
-        arg1, dim1 = configure_arg(node[1], 1)
+        arg0, dim0 = arma.configure_arg(node[0], 0)
+        arg1, dim1 = arma.configure_arg(node[1], 1)
 
         # unknown datatype
         if -1 in (dim0, dim1):

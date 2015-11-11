@@ -29,7 +29,7 @@ Get : Function/Array retrieval
 """
 
 from _func_common import *
-from _assign_common import Assign as A
+from assign import Assign
 
 
 def Lambda(node):

@@ -498,7 +498,38 @@ def wall_clock(node):
 
 
 def plotting(node):
-    node.include("SPlot")
+
     declares = node.func[0]
-    if "_plot" not in declares:
-        matlab2cpp.collection.Var(declares, name="_plot", type="SPlot")
+
+    # only do this once
+    if "_plot" in declares:
+        return
+
+    # add splot to header
+    node.include("SPlot")
+
+    # add a variable for Splot in declare
+    matlab2cpp.collection.Var(declares, name="_plot", type="SPlot")
+
+    # get function variable
+    func = node.func
+    
+    # get function block
+    block = func[3]
+
+    # create new statement
+    statement = matlab2cpp.collection.Statement(block)
+    # fill it with new Get _splot
+    matlab2cpp.collection.Get(statement, backend="reserved", name="_splot")
+
+    # translate the new nodes
+    statement.translate()
+
+    # swap with last statement, if it is a return-statement
+    if block[-2][0].cls == "Return":
+        block.children[-1], block.children[-2] = \
+                block.children[-2], block.children[-1]
+
+
+        
+

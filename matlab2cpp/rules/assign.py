@@ -1,5 +1,5 @@
 import matlab2cpp as mc
-from _arma_common import scalar_assign
+import armadillo as arma
 
 def Assign(node):
     """
@@ -12,20 +12,20 @@ Returns:
     str : Translation of current node.
 
 Examples:
-    >>> print mc.qtranslate("a = b")
+    >>> print mc.qscript("a = b")
     a = b ;
-    >>> print mc.qtranslate("a=[1,2]; b=[1;2]; a=b")
+    >>> print mc.qscript("a=[1,2]; b=[1;2]; a=b")
     int _a [] = {1, 2} ;
-    a = ivec(_a, 2, false) ;
+    a = irowvec(_a, 2, false) ;
     int _b [] = {1, 2} ;
-    b = irowvec(_b, 2, false) ;
+    b = ivec(_b, 2, false) ;
     a = arma::strans(b) ;
-    >>> print mc.qtranslate("a=[1,2,2,1]; b=[2,1;1,2]; a=b")
+    >>> print mc.qscript("a=[1,2,2,1]; b=[2,1;1,2]; a=b")
     int _a [] = {1, 2, 2, 1} ;
-    a = ivec(_a, 4, false) ;
+    a = irowvec(_a, 4, false) ;
     int _b [] = {2, 1, 1, 2} ;
     b = imat(_b, 2, 2, false) ;
-    a = arma::vectorise(b) ;
+    a = b ;
     """
 
     # left-hand-side and right-hand-side
@@ -56,7 +56,7 @@ Examples:
 
         # fill array with scalar value
         elif lhs.dim > 0 and rhs.dim == 0:
-            return scalar_assign(node)
+            return arma.scalar_assign(node)
 
         # dimensions that works just fine
         elif lhs.dim in (1,2) and rhs.dim in (3, 4):

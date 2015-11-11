@@ -28,7 +28,7 @@ import matlab2cpp as mc
 
 __all__ = ["build", "qcpp", "qhpp", "qpy", "qlog", "qtree", "qscript"]
 
-def build(code, disp=False, retall=False, suggest=False, comments=False, **kws):
+def build(code, disp=False, retall=False, suggest=False, comments=True, **kws):
     """
 Build a token tree out of Matlab code.  This function is used by the other
 quick-functions as the first step in code translation.
@@ -316,6 +316,7 @@ See also:
 
     if isinstance(code, str):
         tree_ = build(code, suggest=suggest, retall=True)[0]
+        tree_.translate()
 
     else:
         tree_ = code
@@ -442,7 +443,7 @@ Example::
         | | Error      program      TYPE    Var:13
         | | Error      program      TYPE    Var:17
         | | Error      program      TYPE    Var:19
-        | | Error      program      TYPE    Plus:1
+        | | Error      program      TYPE    Plus:19
 
 See also:
     :py:mod:`matlab2cpp.tree`,
@@ -467,7 +468,7 @@ See also:
 
     return tree_.summary()
 
-def qscript(code, suggest=False, **kws):
+def qscript(code, suggest=True, **kws):
     """
 Perform a full translation (like :py:func:`~matlab2cpp.qcpp` and
 :py:func:`~matlab2cpp.qhpp`), but only focus on the object of interest.
@@ -485,7 +486,7 @@ Returns:
 	str: A code translation in C++.
 
 Example:
-    >>> print mc.qscript("a = 4", suggest=True)
+    >>> print mc.qscript("a = 4")
     a = 4 ;
     """
 

@@ -1,3 +1,3 @@
 
-from _variables import *
+from variables import *
 

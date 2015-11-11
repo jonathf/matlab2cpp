@@ -483,16 +483,17 @@ Examples:
     a = d(0) ;
     b = d(1) ;
     c = d(2) ;
-    >>> print mc.qscript("[a,b,c] = 4")
-    _aux_int_1 = 4 ;
-    a = _aux_int_1(0) ;
-    b = _aux_int_1(1) ;
-    c = _aux_int_1(2) ;
+    >>> print mc.qscript("[a,b,c] = [1,2,3]")
+    int __aux_irowvec_1 [] = {1, 2, 3} ;
+    _aux_irowvec_1 = irowvec(__aux_irowvec_1, 3, false) ;
+    a = _aux_irowvec_1(0) ;
+    b = _aux_irowvec_1(1) ;
+    c = _aux_irowvec_1(2) ;
     """
 
     # left-hand-side not a variable -> create auxillary variable that is
     if node[-1].cls != "Var":
-        return str(node[-1].auxiliary())
+        node[-1].auxiliary()
 
     # split into multiple lines
     out = ""
@@ -500,6 +501,7 @@ Examples:
         i = str(i)
         out += "%(" +i+ ")s = " +str(node[-1])+ "(" +i+ ") ;\n"
     out = out[:-1]
+
     return out
 
 def For(node):
@@ -587,8 +589,11 @@ Return:
     str : Translation of current node.
 
 Examples:
-    >>> print mc.qscript("%{ comment %}")
-    /* comment */
+    >>> print mc.qscript("function f(); %{ comment %}")
+    void f()
+    {
+      /* comment */
+    }
     """
     return "/*%(value)s*/"
 
@@ -604,8 +609,11 @@ Return:
     str : Translation of current node.
 
 Examples:
-    >>> print mc.qscript("% comment")
-    // comment
+    >>> print mc.qscript("function f(); % comment")
+    void f()
+    {
+      // comment
+    }
     """
     return "//%(value)s"
 

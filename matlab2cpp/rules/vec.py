@@ -1,5 +1,5 @@
-from _variables import *
-from _arma_common import configure_arg
+from variables import *
+import armadillo as arma
 
 def Get(node):
 
@@ -17,7 +17,7 @@ def Get(node):
             return "%(name)s(", ", ", ")"
 
 
-    arg, dim = configure_arg(node[0], 0)
+    arg, dim = arma.configure_arg(node[0], 0)
 
     if dim == -1:
         return "%(name)s(%(0)s)"
@@ -42,7 +42,7 @@ def Set(node):
             node.error("More than one arguments in a vec call")
             return "%(name)s(", ", ", ")"
 
-    arg, dim = configure_arg(node[0], 0)
+    arg, dim = arma.configure_arg(node[0], 0)
 
     if dim == -1:
         return "%(name)s(%(0)s)"

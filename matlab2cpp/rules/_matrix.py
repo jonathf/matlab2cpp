@@ -10,8 +10,9 @@ Matrix : Matrix container
 Vector : (Column)-Vector container
     Contains: Expr, ...
 """
-from _arma_common import scalar_assign
-from _assign_common import Assign as default_Assign
+from _code_block import Statement
+import assign
+import armadillo as arma
 
 
 def Vector(node):
@@ -158,6 +159,8 @@ def Matrix(node):
         if node.parent.cls in ("Assign", "Statement"):
             node.parent.backend = "matrix"
             return ""
+        if node.parent.cls in ("Get", "Set") and node.mem != 0:
+            node.type = (node.dim, 0)
         return str(node.auxiliary())
 
     # mix of scalars and colvecs
@@ -229,7 +232,7 @@ def Assign(node):
 
         # scalar
         if rhs.dim == 0:
-            return scalar_assign(node)
+            return arma.scalar_assign(node)
 
         # colvec
         elif rhs.dim == 1:
@@ -261,11 +264,8 @@ def Assign(node):
     else:
         node.dim = dim
 
-    return default_Assign(node)
+    return assign.Assign(node)
 
-
-def Statement(node):
-    return "%(0)s"
 
 Var = "%(name)s"
 

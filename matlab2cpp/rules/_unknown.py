@@ -1,4 +1,5 @@
-from _variables import *
+from variables import *
+from assign import Assign
 
 Declare = "TYPE %(name)s ;"
 
