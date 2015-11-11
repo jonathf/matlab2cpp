@@ -1,5 +1,4 @@
-from _variables import *
-
+from variables import *
 
 def type_string(node):
     """

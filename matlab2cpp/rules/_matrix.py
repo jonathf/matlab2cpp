@@ -11,7 +11,7 @@ Vector : (Column)-Vector container
     Contains: Expr, ...
 """
 from _code_block import Statement
-from _assign_common import Assign as default_Assign
+import assign
 import armadillo as arma
 
 
@@ -264,7 +264,7 @@ def Assign(node):
     else:
         node.dim = dim
 
-    return default_Assign(node)
+    return assign.Assign(node)
 
 
 Var = "%(name)s"

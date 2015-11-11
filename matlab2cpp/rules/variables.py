@@ -1,6 +1,4 @@
 
-from _assign_common import Assign
-
 __all__ = [
 "Var", "Fvar", "Cvar",
 "Set", "Cset", "Fset", "Sset", "Nset",

@@ -316,6 +316,7 @@ See also:
 
     if isinstance(code, str):
         tree_ = build(code, suggest=suggest, retall=True)[0]
+        tree_.translate()
 
     else:
         tree_ = code

@@ -46,9 +46,12 @@ e = [6; 7]
     f.close()
 
     # strip header
-    converted_code = "\n\n".join(converted_code.split("\n\n")[1:])
+    converted_code = "\n".join(converted_code.split("\n")[2:])
 
-    reference_code = """int main(int argc, char** argv)
+    reference_code = """#include <armadillo>
+using namespace arma ;
+
+int main(int argc, char** argv)
 {
   double b ;
   int a ;
@@ -97,9 +100,15 @@ end
     f.close()
 
     # strip header
-    converted_code = "\n\n".join(converted_code.split("\n\n")[1:])
+    converted_code = "\n".join(converted_code.split("\n")[2:])
 
-    reference_code = """irowvec f(irowvec x)
+    reference_code = """#include <armadillo>
+using namespace arma ;
+
+irowvec f(irowvec x) ;
+void g() ;
+
+irowvec f(irowvec x)
 {
   irowvec y ;
   y = x+2 ;
@@ -148,9 +157,15 @@ end
     f.close()
 
     # strip header
-    converted_code = "\n\n".join(converted_code.split("\n\n")[1:])
+    converted_code = "\n".join(converted_code.split("\n")[2:])
 
-    reference_code = """void f(irowvec a, ivec b, irowvec& y, ivec& z)
+    reference_code = """#include <armadillo>
+using namespace arma ;
+
+void f(irowvec a, ivec b, irowvec& y, ivec& z) ;
+void g() ;
+
+void f(irowvec a, ivec b, irowvec& y, ivec& z)
 {
   y = a+2 ;
   z = b-3 ;

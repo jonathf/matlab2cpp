@@ -150,11 +150,11 @@ def include(node):
     program = node.program
     includes = program[0]
 
-    arma = "#include <armadillo.h>"
+    arma = "#include <armadillo>"
     if arma not in includes:
         mc.collection.Include(includes, arma, value=includes.value)
 
-    namespace = "using namespace arma;"
+    namespace = "using namespace arma ;"
     if namespace not in includes:
         mc.collection.Include(includes, namespace, value=includes.value)
 

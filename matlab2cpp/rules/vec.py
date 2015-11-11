@@ -1,4 +1,4 @@
-from _variables import *
+from variables import *
 import armadillo as arma
 
 def Get(node):
