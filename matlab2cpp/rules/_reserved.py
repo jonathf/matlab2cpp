@@ -893,7 +893,9 @@ def Get_xlim(node):
 
 def Get_ylim(node):
     node.plotting()
-    return "_plot.ylim(", ", ", ")"
+    name1 = node[0].name + "[0]"
+    name2 = node[0].name + "[1]"
+    return "_plot.ylim(" + name1 + ", " + name2 + ")"
 
 def Get_caxis(node):
     node.plotting()
@@ -902,6 +904,9 @@ def Get_caxis(node):
 def Get_axis(node):
     node.plotting()
     return "_plot.axis(", ", ", ")"
+
+def Var_grid(node):
+    return Get_grid(node)
 
 def Get_grid(node):
     node.plotting()
