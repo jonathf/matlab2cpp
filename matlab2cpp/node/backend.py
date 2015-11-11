@@ -65,24 +65,23 @@ See also:
                 nodes = flatten(node, False, False, False)
                 break
 
-    indent = [node]
+    indent = []
     outl = []
 
-    nl = int(math.log10(nodes[-1].line+1))
-    nc = int(math.log10(len(nodes[0].code) or 1))
+    nl = len(str(nodes[-1].line))+1
+    nc = len(str(nodes[-1].cur+1))+1
 
     for node in nodes:
 
         out = ""
 
-
         if node.line:
-            nl_ = int(math.log10(node.line))+1
+            nl_ = len(str(node.line))
             out += " "*(nl-nl_) + str(node.line) + " "
-            nc_ = int(math.log10(node.cur or 1))+1
+            nc_ = len(str(node.cur+1))
             out += " "*(nc-nc_) + str(node.cur+1)
         else:
-            out += " "*(nl+nc+2)
+            out += " "*(nl+nc+1)
 
         # indentation
         while indent and not (node.parent is indent[-1]):
@@ -381,15 +380,19 @@ def suggest_datatype(node):
 
     return None, None
 
-
+# small hack to ensure that log isn't clean mid translation
+mid_translation = [0]
 def translate(node, opt=None):
 
     if node.cls == "Project":
         map(translate, node)
         return node
 
-    log = node.program[5]
-    log.children = []
+    if not mid_translation[0]:
+        log = node.program[5]
+        log.children = []
+
+    mid_translation[0] += 1
 
     nodes = flatten(node, False, True, False)
     if not (opt is None) and opt.disp:
@@ -398,10 +401,13 @@ def translate(node, opt=None):
     for node in nodes[::-1]:
         translate_one(node, opt)
 
-    logs = flatten(log, False, True, False)
-    for node in logs[::-1]:
-        translate_one(node, opt)
+    mid_translation[0] -= 1
 
+    if not mid_translation[0]:
+        logs = flatten(log, False, True, False)
+        for node in logs[::-1]:
+            translate_one(node, opt)
+    
     return node
 
 

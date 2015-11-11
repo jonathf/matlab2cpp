@@ -116,8 +116,8 @@ Example::
     <BLANKLINE>
     int main(int argc, char** argv)
     {
-      int a ;
       double b ;
+      int a ;
       string c ;
       a = 4 ;
       b = 5. ;
@@ -136,8 +136,7 @@ See also:
     """
 
     if isinstance(code, str):
-        build_ = build(code, suggest=suggest, retall=True, **kws)
-        tree_ = build_[0]
+        tree_ = build(code, suggest=suggest, retall=True, **kws)[0]
 
     else:
         tree_ = code
@@ -147,10 +146,8 @@ See also:
             raise KeyError(
         "Argument code should be code string, Builder or Program-node")
 
-    if not tree_.str:
-        tree_.translate()
-
-    includes, funcs, inlines, structs, headers, log = tree_
+    tree_.translate()
+    includes, funcs, inlines, structs, headers, log = tree_.program
 
     out = ""
 
@@ -233,7 +230,6 @@ See also:
 
     if isinstance(code, str):
         tree_ = build(code, suggest=suggest, retall=True)[0]
-        tree_.translate()
 
     else:
         tree_ = code
@@ -379,7 +375,6 @@ See alse:
 
     if isinstance(code, str):
         tree_ = build(code, suggest=suggest, retall=True)[0]
-        tree_.translate()
 
     else:
         tree_ = code
@@ -389,6 +384,7 @@ See alse:
             raise KeyError(
         "Argument code should be code string, Builder or Program-node")
 
+    tree_.translate()
     out = tree_[5].str
     out = out.replace("__percent__", "%")
 
@@ -414,36 +410,35 @@ Returns:
 
 Example::
     >>> print mc.qtree("function y=f(x); y=x+4") #doctest: +NORMALIZE_WHITESPACE
-        Program    program      TYPE    unamed
-        | Includes   program      TYPE
-        | | Include    program      TYPE    #include <armadillo>
-        | | Include    program      TYPE    #include "mconvert.h"
-        | | Include    program      TYPE    using namespace arma ;
-    1  1| Funcs      program      TYPE    unamed
-    1  1| | Func       func_return  TYPE    f
-    1  1| | | Declares   func_return  TYPE
-    1  1| | | | Var        unknown      TYPE    y
-    1  1| | | Returns    func_return  TYPE
-    1 10| | | | Var        unknown      TYPE    y
-    1 13| | | Params     func_return  TYPE
-    1 14| | | | Var        unknown      TYPE    x
-    1 16| | | Block      code_block   TYPE
-    1 18| | | | Assign     unknown      TYPE
-    1 18| | | | | Var        unknown      TYPE    y
-    1 20| | | | | Plus       expression   TYPE
-    1 20| | | | | | Var        unknown      TYPE    x
-    1 22| | | | | | Int        int          int
-        | Inlines    program      TYPE    unamed
-        | Structs    program      TYPE    unamed
-        | Headers    program      TYPE    unamed
-        | | Header     program      TYPE    f
-        | Log        program      TYPE    unamed
-        | | Error      program      TYPE    Var:0
-        | | Error      program      TYPE    Var:9
-        | | Error      program      TYPE    Var:13
-        | | Error      program      TYPE    Var:17
-        | | Error      program      TYPE    Var:19
-        | | Error      program      TYPE    Plus:19
+          Program    program      TYPE    unamed
+          | Includes   program      TYPE
+          | | Include    program      TYPE    #include <armadillo>
+          | | Include    program      TYPE    using namespace arma ;
+     1   1| Funcs      program      TYPE    unamed
+     1   1| | Func       func_return  TYPE    f
+     1   1| | | Declares   func_return  TYPE
+     1   1| | | | Var        unknown      TYPE    y
+     1   1| | | Returns    func_return  TYPE
+     1  10| | | | Var        unknown      TYPE    y
+     1  13| | | Params     func_return  TYPE
+     1  14| | | | Var        unknown      TYPE    x
+     1  16| | | Block      code_block   TYPE
+     1  18| | | | Assign     unknown      TYPE
+     1  18| | | | | Var        unknown      TYPE    y
+     1  20| | | | | Plus       expression   TYPE
+     1  20| | | | | | Var        unknown      TYPE    x
+     1  22| | | | | | Int        int          int
+          | Inlines    program      TYPE    unamed
+          | Structs    program      TYPE    unamed
+          | Headers    program      TYPE    unamed
+          | | Header     program      TYPE    f
+          | Log        program      TYPE    unamed
+          | | Error      program      TYPE    Var:0
+          | | Error      program      TYPE    Var:9
+          | | Error      program      TYPE    Var:13
+          | | Error      program      TYPE    Var:17
+          | | Error      program      TYPE    Var:19
+          | | Error      program      TYPE    Plus:19
 
 See also:
     :py:mod:`matlab2cpp.tree`,
@@ -498,6 +493,7 @@ Example:
         if isinstance(tree_, tree.builder.Builder):
             tree_ = tree_[0]
         tree_.translate()
+
 
     out = ""
     if tree_.cls == "Program":

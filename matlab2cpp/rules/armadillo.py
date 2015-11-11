@@ -151,12 +151,18 @@ def include(node):
     includes = program[0]
 
     arma = "#include <armadillo>"
+    namespace = "using namespace arma ;"
+
+    if arma in includes and namespace in includes:
+        return
+
     if arma not in includes:
         mc.collection.Include(includes, arma, value=includes.value)
 
-    namespace = "using namespace arma ;"
     if namespace not in includes:
         mc.collection.Include(includes, namespace, value=includes.value)
+
+    includes.translate()
 
 
 

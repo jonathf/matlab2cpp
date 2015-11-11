@@ -72,8 +72,8 @@ The resulting program will have the following complete form:
     <BLANKLINE>
     double f()
     {
-      int a ;
       double b, c ;
+      int a ;
       a = 4 ;
       b = 4. ;
       c = a+b ;
@@ -82,6 +82,7 @@ The resulting program will have the following complete form:
 """
 
 import os
+import matlab2cpp as mc
 
 def configure(self, suggest=True, **kws):
     """
@@ -90,7 +91,6 @@ configure backend
 See also:
     :py:func:`matlab2cpp.Builder.configure <Builder.configure>`
     """
-
     nodes = self.project.flatten(False, True, False)
 
     while True:
@@ -248,3 +248,7 @@ See also:
 
     for program in self.project:
         program[-1].children = []
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

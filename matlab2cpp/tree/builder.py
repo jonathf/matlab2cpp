@@ -17,23 +17,23 @@ the code. The various constructors uses the support modules in the
 follows::
 
     >>> print builder # doctest: +NORMALIZE_WHITESPACE
-       | Project    program      TYPE    project
-       | | Program    program      TYPE    file1.m
-       | | | Includes   program      TYPE
-    1 1| | | Funcs      program      TYPE    file1.m
-    1 1| | | | Main       func_common  TYPE    main
-    1 1| | | | | Declares   func_return  TYPE
-    1 1| | | | | | Var        unknown      TYPE    a
-    1 1| | | | | Returns    func_return  TYPE
-    1 1| | | | | Params     func_return  TYPE
-    1 1| | | | | Block      code_block   TYPE
-    1 1| | | | | | Assign     unknown      TYPE
-    1 1| | | | | | | Var        unknown      TYPE    a
-    1 5| | | | | | | Int        int          int
-       | | | Inlines    program      TYPE    file1.m
-       | | | Structs    program      TYPE    file1.m
-       | | | Headers    program      TYPE    file1.m
-       | | | Log        program      TYPE    file1.m
+         Project    program      TYPE    project
+         | Program    program      TYPE    file1.m
+         | | Includes   program      TYPE
+     1  1| | Funcs      program      TYPE    file1.m
+     1  1| | | Main       func_common  TYPE    main
+     1  1| | | | Declares   func_return  TYPE
+     1  1| | | | | Var        unknown      TYPE    a
+     1  1| | | | Returns    func_return  TYPE
+     1  1| | | | Params     func_return  TYPE
+     1  1| | | | Block      code_block   TYPE
+     1  1| | | | | Assign     unknown      TYPE
+     1  1| | | | | | Var        unknown      TYPE    a
+     1  5| | | | | | Int        int          int
+         | | Inlines    program      TYPE    file1.m
+         | | Structs    program      TYPE    file1.m
+         | | Headers    program      TYPE    file1.m
+         | | Log        program      TYPE    file1.m
 
 If is possible to get a detailed output of how this process is done, by turning
 the `disp` flag on::
@@ -60,23 +60,23 @@ configure. To configure datatypes, use the `configure` method::
 
     >>> builder.configure(suggest=True)
     >>> print builder # doctest: +NORMALIZE_WHITESPACE
-       | Project    program      TYPE    project
-       | | Program    program      TYPE    file1.m
-       | | | Includes   program      TYPE
-    1 1| | | Funcs      program      TYPE    file1.m
-    1 1| | | | Main       func_common  TYPE    main
-    1 1| | | | | Declares   func_return  int
-    1 1| | | | | | Var        int          int     a
-    1 1| | | | | Returns    func_return  TYPE
-    1 1| | | | | Params     func_return  TYPE
-    1 1| | | | | Block      code_block   TYPE
-    1 1| | | | | | Assign     unknown      TYPE
-    1 1| | | | | | | Var        int          int     a
-    1 5| | | | | | | Int        int          int
-       | | | Inlines    program      TYPE    file1.m
-       | | | Structs    program      TYPE    file1.m
-       | | | Headers    program      TYPE    file1.m
-       | | | Log        program      TYPE    file1.m
+         Project    program      TYPE    project
+         | Program    program      TYPE    file1.m
+         | | Includes   program      TYPE
+     1  1| | Funcs      program      TYPE    file1.m
+     1  1| | | Main       func_common  TYPE    main
+     1  1| | | | Declares   func_return  int
+     1  1| | | | | Var        int          int     a
+     1  1| | | | Returns    func_return  TYPE
+     1  1| | | | Params     func_return  TYPE
+     1  1| | | | Block      code_block   TYPE
+     1  1| | | | | Assign     unknown      TYPE
+     1  1| | | | | | Var        int          int     a
+     1  5| | | | | | Int        int          int
+         | | Inlines    program      TYPE    file1.m
+         | | Structs    program      TYPE    file1.m
+         | | Headers    program      TYPE    file1.m
+         | | Log        program      TYPE    file1.m
 
 Multiple program can be loaded into the same builder. This allows for building
 of projects that involves multiple files. For example::
@@ -167,17 +167,17 @@ Example::
 
     >>> builder = mc.Builder()
     >>> print builder
-      | Project    program      TYPE    project
+         Project    program      TYPE    project
     >>> builder.load("unnamed.m", "")
     >>> print builder # doctest: +NORMALIZE_WHITESPACE
-       | Project    program      TYPE    project
-       | | Program    program      TYPE    unnamed.m
-       | | | Includes   program      TYPE
-    1 1| | | Funcs      program      TYPE    unnamed.m
-       | | | Inlines    program      TYPE    unnamed.m
-       | | | Structs    program      TYPE    unnamed.m
-       | | | Headers    program      TYPE    unnamed.m
-       | | | Log        program      TYPE    unnamed.m
+         Project    program      TYPE    project
+         | Program    program      TYPE    unnamed.m
+         | | Includes   program      TYPE
+     1  1| | Funcs      program      TYPE    unnamed.m
+         | | Inlines    program      TYPE    unnamed.m
+         | | Structs    program      TYPE    unnamed.m
+         | | Headers    program      TYPE    unnamed.m
+         | | Log        program      TYPE    unnamed.m
         """
 
         if self.disp:
@@ -186,6 +186,42 @@ Example::
         self.code = code + "\n\n\n"
         self.create_program(name)
 
+        index = self.project.names.index(name)
+        program = self.project[index]
+
+        nodes = program.flatten(False, True, False)
+        # Find if some names should be reserved
+        unassigned = {}
+        for node in nodes[::-1]:
+
+            if node.cls not in ("Var", "Fvar", "Cvar", "Set", "Cset", "Sset",
+                    "Fset", "Nset", "Get", "Cget", "Fget", "Nget", "Sget"):
+                continue
+
+            if node.name not in unassigned:
+                unassigned[node.name] = True
+
+            if node.parent.cls in ("Params", "Declares"):
+                unassigned[node.name] = False
+
+        unassigned = [k for k,v in unassigned.items() if v]
+
+        reserved = set([])
+        for i in xrange(len(unassigned)-1, -1, -1):
+
+            if unassigned[i] in mc.rules._reserved.reserved:
+                reserved.add(unassigned.pop(i))
+
+        for node in nodes[::-1]:
+
+            if node.name in reserved:
+                node.backend = "reserved"
+
+        program.unassigned = unassigned
+
+    def get_unknowns(self, name):
+        index = self.project.names.index(name)
+        return self.project[index].unassigned
 
     def configure(self, suggest=True, **kws):
         """
@@ -199,58 +235,58 @@ Example::
     >>> builder = mc.Builder()
     >>> builder.load("unnamed.m", "a=1; b=2.; c='c'")
     >>> print builder # doctest: +NORMALIZE_WHITESPACE
-       | Project    program      TYPE    project
-       | | Program    program      TYPE    unnamed.m
-       | | | Includes   program      TYPE
-    1 1| | | Funcs      program      TYPE    unnamed.m
-    1 1| | | | Main       func_common  TYPE    main
-    1 1| | | | | Declares   func_return  TYPE
-    1 1| | | | | | Var        unknown      TYPE    a
-    1 1| | | | | | Var        unknown      TYPE    b
-    1 1| | | | | | Var        unknown      TYPE    c
-    1 1| | | | | Returns    func_return  TYPE
-    1 1| | | | | Params     func_return  TYPE
-    1 1| | | | | Block      code_block   TYPE
-    1 1| | | | | | Assign     unknown      TYPE
-    1 1| | | | | | | Var        unknown      TYPE    a
-    1 3| | | | | | | Int        int          int
-    1 6| | | | | | Assign     unknown      TYPE
-    1 6| | | | | | | Var        unknown      TYPE    b
-    1 8| | | | | | | Float      double       double
-    1 12| | | | | | Assign     unknown      TYPE
-    1 12| | | | | | | Var        unknown      TYPE    c
-    1 14| | | | | | | String     string       string
-       | | | Inlines    program      TYPE    unnamed.m
-       | | | Structs    program      TYPE    unnamed.m
-       | | | Headers    program      TYPE    unnamed.m
-       | | | Log        program      TYPE    unnamed.m
+         Project    program      TYPE    project
+         | Program    program      TYPE    unnamed.m
+         | | Includes   program      TYPE
+     1  1| | Funcs      program      TYPE    unnamed.m
+     1  1| | | Main       func_common  TYPE    main
+     1  1| | | | Declares   func_return  TYPE
+     1  1| | | | | Var        unknown      TYPE    a
+     1  1| | | | | Var        unknown      TYPE    b
+     1  1| | | | | Var        unknown      TYPE    c
+     1  1| | | | Returns    func_return  TYPE
+     1  1| | | | Params     func_return  TYPE
+     1  1| | | | Block      code_block   TYPE
+     1  1| | | | | Assign     unknown      TYPE
+     1  1| | | | | | Var        unknown      TYPE    a
+     1  3| | | | | | Int        int          int
+     1  6| | | | | Assign     unknown      TYPE
+     1  6| | | | | | Var        unknown      TYPE    b
+     1  8| | | | | | Float      double       double
+     1 12| | | | | Assign     unknown      TYPE
+     1 12| | | | | | Var        unknown      TYPE    c
+     1 14| | | | | | String     string       string
+         | | Inlines    program      TYPE    unnamed.m
+         | | Structs    program      TYPE    unnamed.m
+         | | Headers    program      TYPE    unnamed.m
+         | | Log        program      TYPE    unnamed.m
     >>> builder.configure(suggest=True)
     >>> print builder # doctest: +NORMALIZE_WHITESPACE
-       | Project    program      TYPE    project
-       | | Program    program      TYPE    unnamed.m
-       | | | Includes   program      TYPE
-    1 1| | | Funcs      program      TYPE    unnamed.m
-    1 1| | | | Main       func_common  TYPE    main
-    1 1| | | | | Declares   func_return  TYPE
-    1 1| | | | | | Var        int          int     a
-    1 1| | | | | | Var        double       double  b
-    1 1| | | | | | Var        string       string  c
-    1 1| | | | | Returns    func_return  TYPE
-    1 1| | | | | Params     func_return  TYPE
-    1 1| | | | | Block      code_block   TYPE
-    1 1| | | | | | Assign     unknown      TYPE
-    1 1| | | | | | | Var        int          int     a
-    1 3| | | | | | | Int        int          int
-    1 6| | | | | | Assign     unknown      TYPE
-    1 6| | | | | | | Var        double       double  b
-    1 8| | | | | | | Float      double       double
-    1 12| | | | | | Assign     unknown      TYPE
-    1 12| | | | | | | Var        string       string  c
-    1 14| | | | | | | String     string       string
-       | | | Inlines    program      TYPE    unnamed.m
-       | | | Structs    program      TYPE    unnamed.m
-       | | | Headers    program      TYPE    unnamed.m
-       | | | Log        program      TYPE    unnamed.m
+         Project    program      TYPE    project
+         | Program    program      TYPE    unnamed.m
+         | | Includes   program      TYPE
+     1  1| | Funcs      program      TYPE    unnamed.m
+     1  1| | | Main       func_common  TYPE    main
+     1  1| | | | Declares   func_return  TYPE
+     1  1| | | | | Var        int          int     a
+     1  1| | | | | Var        double       double  b
+     1  1| | | | | Var        string       string  c
+     1  1| | | | Returns    func_return  TYPE
+     1  1| | | | Params     func_return  TYPE
+     1  1| | | | Block      code_block   TYPE
+     1  1| | | | | Assign     unknown      TYPE
+     1  1| | | | | | Var        int          int     a
+     1  3| | | | | | Int        int          int
+     1  6| | | | | Assign     unknown      TYPE
+     1  6| | | | | | Var        double       double  b
+     1  8| | | | | | Float      double       double
+     1 12| | | | | Assign     unknown      TYPE
+     1 12| | | | | | Var        string       string  c
+     1 14| | | | | | String     string       string
+         | | Inlines    program      TYPE    unnamed.m
+         | | Structs    program      TYPE    unnamed.m
+         | | Headers    program      TYPE    unnamed.m
+         | | Log        program      TYPE    unnamed.m
     """
         mc.configure.configure(self, suggest, **kws)
 
@@ -298,39 +334,6 @@ Example::
         out += "Expected: " + text
         raise SyntaxError(out)
 
-    def get_unknowns(self, name):
-
-        program = self.project[self.project.names.index(name)]
-
-        nodes = program.flatten(False, True, False)
-        # Find if some names should be reserved
-        unassigned = {}
-        for node in nodes[::-1]:
-
-            if node.cls not in ("Var", "Fvar", "Cvar", "Set", "Cset", "Sset",
-                    "Fset", "Nset", "Get", "Cget", "Fget", "Nget", "Sget"):
-                continue
-
-            if node.name not in unassigned:
-                unassigned[node.name] = True
-
-            if node.parent.cls in ("Params", "Declares"):
-                unassigned[node.name] = False
-
-        unassigned = [k for k,v in unassigned.items() if v]
-
-        reserved = set([])
-        for i in xrange(len(unassigned)-1, -1, -1):
-
-            if unassigned[i] in mc.rules._reserved.reserved:
-                reserved.add(unassigned.pop(i))
-
-        for node in nodes[::-1]:
-
-            if node.name in reserved:
-                node.backend = "reserved"
-
-        return unassigned
 
     def __getitem__(self, i):
         return self.project[i]

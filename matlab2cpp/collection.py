@@ -198,6 +198,7 @@ class Int(Node):
 
 class Float(Node):
     def __init__(self, parent, value, backend="double", type="double", **kws):
+        if value[0] == ".": value = "0" + value
         Node.__init__(self, parent, value=value, backend=backend, type=type, **kws)
 
 class Imag(Node):

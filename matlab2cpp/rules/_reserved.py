@@ -5,6 +5,8 @@ The module will always check if the specific "<class>_<name>" name
 exists before finding the generic "<class>" name.
 """
 
+import matlab2cpp as mc
+
 # List of function names that should be handled by reserved.py:
 reserved = {
 "i", "and", "or", "not", "all", "any",
@@ -892,10 +894,39 @@ def Get_xlim(node):
     return "_plot.xlim(", ", ", ")"
 
 def Get_ylim(node):
+    """
+Examples:
+    >>> print mc.qscript("ylim(0.5,.7)")
+    _plot.ylim(0.5, 0.7) ;
+    _plot.show() ;
+    >>> print mc.qscript("ylim([0.5,.7])")
+    _plot.ylim(0.5, 0.7) ;
+    _plot.show() ;
+    """
+
     node.plotting()
-    name1 = node[0].name + "[0]"
-    name2 = node[0].name + "[1]"
-    return "_plot.ylim(" + name1 + ", " + name2 + ")"
+
+    if len(node) == 1:
+
+        arg = node[0]
+
+        if arg.cls == "Matrix":
+            a,b = arg[0]
+            return "_plot.ylim(" + str(a) + ", " + str(b) + ")"
+
+        elif arg.num and arg.dim>0:
+            name1 = name + "[0]"
+            name2 = name + "[1]"
+            return "_plot.ylim(" + name1 + ", " + name2 + ")"
+
+        node.error("argument array type")
+        return "_plot.ylim(", ", ", ")"
+
+
+    elif len(node) == 2:
+        return "_plot.ylim(", ", ", ")"
+
+
 
 def Get_caxis(node):
     node.plotting()
@@ -922,3 +953,8 @@ def Get_colormap(node):
 
 def Get__splot(node):
     return "_plot.show()"
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+

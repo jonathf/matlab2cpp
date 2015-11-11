@@ -59,10 +59,7 @@ Args:
 Example:
     >>> prog = mc.build("function f(a,b); c=4; end")
     >>> prog.ftypes = {"f": {"a":"int", "b":"vec", "c":"float"}}
-    >>> print mc.qhpp(prog)
-    #include <armadillo>
-    using namespace arma ;
-    <BLANKLINE>
+    >>> print mc.qscript(prog)
     void f(int a, vec b)
     {
       float c ;

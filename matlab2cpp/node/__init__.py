@@ -12,31 +12,31 @@ To illustrate both nodes and relationship we introduce the following example:
     >>> builder[0].ftypes = {"f" : {"x": "int", "y": "double"}}
     >>> builder.configure()
     >>> builder.translate()
-    >>> print builder
-            Project    program      TYPE    project
-            | Program    program      TYPE    unnamed
-            | | Includes   program      TYPE
-            | | | Include    program      TYPE    #include <armadillo>
-            | | | Include    program      TYPE    using namespace arma ;
-      1   1 | | Funcs      program      TYPE    unnamed
-      1   1 | | | Func       func_return  double  f
-      1   1 | | | | Declares   func_return  double
-      1   1 | | | | | Var        double       double  y
-      1   1 | | | | Returns    func_return  double
-      1  10 | | | | | Var        double       double  y
-      1  13 | | | | Params     func_return  int
-      1  14 | | | | | Var        int          int     x
-      1  16 | | | | Block      code_block   TYPE
-      1  18 | | | | | Assign     unknown      TYPE
-      1  18 | | | | | | Var        double       double  y
-      1  20 | | | | | | Plus       expression   int
-      1  20 | | | | | | | Var        int          int     x
-      1  22 | | | | | | | Int        int          int
-            | | Inlines    program      TYPE    unnamed
-            | | Structs    program      TYPE    unnamed
-            | | Headers    program      TYPE    unnamed
-            | | | Header     program      TYPE    f
-            | | Log        program      TYPE    unnamed
+    >>> print builder # doctest: +NORMALIZE_WHITESPACE
+         Project    program      TYPE    project
+         | Program    program      TYPE    unnamed
+         | | Includes   program      TYPE
+         | | | Include    program      TYPE    #include <armadillo>
+         | | | Include    program      TYPE    using namespace arma ;
+     1  1| | Funcs      program      TYPE    unnamed
+     1  1| | | Func       func_return  double  f
+     1  1| | | | Declares   func_return  double
+     1  1| | | | | Var        double       double  y
+     1  1| | | | Returns    func_return  double
+     1 10| | | | | Var        double       double  y
+     1 13| | | | Params     func_return  int
+     1 14| | | | | Var        int          int     x
+     1 16| | | | Block      code_block   TYPE
+     1 18| | | | | Assign     unknown      TYPE
+     1 18| | | | | | Var        double       double  y
+     1 20| | | | | | Plus       expression   int
+     1 20| | | | | | | Var        int          int     x
+     1 22| | | | | | | Int        int          int
+         | | Inlines    program      TYPE    unnamed
+         | | Structs    program      TYPE    unnamed
+         | | Headers    program      TYPE    unnamed
+         | | | Header     program      TYPE    f
+         | | Log        program      TYPE    unnamed
 
 
 Navigating the tree
