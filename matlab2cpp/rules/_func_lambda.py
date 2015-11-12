@@ -28,7 +28,8 @@ Get : Function/Array retrieval
     Property: name
 """
 
-from function import *
+from function import type_string
+from variables import *
 from assign import Assign
 
 
@@ -98,5 +99,16 @@ def Lambda(node):
     out += "(" + str(lparams) + ") {" + str(expr) + " ; }"
     return out
 
-Declare = "std::function %(name)s ;"
+Returns = ""
 
+def Params(node):
+    return ", ".join(["%s %s" % (type_string(n), n.name) for n in node])
+
+def Declares(node):
+    return ", ".join(["%s %s" % (type_string(n), str(n)) for n in node])
+
+Func = ""
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

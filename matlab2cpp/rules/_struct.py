@@ -1,6 +1,7 @@
+from assign import Assign
 from variables import *
 
-def Declare(node):
-    name = node["name"]
-    return "_"+name.capitalize() + " " + name + " ;"
+def Fvar(node):
+    return "%(name)s.%(value)s"
+
 

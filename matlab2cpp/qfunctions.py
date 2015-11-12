@@ -465,7 +465,7 @@ See also:
 
     return tree_.summary()
 
-def qscript(code, suggest=True, **kws):
+def qscript(code, suggest=True, ftypes={}, **kws):
     """
 Perform a full translation (like :py:func:`~matlab2cpp.qcpp` and
 :py:func:`~matlab2cpp.qhpp`), but only focus on the object of interest.
@@ -489,12 +489,14 @@ Example:
 
     if isinstance(code, str):
         tree_ = build(code, suggest=suggest, retall=True, **kws)[0]
-        tree_.translate()
     else:
         tree_ = code
         if isinstance(tree_, tree.builder.Builder):
             tree_ = tree_[0]
-        tree_.translate()
+
+    if ftypes:
+        tree_.ftypes = ftypes
+    tree_.translate()
 
     out = ""
     if tree_.cls == "Program":

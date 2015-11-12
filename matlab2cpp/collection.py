@@ -248,7 +248,7 @@ class Cget(Node):
         Node.__init__(self, parent, name=name, backend=backend, **kws)
 
 class Fget(Node):
-    def __init__(self, parent, name, value, backend="struct", **kws):
+    def __init__(self, parent, name, value, backend="structs", **kws):
         Node.__init__(self, parent, name=name, value=value, backend=backend, **kws)
 
 class Sget(Node):
@@ -264,7 +264,7 @@ class Cset(Node):
         Node.__init__(self, parent, name=name, backend=backend, **kws)
 
 class Fset(Node):
-    def __init__(self, parent, name, value, backend="struct", **kws):
+    def __init__(self, parent, name, value, backend="structs", **kws):
         Node.__init__(self, parent, name=name, value=value, backend=backend, **kws)
 
 class Sset(Node):

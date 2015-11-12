@@ -1,10 +1,4 @@
 
-__all__ = [
-"Var", "Fvar", "Cvar",
-"Set", "Cset", "Fset", "Sset", "Nset",
-"Get", "Cget", "Fget", "Sget", "Nget",
-]
-
 def Var(node):
     if node.type == "TYPE":
         node.error("unknown data type")
@@ -62,10 +56,6 @@ def Cset(node):
     out = out + ")s, %(".join(map(str, range(n_fields, len(node))))
     out = out + ")s)"
     return out
-
-def Fset(node):
-#      node.typeerror()
-    return "%(name)s.%(value)s(", ", ", ")"
 
 def Sset(node):
     node.pointer = 0

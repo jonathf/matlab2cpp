@@ -92,23 +92,23 @@ def set(node, types):
 
         if name in structs.names:
 
-            types = types[name]
+            types_ = types[name]
             struct = structs[structs.names.index(name)]
 
-            for key in types.keys():
+            for key in types_.keys():
 
                 if key in struct.names:
 
                     var = struct[struct.names.index(key)]
 
                     if var.cls == "Counter":
-                        var.value = str(types[key])
+                        var.value = str(types_[key])
                     else:
-                        var.type = types[key]
+                        var.type = types_[key]
 
                 else:
                     var = mc.collection.Declare(struct, key, backend="struct",
-                        type=types[key])
+                        type=types_[key])
 
 
 def get(node):

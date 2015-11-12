@@ -1,4 +1,4 @@
-from variables import *
+import matlab2cpp as mc
 
 def type_string(node):
     """
@@ -7,6 +7,16 @@ Determine string represnentation of type.
 Outside scalars and armadillo, the datatype name and their declaration do not
 match. This function converts simple datatype declaration and translate them to
 equivalent C++ declarations.
+
++-----------------+-----------------------+
+| Input           | Output                |
++=================+=======================+
+| numerical types | node.type             |
++-----------------+-----------------------+
+| struct, structs | struct container name |
++-----------------+-----------------------+
+| func_lambda     | std::function<...>    |
++-----------------+-----------------------+
 
 Args:
     node (Node): location in tree
@@ -52,137 +62,6 @@ Returns:
 
     return node.type
 
-
-def Returns(node):
-
-    # In multi-returns, place return values in parameters as references
-    if node.backend == "func_returns":
-        out = ""
-        for child in node[:]:
-            out += ", " + type_string(child) + "& " + str(child)
-        return out[2:]
-
-    # lambda functions are only printed in Lambda
-    if node.backend == "func_lambda":
-        return ""
-
-    assert False
-
-
-def Params(node):
-
-    if node.backend in ("func_return", "func_returns"):
-
-        # Create list of parameters
-        out = ""
-        for child in node[:]:
-            out += ", " + type_string(child) + " " + str(child)
-        return out[2:]
-
-    # lambda functions are only printed in Lambda
-    if node.backend == "func_lambda":
-        return ", ".join(["%s %s" % (type_string(n), n.name) for n in node])
-
-
-    assert False
-
-
-def Declares(node):
-
-    # normal functions
-    if node.backend in ("func_return", "func_returns"):
-
-        if not node:
-            return ""
-
-        returns = node.parent[1]
-
-        declares = {}   # {"int" : ["a", "b"]} -> int a, b ;
-        structs = {}    # {"_A" : "a"} -> _A a;
-
-        # fill declares and structs
-        for child in node[:]:
-
-            # return values in multi-returns are declared as parameter
-            if child.name in returns and node.backend == "func_returns":
-                continue
-
-            type = type_string(child)
-
-            if type not in declares:
-                declares[type] = []
-
-            declares[type].append(child)
-
-            if child.type == "structs":
-                structs[child.name] = child
-
-        # create output
-        out = ""
-        keys = declares.keys()
-        keys.sort()
-        for key in keys:
-            val = declares[key]
-            val.sort(cmp=lambda x,y: cmp(x.name, y.name))
-
-            # datatype
-            out += "\n" + key + " "
-
-            # all variables with that type
-            for v in val:
-
-                out += str(v)
-                if v.name in structs:
-
-                    structs_ = node.program[3]
-                    struct = structs_[structs_.names.index(v.name)]
-                    size = struct[struct.names.index("_size")].value
-                    out += "[%s]" % size
-
-                out += ", "
-
-            out = out[:-2] + " ;"
-
-        return out[1:]
-
-    # lambda functions is just a comma separated list
-    if node.backend == "func_lambda":
-        return ", ".join(["%s %s" % (type_string(n), str(n)) for n in node])
-
-    assert False
-
-
-def Func(node):
-
-    # zero or multiple returns
-    if node.backend == "func_returns":
-
-        # both returns and parameters present
-        if len(node[1]) and len(node[2]):
-            if len(node[0])>len(node[1]):
-                return """void %(name)s(%(2)s, %(1)s)
-{
-%(0)s
-%(3)s
-}"""
-            return """void %(name)s(%(2)s, %(1)s)
-{
-%(3)s
-}"""
-
-        # one of returns or params missing
-        if len(node[0])>len(node[1]):
-            return """void %(name)s(%(2)s%(1)s)
-{
-%(0)s
-%(3)s
-}"""
-        return """void %(name)s(%(2)s%(1)s)
-{
-%(3)s
-}"""
-    
-    if node.backend == "func_lambda":
-        return ""
-
-
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
