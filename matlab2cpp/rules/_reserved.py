@@ -895,7 +895,7 @@ Examples:
     >>> print mc.qscript("xlim(0.0, 3.14)")
     _plot.xlim(0.0, 3.14) ;
     _plot.show() ;
-    >>>print mc.qscript("xlim([0.0, 3.14])")
+    >>> print mc.qscript("xlim([0.0, 3.14])")
     _plot.xlim(0.0, 3.14) ;
     _plot.show() ;
     """
@@ -906,12 +906,15 @@ Examples:
         arg = node[0]
 
         if arg.cls == "Matrix" and len(arg[0]) == 2:
+
             a,b = arg[0]
             return "_plot.xlim(" + str(a) + ", " + str(b) + ")"
 
         elif arg.cls != "Matrix" and arg.num and arg.dim>0:
+
             if arg.type != "rowvec":
                 node.warning("input argument type should be rowvec (double)")
+
             name1 = arg.name + "(0)"; name2 = arg.name + "(1)"
             return "_plot.xlim(" + name1 + ", " + name2 + ")"
 
@@ -939,9 +942,12 @@ Examples:
                 return "_plot.ylim(" + str(a) + ", " + str(b) + ")"
             
         elif arg.cls != "Matrix" and arg.num and arg.dim>0:
-            if arg.type != "rowvec":
-                node.warning("input argument type should be rowvec (double)")
-            name1 = arg.name + "(0)"; name2 = arg.name + "(1)"
+
+            name1 = arg.name + "(0)"
+            name2 = arg.name + "(1)"
+            if arg.mem not in (2,3):
+                name1 = "(double) " + name1
+                name2 = "(double) " + name2
             return "_plot.ylim(" + name1 + ", " + name2 + ")"
 
     node.error("argument array type")
@@ -949,10 +955,10 @@ Examples:
 
 def Get_caxis(node):
     """
-    >>>print mc.qscript("caxis(0, 3)")
+    >>> print mc.qscript("caxis(0, 3)")
     _plot.caxis(0, 3) ;
     _plot.show() ;
-    >>>print mc.qscript("caxis([0, 3])")
+    >>> print mc.qscript("caxis([0, 3])")
     _plot.caxis(0, 3) ;
     _plot.show() ;
     """
@@ -977,10 +983,10 @@ def Get_caxis(node):
 
 def Get_axis(node):
     """
-    >>>print mc.qscript("axis(0, 3, -2, 4)")
+    >>> print mc.qscript("axis(0, 3, -2, 4)")
     _plot.axis(0, 3, -(2), 4) ;
     _plot.show() ;
-    >>>print mc.qscript("axis([0, 3, -2, 4])")
+    >>> print mc.qscript("axis([0, 3, -2, 4])")
     _plot.axis(0, 3, -(2), 4) ;
     _plot.show() ;
     """
