@@ -78,9 +78,6 @@ See also:
         return backend.summary(self, args)
 
 
-    def configure(self, suggest=False):
-        matlab2cpp.configure.configure(self, suggest)
-
     def translate(self, opt=None, only=False):
         """Generate code"""
         if not self.project.builder.configured:
