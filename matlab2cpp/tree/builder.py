@@ -21,7 +21,7 @@ follows::
          | Program    program      TYPE    file1.m
          | | Includes   program      TYPE
      1  1| | Funcs      program      TYPE    file1.m
-     1  1| | | Main       func_common  TYPE    main
+     1  1| | | Main       func_return  TYPE    main
      1  1| | | | Declares   func_return  TYPE
      1  1| | | | | Var        unknown      TYPE    a
      1  1| | | | Returns    func_return  TYPE
@@ -64,7 +64,7 @@ configure. To configure datatypes, use the `configure` method::
          | Program    program      TYPE    file1.m
          | | Includes   program      TYPE
      1  1| | Funcs      program      TYPE    file1.m
-     1  1| | | Main       func_common  TYPE    main
+     1  1| | | Main       func_return  TYPE    main
      1  1| | | | Declares   func_return  int
      1  1| | | | | Var        int          int     a
      1  1| | | | Returns    func_return  TYPE
@@ -88,7 +88,6 @@ of projects that involves multiple files. For example::
 The two programs refer to each other through their names. This can the
 suggestion engine use::
 
-    >>> builder.configure(suggest=True)
     >>> print mc.qscript(builder[0])
     int a(int x)
     {
@@ -100,8 +99,6 @@ suggestion engine use::
     b = a(2) ;
 """
 
-import matlab2cpp as mc
-
 import expression
 import functions
 import variables
@@ -110,6 +107,9 @@ import branches
 import iterate
 import assign
 import codeblock
+import suppliment
+
+import matlab2cpp as mc
 
 class Builder(object):
     """
@@ -131,6 +131,10 @@ Convert Matlab-code to a tree of nodes.
 +--------------------------------------------+--------------------++-----------+
 
     """
+    ftypes = suppliment.Fbuilder()
+    stypes = suppliment.Sbuilder()
+    itypes = suppliment.Ibuilder()
+    vtypes = suppliment.Vbuilder()
 
     def __init__(self, disp=False, comments=True, **kws):
         """
@@ -151,6 +155,8 @@ See also:
         self.project = mc.collection.Project()
         self.project.kws = kws
         self.project.builder = self
+
+        self.configured = False
 
     def load(self, name, code):
         """
@@ -239,7 +245,7 @@ Example::
          | Program    program      TYPE    unnamed.m
          | | Includes   program      TYPE
      1  1| | Funcs      program      TYPE    unnamed.m
-     1  1| | | Main       func_common  TYPE    main
+     1  1| | | Main       func_return  TYPE    main
      1  1| | | | Declares   func_return  TYPE
      1  1| | | | | Var        unknown      TYPE    a
      1  1| | | | | Var        unknown      TYPE    b
@@ -266,7 +272,7 @@ Example::
          | Program    program      TYPE    unnamed.m
          | | Includes   program      TYPE
      1  1| | Funcs      program      TYPE    unnamed.m
-     1  1| | | Main       func_common  TYPE    main
+     1  1| | | Main       func_return  TYPE    main
      1  1| | | | Declares   func_return  TYPE
      1  1| | | | | Var        int          int     a
      1  1| | | | | Var        double       double  b
@@ -288,12 +294,19 @@ Example::
          | | Headers    program      TYPE    unnamed.m
          | | Log        program      TYPE    unnamed.m
     """
+        if self.configured:
+            raise Exception("configure can only be run once")
+        self.configured = True
         mc.configure.configure(self, suggest, **kws)
 
     def translate(self):
         """
 Translate node tree
         """
+
+        if not self.configured:
+            self.configure()
+
         for program in self.project:
             program.translate()
 

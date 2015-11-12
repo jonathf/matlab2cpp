@@ -48,7 +48,7 @@ Example:
        Program    program      TYPE    unamed
        | Includes   program      TYPE
     1 1| Funcs      program      TYPE    unamed
-    1 1| | Main       func_common  TYPE    main
+    1 1| | Main       func_return  TYPE    main
     1 1| | | Declares   func_return  TYPE
     1 1| | | Returns    func_return  TYPE
     1 1| | | Params     func_return  TYPE
@@ -328,7 +328,7 @@ Example:
        Program    program      TYPE    unnamed
        | Includes   program      TYPE
     1 1| Funcs      program      TYPE    unnamed
-    1 1| | Main       func_common  TYPE    main
+    1 1| | Main       func_return  TYPE    main
     1 1| | | Declares   func_return  TYPE
     1 1| | | Returns    func_return  TYPE
     1 1| | | Params     func_return  TYPE
@@ -388,7 +388,7 @@ Example:
         Program    program      TYPE    unnamed
         | Includes   program      TYPE
     1  1| Funcs      program      TYPE    unnamed
-    1  1| | Main       func_common  TYPE    main
+    1  1| | Main       func_return  TYPE    main
     1  1| | | Declares   func_return  TYPE
     1  1| | | | Var        unknown      func_lambdaf
     1  1| | | Returns    func_return  TYPE

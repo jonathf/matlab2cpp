@@ -96,12 +96,12 @@ def get(node):
 
 
 class Ftypes(object):
-
+    "Access to function types from program node"
     def __get__(self, instance, owner):
         return get(instance)
-
     def __set__(self, instance, value):
         set(instance, value)
+
 
 
 if __name__ == "__main__":

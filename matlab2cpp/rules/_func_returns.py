@@ -18,8 +18,7 @@ Get : Function/Array retrieval
     Contains: Gets
     Property: name
 """
-from _func_common import *
-
+from function import *
 
 def Assigns(node):
 

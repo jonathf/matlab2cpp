@@ -15,8 +15,6 @@ variable type.
 
 """
 
-import matlab2cpp as mc
-
 PREFIX = """# encoding: utf-8
 #
 # Supplement file
@@ -44,58 +42,60 @@ from structs import Stypes
 from includes import Itypes
 from verbatim import Vtypes
 
-def set_variables(program, types_f={}, types_s={}, types_i=[]):
-    """
-Insert the scope variable types into the node-tree.
-
-Args:
-    program (Program): Node-tree representation of program
-    types_f (dict): Nested dictionary where outer keys are function names, inner
-        keys are name of variables and inner values are datatype name.
-    types_s (dict): Nested dictionary where outer keys are struct names, inner
-        keys are name of variables and inner values are datatype name.
-    types_i (list): List of included statements.
-
-Example:
-    >>> prog = mc.build("function f(a,b); c=4; end")
-    >>> prog.ftypes = {"f": {"a":"int", "b":"vec", "c":"float"}}
-    >>> print mc.qscript(prog)
-    void f(int a, vec b)
-    {
-      float c ;
-      c = (float) 4 ;
-    }
-"""
-    functions.set(program, types_f)
-    structs.set(program, types_s)
-    includes.set(program, types_i)
+import matlab2cpp as mc
 
 
-def get_variables(program):
-    """
-Retrieve scope variables from node-tree
-
-Args:
-    program (Program): Node-tree representaiton of program
-
-Returns: types_f (dict), types_s (dict), types_i (list), suggest (dict)
-    Nested dictionaries as provided in the supplement `.py` file.
-    Respectively for function types, struct types, include types and suggested
-    types.
-
-Example:
-    >>> prog = mc.build("function f(); a=1; b='s'; end")
-    >>> print prog.suggest
-    {'f': {'a': 'int', 'b': 'string'}}
-"""
-
-    types_f = functions.get(program)
-    types_s = structs.get(program)
-    types_i = includes.get(program)
-    suggest = suggests.get(program)
-
-    return types_f, types_s, types_i, suggest
-
+# def set_variables(program, types_f={}, types_s={}, types_i=[]):
+#     """
+# Insert the scope variable types into the node-tree.
+#
+# Args:
+#     program (Program): Node-tree representation of program
+#     types_f (dict): Nested dictionary where outer keys are function names, inner
+#         keys are name of variables and inner values are datatype name.
+#     types_s (dict): Nested dictionary where outer keys are struct names, inner
+#         keys are name of variables and inner values are datatype name.
+#     types_i (list): List of included statements.
+#
+# Example:
+#     >>> prog = mc.build("function f(a,b); c=4; end")
+#     >>> prog.ftypes = {"f": {"a":"int", "b":"vec", "c":"float"}}
+#     >>> print mc.qscript(prog)
+#     void f(int a, vec b)
+#     {
+#       float c ;
+#       c = (float) 4 ;
+#     }
+# """
+#     functions.set(program, types_f)
+#     structs.set(program, types_s)
+#     includes.set(program, types_i)
+#
+#
+# def get_variables(program):
+#     """
+# Retrieve scope variables from node-tree
+#
+# Args:
+#     program (Program): Node-tree representaiton of program
+#
+# Returns: types_f (dict), types_s (dict), types_i (list), suggest (dict)
+#     Nested dictionaries as provided in the supplement `.py` file.
+#     Respectively for function types, struct types, include types and suggested
+#     types.
+#
+# Example:
+#     >>> prog = mc.build("function f(); a=1; b='s'; end")
+#     >>> print prog.suggest
+#     {'f': {'a': 'int', 'b': 'string'}}
+# """
+#
+#     types_f = functions.get(program)
+#     types_s = structs.get(program)
+#     types_i = includes.get(program)
+#     suggest = suggests.get(program)
+#
+#     return types_f, types_s, types_i, suggest
 
 def str_variables(types_f={}, types_s={}, types_i=[],
         suggest={}, prefix=True, types_v={}):

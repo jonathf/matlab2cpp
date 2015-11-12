@@ -89,7 +89,7 @@ class Header(Node):
         Node.__init__(self, parent, name=name, backend=backend, **kws)
 
 class Main(Node):
-    def __init__(self, parent, name="main", backend="func_common", **kws):
+    def __init__(self, parent, name="main", backend="func_return", **kws):
         Node.__init__(self, parent, name=name, backend=backend, **kws)
 
 class Error(Node):

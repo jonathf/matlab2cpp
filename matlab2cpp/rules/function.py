@@ -55,9 +55,6 @@ Returns:
 
 def Returns(node):
 
-    if node.backend == "func_return":
-        return "", "" 
-
     # In multi-returns, place return values in parameters as references
     if node.backend == "func_returns":
         out = ""
@@ -106,7 +103,7 @@ def Declares(node):
         # fill declares and structs
         for child in node[:]:
 
-            # return values i multi-returns are declared as parameter
+            # return values in multi-returns are declared as parameter
             if child.name in returns and node.backend == "func_returns":
                 continue
 
@@ -126,7 +123,7 @@ def Declares(node):
         keys.sort()
         for key in keys:
             val = declares[key]
-            val.sort()
+            val.sort(cmp=lambda x,y: cmp(x.name, y.name))
 
             # datatype
             out += "\n" + key + " "
@@ -156,26 +153,6 @@ def Declares(node):
 
 
 def Func(node):
-
-    # single return function
-    if node.backend == "func_return":
-
-        node.type = node[1][0].type
-
-        # function ends with a return statement
-        if node[-1][-1] and node[-1][-1][-1].cls == "Return":
-            return """%(type)s %(name)s(%(2)s)
-{
-%(0)s
-%(3)s
-}"""
-
-        return """%(type)s %(name)s(%(2)s)
-{
-%(0)s
-%(3)s
-return %(1)s ;
-}"""
 
     # zero or multiple returns
     if node.backend == "func_returns":
@@ -208,20 +185,4 @@ return %(1)s ;
     if node.backend == "func_lambda":
         return ""
 
-
-def Main(node):
-
-    # has variables to declare
-    if node[0]:
-        return """int main(int argc, char** argv)
-{
-%(0)s
-%(3)s
-return 0 ;
-}"""
-    return """int main(int argc, char** argv)
-{
-%(3)s
-return 0 ;
-}"""
 
