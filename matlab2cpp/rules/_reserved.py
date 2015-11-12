@@ -890,9 +890,34 @@ def Get_colorbar(node):
     return "_plot.colorbar(", ", ", ")"
 
 def Get_xlim(node):
-    node.plotting()
-    return "_plot.xlim(", ", ", ")"
+    """
+Examples:
+    >>> print mc.qscript("xlim(0.0, 3.14)")
+    _plot.xlim(0.0, 3.14) ;
+    _plot.show() ;
+    >>>print mc.qscript("xlim([0.0, 3.14])")
+    _plot.xlim(0.0, 3.14) ;
+    _plot.show() ;
+    """
 
+    node.plotting()
+
+    if len(node) == 1:
+        arg = node[0]
+
+        if arg.cls == "Matrix" and len(arg[0]) == 2:
+            a,b = arg[0]
+            return "_plot.xlim(" + str(a) + ", " + str(b) + ")"
+
+        elif arg.cls != "Matrix" and arg.num and arg.dim>0:
+            if arg.type != "rowvec":
+                node.warning("input argument type should be rowvec (double)")
+            name1 = arg.name + "(0)"; name2 = arg.name + "(1)"
+            return "_plot.xlim(" + name1 + ", " + name2 + ")"
+
+    node.error("argument array type")
+    return "_plot.xlim(", ", ", ")"
+    
 def Get_ylim(node):
     """
 Examples:
@@ -907,33 +932,76 @@ Examples:
     node.plotting()
 
     if len(node) == 1:
-
         arg = node[0]
 
-        if arg.cls == "Matrix":
-            a,b = arg[0]
-            return "_plot.ylim(" + str(a) + ", " + str(b) + ")"
-
-        elif arg.num and arg.dim>0:
-            name1 = name + "[0]"
-            name2 = name + "[1]"
+        if arg.cls == "Matrix" and len(arg[0]) == 2:
+                a,b = arg[0]
+                return "_plot.ylim(" + str(a) + ", " + str(b) + ")"
+            
+        elif arg.cls != "Matrix" and arg.num and arg.dim>0:
+            if arg.type != "rowvec":
+                node.warning("input argument type should be rowvec (double)")
+            name1 = arg.name + "(0)"; name2 = arg.name + "(1)"
             return "_plot.ylim(" + name1 + ", " + name2 + ")"
 
-        node.error("argument array type")
-        return "_plot.ylim(", ", ", ")"
-
-
-    elif len(node) == 2:
-        return "_plot.ylim(", ", ", ")"
-
-
+    node.error("argument array type")
+    return "_plot.ylim(", ", ", ")"
 
 def Get_caxis(node):
+    """
+    >>>print mc.qscript("caxis(0, 3)")
+    _plot.caxis(0, 3) ;
+    _plot.show() ;
+    >>>print mc.qscript("caxis([0, 3])")
+    _plot.caxis(0, 3) ;
+    _plot.show() ;
+    """
+
     node.plotting()
+
+    if len(node) == 1:
+        arg = node[0]
+
+        if arg.cls == "Matrix" and len(arg[0]) == 2:
+                a,b = arg[0]
+                return "_plot.caxis(" + str(a) + ", " + str(b) + ")"
+            
+        elif arg.cls != "Matrix" and arg.num and arg.dim>0:
+            if arg.type != "rowvec":
+                node.warning("input argument type should be rowvec (double)")
+            name1 = arg.name + "(0)"; name2 = arg.name + "(1)"
+            return "_plot.caxis(" + name1 + ", " + name2 + ")"
+
+    node.error("argument array type")
     return "_plot.caxis(", ", ", ")"
 
 def Get_axis(node):
+    """
+    >>>print mc.qscript("axis(0, 3, -2, 4)")
+    _plot.axis(0, 3, -(2), 4) ;
+    _plot.show() ;
+    >>>print mc.qscript("axis([0, 3, -2, 4])")
+    _plot.axis(0, 3, -(2), 4) ;
+    _plot.show() ;
+    """
+
     node.plotting()
+
+    if len(node) == 1:
+        arg = node[0]
+
+        if arg.cls == "Matrix" and len(arg[0]) == 4:
+                a,b,c,d = arg[0]
+                return "_plot.axis(" + str(a) + ", " + str(b) + ", " + str(c) + ", " + str(d) + ")"
+            
+        elif arg.cls != "Matrix" and arg.num and arg.dim>0:
+            if arg.type != "rowvec":
+                node.warning("input argument type should be rowvec (double)")
+            name1 = arg.name + "(0)"; name2 = arg.name + "(1)"
+            name3 = arg.name + "(2)"; name4 = arg.name + "(3)"
+            return "_plot.axis(" + name1 + ", " + name2 + ", " + name3 + ", " + name4 + ")"
+
+    node.error("argument array type")
     return "_plot.axis(", ", ", ")"
 
 def Var_grid(node):
