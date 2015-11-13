@@ -496,7 +496,7 @@ def reserved(self, node, start):
 
     if self.code[k:k+4] == "hold":
 
-        statement = mc.collection.Statement(node)
+        statement = mc.collection.Statement(node, cur=start)
         
         l = k+4
         while self.code[l] in " \t":
@@ -509,7 +509,7 @@ def reserved(self, node, start):
         while self.code[k] in " \t":
             k += 1
 
-        get = mc.collection.Get(statement, name="hold")
+        get = mc.collection.Get(statement, name="hold", cur=start)
 
         if self.code[k:k+2] == "on":
             mc.collection.String(get, "on")
@@ -527,7 +527,7 @@ def reserved(self, node, start):
 
     if self.code[k:k+4] == "grid":
 
-        statement = mc.collection.Statement(node)
+        statement = mc.collection.Statement(node, cur=start)
         
         l = k+4
         while self.code[l] in " \t":
@@ -540,18 +540,18 @@ def reserved(self, node, start):
         while self.code[k] in " \t":
             k += 1
 
-        get = mc.collection.Get(statement, name="grid")
+        get = mc.collection.Get(statement, name="grid", cur=start)
 
         if self.code[k:k+2] == "on":
-            mc.collection.String(get, "on")
+            mc.collection.String(get, "on", cur=k)
             return k+2
 
         if self.code[k:k+3] == "off":
-            mc.collection.String(get, "off")
+            mc.collection.String(get, "off", cur=k)
             return k+3
 
         if self.code[k:k+5] == "minor":
-            mc.collection.String(get, "minor")
+            mc.collection.String(get, "minor", cur=k)
             return k+5
 
         return k
