@@ -182,7 +182,7 @@ void g()
   f(a, b, y, z) ;
 }"""
 
-    assert converted_code == reference_code
+    assert reference_code == converted_code
 
 
 

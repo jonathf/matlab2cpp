@@ -17,7 +17,7 @@ or the python function :py:func:`~matlab2cpp.qtree`. For example::
        | | Include    program      TYPE    #include <armadillo>
        | | Include    program      TYPE    using namespace arma ;
     1 1| Funcs      program      TYPE    unamed
-    1 1| | Main       func_common  TYPE    main
+    1 1| | Main       func_return  TYPE    main
     1 1| | | Declares   func_return  TYPE
     1 1| | | | Var        unknown      (int)   a
     1 1| | | Returns    func_return  TYPE
@@ -91,7 +91,7 @@ upon how the configuration is set up. Intuitively enough, if datatype is set to
        | | Include    program      TYPE    #include <armadillo>
        | | Include    program      TYPE    using namespace arma ;
     1 1| Funcs      program      TYPE    unamed
-    1 1| | Main       func_common  TYPE    main
+    1 1| | Main       func_return  TYPE    main
     1 1| | | Declares   func_return  int
     1 1| | | | Var        int          int     a
     1 1| | | Returns    func_return  TYPE

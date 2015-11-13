@@ -36,7 +36,7 @@ They are available through the `mc.qfunctions` module and mirrors the
 functionality offered by the `mconvert` function.
 """
 
-__version__ = 1.1
+__version__ = 1.2
 
 import time
 from datetime import datetime as date
@@ -44,10 +44,10 @@ import os
 from os.path import sep
 import imp
 
+import supplement
 import node
 import tree
 
-import supplement
 import qfunctions
 import collection
 import inlines

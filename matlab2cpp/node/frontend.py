@@ -83,6 +83,9 @@ See also:
 
     def translate(self, opt=None, only=False):
         """Generate code"""
+        if not self.project.builder.configured:
+            self.project.builder.configure()
+
         if only:
             backend.translate_one(self, opt)
         else:
@@ -112,7 +115,7 @@ Parameters
 type : str, None
     If provided, auxiliary variable type will be converted
         """
-        backend.auxillary(self, type, convert)
+        return backend.auxillary(self, type, convert)
 
 
     def resize(self):

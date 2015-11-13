@@ -28,7 +28,7 @@ Get : Function/Array retrieval
     Property: name
 """
 
-from _func_common import *
+from function import *
 from assign import Assign
 
 

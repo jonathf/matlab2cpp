@@ -128,6 +128,10 @@ See also:
 
                     for program in self.project:
 
+                        # don't use file your in as external library
+                        if program is node.program:
+                            continue
+
                         if os.path.basename(program.name) == node.name+".m":
                             func = program[1][0]
                             node.backend = func.backend

@@ -28,7 +28,7 @@ import matlab2cpp as mc
 
 __all__ = ["build", "qcpp", "qhpp", "qpy", "qlog", "qtree", "qscript"]
 
-def build(code, disp=False, retall=False, suggest=False, comments=True, **kws):
+def build(code, disp=False, retall=False, suggest=True, comments=True, **kws):
     """
 Build a token tree out of Matlab code.  This function is used by the other
 quick-functions as the first step in code translation.
@@ -70,15 +70,18 @@ See also:
     """
 
     code = code + "\n\n\n\n"
-    tree_ = tree.builder.Builder(disp=disp, comments=comments, **kws)
-    tree_.load("unamed", code)
-    tree_.configure(2*suggest)
+    builder = tree.builder.Builder(disp=disp, comments=comments, **kws)
+    builder.load("unamed", code)
+    builder.configure(2*suggest)
+
     if retall:
-        return tree_
-    if tree_[0][1][0].name == "main":
-        out = tree_[0][1][0][3]
+        return builder
+
+    if builder[0][1][0].name == "main":
+        out = builder[0][1][0][3]
         return out
-    return tree_[0][1]
+
+    return builder[0][1]
 
 
 def qcpp(code, suggest=True, **kws):
@@ -125,7 +128,6 @@ Example::
       return 0 ;
     }
     >>> build = mc.build(code, retall=True)
-    >>> build.configure()
     >>> print mc.qcpp(build) == mc.qcpp(code)
     True
 
@@ -493,7 +495,6 @@ Example:
         if isinstance(tree_, tree.builder.Builder):
             tree_ = tree_[0]
         tree_.translate()
-
 
     out = ""
     if tree_.cls == "Program":
