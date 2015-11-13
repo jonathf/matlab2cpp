@@ -61,9 +61,9 @@ int main(int argc, char** argv)
   a = 1 ;
   b = 2. ;
   c = "3" ;
-  int _d [] = {4, 5} ;
+  sword _d [] = {4, 5} ;
   d = irowvec(_d, 2, false) ;
-  int _e [] = {6, 7} ;
+  sword _e [] = {6, 7} ;
   e = ivec(_e, 2, false) ;
   return 0 ;
 }"""
@@ -118,7 +118,7 @@ irowvec f(irowvec x)
 void g()
 {
   irowvec x, y ;
-  int _x [] = {1, 2, 3} ;
+  sword _x [] = {1, 2, 3} ;
   x = irowvec(_x, 3, false) ;
   y = f(x) ;
 }"""
@@ -175,9 +175,9 @@ void g()
 {
   irowvec a, y ;
   ivec b, z ;
-  int _a [] = {1, 2, 3} ;
+  sword _a [] = {1, 2, 3} ;
   a = irowvec(_a, 3, false) ;
-  int _b [] = {4, 5, 6} ;
+  sword _b [] = {4, 5, 6} ;
   b = ivec(_b, 3, false) ;
   f(a, b, y, z) ;
 }"""
@@ -239,9 +239,9 @@ void g()
 {
   irowvec a, y ;
   ivec b, z ;
-  int _a [] = {1, 2, 3} ;
+  sword _a [] = {1, 2, 3} ;
   a = irowvec(_a, 3, false) ;
-  int _b [] = {4, 5, 6} ;
+  sword _b [] = {4, 5, 6} ;
   b = ivec(_b, 3, false) ;
   f(a, b, y, z) ;
 }"""

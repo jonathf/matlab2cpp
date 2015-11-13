@@ -912,10 +912,12 @@ Examples:
 
         elif arg.cls != "Matrix" and arg.num and arg.dim>0:
 
-            if arg.type != "rowvec":
-                node.warning("input argument type should be rowvec (double)")
+            name1 = arg.name + "(0)"
+            name2 = arg.name + "(1)"
+            if arg.mem not in (2,3):
+                name1 = "static_cast<double>(" + name1 + ")"
+                name2 = "static_cast<double>(" + name2 + ")"
 
-            name1 = arg.name + "(0)"; name2 = arg.name + "(1)"
             return "_plot.xlim(" + name1 + ", " + name2 + ")"
 
     node.error("argument array type")
@@ -946,8 +948,9 @@ Examples:
             name1 = arg.name + "(0)"
             name2 = arg.name + "(1)"
             if arg.mem not in (2,3):
-                name1 = "(double) " + name1
-                name2 = "(double) " + name2
+                name1 = "static_cast<double>(" + name1 + ")"
+                name2 = "static_cast<double>(" + name2 + ")"
+
             return "_plot.ylim(" + name1 + ", " + name2 + ")"
 
     node.error("argument array type")
@@ -973,9 +976,13 @@ def Get_caxis(node):
                 return "_plot.caxis(" + str(a) + ", " + str(b) + ")"
             
         elif arg.cls != "Matrix" and arg.num and arg.dim>0:
-            if arg.type != "rowvec":
-                node.warning("input argument type should be rowvec (double)")
-            name1 = arg.name + "(0)"; name2 = arg.name + "(1)"
+
+            name1 = arg.name + "(0)"
+            name2 = arg.name + "(1)"
+            if arg.mem not in (2,3):
+                name1 = "static_cast<double>(" + name1 + ")"
+                name2 = "static_cast<double>(" + name2 + ")"
+
             return "_plot.caxis(" + name1 + ", " + name2 + ")"
 
     node.error("argument array type")
@@ -1001,10 +1008,17 @@ def Get_axis(node):
                 return "_plot.axis(" + str(a) + ", " + str(b) + ", " + str(c) + ", " + str(d) + ")"
             
         elif arg.cls != "Matrix" and arg.num and arg.dim>0:
-            if arg.type != "rowvec":
-                node.warning("input argument type should be rowvec (double)")
-            name1 = arg.name + "(0)"; name2 = arg.name + "(1)"
-            name3 = arg.name + "(2)"; name4 = arg.name + "(3)"
+            
+            name1 = arg.name + "(0)";
+            name2 = arg.name + "(1)"
+            name3 = arg.name + "(2)";
+            name4 = arg.name + "(3)"
+            if arg.mem not in (2,3):
+                name1 = "static_cast<double>(" + name1 + ")"
+                name2 = "static_cast<double>(" + name2 + ")"
+                name3 = "static_cast<double>(" + name3 + ")"
+                name4 = "static_cast<double>(" + name4 + ")"
+            
             return "_plot.axis(" + name1 + ", " + name2 + ", " + name3 + ", " + name4 + ")"
 
     node.error("argument array type")

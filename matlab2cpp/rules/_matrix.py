@@ -233,6 +233,10 @@ def Assign(node):
     # decomposed matrix
     if rhs.value:
 
+        type = node.type
+        if type == "int":
+            type = "sword"
+
         # scalar
         if rhs.dim == 0:
             return arma.scalar_assign(node)
@@ -243,7 +247,7 @@ def Assign(node):
             # save number of rows as 'rows'
             node["rows"] = len(node[1][0])*len(node[1])
 
-            return "%(type)s _%(0)s [] = %(1)s ;\n"+\
+            return type + " _%(0)s [] = %(1)s ;\n"+\
                     "%(0)s = %(ctype)s(_%(0)s, %(rows)s, false) ;"
 
         # rowvec
@@ -251,7 +255,7 @@ def Assign(node):
 
             # save number of cols as 'cols'
             node["cols"] = len(node[1][0])*len(node[1])
-            return "%(type)s _%(0)s [] = %(1)s ;\n"+\
+            return type + " _%(0)s [] = %(1)s ;\n"+\
                     "%(0)s = %(ctype)s(_%(0)s, %(cols)s, false) ;"
 
         # matrix
@@ -259,7 +263,7 @@ def Assign(node):
             # save number of rows and columns
             node["rows"] = len(node[1][0])
             node["cols"] = len(node[1])
-            return "%(type)s _%(0)s [] = %(1)s ;\n"+\
+            return type + " _%(0)s [] = %(1)s ;\n"+\
         "%(0)s = %(ctype)s(_%(0)s, %(rows)s, %(cols)s, false) ;"
 
         assert False
