@@ -497,7 +497,12 @@ def reserved(self, node, start):
     if self.code[k:k+4] == "hold":
 
         statement = mc.collection.Statement(node)
-        if self.code[k+4] == "(":
+        
+        l = k+4
+        while self.code[l] in " \t":
+            l += 1
+        
+        if self.code[l] == "(":
             return expression.create(self, statement, k)
 
         k += 4
@@ -520,7 +525,38 @@ def reserved(self, node, start):
 
         return k
 
+    if self.code[k:k+4] == "grid":
 
+        statement = mc.collection.Statement(node)
+        
+        l = k+4
+        while self.code[l] in " \t":
+            l += 1
+            
+        if self.code[l] == "(":
+            return expression.create(self, statement, k)
+
+        k += 4
+        while self.code[k] in " \t":
+            k += 1
+
+        get = mc.collection.Get(statement, name="grid")
+
+        if self.code[k:k+2] == "on":
+            mc.collection.String(get, "on")
+            return k+2
+
+        if self.code[k:k+3] == "off":
+            mc.collection.String(get, "off")
+            return k+3
+
+        if self.code[k:k+5] == "minor":
+            mc.collection.String(get, "minor")
+            return k+5
+
+        return k
+        
+        
     if self.code[k:k+5] == "clear":
         pass
 

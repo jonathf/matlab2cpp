@@ -1029,6 +1029,19 @@ def Var_grid(node):
 
 def Get_grid(node):
     node.plotting()
+    
+    if node and node[0].cls == "String":
+
+        if node[0].value == "on":
+            return "_plot.grid({{\"b\", \"on\"}})"
+
+        if node[0].value == "off":
+            return "_plot.grid({{\"b\", \"off\"}})"
+        
+        node.error('argument must either be "on" or "off"')
+
+        return "_plot.grid(", ", ", ")"
+
     return "_plot.grid(", ", ", ")"
 
 def Get_subplot(node):
