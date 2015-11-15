@@ -20,7 +20,6 @@ Get : Function call
 Var : Function call hidden as variable
     Example "y"
     Contains: nothing
-    property: name
 """
 
 import matlab2cpp as mc
@@ -34,6 +33,8 @@ def Var(node):
     
 Writing a function as if a variable, is equivalent to calling the function
 without arguments.
+
+property: name (of variable)
 
 Examples:
     >>> print mc.qscript("function y=f(); y=1; end; function g(); f")
@@ -154,6 +155,21 @@ Examples:
 
 
 def Func(node):
+    """Function declaration
+
+Contains: Declares Returns Params Block
+Property: name (of function)
+
+Examples:
+    >>> print mc.qscript("function y=f(); y=1")
+    int f()
+    {
+      int y ;
+      y = 1 ;
+      return y ;
+    }
+    """
+
 
     # type information is in params and declare, not return
     retname = node[1][0].name
@@ -180,6 +196,23 @@ return %(1)s ;
 
 
 def Main(node):
+    """
+Main function
+
+Contains: Declares Returns Params Block
+Property: name (of function)
+
+Examples:
+    >>> print mc.qcpp("4")
+    #include <armadillo>
+    using namespace arma ;
+    <BLANKLINE>
+    int main(int argc, char** argv)
+    {
+      4 ;
+      return 0 ;
+    }
+    """
 
     # has variables to declare
     if node[0]:

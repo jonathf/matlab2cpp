@@ -1,39 +1,25 @@
 """
-Lambda Functions
-
-Nodes
------
-Lambda : Function
-    Contains: Returns, Params, Block
-    Property: name
-
-Func : Function
-    Contains: Returns, Params, Block
-    Property: name
-
-Returns : Function return variables
-    Contains: Var, ...
-
-Params : Function parameter variables
-    Contains: Var, ...
-
-Declares : Declarations in the beginning of function
-    Contains: Var, ...
-    Rule: func_return.py (if one variable return)
-          func_returns.py (if multiple return)
-
-Get : Function/Array retrieval
-    Example: "y(4)"
-    Contains: Gets
-    Property: name
+Anonymous/Lambda Functions
 """
 
+import matlab2cpp as mc
 from function import type_string
 from variables import *
 from assign import Assign
 
 
 def Lambda(node):
+    """Lambda function statement
+
+During construction, builder creates a full function for lambda expression.
+These functions are available through node.reference.
+
+Property: name (of function)
+
+Examples:
+    >>> print mc.qscript("f = @() 4")
+    f = [] () {4 ; } ;
+    """
 
     # lambda function are created as full functions, but referenced to be
     # written inline
@@ -102,11 +88,32 @@ def Lambda(node):
 Returns = ""
 
 def Params(node):
+    """Parameter structure in lambda functions
+
+Contains: Var*
+
+Examples:
+    >>> print mc.qscript("f = @(x,y,z) x+y+z; f(1,2.,'3')")
+    f = [] (int x, double y, string z) {x+y+z ; } ;
+    f(1, 2., "3") ;
+    """
     return ", ".join(["%s %s" % (type_string(n), n.name) for n in node])
 
 def Declares(node):
-    return ", ".join(["%s %s" % (type_string(n), str(n)) for n in node])
+    """Variable scope in lambda function
 
+If variables
+
+Examples:
+    >>> print mc.qscript("x = 4; f = @() x+2")
+    x = 4 ;
+    f = [x] () {x+2 ; } ;
+    """
+
+    # handle in Lambda
+    return ""
+
+# Actual lambda function is hidden
 Func = ""
 
 if __name__ == "__main__":
