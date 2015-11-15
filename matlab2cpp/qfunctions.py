@@ -25,6 +25,7 @@ Function                        Description
 import supplement
 import tree
 import matlab2cpp as mc
+from rules._program import add_indenting, number_fix, strip
 
 __all__ = ["build", "qcpp", "qhpp", "qpy", "qlog", "qtree", "qscript"]
 
@@ -169,7 +170,13 @@ See also:
 
         out = out.replace("__percent__", "%")
 
-    return out[:-2]
+        out =  out[:-2]
+
+        out = strip(out)
+        out = number_fix(out)
+        out = add_indenting(out)
+
+    return out
 
 
 def qhpp(code, suggest=False):
@@ -262,9 +269,14 @@ See also:
     if funcs.str:
         out += funcs.str + "\n\n"
 
-    out = out.replace("__percent__", "%")
+    out =  out[:-2]
 
-    return out[:-2]
+    out = out.replace("__percent__", "%")
+    out = strip(out)
+    out = number_fix(out)
+    out = add_indenting(out)
+
+    return out
 
 
 def qpy(code, suggest=True, prefix=False):
@@ -509,6 +521,9 @@ Example:
 
 
     out = out.replace("__percent__", "%")
+    out = strip(out)
+    out = number_fix(out)
+    out = add_indenting(out)
 
     return out
 

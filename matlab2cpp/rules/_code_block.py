@@ -59,7 +59,7 @@ Examples:
     >>> print mc.qscript("while 1, f()")
     while (1)
     {
-    f() ;
+      f() ;
     }
     """
     node.error("While-loops are currently not supported.")
@@ -89,15 +89,15 @@ Examples:
     >>> print mc.qscript("if a, b; elseif c, d; else e")
     if (a)
     {
-    b ;
+      b ;
     }
     else if (c)
     {
-    d ;
+      d ;
     }
     else
     {
-    e ;
+      e ;
     }
     """
     return "", "\n", ""
@@ -125,12 +125,12 @@ Examples:
     >>> print mc.qscript("if a, b")
     if (a)
     {
-    b ;
+      b ;
     }
     >>> print mc.qscript("if a, end")
     if (a)
     {
-    // Empty block
+      // Empty block
     }
     """
     return """if (%(0)s)
@@ -161,20 +161,20 @@ Examples:
     >>> print mc.qscript("if a, b; elseif c, d")
     if (a)
     {
-    b ;
+      b ;
     }
     else if (c)
     {
-    d ;
+      d ;
     }
     >>> print mc.qscript("if a, b; elseif c, end")
     if (a)
     {
-    b ;
+      b ;
     }
     else if (c)
     {
-    // Empty block
+      // Empty block
     }
     """
     return """else if (%(0)s)
@@ -203,20 +203,20 @@ Examples:
     >>> print mc.qscript("if a, b; else c")
     if (a)
     {
-    b ;
+      b ;
     }
     else
     {
-    c ;
+      c ;
     }
     >>> print mc.qscript("if a, b; else; end")
     if (a)
     {
-    b ;
+      b ;
     }
     else
     {
-    // Empty block
+      // Empty block
     }
     """
     return """else
@@ -250,11 +250,11 @@ Examples:
     a = 1 ;
     if (b == a)
     {
-    c ;
+      c ;
     }
     else
     {
-    d ;
+      d ;
     }
     """
     if node[0].cls == "Var":
@@ -289,13 +289,13 @@ Example:
     int _var_int = 1 ;
     if (b == _var_int)
     {
-    c ;
+      c ;
     }
     >>> print mc.qscript("a=1; switch a; case b; c;")
     a = 1 ;
     if (b == a)
     {
-    c ;
+      c ;
     }
     """
 
@@ -338,11 +338,11 @@ Example:
     int _var_int = 1 ;
     if (a == _var_int)
     {
-    b ;
+      b ;
     }
     else
     {
-    c ;
+      c ;
     }
     """
     return "else\n{\n%(0)s\n}"
@@ -369,11 +369,11 @@ Examples:
     >>> print mc.qscript("try; a; catch; b")
     try
     {
-    a ;
+      a ;
     }
     catch (...)
     {
-    b ;
+      b ;
     }
     """
     node.error("Try-statement are currently not supported.")
@@ -444,7 +444,7 @@ Examples:
     a ;
     if (b)
     {
-    c ;
+      c ;
     }
     d ;
     """
@@ -528,18 +528,18 @@ Examples:
     >>> print mc.qscript("for i=1:10; a")
     for (i=1; i<=10; i++)
     {
-    a ;
+      a ;
     }
     >>> print mc.qscript("for i=1:2:10; a")
     for (i=1; i<=10; i+=2)
     {
-    a ;
+      a ;
     }
     >>> print mc.qscript("for i=a; b")
     for (int _i=0; _i<length(a); _i++)
     {
-    i = a[_i] ;
-    b ;
+      i = a[_i] ;
+      b ;
     }
     """
     var, range = node[:2]

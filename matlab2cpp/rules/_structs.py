@@ -8,4 +8,4 @@ def Fget(node):
     pass
 
 def Fset(node):
-    return "%(name)s.%(value)s(", ", ", ")"
+    return "%(name)s.%(value)s[", ", ", "-1]"

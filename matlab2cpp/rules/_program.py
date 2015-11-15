@@ -37,9 +37,8 @@ Examples:
     >>> print number_fix("a(8-1, 5-1)")
     a(7, 4)
     """
-
     # Cosmetic fix
-    for p0,p1,p2 in set(re.findall(r"(([ ,(])(-?\d+)-1)", text)):
+    for p0,p1,p2 in set(re.findall(r"(([ ,(\[])(-?\d+)-1)", text)):
         val = int(p2)-1
         val = p1+str(val)
         text = val.join(text.split(p0))
@@ -110,10 +109,10 @@ Include = "%(name)s"
 
 def Funcs(node):
     text = "\n\n".join(map(str, node[:]))
-    text = add_indenting(text)
-    text = number_fix(text)
+    # text = add_indenting(text)
+    # text = number_fix(text)
     text = re.sub(r"\n *(\n *)+", r"\n\n", text)
-    text = strip(text)
+    # text = strip(text)
 
     return text
 
@@ -134,7 +133,7 @@ namespace m2cpp
 
 #endif
 """
-    text = add_indenting(text)
+    # text = add_indenting(text)
     return text
 
 def Inline(node):
@@ -182,7 +181,7 @@ def Struct(node):
         out = out + "\n" + key + " " + ", ".join([str(v) for v in val]) + " ;"
     out = out + "\n} ;"
 
-    out = add_indenting(out)
+    # out = add_indenting(out)
 
     return out
 

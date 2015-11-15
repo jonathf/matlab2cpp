@@ -19,7 +19,7 @@ To illustrate both nodes and relationship we introduce the following example:
          | | | Include    program      TYPE    #include <armadillo>
          | | | Include    program      TYPE    using namespace arma ;
      1  1| | Funcs      program      TYPE    unnamed
-     1  1| | | Func       func_return  double  f
+     1  1| | | Func       func_return  TYPE    f
      1  1| | | | Declares   func_return  double
      1  1| | | | | Var        double       double  y
      1  1| | | | Returns    func_return  double

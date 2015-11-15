@@ -11,12 +11,6 @@ Returns : Function return variables
     Contains: Var, ...
 
 Params : Function parameter variables
-    Contains: Var, ...
-
-Declares : Declarations in the beginning of function
-    Contains: Var, ...
-    Rule: func_return.py (if one variable return)
-          func_returns.py (if multiple return)
 
 Get : Function call
     Example: "y(4)"
@@ -33,6 +27,7 @@ import matlab2cpp as mc
 
 from function import type_string
 from variables import Get
+
 
 def Var(node):
     """Function call as variable
@@ -58,20 +53,27 @@ Examples:
     return Get(node)
 
 Returns = "", ""
+"single return value are used varbatim"
 
 def Params(node):
     """Parameters in functions with one return
 
+Adds type prefix.
+
+Contains: Var*
+
 Examples:
-    >>> code = "function y(a,b,c,d,e)"
+    >>> code = "function y=f(a,b,c,d,e); y=1"
     >>> builder = mc.Builder()
     >>> builder.load("unamed", code)
-    >>> builder[0].ftypes = {"y":{"a": "int", "b":"double", "c":"cx_mat",
-    ...     "d":"func_lambda", "e":"struct", "f":"structs"}}
+    >>> builder[0].ftypes = {"f":{"a": "int", "b":"double", "c":"cx_mat",
+    ...     "d":"func_lambda", "e":"struct", "y":"int"}}
     >>> print mc.qscript(builder)
-    void y(int a, double b, cx_mat c, std::function d, _E e)
+    int f(int a, double b, cx_mat c, std::function d, _E e)
     {
-      // Empty block
+      int y ;
+      y = 1 ;
+      return y ;
     }
     """
 
@@ -82,6 +84,24 @@ Examples:
 
 
 def Declares(node):
+    """Declarations in the beginning of function
+
+Contains: Var*
+
+Examples:
+    >>> print mc.qscript("function d=f(); a=1; b.c='2'; d.e(1)=[4,5]")
+    _D f()
+    {
+      _B b ;
+      _D d ;
+      int a ;
+      a = 1 ;
+      b.c = "2" ;
+      sword _d [] = {4, 5} ;
+      d.e[0] = irowvec(_d, 2, false) ;
+      return d ;
+    }
+    """
 
     if not node:
         return ""
@@ -132,20 +152,26 @@ def Declares(node):
 
     return out[1:]
 
+
 def Func(node):
 
-    # type is same as returned
-    node.type = node[1][0].type
+    # type information is in params and declare, not return
+    retname = node[1][0].name
+    if retname in node[0].names:
+        retval = node[0][node[0].names.index(retname)]
+    if retname in node[2].names:
+        retval = node[2][node[1].names.index(retname)]
+    rettype = type_string(retval)
 
     # function ends with a return statement
     if node[-1][-1] and node[-1][-1][-1].cls == "Return":
-        return """%(type)s %(name)s(%(2)s)
+        return rettype + """ %(name)s(%(2)s)
 {
 %(0)s
 %(3)s
 }"""
 
-    return """%(type)s %(name)s(%(2)s)
+    return rettype + """ %(name)s(%(2)s)
 {
 %(0)s
 %(3)s

@@ -247,24 +247,24 @@ def Assign(node):
             # save number of rows as 'rows'
             node["rows"] = len(node[1][0])*len(node[1])
 
-            return type + " _%(0)s [] = %(1)s ;\n"+\
-                    "%(0)s = %(ctype)s(_%(0)s, %(rows)s, false) ;"
+            return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
+                "%(0)s = %(ctype)s(_" + node[0].name + ", %(rows)s, false) ;"
 
         # rowvec
         elif rhs.dim == 2:
 
             # save number of cols as 'cols'
             node["cols"] = len(node[1][0])*len(node[1])
-            return type + " _%(0)s [] = %(1)s ;\n"+\
-                    "%(0)s = %(ctype)s(_%(0)s, %(cols)s, false) ;"
+            return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
+                "%(0)s = %(ctype)s(_" + node[0].name + ", %(cols)s, false) ;"
 
         # matrix
         elif rhs.dim == 3:
             # save number of rows and columns
             node["rows"] = len(node[1][0])
             node["cols"] = len(node[1])
-            return type + " _%(0)s [] = %(1)s ;\n"+\
-        "%(0)s = %(ctype)s(_%(0)s, %(rows)s, %(cols)s, false) ;"
+            return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
+        "%(0)s = %(ctype)s(_" + node[0].name + ", %(rows)s, %(cols)s, false) ;"
 
         assert False
 

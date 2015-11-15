@@ -1,22 +1,7 @@
 """
 Functions with multiple returns
-
-Returns : Function return variables
-    Contains: Var*
-
-Params : Function parameter variables
-    Contains: Var*
-
-Get : Function call
-    Example: "y(4)"
-    Contains: Expression*
-    Property: name
-
-Var : Function call hidden as variable
-    Example: "y"
-    Property: name
-
 """
+
 import matlab2cpp as mc
 from function import type_string
 from variables import Get
@@ -26,7 +11,7 @@ def Func(node):
     """Function declaration
 
 Contains: Declares Returns Params Block
-Property: name
+Property: name (of function)
 
 Examples:
     >>> print mc.qscript("function f()")
@@ -68,7 +53,7 @@ def Var(node):
 Writing a function as if a variable, is equivalent to calling the function
 without arguments.
 
-Property: name
+Property: name (of variable)
 
 Examples:
     >>> print mc.qscript("function f(); end; function g(); f")
@@ -84,6 +69,7 @@ Examples:
 """
     # push the job over to Get
     return Get(node)
+
 
 def Assigns(node):
     """Assignment where rhs is a function call and lhs are multiple returns.
@@ -128,7 +114,7 @@ def Returns(node):
 
 Adds type prefix and '&' (since they are to be placed in parameters)
 
-Contains: Return_variable*
+Contains: Return*
 
 Examples:
     >>> print mc.qscript("function [a,b]=f(); a=1, b=2.")
@@ -150,7 +136,7 @@ def Params(node):
 
 Adds type prefix.
 
-Contains: Parameter_variable*
+Contains: Var*
 
 Examples:
     >>> ftypes = {"f": {"a":"int", "b":"double"}}
@@ -171,19 +157,18 @@ Examples:
 def Declares(node):
     """Variables declared on the top of the function
 
-Contains: Declare_variable*
+Contains: Declare*
 
 Examples:
-    # >>> ftypes = {"f":}
     >>> print mc.qscript("function f(); a=1; b.c='2'; d.e(1)=[4,5]")
     void f()
     {
       _B b ;
-      _D d[100] ;
+      _D d ;
       int a ;
       a = 1 ;
       b.c = "2" ;
-      int _d [] = {4, 5} ;
+      sword _d [] = {4, 5} ;
       d.e[0] = irowvec(_d, 2, false) ;
     }
     """
@@ -243,8 +228,6 @@ Examples:
         out = out[:-2] + " ;"
 
     return out[1:]
-
-
 
 
 if __name__ == "__main__":
