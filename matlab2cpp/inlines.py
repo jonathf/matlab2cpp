@@ -1,4 +1,3 @@
-import snippets
 import os
 
 def retrieve(node, name, **kws):
