@@ -2,15 +2,21 @@
 
 import re
 import matlab2cpp
-
+set_ = set
 
 def set(D, code):
 
     for key, value in D.items():
 
-        value = "___" + key + '___' + value.replace('\n', '___')
         findterm = r'.*' + re.escape(key) + r'.*'
-        code = re.sub(findterm, value, code)
+        keys = set_(re.findall(findterm, code))
+
+        value = '___' + value.replace('\n', '___')
+
+        for key_ in keys:
+            findterm_ = re.escape(key_)
+            value_ = "___" + key_ + value
+            code = re.sub(findterm_, value_, code)
 
     return code
         
