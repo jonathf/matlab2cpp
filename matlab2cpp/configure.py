@@ -83,6 +83,7 @@ The resulting program will have the following complete form:
 
 import os
 import matlab2cpp as mc
+import rule._configure as con
 
 def configure(self, suggest=True, **kws):
     """
