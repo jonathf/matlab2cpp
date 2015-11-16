@@ -3,9 +3,25 @@ Anonymous/Lambda Functions
 """
 
 import matlab2cpp as mc
+
 from function import type_string
-from variables import *
 from assign import Assign
+
+def Get(node):
+    """Function call of an lambda function
+
+Contains: Expression*
+
+Examples:
+    >>> print mc.qscript("x = 4; f = @() x; y = f()")
+    x = 4 ;
+    f = [x] () {x ; } ;
+    y = f() ;
+    """
+    return "%(name)s(", ", ", ")"
+
+Var = "%(name)s"
+
 
 
 def Lambda(node):

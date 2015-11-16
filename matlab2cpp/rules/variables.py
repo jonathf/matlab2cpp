@@ -64,11 +64,9 @@ def Sset(node):
     return "%(name)s[", ", ", "-1].%(value)s"
 
 def Nset(node):
-#      node.typeerror()
     return "%(name)s.(", ", ", ")"
 
 def Get(node):
-#      node.typeerror()
     return "%(name)s(", ", ", ")"
 
 def Cget(node):
