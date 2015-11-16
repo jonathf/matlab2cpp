@@ -1,7 +1,22 @@
-Paren = "(%(0)s)"
+import matlab2cpp as mc
+
+def Paren(node):
+    """Parenthesis surounding expression.
+
+Examples:
+    >>> print mc.qscript("(1+2)*(3-4)")
+    (1+2)*(3-4) ;
+    """
+    return "(%(0)s)"
 
 def End(node):
-    """The 'end' statement indicating not end of block, but end-of-range."""
+    """The 'end' statement indicating not end of block, but end-of-range.
+    
+Examples:
+    >>> print mc.qscript("x = zeros(2,2,2); x(end, end, end)")
+    x = arma::zeros<cube>(2, 2, 2) ;
+    x(x.n_rows, x.n_cols, x.n_slices) ;
+    """
 
     # find context for what end refers to
     pnode = node
@@ -28,9 +43,35 @@ def End(node):
     else:
         node.error("end statement in arg>3")
 
+
 Break = "break"
 
 def Return(node):
+    """Return statement
+
+Examples:
+    >>> print mc.qscript("function f(); return")
+    void f()
+    {
+      return ;
+    }
+    >>> print mc.qscript("function y=f(); return; y=1")
+    int f()
+    {
+      int y ;
+      return y ;
+      y = 1 ;
+      return y ;
+    }
+    >>> print mc.qscript("function [y,z]=f(); return; y=1; z=2")
+    void f(int& y, int& z)
+    {
+      return ;
+      y = 1 ;
+      z = 2 ;
+    }
+
+    """
     func = node.func
     if func["backend"] == "func_returns":
         return "return"
@@ -45,19 +86,27 @@ def Return(node):
 # simple operators
 def Mul(node):
     """(Matrix-)multiplication
+
+Examples:
+    >>> print mc.qscript("a = [1,2,3]; b = [4;5;6]; c = a*b")
+    sword _a [] = {1, 2, 3} ;
+    a = irowvec(_a, 3, false) ;
+    sword _b [] = {4, 5, 6} ;
+    b = ivec(_b, 3, false) ;
+    c = a*b ;
     """
 
-    # unknown input
-    if node.type == "TYPE":
-        return "", "*", ""
-
-    # not numerical
-    if not node.num:
-        node.error("non-numerical multiplication %s" % str([n.type for n in node]))
+    if not node[0].num:
         return "", "*", ""
 
     dim = node[0].dim
+    mem = max(node[0].mem, 2)
+
     for child in node[1:]:
+
+        # not numerical
+        if not child.num:
+            return "", "*", ""
 
         if dim == 0:
             dim = child.dim
@@ -94,12 +143,22 @@ def Mul(node):
             elif child.dim == 3:
                 dim = 3
 
-    node.dim = dim
+        mem = max(mem, child.mem)
+
+    node.type = (dim, mem)
 
     return "", "*", ""
 
 def Elmul(node):
     """Element multiplication
+
+Examples:
+    >>> print mc.qscript("a = [1,2,3]; b = [4,5,6]; c = a.*b")
+    sword _a [] = {1, 2, 3} ;
+    a = irowvec(_a, 3, false) ;
+    sword _b [] = {4, 5, 6} ;
+    b = irowvec(_b, 3, false) ;
+    c = a%b ;
     """
 
     # unknown input
@@ -120,6 +179,16 @@ def Elmul(node):
     return "", "__percent__", ""
 
 def Plus(node):
+    """Addition
+
+Examples:
+    >>> print mc.qscript("a = [1,2,3]; b = [4,5,6]; c = a+b")
+    sword _a [] = {1, 2, 3} ;
+    a = irowvec(_a, 3, false) ;
+    sword _b [] = {4, 5, 6} ;
+    b = irowvec(_b, 3, false) ;
+    c = a+b ;
+    """
 
     # non-numerical addition
     if not node.num:
@@ -128,6 +197,16 @@ def Plus(node):
     return "", "+", ""
 
 def Minus(node):
+    """Subtraction
+
+Examples:
+    >>> print mc.qscript("a = [1,2,3]; b = [4,5,6]; c = a-b")
+    sword _a [] = {1, 2, 3} ;
+    a = irowvec(_a, 3, false) ;
+    sword _b [] = {4, 5, 6} ;
+    b = irowvec(_b, 3, false) ;
+    c = a-b ;
+    """
     return "", "-", ""
 
 Gt      = "", ">", ""
@@ -437,6 +516,11 @@ Not = "not ", "", ""
 
 def Transpose(node):
     """(Simple) transpose
+
+    >>> print mc.qscript("a = [1,2,3]; b = a.'")
+    sword _a [] = {1, 2, 3} ;
+    a = irowvec(_a, 3, false) ;
+    b = arma::strans(a) ;
     """
 
     # unknown datatype
@@ -459,6 +543,10 @@ def Transpose(node):
 
 def Ctranspose(node):
     """Complex transpose
+    >>> print mc.qscript("a = [1,2,3]; b = a'")
+    sword _a [] = {1, 2, 3} ;
+    a = irowvec(_a, 3, false) ;
+    b = arma::trans(a) ;
     """
 
     # unknown input
@@ -476,6 +564,17 @@ def Ctranspose(node):
     return "arma::trans(", "", ")"
 
 def Colon(node):
+    """Colon (as operator)
+
+Examples:
+    >>> print mc.qscript("a = 1:10; b = 1:10:2")
+    a = arma::span(1, 10) ;
+    b = m2cpp::span(1, 10, 2) ;
+    >>> print mc.qscript("a = [1,2,3]; a(1:2:2)")
+    sword _a [] = {1, 2, 3} ;
+    a = irowvec(_a, 3, false) ;
+    a(m2cpp::uspan(0, 2, 1)) ;
+    """
 
     # context: array argument (must always be uvec)
     if node.parent.cls in ("Get", "Cget", "Nget", "Fget", "Sget",
@@ -488,11 +587,10 @@ def Colon(node):
 
         # three arguments
         elif len(node) == 3:
-            node.include("uspan")
             return "m2cpp::uspan(%(0)s-1, %(1)s, %(2)s-1)"
 
         else:
-            return "", ":", ""
+            return "m2cpp::uspan(", ", ", ")"
 
     else:
 
@@ -520,9 +618,9 @@ def Colon(node):
         elif len(node) == 3:
             args = "(%(0)s, %(1)s, %(2)s)"
 
-        # no negative indices
-        if node.mem == 0:
-            return "m2cpp::uspan"+args
-
         return "m2cpp::span"+args
 
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

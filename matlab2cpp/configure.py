@@ -205,17 +205,25 @@ See also:
                 node.type = [n.type for n in node]
                 node.translate(only=True)
 
+            elif node.cls == "Assign" and node[0].cls != "Set" and node[0].type == "TYPE":
+                node[0].suggest = node[1].type
+
+
             if node.type == "TYPE":
 
-                if node.cls not in\
+                if node.cls == "Mul":
+                    node.translate(only=True)
+
+                elif node.cls in ("Transpose", "Ctranspose"):
+                    node.type = node[0].type
+                    if node[0].num and node[0].dim in (1,2):
+                        node.dim = 3-node[0].dim
+
+                elif node.cls not in\
                         ("Set", "Cset", "Fset", "Nset", "Sset",
                         "Get", "Cget", "Fget", "Nget", "Sget",
                         "Assign", "Assigns"):
                     node.type = [n.type for n in node]
-
-                if node.cls in ("Div", "Eldiv", "Rdiv", "Elrdiv"):
-                    if node.num and node.mem < 2:
-                        node.mem = 2
 
                 elif node.cls == "Fvar":
                     node.declare.type = node.type
@@ -228,17 +236,18 @@ See also:
                 var, range = node[:2]
                 var.suggest = "int"
 
-            elif node.cls == "Assign" and node[0].cls != "Set":
-                node[0].suggest = node[1].type
-
             elif node.cls == "Neg" and node[0].mem == 0:
                 node.mem = 1
+
+
+
 
         if suggest:
 
             complete = True
 
             for program in self.project:
+                
                 suggests = program.suggest
                 program.stypes = suggests
                 program.ftypes = suggests
