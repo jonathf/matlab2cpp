@@ -1,1 +1,1 @@
-Verbatim = "%(value)s"
+Verbatim = "// %(name)s\n%(value)s"
