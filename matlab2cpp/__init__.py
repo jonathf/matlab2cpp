@@ -26,9 +26,7 @@ The toolbox is sorted into the following modules:
 +----------------------------------+--------------------------------------+
 | :py:mod:`~matlab2cpp.collection` | The collcetion of various node       |
 +----------------------------------+--------------------------------------+
-| :py:mod:`~matlab2cpp.rule`       | Translation rules                    |
-+----------------------------------+--------------------------------------+
-| :py:mod:`~matlab2cpp.inlines`    | Code insertion                       |
+| :py:mod:`~matlab2cpp.rules`      | Translation rules                    |
 +----------------------------------+--------------------------------------+
 
 The simplest way to use the library is to use the quick translation functions.

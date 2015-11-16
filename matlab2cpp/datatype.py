@@ -49,8 +49,6 @@ The non-numerical types are as follows:
 +---------------+------------------------+
 | *func_lambda* | Anonymous function     |
 +---------------+------------------------+
-| *wall_clock*  | Timer function         |
-+---------------+------------------------+
 
 Numerical datatypes
 ~~~~~~~~~~~~~~~~~~~

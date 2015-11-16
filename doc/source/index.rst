@@ -12,5 +12,4 @@ Matlab2cpp
     node
     collection
     rules
-    inlines
 

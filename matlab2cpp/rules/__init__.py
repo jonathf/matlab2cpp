@@ -84,14 +84,14 @@ a string or tuple in the same way as the directly defined string and tuple are
 define so far. For example, without addressing how one can use `node`, the
 following is equivalent:
 
-    >>> Plus = "", "+", ""
+    >>> Plus = "", "+ ", ""
     >>> print mc.qscript("2+3", Plus=Plus)
-    2+3 ;
+    2+ 3 ;
     >>> def Plus(node):
-    ...     return "", "+", ""
+    ...     return "", " +", ""
     ...
     >>> print mc.qscript("2+3", Plus=Plus)
-    2+3 ;
+    2 +3 ;
 """
 
 import matlab2cpp as mc
