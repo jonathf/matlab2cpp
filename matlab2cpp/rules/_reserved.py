@@ -1,7 +1,7 @@
 """
 Reserved translation rules
 
-See :py:set:`~matlab2cpp.rules.reserved<rules.reserved>` for a collection of
+See :py:attr:`rules.reserved <matlab2cpp.rules.reserved>` for a collection of
 set of the various reserved words implemented into matlab2cpp.
 """
 
