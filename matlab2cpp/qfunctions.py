@@ -137,11 +137,12 @@ See also:
         tree_ = code
         if isinstance(tree_, tree.builder.Builder):
             tree_ = tree_[0]
-        if tree_.cls != "Program":
-            raise KeyError(
-        "Argument code should be code string, Builder or Program-node")
 
-    tree_.translate()
+    tree_ = tree_.program
+
+    if not tree_.str:
+        tree_.translate()
+
     includes, funcs, inlines, structs, headers, log = tree_.program
 
     out = ""

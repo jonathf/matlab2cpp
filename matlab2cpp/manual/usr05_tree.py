@@ -1,4 +1,6 @@
 """
+.. _usr05:
+
 Creating node tree
 ===================
 

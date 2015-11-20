@@ -19,19 +19,19 @@ used in translation.
 Datatypes can be roughly split into two groups: **numerical** and
 **non-numerical** types.  The numerical types are as follows:
 
-+-----------------+--------------+---------+---------+--------+-----------+
-|                 | unsigned int | int     | float   | double | complex   |
-+=================+==============+=========+=========+========+===========+
-| **scalar**      | uword        | int     | float   | double | cx_double |
-+-----------------+--------------+---------+---------+--------+-----------+
-| **vector**      | uvec         | ivec    | fvec    | vec    | cx_vec    |
-+-----------------+--------------+---------+---------+--------+-----------+
-| **row\-vector** | urowvec      | irowvec | frowvec | rowvec | cx_rowvec |
-+-----------------+--------------+---------+---------+--------+-----------+
-| **matrix**      | umat         | imat    | fmat    | mat    | cx_mat    |
-+-----------------+--------------+---------+---------+--------+-----------+
-| **cube**        | ucube        | icube   | fcube   | cube   | cx_cube   |
-+-----------------+--------------+---------+---------+--------+-----------+
++---------------+--------------+---------+---------+--------+-----------+
+|               | unsigned int | int     | float   | double | complex   |
++===============+==============+=========+=========+========+===========+
+| `scalar`      | uword        | int     | float   | double | cx_double |
++---------------+--------------+---------+---------+--------+-----------+
+| `vector`      | uvec         | ivec    | fvec    | vec    | cx_vec    |
++---------------+--------------+---------+---------+--------+-----------+
+| `row\-vector` | urowvec      | irowvec | frowvec | rowvec | cx_rowvec |
++---------------+--------------+---------+---------+--------+-----------+
+| `matrix`      | umat         | imat    | fmat    | mat    | cx_mat    |
++---------------+--------------+---------+---------+--------+-----------+
+| `cube`        | ucube        | icube   | fcube   | cube   | cx_cube   |
++---------------+--------------+---------+---------+--------+-----------+
 
 Values along the horizontal axis represents the amount of memory reserved per
 element, and the along the vertical axis represents the various number of
@@ -39,26 +39,26 @@ dimensions.  The names are equivalent to the ones in the Armadillo package.
 
 The non-numerical types are as follows:
 
-+-----------------+------------------------+
-| Name            | Description            |
-+=================+========================+
-| **char**        | Single text character  |
-+-----------------+------------------------+
-| **string**      | Text string            |
-+-----------------+------------------------+
-| **struct**      | Struct container       |
-+-----------------+------------------------+
-| **structs**     | Struct array container |
-+-----------------+------------------------+
-| **func_lambda** | Anonymous function     |
-+-----------------+------------------------+
++----------------------------------+------------------------+
+| Name                             | Description            |
++==================================+========================+
+| `char`                           | Single text character  |
++----------------------------------+------------------------+
+| `string`                         | Text string            |
++----------------------------------+------------------------+
+| :ref:`struct <struct>`           | Struct container       |
++----------------------------------+------------------------+
+| :ref:`structs <structs>`         | Struct array container |
++----------------------------------+------------------------+
+| :ref:`func_lambda <func_lambda>` | Anonymous function     |
++----------------------------------+------------------------+
 
 The node datatype can be referenced by any node through `node.type` and can be
-inserted as placeholder through `%(type)s`. For example::
+inserted as placeholder through ``%(type)s``. For example::
 
     >>> def Var(node):
-    ...     if node.name == "x":    node.type = "vec"
-    ...     else:                   node.type = "rowvec"
+    ...     if node.name == "x": node.type = "vec"
+    ...     if node.name == "y": node.type = "rowvec"
     ...     return node.name
     >>> print mc.qscript("function f(x,y)", Var=Var)
     void f(vec x, rowvec y)
@@ -71,24 +71,23 @@ Function scope
 
 If not specified otherwise, the program will not assign datatype types to any
 of variables. The user could in theory navigate the node tree and assign the
-variables one by one using the node attributes to navigate. (See :ref:`usr04`
-for details.) However that would be very cumbersome. Instead the datatypes are
-define collectively inside their scope. In the case of variables in functions,
-the scope variables are the variables declaration
+variables one by one using the node attributes to navigate. (See section
+:ref:`usr04` for details.) However that would be very cumbersome. Instead the
+datatypes are define collectively inside their scope. In the case of variables
+in functions, the scope variables are the variables declaration
 :py:class:`~matlab2cpp.Declares` and function parameters
 :py:class:`~matlab2cpp.Params`. To reach the variable that serves as
 a scope-wide type, the node attribute :py:attr:`~matlab2cpp.Node.declare` can
 be used.
 
 Manually interacting with the variable scope is simpler then iterating through
-the full tree, but can in many cases still be
-
-can
-be inserted much simpler into the program using supplement attribute 
+the full tree, but can in many cases still be cumbersome. To simplefy
+interaction with datatype scopes, each program has an suppliment attribute
 :py:attr:`~matlab2cpp.Node.ftypes`. The attribute is a nested dictionary where
 the outer shell represents the function name the variables are defined. The
 inner shell is the variables where keys are variable names and values are
-types. For example::
+types. It can be used to quickly retrievieng and inserting datatypes.
+For example::
 
     >>> tree = mc.build("function f(a)")
     >>> print tree.ftypes
@@ -100,30 +99,283 @@ types. For example::
       // Empty block
     }
 
-Here there is one function scope defined by `f`, with one variable `a`.
 
-
-
+.. _func_lambda:
 
 Anonymous functions
-~~~~~~~~~~~~~~~~~~~
-.. automodule:: matlab2cpp.supplement.functions
+-------------------
 
-Data structures
-~~~~~~~~~~~~~~~
-.. automodule:: matlab2cpp.supplement.structs
+In addition to normal function, Matlab have support for anonymous function
+through the name prefix ``@``.  For example::
 
-Suggestions
-~~~~~~~~~~~
-.. automodule:: matlab2cpp.supplement.suggests
+    >>> print mc.qscript("function f(); g = @(x) x^2; g(4)")
+    void f()
+    {
+      std::function<int(int)> g ;
+      g = [] (int x) {pow(x,2) ; } ;
+      g(4) ;
+    }
 
-Includes
-~~~~~~~~
-.. automodule:: matlab2cpp.supplement.includes
+The translator creates an ``C++11`` lambda function with equivalent
+functionality.  To achieve this, the translator creates an extra function in
+the node-tree.  The name of the function is the same as assigned variable with
+a ``_``-prefix (and a number postfix, if name is taken).  The information about
+this function dictate the behaviour of the output The supplement file have the
+following form::
+
+    >>> print mc.qpy("function f(); g = @(x) x^2; g(4)")
+    functions = {
+      "_g" : {
+              "x" : "int",
+      },
+      "f" : {
+        "g" : "func_lambda",
+      },
+    }
+    includes = [
+      '#include <armadillo>',
+      'using namespace arma ;',
+    ]
+
+The function `g` is a variable inside `f`'s function scope.  It has the datatype
+`func_lambda` to indicate that it should be handled as a function.  The
+associated function scope `_g` contains the variables inside the definition of
+the anonymous function.
+
+
+.. _struct:
+
+Data structure
+--------------
+
+Data structures in Matlab can be constructed explicitly through the
+``struct``-function.  However, they can also be constructed implicitly by
+direct assignment.  For example will ``a.b=4`` create a ``struct`` with name
+``a`` that has one field ``b``.  When translating such a snippet, it creates
+a C++-struct, such that::
+
+    >>> print mc.qhpp("function f(); a.b = 4.", suggest=True)
+    #include <armadillo>
+    using namespace arma ;
+    <BLANKLINE>
+    struct _A
+    {
+      double b ;
+    } ;
+    <BLANKLINE>
+    void f()
+    {
+      _A a ;
+      a.b = 4. ;
+    }
+
+In the suppliment file, the local variable `a` will be assigned as a `struct`.
+In addition, since the struct has content, the suppliment file creates a new
+section for structs.  It will have the following form::
+
+    >>> print mc.qpy("function f(); a.b = 4.", suggest=True)
+    functions = {
+      "f" : {
+        "a" : "struct",
+      },
+    }
+    structs = {
+      "a" : {
+        "b" : "double",
+      },
+    }
+    includes = [
+      '#include <armadillo>',
+      'using namespace arma ;',
+    ]
+
+Quick retrieving and inserting struct variables can be done through the
+:py:attr:`~matlab2cpp.Node.stypes` attribute::
+
+    >>> tree = mc.build("a.b = 4")
+    >>> tree.ftypes = {"f": {"a": "struct"}}
+    >>> tree.stypes = {"a": {"b": "double"}}
+    >>> print mc.qcpp(tree)
+    #include <armadillo>
+    using namespace arma ;
+    <BLANKLINE>
+    struct _A
+    {
+      double b ;
+    } ;
+    <BLANKLINE>
+    int main(int argc, char** argv)
+    {
+      _A a ;
+      a.b = (double) 4 ;
+      return 0 ;
+    }
+
+.. _structs:
+
+Struct tables
+-------------
+
+Given that the data structure is indexed, e.g. ``a(1).b``, it forms a struct
+table.  Very similar to regular :ref:`structs <struct>`, which only has one
+value per element.  There are a couple of differences in the translation.
+First, the struct is declared as an array:
+
+    >>> print mc.qhpp("function f(); a(1).b = 4.", suggest=True)
+    #include <armadillo>
+    using namespace arma ;
+    <BLANKLINE>
+    struct _A
+    {
+      double b ;
+    } ;
+    <BLANKLINE>
+    void f()
+    {
+      _A a[100] ;
+      a[0].b = 4. ;
+    }
+
+The translation assigned reserves 100 pointers for the content of ``a``.
+Obviously, there are situations where this isn't enough (or too much), and the
+number should be increased. So second, to adjust this number, the suppliment
+file specifies the number of elements in the integer ``_size``:
+
+    >>> print mc.qpy("function f(); a(1).b = 4.", suggest=True)
+    functions = {
+      "f" : {
+        "a" : "structs",
+      },
+    }
+    structs = {
+      "a" : {
+        "_size" : 100,
+            "b" : "double",
+      },
+    }
+    includes = [
+      '#include <armadillo>',
+      'using namespace arma ;',
+    ]
+
 
 Suggestion engine
 -----------------
-.. automodule:: matlab2cpp.configure
+
+The examples so far, when the functions :py:func:`~matlab2cpp.qcpp`,
+:py:func:`~matlab2cpp.qhpp` and :py:func:`~matlab2cpp.qpy` are used, the
+argument ``suggest=True`` have been used, and all variable types have been
+filled in. Consider the following program where this is not the case::
+
+    >>> print mc.qhpp("function c=f(); a = 4; b = 4.; c = a+b", suggest=False)
+    #include <armadillo>
+    using namespace arma ;
+    <BLANKLINE>
+    TYPE f()
+    {
+      TYPE a, b, c ;
+      a = 4 ;
+      b = 4. ;
+      c = a+b ;
+      return c ;
+    }
+
+Since all variables are unknown, the program decides to fill in the dummy
+variable ``TYPE`` for each unknown variable. Any time variables are unknown,
+``TYPE`` is used. The supplement file created by `mconvert` or
+:py:func:`~matlab2cpp.qpy` reflects all these unknown variables as follows::
+
+    >>> print mc.qpy("function c=f(); a = 4; b = 4.; c = a+b", suggest=False)
+    functions = {
+      "f" : {
+        "a" : "", # int
+        "b" : "", # double
+        "c" : "",
+      },
+    }
+    includes = [
+      '#include <armadillo>',
+      'using namespace arma ;',
+    ]
+
+By flipping the boolean to ``True``, all the variables get assigned datatypes::
+
+    >>> print mc.qpy("function c=f(); a = 4; b = 4.; c = a+b", suggest=True)
+    functions = {
+      "f" : {
+        "a" : "int",
+        "b" : "double",
+        "c" : "double",
+      },
+    }
+    includes = [
+      '#include <armadillo>',
+      'using namespace arma ;',
+    ]
+
+The resulting program will have the following complete form:
+
+    >>> print mc.qhpp(
+    ...     "function c=f(); a = 4; b = 4.; c = a+b", suggest=True)
+    #include <armadillo>
+    using namespace arma ;
+    <BLANKLINE>
+    double f()
+    {
+      double b, c ;
+      int a ;
+      a = 4 ;
+      b = 4. ;
+      c = a+b ;
+      return c ;
+    }
+
+Note here though that the variable ``c`` didn't have a suggestion. The
+suggestion is an interactive process such that ``a`` and ``b`` both must be
+known beforehand.  The variable ``a`` and ``b`` get assigned the datatypes
+``int`` and ``double`` because of the direct assignment of variable.  After
+this, the process starts over and tries to find other variables that suggestion
+could fill out for.  In the case of the ``c`` variable, the assignment on the
+right were and addition between ``int`` and ``double``.  To not loose
+precision, it then chooses to keep `double`, which is passed on to the ``c``
+variable.  In practice the suggestions can potentially fill in all datatypes
+automatically in large programs, and often quite intelligently. For example,
+variables get suggested across function call scope::
+
+    >>> print mc.qscript('function y=f(x); y=x; function g(); z=f(4)')
+    int f(int x)
+    {
+      int y ;
+      y = x ;
+      return y ;
+    }
+    <BLANKLINE>
+    void g()
+    {
+      int z ;
+      z = f(4) ;
+    }
+
+And accross multiple files::
+
+    >>> builder = mc.Builder()
+    >>> builder.load("f.m", "function y=f(x); y=x")
+    >>> builder.load("g.m", "function g(); z=f(4)")
+    >>> builder.configure(suggest=True)
+    >>> tree_f, tree_g = builder[:]
+    >>> print mc.qscript(tree_f)
+    int f(int x)
+    {
+      int y ;
+      y = x ;
+      return y ;
+    }
+    >>> print mc.qscript(tree_g)
+    void g()
+    {
+      int z ;
+      z = f(4) ;
+    }
 """
 import matlab2cpp as mc
 
