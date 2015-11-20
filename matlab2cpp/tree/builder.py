@@ -108,6 +108,7 @@ import iterate
 import assign
 import codeblock
 import suppliment
+import identify
 
 import matlab2cpp as mc
 
@@ -439,7 +440,9 @@ Example::
 
 
     def iterate_list(self, cur):
-        return iterate.list(self, cur)
+        if identify.space_delimited(self, cur):
+            return self.iterate_space_list(cur)
+        return self.iterate_comma_list(cur)
 
     def iterate_comma_list(self, cur):
         return iterate.comma_list(self, cur)

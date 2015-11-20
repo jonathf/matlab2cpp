@@ -1,33 +1,32 @@
 """
-The simplest way to interact with the `Matlab2cpp`-toolbox is to use the
-`mconvert` frontend.  The script automatically creates files with various
-extensions containing translations and/or meta-information.
-Even though `mconvert` is sufficient for performing all code translation, many
-of the examples in this manual are done through a python interface, since some
-of the python functionality also will be discussed.  Given that `Matlab2cpp`
-is properly installed on your system, the python library is available in
-Python's path.  For the examples, the module is assumed imported as
-
-    >>> import matlab2cpp as mc
 
 The toolbox is sorted into the following modules:
 
-+----------------------------------+--------------------------------------+
-| Module                           | Description                          |
-+==================================+======================================+
-| :py:mod:`~matlab2cpp.qfunctions` | Functions for performing simple      |
-|                                  | translations                         |
-+----------------------------------+--------------------------------------+
-| :py:mod:`~matlab2cpp.tree`       | Constructing a tree from Matlab code |
-+----------------------------------+--------------------------------------+
-| :py:mod:`~matlab2cpp.datatype`   | The various node data types          |
-+----------------------------------+--------------------------------------+
-| :py:mod:`~matlab2cpp.node`       | Node behavior                        |
-+----------------------------------+--------------------------------------+
-| :py:mod:`~matlab2cpp.collection` | The collcetion of various node       |
-+----------------------------------+--------------------------------------+
-| :py:mod:`~matlab2cpp.rules`      | Translation rules                    |
-+----------------------------------+--------------------------------------+
++----------------------------------+----------------------------------------+
+| Module                           | Description                            |
++==================================+========================================+
+| :py:mod:`~matlab2cpp.qfunctions` | Functions for performing simple        |
+|                                  | translations                           |
++----------------------------------+----------------------------------------+
+| :py:mod:`~matlab2cpp.tree`       | Constructing a tree from Matlab code   |
++----------------------------------+----------------------------------------+
+| :py:mod:`~matlab2cpp.node`       | Node behavior                          |
++----------------------------------+----------------------------------------+
+| :py:mod:`~matlab2cpp.datatype`   | The various node data types            |
++----------------------------------+----------------------------------------+
+| :py:mod:`~matlab2cpp.configure`  | Rutine for setting datatype            |
+|                                  | automatically                          |
++----------------------------------+----------------------------------------+
+| :py:mod:`~matlab2cpp.collection` | The collcetion of various node         |
++----------------------------------+----------------------------------------+
+| :py:mod:`~matlab2cpp.rules`      | Translation rules                      |
++----------------------------------+----------------------------------------+
+| :py:mod:`~matlab2cpp.supplement` | Functions for inserting and extraction |
+|                                  | datatypes                              |
++----------------------------------+----------------------------------------+
+| :py:mod:`~matlab2cpp.testsuite`  | Suite for testing software             |
++----------------------------------+----------------------------------------+
+
 
 The simplest way to use the library is to use the quick translation functions.
 They are available through the `mc.qfunctions` module and mirrors the
@@ -48,9 +47,9 @@ import tree
 
 import qfunctions
 import collection
-import inlines
 import configure
 import rules
+import manual
 
 __all__ = ["main"]
 

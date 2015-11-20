@@ -1,12 +1,5 @@
 """
-Quick functions collection of frontend tools for performing code translation.
-Each of the function :py:func:`~matlab2cpp.qcpp`, :py:func:`~matlab2cpp.qhpp`,
-:py:func:`~matlab2cpp.qpy` and :py:func:`~matlab2cpp.qlog` are directly related
-to the functionality of the :program:`mconvert` script. The name indicate the
-file extension that the script will create.  In addition there are the three
-functions :py:func:`~matlab2cpp.qtree` and :py:func:`~matlab2cpp.qscript`. The
-former represents a summary of the created node tree. The latter is a simple
-translation tool that is more of a one-to-one translation.
+Various function for creating quick translations.
 
 ==============================  ===========
 Function                        Description
@@ -19,7 +12,6 @@ Function                        Description
 :py:func:`~matlab2cpp.qscript`  Create quick code translation
 :py:func:`~matlab2cpp.qtree`    Create summary of node tree
 ==============================  ===========
-
 """
 
 import supplement

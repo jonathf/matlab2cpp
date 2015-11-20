@@ -1,5 +1,5 @@
 import re
-import math
+import os
 
 import reference
 import matlab2cpp
@@ -413,12 +413,13 @@ def translate(node, opt=None):
 
 def translate_one(node, opt):
 
-    if node.program.parent.kws.get(node.cls, None):
+    value = node.program.parent.kws.get(node.cls+"_"+node.name, None)
 
+    if value is None:
         value = node.program.parent.kws.get(node.cls, None)
 
-    else:
-
+    if value is None:
+        
         backend = node.backend
         if backend == "TYPE":
             backend = "unknown"
@@ -486,7 +487,28 @@ def translate_one(node, opt):
 
 def include(node, name, **kws):
 
-    include_code, library_code = matlab2cpp.inlines.retrieve(node, name, **kws)
+    if os.path.isfile(name):
+
+        name = os.path.relpath(name, os.path.dirname(node.program.name))
+        include_code = '#include "%s.hpp"' % name
+        library_code = ""
+
+        if node.name == name:
+            include_code = ""
+
+    else:
+
+        library_code = ""
+        if name == "SPlot":
+            include_code = '#include "SPlot.h"'
+
+        elif name == "m2cpp":
+            include_code = '#include "m2cpp.h"'
+
+        elif name == "arma":
+            include_code = "#include <armadillo>"
+        else:
+            include_code = ""
 
     includes = node.program[0]
     if include_code and include_code not in includes.names:

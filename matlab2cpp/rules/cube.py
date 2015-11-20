@@ -11,7 +11,7 @@ def Get(node):
         else:
             node.error("More than three arguments in a cube call")
 
-        return "%(name)s(", ", ", ")"
+        return "%(name)s(", "-1, ", "-1)"
 
 
     # Single argument
@@ -21,7 +21,7 @@ def Get(node):
 
         # unknown input
         if dim == -1:
-            return "%(name)s(%(0)s)"
+            return "%(name)s(%(0)s-1)"
 
         # scalar input
         if dim == 0:
@@ -38,7 +38,7 @@ def Get(node):
 
         # unkonwn input
         if -1 in (dim0, dim1):
-            return "%(name)s(", ", ", ")"
+            return "%(name)s(", "-1, ", "-1)"
 
         # Configure dimensions
         if dim0:
@@ -65,7 +65,7 @@ def Get(node):
 
         # unknown arguments
         if -1 in (dim0, dim1, dim2):
-            return "%(name)s(", ", ", ")"
+            return "%(name)s(", "-1, ", "-1)"
 
         # Configure dimensions
         if dim0:
@@ -104,7 +104,7 @@ def Set(node):
         else:
             node.error("More than three arguments in a cube set")
 
-        return "%(name)s(", ", ", ")"
+        return "%(name)s(", "-1, ", "-1)"
 
     # Single argument
     if len(node) == 1:
@@ -113,7 +113,7 @@ def Set(node):
 
         # unknown arguments
         if dim == -1:
-            return "%(name)s(%(0)s)"
+            return "%(name)s(%(0)s-1)"
 
         # if scalar arg, set node as scalar
         if dim == 0:
@@ -130,7 +130,7 @@ def Set(node):
 
         # unknown args
         if -1 in (dim0, dim1):
-            return "%(name)s(", ", ", ")"
+            return "%(name)s(", "-1, ", "-1)"
 
         node = node.resize() # matlab to armadillo fix for cubes
 

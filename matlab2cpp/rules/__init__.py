@@ -1,97 +1,98 @@
 """
-Given a fully configured node-tree, the job can start to make a translation.
-The translation is the application of a set of translation rules.
-The rules are collected in the folder `rules`. All files contained in the folder
-tarts with the prefix `_` (to avoid conflicting names with the python
-interpreter) and a `.py` extension indicating that the code just a traditional
-python script.
+.. _rules:
 
-Starting with the simplest form of translation is to define a simple string. For
-example:
+Datatype driven rules have the same name as datatypes reference in
+:py:mod:`~matlab2cpp.datatype`. They are as follows:
 
-    >>> Int = "6"
++-----------+----------------------------------------+------------------+
+| Datatype  | Rule                                   | Description      |
++===========+========================================+==================+
+| cell      | :py:mod:`~matlab2cpp.rules._cell`      | Cell structure   |
++-----------+----------------------------------------+------------------+
+| char      | :py:mod:`~matlab2cpp.rules._char`      | Word character   |
++-----------+----------------------------------------+------------------+
+| cube      | :py:mod:`~matlab2cpp.rules._cube`      | Armadillo cube   |
++-----------+----------------------------------------+------------------+
+| cx_cube   | :py:mod:`~matlab2cpp.rules._cx_cube`   | Armadillo cube   |
++-----------+----------------------------------------+------------------+
+| cx_double | :py:mod:`~matlab2cpp.rules._cx_double` | Scalar complex   |
++-----------+----------------------------------------+------------------+
+| cx_mat    | :py:mod:`~matlab2cpp.rules._cx_mat`    | Armadillo matrix |
++-----------+----------------------------------------+------------------+
+| cx_rowvec | :py:mod:`~matlab2cpp.rules._cx_rowvec` | Armadillo rowvec |
++-----------+----------------------------------------+------------------+
+| cx_vec    | :py:mod:`~matlab2cpp.rules._cx_vec`    | Armadillo colvec |
++-----------+----------------------------------------+------------------+
+| double    | :py:mod:`~matlab2cpp.rules._double`    | Scalar double    |
++-----------+----------------------------------------+------------------+
+| fcube     | :py:mod:`~matlab2cpp.rules._fcube`     | Armadillo cube   |
++-----------+----------------------------------------+------------------+
+| float     | :py:mod:`~matlab2cpp.rules._float`     | Scalar float     |
++-----------+----------------------------------------+------------------+
+| fmat      | :py:mod:`~matlab2cpp.rules._fmat`      | Armadillo matrix |
++-----------+----------------------------------------+------------------+
+| frowvec   | :py:mod:`~matlab2cpp.rules._frowvec`   | Armadillo rowvec |
++-----------+----------------------------------------+------------------+
+| fvec      | :py:mod:`~matlab2cpp.rules._fvec`      | Armadillo colvec |
++-----------+----------------------------------------+------------------+
+| icube     | :py:mod:`~matlab2cpp.rules._icube`     | Armadillo cube   |
++-----------+----------------------------------------+------------------+
+| imat      | :py:mod:`~matlab2cpp.rules._imat`      | Armadillo matrix |
++-----------+----------------------------------------+------------------+
+| int       | :py:mod:`~matlab2cpp.rules._int`       | Scalar integer   |
++-----------+----------------------------------------+------------------+
+| irowvec   | :py:mod:`~matlab2cpp.rules._irowvec`   | Armadillo rowvec |
++-----------+----------------------------------------+------------------+
+| ivec      | :py:mod:`~matlab2cpp.rules._ivec`      | Armadillo colvec |
++-----------+----------------------------------------+------------------+
+| mat       | :py:mod:`~matlab2cpp.rules._mat`       | Armadillo matrix |
++-----------+----------------------------------------+------------------+
+| rowvec    | :py:mod:`~matlab2cpp.rules._rowvec`    | Armadillo rowvec |
++-----------+----------------------------------------+------------------+
+| string    | :py:mod:`~matlab2cpp.rules._string`    | Character string |
++-----------+----------------------------------------+------------------+
+| struct    | :py:mod:`~matlab2cpp.rules._struct`    | Struct           |
++-----------+----------------------------------------+------------------+
+| structs   | :py:mod:`~matlab2cpp.rules._structs`   | Array of structs |
++-----------+----------------------------------------+------------------+
+| ucube     | :py:mod:`~matlab2cpp.rules._ucube`     | Armadillo cube   |
++-----------+----------------------------------------+------------------+
+| umat      | :py:mod:`~matlab2cpp.rules._umat`      | Armadillo matrix |
++-----------+----------------------------------------+------------------+
+| urowvec   | :py:mod:`~matlab2cpp.rules._urowvec`   | Armadillo rowvec |
++-----------+----------------------------------------+------------------+
+| uvec      | :py:mod:`~matlab2cpp.rules._uvec`      | Armadillo colvec |
++-----------+----------------------------------------+------------------+
+| uword     | :py:mod:`~matlab2cpp.rules._uword`     | Scalar uword     |
++-----------+----------------------------------------+------------------+
+| vec       | :py:mod:`~matlab2cpp.rules._vec`       | Armadillo colvec |
++-----------+----------------------------------------+------------------+
 
-The name `Int` (with capital letter) represents the node the rule is applicable
-for, the right hand side when it is a string, will be used as the translation
-every time `Int` occurs. To illustrate this, consider the following simple
-example:
+These basic types are then glued together through the following:
 
-    >>> print mc.qscript("5")
-    5 ;
-
-To implement the new rule we (globally) insert the rule for all instances of
-`Int` as follows:
-
-    >>> print mc.qscript("5", Int=Int)
-    6 ;
-
-Obviously, this type of translation is very useful except for a very few
-exceptions. First of all, each `int` (and obviously many other nodes) contain
-a value. To represent this value, the translation rule uses string
-interpolation. This can be implemented as follows:
-
-    >>> Int = "%(value)s+1"
-    >>> print mc.qscript("5", Int=Int)
-    5+1 ;
-
-There are also other place holder names. For example, variables `Var` have
-a name, which refer to it's scope defined name.  For example:
-
-    >>> Var = "__%(name)s__"
-    >>> print mc.qscript("a = 4", Var=Var)
-    __a__ = 4 ;
-
-Since all the code is structured as a node tree, many of the node have node
-children. The translation is performed leaf-to-root, implying that at the time
-of translation of any node, all of it's children are already translated and
-available in interpolation. The children are indexed by number, counting from 0.
-For example:
-
-    >>> print mc.qscript("2+3")
-    2+3 ;
-
-Here we have an addition node `Plus`, with two children, both `Int`. They are
-respectively index 0 and 1. We can use this information to manipulate how the
-addition works:
-
-    >>> Plus = "%(1)s+%(0)s"
-    >>> print mc.qscript("2+3", Plus=Plus)
-    3+2 ;
-
-One obvious problem with this approach is that the number of children of node
-might be variable. For example the `Plus` in "2+3" has two children while
-"1+2+3" has three. To address nodes with variable number of node children,
-alternative representation can be used. Instead of defining a string, a tuple of
-three string can be used. They represents prefix, infix and postfix between each
-node child. For example:
-
-    >>> Plus = "", "+", ""
-
-It implies that there should be noting in front, in between each node child,
-a "+" should be used, and nothing at the ends. In practice we get:
-
-    >>> print mc.qscript("2+3", Plus=Plus)
-    2+3 ;
-    >>> print mc.qscript("1+2+3", Plus=Plus)
-    1+2+3 ;
-
-And this is the full extent of how the system uses string values. However, in
-practice, they are not used much. Instead functions are used. They are defined
-with the same name the class (the software figures the details out what is
-what). This function should always take a single `node` argument which
-represents the current node in the node tree. The function should return either
-a string or tuple in the same way as the directly defined string and tuple are
-define so far. For example, without addressing how one can use `node`, the
-following is equivalent:
-
-    >>> Plus = "", "+ ", ""
-    >>> print mc.qscript("2+3", Plus=Plus)
-    2+ 3 ;
-    >>> def Plus(node):
-    ...     return "", " +", ""
-    ...
-    >>> print mc.qscript("2+3", Plus=Plus)
-    2 +3 ;
++-------------------------------------------+---------------------------------------+
+| Rule                                      | Description                           |
++===========================================+=======================================+
+| :py:mod:`~matlab2cpp.rules._code_block`   | Branches, loops etc.                  |
++-------------------------------------------+---------------------------------------+
+| :py:mod:`~matlab2cpp.rules._expression`   | Operators and special characters      |
++-------------------------------------------+---------------------------------------+
+| :py:mod:`~matlab2cpp.rules._func_lambda`  | Anonymous functions                   |
++-------------------------------------------+---------------------------------------+
+| :py:mod:`~matlab2cpp.rules._func_return`  | Functions with one return value       |
++-------------------------------------------+---------------------------------------+
+| :py:mod:`~matlab2cpp.rules._func_returns` | Functions with multiple return values |
++-------------------------------------------+---------------------------------------+
+| :py:mod:`~matlab2cpp.rules._matrix`       | Matrix constructor                    |
++-------------------------------------------+---------------------------------------+
+| :py:mod:`~matlab2cpp.rules._program`      | Program postprocessing                |
++-------------------------------------------+---------------------------------------+
+| :py:mod:`~matlab2cpp.rules._reserved`     | Reserved names from Matlab library    |
++-------------------------------------------+---------------------------------------+
+| :py:mod:`~matlab2cpp.rules._unknown`      | Structures with unknown origin        |
++-------------------------------------------+---------------------------------------+
+| :py:mod:`~matlab2cpp.rules._verbatim`     | Special verbatim translations         |
++-------------------------------------------+---------------------------------------+
 """
 
 import matlab2cpp as mc
@@ -104,6 +105,8 @@ for name in glob.glob(os.path.dirname(__file__)+sep+"*.py"):
     name = name.split(sep)[-1]
     if name != "__init__":
         exec("import %s" % name[:-3])
+
+from _reserved import reserved
 
 if __name__ == "__main__":
     import doctest
