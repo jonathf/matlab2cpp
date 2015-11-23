@@ -554,7 +554,7 @@ def plotting(node):
     statement.translate()
 
     # swap with last statement, if it is a return-statement
-    if block[-2][0].cls == "Return":
+    if len(block)>1 and block[-2] and block[-2][0].cls == "Return":
         block.children[-1], block.children[-2] = \
                 block.children[-2], block.children[-1]
 
