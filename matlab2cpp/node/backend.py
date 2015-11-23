@@ -113,7 +113,7 @@ See also:
 
 def auxillary(node, type, convert):
 
-    assert node.parent["class"] != "Assign",\
+    assert node.parent.cls != "Assign",\
             ".auxiliary() must be triggered mid expression."
 
     type = type or node.type

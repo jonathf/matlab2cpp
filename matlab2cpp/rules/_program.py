@@ -159,7 +159,7 @@ def Warning(node):
 
 def Struct(node):
 
-    name = "_"+node["name"].capitalize()
+    name = "_"+node.name.capitalize()
     out = "struct " + name + "\n{"
 
     declares = {}

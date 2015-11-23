@@ -114,7 +114,7 @@ import backend
 
 import matlab2cpp.datatype as dt
 import matlab2cpp.supplement as sup
-import matlab2cpp
+import matlab2cpp as mc
 
 class Node(object):
     backend = ref.Property_reference("backend")
@@ -203,12 +203,12 @@ See also:
 
         prop = self.prop.copy()
         for key in self.prop:
-            if prop[key] is None:
-                prop[key] = self[key]
+            if prop[key] is None and hasattr(self, key):
+                prop[key] = getattr(self, key)
 
-        I = len(self)
+        I = len(self.children)
         for i in xrange(I):
-            prop[str(i)] = prop["-"+str(I-i)] = self[i]["str"]
+            prop[str(i)] = prop["-"+str(I-i)] = self[i].prop["str"]
         return prop
 
 
@@ -247,20 +247,55 @@ type : str, None
     def wall_clock(self):
         return backend.wall_clock(self)
 
-    def __getitem__(self, i):
-        if isinstance(i, str):
-            out = self.prop[i]
-            if out is None:
-                if i == "cls":
-                    return self.cls
-                elif hasattr(self, i):
-                    return getattr(self, i)
-            return out
+    def __getitem__(self, index):
+        """
+Retrieve node child.
 
+Args:
+    index (int): Get node child by positional order
+    index (str): Get first instance with `node.name==index`
+    index (Node): Get first instance with `node.name==index.name`
+    index (slice): Get sublist of `node.children`
+
+Examples:
+
+    >>> node = mc.Var(None, "a")
+    >>> node["b"]
+    Traceback (most recent call last):
+        ...
+    IndexError: node child "b" not found
+    >>> node[0]
+    Traceback (most recent call last):
+        ...
+    IndexError: index of Var out of range (0)
+    >>> node[()]
+    Traceback (most recent call last):
+        ...
+    TypeError: index of Var must be in (int, str, slice, Node), not tuple
+        """
+        i = index # shorter
         if isinstance(i, Node):
-            i = self.names.index(i.name)
+            i = i.name
 
-        return self.children[i]
+        if isinstance(i, str):
+            if i not in self.names:
+                raise IndexError("node child \"%s\" not found" % i)
+            i = self.names.index(i)
+
+        if isinstance(i, int):
+
+            if len(self) <= i:
+                raise IndexError(
+                        "index of %s out of range (%d)" % (self.cls, i))
+            return self.children[i]
+
+        if isinstance(i, slice):
+            return self.children[i]
+
+        raise TypeError(
+                "index of %s must be in (int, str, slice, Node), not %s" \
+                % (self.cls, i.__class__.__name__))
+
 
     def __contains__(self, i):
         if isinstance(i, str):
@@ -332,3 +367,6 @@ Return:
     def plotting(self):
         return backend.plotting(self)
 
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
