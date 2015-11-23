@@ -6,10 +6,7 @@ Node behavior
 
 So far the translation has been for the most part fairly simple, where the
 translation is reduced to either a string or a tuple of strings for weaving
-sub-nodes together. However, as noted in the section `Translation rules`, it is
-possible to provide a Python function that returns such a value as the
-translation rule. In such a case, the function is assumed to take a single
-input `node`. For example::
+sub-nodes together. Consider the following example::
 
     >>> def Plus(node):
     ...     return "", " +", ""
@@ -17,8 +14,27 @@ input `node`. For example::
     >>> print mc.qscript("2+3", Plus=Plus)
     2 +3 ;
 
-This node represents the current node of the tree as it is translated. By using
-this, much more powerful translation. To understand how, we first have to
+The node argument represents the current node of the tree as it is translated.
+We saw this being used in the last section :ref:`usr03` to get and set node
+datatype. However, there are much more you can get out of the node. First, to
+help understand the current situation from a coding perspective, one can use
+the help function ``summary``, which gives a quick summary of the node and its
+node children. It works the same way as the function
+:py:func:`~matlab2cpp.qtree`, but can be used mid translation. For example::
+
+    >>> def Plus(node):
+    ...     print node.summary()
+    ...     return "", " +", ""
+    ...
+    >>> print mc.qscript("2+3", Plus=Plus) # doctest: +NORMALIZE_WHITESPACE
+     1  1Plus       expression   int
+     1  1| Int        int          int
+     1  3| Int        int          int
+    2 +3 ;
+
+The first line represent the current node
+:py:class:`~matlab2cpp.collection.Plus`.
+
 introduce the node tree structure and how the nodes relate to each other.
 This will vary from program to program, so a printout of the current state is
 a good startingpoint. This can either be done through the function
@@ -96,3 +112,7 @@ is is placed. For example, consider the following::
 
 """
 import matlab2cpp as mc
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

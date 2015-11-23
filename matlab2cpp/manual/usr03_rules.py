@@ -94,7 +94,8 @@ at the ends. In practice we get::
     >>> print mc.qscript("1+2+3", Plus=Plus)
     1+2+3 ;
 
-And this is the full extent of how the system uses string values. However, in
+
+And this is the extent of how the system uses string values. However, in
 practice, they are not used much. Instead of strings and tuples functions are
 used. They are defined with the same name the string/tuple. This function
 should always take a single argument of type :py:class:`~matlab2cpp.Node` which
@@ -111,6 +112,21 @@ equivalent::
     ...
     >>> print mc.qscript("2+3", Plus=Plus)
     2 +3 ;
+
+One application of the ``node`` argument is to use it to configure datatypes.
+As discussed in the previous section :ref:`usr02`, the node attribute
+:py:attr:`~matlab2cpp.Node.type` contains information about datatype.
+For example::
+
+    >>> def Var(node):
+    ...     if node.name == "x": node.type = "vec"
+    ...     if node.name == "y": node.type = "rowvec"
+    ...     return node.name
+    >>> print mc.qscript("function f(x,y)", Var=Var)
+    void f(vec x, rowvec y)
+    {
+      // Empty block
+    }
 
 For more details on the behavior of the :py:mod:`~matlab2cpp.node` argument, 
 see section on node :ref:`usr04`. For an extensive list of the various nodes
@@ -141,13 +157,8 @@ translation adapts::
 To address this in the same node will quickly become very convoluted. So
 instead, the rules are split into various backends. This simplifies things for
 each rule that have multiple interpretations, but also ensures that code isn't
-to bloated.
-
-There are many rules to translation rule backends in matlab2cpp. This is mainly
-because each :py:mod:`~matlab2cpp.datatype` have a corresponding backend. The
-various :py:mod:`~matlab2cpp.datatypes` and how they are determined will be
-discussed in the next section :ref:`usr03`.  For an overview of the various
-backend, see the developer manual :ref:`dev07`.
+to bloated.  For an overview of the various backend, see the developer manual
+:ref:`dev07`.
 
 Reserved rules
 --------------

@@ -10,8 +10,8 @@ User Manual
 
     usr00_intro
     usr01_interaction
-    usr02_rules
-    usr03_datatype
+    usr02_datatype
+    usr03_rules
     usr04_node
     usr05_tree
 

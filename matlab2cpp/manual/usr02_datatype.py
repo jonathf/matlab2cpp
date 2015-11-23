@@ -1,8 +1,8 @@
 """
-.. _usr03:
+.. _usr02:
 
-Configuring datatypes
-=====================
+Configuring translation
+=======================
 
 One of the translation challenges is how each variable type determined. In C++
 all variables have to be explicitly declared, while in Matlab they are declared
@@ -11,16 +11,13 @@ many variables where the data types are unknown and impossible for the
 Matlab2cpp software to translate.  How to translate the behavior of an integer
 is vastly different from an float matrix.
 
-As noted in the last section :ref:`usr02`, each node can have multiple
-backends. At the simplest level, each node have
-a :py:mod:`~matlab2cpp.datatype` which represents what backend rule should be
-used in translation. 
-
+To differentiate between types, each node have an attribute
+:py:attr:`~matlab2cpp.Node.type` which represents the node datatype.
 Datatypes can be roughly split into two groups: **numerical** and
 **non-numerical** types.  The numerical types are as follows:
 
 +---------------+--------------+---------+---------+--------+-----------+
-|               | unsigned int | int     | float   | double | complex   |
+|               | unsigned int | integer | float   | double | complex   |
 +===============+==============+=========+=========+========+===========+
 | `scalar`      | uword        | int     | float   | double | cx_double |
 +---------------+--------------+---------+---------+--------+-----------+
@@ -52,19 +49,6 @@ The non-numerical types are as follows:
 +----------------------------------+------------------------+
 | :ref:`func_lambda <func_lambda>` | Anonymous function     |
 +----------------------------------+------------------------+
-
-The node datatype can be referenced by any node through `node.type` and can be
-inserted as placeholder through ``%(type)s``. For example::
-
-    >>> def Var(node):
-    ...     if node.name == "x": node.type = "vec"
-    ...     if node.name == "y": node.type = "rowvec"
-    ...     return node.name
-    >>> print mc.qscript("function f(x,y)", Var=Var)
-    void f(vec x, rowvec y)
-    {
-      // Empty block
-    }
 
 Function scope
 --------------
