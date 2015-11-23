@@ -22,7 +22,7 @@ def Get(node):
         else:
             node.error("More than two arguments in a matrix call")
 
-        return "%(name)s(", ", ", ")"
+        return "%(name)s(", "-1, ", "-1)"
 
     # Single argument
     if len(node) == 1:
@@ -31,7 +31,7 @@ def Get(node):
 
         # unknown input
         if dim == -1:
-            return "%(name)s(%(0)s)"
+            return "%(name)s(%(0)s-1)"
 
         # scalar begets scalar
         if dim == 0:
@@ -110,7 +110,7 @@ def Set(node):
         else:
             node.error("More than two arguments in a matrix set")
 
-        return "%(name)s(", ", ", ")"
+        return "%(name)s(", "-1, ", "-1)"
 
     # Single argument
     if len(node) == 1:
@@ -123,7 +123,7 @@ def Set(node):
 
         # unknown datatype
         elif dim == -1:
-            return "%(name)s(", ", ", ")"
+            return "%(name)s(", "-1, ", "-1)"
 
         return "%(name)s(" + arg + ")"
 
@@ -136,7 +136,7 @@ def Set(node):
 
         # unknown datatype
         if -1 in (dim0, dim1):
-            return "%(name)s(", ", ", ")"
+            return "%(name)s(", "-1, ", "-1)"
 
         # Configure dimensions
         if dim0:

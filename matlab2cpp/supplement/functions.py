@@ -1,43 +1,6 @@
 """
-In addition to normal function, Matlab have support for anonymous function
-through the name prefix `@`.  For example:
-
-    >>> print mc.qhpp("function f(); g = @(x) x^2; g(4)", suggest=True)
-    #include <armadillo>
-    using namespace arma ;
-    <BLANKLINE>
-    void f()
-    {
-      std::function<int(int)> g ;
-      g = [] (int x) {pow(x,2) ; } ;
-      g(4) ;
-    }
-
-The translator creates an C++11 lambda function with equivalent functionality.
-To achieve this, the translator creates an extra function in the node-tree.  The
-name of the function is the same as assigned variable with a `_`-prefix (and
-a number postfix, if name is taken).  The information about this function
-dictate the behaviour of the output The supplement file have the following form:
-
-    >>> print mc.qpy("function f(); g = @(x) x^2; g(4)", suggest=True)
-    functions = {
-      "_g" : {
-              "x" : "int",
-      },
-      "f" : {
-        "g" : "func_lambda",
-      },
-    }
-    includes = [
-      '#include <armadillo>',
-      'using namespace arma ;',
-    ]
-
-The function `g` is a variable inside `f`'s function scope.  It has the datatype
-`func_lambda` to indicate that it should be handled as a function.  The
-associated function scope `_g` contains the variables inside the definition of
-the anonymous function.
 """
+
 import matlab2cpp as mc
 
 def set(node, types):

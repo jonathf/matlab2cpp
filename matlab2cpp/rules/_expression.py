@@ -15,7 +15,7 @@ def End(node):
 Examples:
     >>> print mc.qscript("x = zeros(2,2,2); x(end, end, end)")
     x = arma::zeros<cube>(2, 2, 2) ;
-    x(x.n_rows, x.n_cols, x.n_slices) ;
+    x(x.n_rows-1, x.n_cols-1, x.n_slices-1) ;
     """
 
     # find context for what end refers to

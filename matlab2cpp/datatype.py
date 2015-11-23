@@ -1,96 +1,19 @@
 """
-One of the translation challenges is how each variable type determined. In C++
-all variables have to be explicitly declared, while in Matlab they are declared
-implicitly at creation.  When translating between the two languages, there are
-many variables where the data types are unknown and impossible for the
-Matlab2cpp software to translate.  How to translate the behavior of an integer
-is vastly different from an float matrix.
-    
-Variable types
---------------
+The follwing constructor classes exists here:
 
-Even though not always relevant, all node has it's own datatype.  It can be
-referenced by `node.type` and can be inserted as placeholder through
-`%(type)s`.  Note however that there are many data types available.  The
-options for valid variable types are listed in the supplement file.  They can
-be roughly split into two groups: **numerical** and **non-numerical** types.
-The numerical types are as follows:
-
-+---------------+----------------+---------+---------+----------+------------+
-|               | *unsigned int* | *int*   | *float* | *double* | *complex*  |
-+===============+================+=========+=========+==========+============+
-| *scalar*      | uword          | int     | float   | double   | cx_double  |
-+---------------+----------------+---------+---------+----------+------------+
-| *vector*      | uvec           | ivec    | fvec    | vec      | cx_vec     |
-+---------------+----------------+---------+---------+----------+------------+
-| *row\-vector* | urowvec        | irowvec | frowvec | rowvec   | cx_rowvec  |
-+---------------+----------------+---------+---------+----------+------------+
-| *matrix*      | umat           | imat    | fmat    | mat      | cx_mat     |
-+---------------+----------------+---------+---------+----------+------------+
-| *cube*        | ucube          | icube   | fcube   | cube     | cx_cube    |
-+---------------+----------------+---------+---------+----------+------------+
-
-Values along the horizontal axis represents the amount of memory reserved per
-element, and the along the vertical axis represents the various number of
-dimensions.  The names are equivalent to the ones in the Armadillo package.
-
-The non-numerical types are as follows:
-
-+---------------+------------------------+
-| Name          | Description            |
-+===============+========================+
-| *char*        | Single text character  |
-+---------------+------------------------+
-| *string*      | Text string            |
-+---------------+------------------------+
-| *struct*      | Struct container       |
-+---------------+------------------------+
-| *structs*     | Struct array container |
-+---------------+------------------------+
-| *func_lambda* | Anonymous function     |
-+---------------+------------------------+
-| *wall_clock*  | Timer function         |
-+---------------+------------------------+
-
-Numerical datatypes
-~~~~~~~~~~~~~~~~~~~
-
-Most of the allowed datatypes are numerical values with varying type-space and
-dimensionality.  So when addressing a numerical value, the nodes attributes
-`node.dim` and node.mem` can often be useful, since they contain direct
-information about that information.
-
-Example:
-    >>> node = mc.collection.Var(None, "name", type="ivec")
-    >>> print node.type
-    ivec
-    >>> print node.dim, node.mem
-    1 1
-
-These nodes also support dynamic rewriting of the datatype.
-Continuing our example:
-    >>> node.dim = 3
-    >>> print node.type
-    imat
-    >>> node.mem = 4
-    >>> print node.type
-    cx_mat
-
-The connection between the nummerical values and datatypes is as follows:
-
-+-------+-------------+--+-------+--------------+
-| *mem* | Description |  | *dim* | Description  |
-+=======+=============+==+=======+==============+
-| 0     | unsiged int |  | 0     | scalar       |
-+-------+-------------+--+-------+--------------+
-| 1     | integer     |  | 1     | (col-)vector |
-+-------+-------------+--+-------+--------------+
-| 2     | float       |  | 2     | row-vector   |
-+-------+-------------+--+-------+--------------+
-| 3     | double      |  | 3     | matrix       |
-+-------+-------------+--+-------+--------------+
-| 4     | complex     |  | 4     | cubu         |
-+-------+-------------+--+-------+--------------+
++------------------------------------------+---------------------------------------+
+| Class                                    | Description                           |
++==========================================+=======================================+
+| :py:class:`~matlab2cpp.datatype.Type`    | Frontend for the datatype string      |
++------------------------------------------+---------------------------------------+
+| :py:class:`~matlab2cpp.datatype.Dim`     | Reference to the number of dimensions |
++------------------------------------------+---------------------------------------+
+| :py:class:`~matlab2cpp.datatype.Mem`     | Reference to the memory type          |
++------------------------------------------+---------------------------------------+
+| :py:class:`~matlab2cpp.datatype.Num`     | Numerical value indicator             |
++------------------------------------------+---------------------------------------+
+| :py:class:`~matlab2cpp.datatype.Suggest` | Frontend for suggested datatype       |
++------------------------------------------+---------------------------------------+
 """
 
 import supplement
@@ -261,8 +184,39 @@ def get_type(instance):
     return instance.prop["type"]
 
 class Dim(object):
+    """
+The `node.dim` is a help variable for handling numerical datatype.
+It represents the number of dimension a numerical object represents:
+
++-------+--------------+
+| *dim* | Description  |
++=======+==============+
+| 0     | scalar       |
++-------+--------------+
+| 1     | (col-)vector |
++-------+--------------+
+| 2     | row-vector   |
++-------+--------------+
+| 3     | matrix       |
++-------+--------------+
+| 4     | cube         |
++-------+--------------+
+| None  | Other        |
++-------+--------------+
+
+The variable can be both read and set in real time:
+
+    >>> node = mc.Var(None, "name", type="float")
+    >>> print node.dim
+    0
+    >>> node.dim = 3
+    >>> print node.type
+    fmat
+    """
 
     def __get__(self, instance, owner):
+        if instance is None:
+            return self
         return get_dim(get_type(instance))
 
     def __set__(self, instance, value):
@@ -271,8 +225,39 @@ class Dim(object):
 
 
 class Mem(object):
+    """
+The `node.mem` is a help variable for handling numerical datatype.
+It represents the internal basic datatype represented in memory:
+
++-------+-------------+
+| *mem* | Description |
++=======+=============+
+| 0     | unsiged int |
++-------+-------------+
+| 1     | integer     |
++-------+-------------+
+| 2     | float       |
++-------+-------------+
+| 3     | double      |
++-------+-------------+
+| 4     | complex     |
++-------+-------------+
+| None  | Other       |
++-------+-------------+
+
+The variable can be both read and set in real time:
+
+    >>> node = mc.Var(None, "name", type="float")
+    >>> print node.mem
+    2
+    >>> node.mem = 3
+    >>> print node.type
+    double
+    """
 
     def __get__(self, instance, owner):
+        if instance is None:
+            return self
         return get_mem(get_type(instance))
 
     def __set__(self, instance, value):
@@ -281,8 +266,14 @@ class Mem(object):
 
 
 class Num(object):
+    """
+The `node.num` is a help variable for handling numerical datatype.  It is
+a boolean values which is true given that the datatype is of numerical type.
+    """
 
     def __get__(self, instance, owner):
+        if instance is None:
+            return self
         return get_num(get_type(instance))
 
     def __set__(self, instance, value):
@@ -293,9 +284,52 @@ class Num(object):
 
 
 class Type(object):
+    """
+Datatypes can be roughly split into two groups: **numerical** and
+**non-numerical** types.  The numerical types are as follows:
+
++-------------+--------------+-----------+-----------+----------+-------------+
+|             | unsigned int | int       | float     | double   | complex     |
++=============+==============+===========+===========+==========+=============+
+| scalar      | *uword*      | *int*     | *float*   | *double* | *cx_double* |
++-------------+--------------+-----------+-----------+----------+-------------+
+| vector      | *uvec*       | *ivec*    | *fvec*    | *vec*    | *cx_vec*    |
++-------------+--------------+-----------+-----------+----------+-------------+
+| row\-vector | *urowvec*    | *irowvec* | *frowvec* | *rowvec* | *cx_rowvec* |
++-------------+--------------+-----------+-----------+----------+-------------+
+| matrix      | *umat*       | *imat*    | *fmat*    | *mat*    | *cx_mat*    |
++-------------+--------------+-----------+-----------+----------+-------------+
+| cube        | *ucube*      | *icube*   | *fcube*   | *cube*   | *cx_cube*   |
++-------------+--------------+-----------+-----------+----------+-------------+
+
+Values along the horizontal axis represents the amount of memory reserved per
+element, and the along the vertical axis represents the various number of
+dimensions.  The names are equivalent to the ones in the Armadillo package.
+
+The non-numerical types are as follows:
+
++---------------+------------------------+
+| Name          | Description            |
++===============+========================+
+| *char*        | Single text character  |
++---------------+------------------------+
+| *string*      | Text string            |
++---------------+------------------------+
+| *struct*      | Struct container       |
++---------------+------------------------+
+| *structs*     | Struct array container |
++---------------+------------------------+
+| *func_lambda* | Anonymous function     |
++---------------+------------------------+
+
+The node datatype can be referenced by any node through `node.type` and can be
+inserted as placeholder through `%(type)s`.
+    """
 
     def __get__(self, instance, owner):
-        return get_type(instance) #+ "*"*instance.pointer
+        if instance is None:
+            return self
+        return get_type(instance)
 
     def __set__(self, instance, value):
         value = value or "TYPE"
@@ -308,6 +342,8 @@ class Type(object):
 
 
 class Suggest(object):
+    """Same as Type, but for suggested value.
+    """
 
     def __set__(self, instance, value):
         if value == "TYPE":

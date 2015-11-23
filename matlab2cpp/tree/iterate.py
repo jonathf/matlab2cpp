@@ -1,39 +1,20 @@
 """
 Rutines for iterating lists
 
-+------------------------------------------------+-----------------------------+
-| Functions                                      | Description                 |
-+================================================+=============================+
-| :py:func:`~matlab2cpp.tree.iterate.list`       | Iterate over a list         |
-+------------------------------------------------+-----------------------------+
-| :py:func:`~matlab2cpp.tree.iterate.comma_list` | Iterate over a comma        |
-|                                                | separated list              |
-+------------------------------------------------+-----------------------------+
-| :py:func:`~matlab2cpp.tree.iterate.space_list` | Iterate over a space        |
-|                                                | delimited list              |
-+------------------------------------------------+-----------------------------+
++------------------------------------------------+----------------------+
+| Functions                                      | Description          |
++================================================+======================+
+| :py:func:`~matlab2cpp.tree.iterate.comma_list` | Iterate over a comma |
+|                                                | separated list       |
++------------------------------------------------+----------------------+
+| :py:func:`~matlab2cpp.tree.iterate.space_list` | Iterate over a space |
+|                                                | delimited list       |
++------------------------------------------------+----------------------+
 """
 
 import constants as c
 import findend
 import identify
-
-
-def list(self, start):
-    """
-Iterate over a list
-
-Args:
-    self (Builder): Code constructor
-    start (int): Current position in code
-
-Returns:
-	list : A list of 2-tuples that represents index start and end for each expression in list
-    """
-
-    if identify.space_delimited(self, start):
-        return space_list(self, start)
-    return comma_list(self, start)
 
 
 def comma_list(self, start):
@@ -45,7 +26,8 @@ Args:
     start (int): Current position in code
 
 Returns:
-	list : A list of 2-tuples that represents index start and end for each expression in list
+    list : A list of 2-tuples that represents index start and end for each
+    expression in list
     """
 
     if  self.code[start] not in c.l_start:
@@ -108,7 +90,8 @@ Args:
     start (int): Current position in code
 
 Returns:
-	list : A list of 2-tuples that represents index start and end for each expression in list
+    list : A list of 2-tuples that represents index start and end for each
+    expression in list
     """
 
     if  self.code[start] not in c.l_start:

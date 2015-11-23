@@ -7,14 +7,14 @@ def Get(node):
 
         if not len(node):
             node.error("Zero arguments in a vec call")
-            return "%(name)s(", ", ", ")"
+            return "%(name)s()"
 
         elif len(node) == 2 and node[1].cls == "Int" and node[1].value == "1":
             pass
 
         else:
             node.error("More than one arguments in a vec call")
-            return "%(name)s(", ", ", ")"
+            return "%(name)s(", "-1, ", "-1)"
 
 
     arg, dim = arma.configure_arg(node[0], 0)
@@ -33,14 +33,14 @@ def Set(node):
 
         if not len(node):
             node.error("Zero arguments in a vec call")
-            return "%(name)s(", ", ", ")"
+            return "%(name)s()"
 
         elif len(node) == 2 and node[1].cls == "Int" and node[1].value == "1":
             pass
 
         else:
             node.error("More than one arguments in a vec call")
-            return "%(name)s(", ", ", ")"
+            return "%(name)s(", "-1, ", "-1)"
 
     arg, dim = arma.configure_arg(node[0], 0)
 

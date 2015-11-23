@@ -1,3 +1,7 @@
+"""
+filler for Armadillo
+"""
+
 import matlab2cpp as mc
 
 def configure_arg(node, index):

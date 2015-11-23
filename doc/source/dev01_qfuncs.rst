@@ -1,11 +1,8 @@
-User interaction
-================
-.. automodule:: matlab2cpp
-.. autoprogram:: mconvert:parser
-    :prog: mconvert
+.. _dev01:
 
 Quick translation functions
 ---------------------------
+
 .. automodule:: matlab2cpp.qfunctions
 
 .. autofunction:: matlab2cpp.build
@@ -15,4 +12,3 @@ Quick translation functions
 .. autofunction:: matlab2cpp.qlog
 .. autofunction:: matlab2cpp.qscript
 .. autofunction:: matlab2cpp.qtree
-

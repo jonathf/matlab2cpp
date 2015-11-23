@@ -1,8 +1,8 @@
 """
 Reserved translation rules
 
-The module will always check if the specific "<class>_<name>" name
-exists before finding the generic "<class>" name.
+See :py:attr:`rules.reserved <matlab2cpp.rules.reserved>` for a collection of
+set of the various reserved words implemented into matlab2cpp.
 """
 
 import matlab2cpp as mc
@@ -29,10 +29,6 @@ reserved = {
 # Common attribute
 
 Assign = "%(0)s = %(1)s ;"
-
-def Declare(node):
-    raise ValueError("Variable name '%s' is reserved."%node["name"]\
-            +"\nPlease rename variable.")
 
 def Var(node):
     return "%(name)s"
@@ -251,12 +247,8 @@ def Get_length(node):
 
 def Get_min(node):
 
-    # unknown datatype handler
-    if not all([n.num for n in node]):
-        return "min(", ", ", ")"
-
     # everything scalar
-    if all([(n.dim < 2) for n in node]):
+    if not all([n.num for n in node]) or  all([(n.dim < 2) for n in node]):
         return "std::min(", ", ", ")"
 
     node.type = node[0].type
@@ -755,7 +747,7 @@ def Get_sum(node):
     # unknown input
     if not arg.num or arg.dim == 0:
         node.error("sum over non-array")
-        return "sum(", ", ", ")"
+        return "arma::sum(", ", ", ")"
 
     node.type = arg.type
 
