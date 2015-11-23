@@ -360,6 +360,21 @@ And accross multiple files::
       int z ;
       z = f(4) ;
     }
+
+Verbatim translations
+---------------------
+In some cases, the translation can not be performed. For example, the Matlab
+function ``eval`` can not be properly translated. Matlab is interpreted, and
+can easily take a string from local name space, and feed it to the interpreter.
+In C++ however, the code must be pre-compiled. Not knowing what the string
+input is before runtime, makes this difficult. So instead it makes more sense
+to make some custom translation by hand.
+
+Since ``matlab2cpp`` produces C++ files, it is possible to edit them after
+creation. However, if changes are made to the Matlab-file at a later point, the
+custom edits have to be added manually again. To resolve this, ``matlab2cpp``
+supports verbatim translations through the suppliment file ``.py`` and through
+the node attribute :py:attr:`~matlab2cpp.Node.vtypes`
 """
 import matlab2cpp as mc
 
