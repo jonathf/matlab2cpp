@@ -10,7 +10,7 @@ def get(node):
 
     for func in funcs:
 
-        suggest[func["name"]] = suggest_ = {}
+        suggest[func.name] = suggest_ = {}
 
         declares, params = func[0], func[2]
         for var in declares[:]+params[:]:
@@ -25,11 +25,11 @@ def get(node):
                 if type == "TYPE":
                     type = ""
                 if type:
-                    suggest_[var["name"]] = type
+                    suggest_[var.name] = type
 
     for struct in structs:
 
-        suggest[struct["name"]] = suggest_ = {}
+        suggest[struct.name] = suggest_ = {}
 
         for var in struct:
 
@@ -43,7 +43,7 @@ def get(node):
                 if type == "TYPE":
                     type = ""
                 if type:
-                    suggest_[var["name"]] = type
+                    suggest_[var.name] = type
 
     return suggest
 

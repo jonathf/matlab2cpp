@@ -39,15 +39,15 @@ def get(node):
 
     for func in funcs:
 
-        types[func["name"]] = types_ = {}
+        types[func.name] = types_ = {}
 
         declares, params = func[0], func[2]
         for var in declares[:]+params[:]:
 
-            type = var.prop["type"]
+            type = var.type
             if type == "TYPE":
                 type = ""
-            types_[var["name"]] = type
+            types_[var.name] = type
 
             if not type:
 

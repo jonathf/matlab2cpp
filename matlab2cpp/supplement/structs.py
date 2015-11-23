@@ -36,7 +36,7 @@ def get(node):
     types_s = {}
     for struct in structs:
 
-        types_s[struct["name"]] = types = {}
+        types_s[struct.prop["name"]] = types = {}
 
         for var in struct:
 

@@ -73,10 +73,10 @@ Examples:
 
     """
     func = node.func
-    if func["backend"] == "func_returns":
+    if func.backend == "func_returns":
         return "return"
 
-    if func["backend"] == "func_lambda":
+    if func.backend == "func_lambda":
         return "return _retval"
 
     return_value = func[1][0].name
