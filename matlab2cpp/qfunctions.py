@@ -21,7 +21,8 @@ from rules._program import add_indenting, number_fix, strip
 
 __all__ = ["build", "qcpp", "qhpp", "qpy", "qlog", "qtree", "qscript"]
 
-def build(code, disp=False, retall=False, suggest=True, comments=True, **kws):
+def build(code, disp=False, retall=False, suggest=True, comments=True,
+        vtypes=None, **kws):
     """
 Build a token tree out of Matlab code.  This function is used by the other
 quick-functions as the first step in code translation.
@@ -31,14 +32,15 @@ the line it crashed on and explain as far as it can why it crashed.
 
 Args:
     code (str): Code to be interpreted
-    disp (bool): If true, print out diagnostic information while interpreting
+    disp (bool): If true, print out diagnostic information while interpreting.
     retall (bool): If true, return full token tree instead of only code related.
     suggest (bool): If true, suggestion engine will be used to fill in datatypes.
     comments (bool): If true, comments will be striped away from the solution.
+    vtypes (dict): Verbatim translations added to tree before process.
     **kws: Additional arguments passed to :py:obj:`~matlab2cpp.Builder`.
 
 Returns:
-	Builder,Node: The tree constructor if `retall` is true, else the root node for code.
+    Builder,Node: The tree constructor if `retall` is true, else the root node for code.
 
 Example use::
     >>> builder = mc.build("a=4", retall=True)
@@ -63,6 +65,10 @@ See also:
     """
 
     code = code + "\n\n\n\n"
+
+    if vtypes:
+        code = supplement.verbatim.set(vtypes, code)
+    
     builder = tree.builder.Builder(disp=disp, comments=comments, **kws)
     builder.load("unamed", code)
     builder.configure(2*suggest)

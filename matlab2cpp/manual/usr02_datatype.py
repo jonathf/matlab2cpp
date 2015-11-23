@@ -363,6 +363,7 @@ And accross multiple files::
 
 Verbatim translations
 ---------------------
+
 In some cases, the translation can not be performed. For example, the Matlab
 function ``eval`` can not be properly translated. Matlab is interpreted, and
 can easily take a string from local name space, and feed it to the interpreter.
@@ -374,7 +375,42 @@ Since ``matlab2cpp`` produces C++ files, it is possible to edit them after
 creation. However, if changes are made to the Matlab-file at a later point, the
 custom edits have to be added manually again. To resolve this, ``matlab2cpp``
 supports verbatim translations through the suppliment file ``.py`` and through
-the node attribute :py:attr:`~matlab2cpp.Node.vtypes`
+the node attribute :py:attr:`~matlab2cpp.Node.vtypes`.
+:py:attr:`~matlab2cpp.node.vtype` is a dictionary where the keys are string
+found in the orginal code, and the values are string of the replacement.
+
+Performing a verbatim replacement has to be done before the node tree is
+constructed. Assigning :py:attr:`~matlab2cpp.Node.vtypes` doesn't work very
+well. Instead the replacement dictionary can be bassed as argument to
+:py:func:`~matlab2cpp.build`::
+
+    >>> tree = mc.build('''a=1
+    ... b=2
+    ... c=3''', vtypes = {"b": "_replaced_text_"})
+    >>> print mc.qscript(tree)
+    a = 1 ;
+    // b=2
+    _replaced_text_
+    c = 3 ;
+
+Note that when a match is found, the whole line is replaced. No also how the
+source code is retained a comment above the verbatim translation. The
+verbatim key can only match a single line, however the replacement might span
+multiple lines. For example::
+
+    >>> replace_code = '''one line
+    ... two line
+    ... three line'''
+    >>> tree = mc.build('''a=1
+    ... b=2
+    ... c=3''', vtypes={"b": replace_code})
+    >>> print mc.qscript(tree)
+    a = 1 ;
+    // b=2
+    one line
+    two line
+    three line
+    c = 3 ;
 """
 import matlab2cpp as mc
 
