@@ -23,22 +23,29 @@ Requirements:
 * Python 2.7.3
 * Armadillo (Not required for running, but generator
   creates armadillo code.)
+* Sphinx (for compiling documentation)
 
 Linux/Mac:
 
-As root, run the following command: ::
+As root, run the following command::
 
     $ python setup.py install
 
 The executable ´mconvert´ is now available from path.
 
-Windows: ::
+Windows::
 
     > Python setup.py install
 
 The executable mconvert.py can freely be copied or be added to
 environmental variables manually (with or without the `.py` extension).
 
+Sphinx::
+
+    pip install sphinx
+    pip install sphinxcontrib-autoprogram
+    pip install sphinxcontrib-napoleon
+    pip install sphinx-argparse
 
 
 An illustrating Example
@@ -47,7 +54,7 @@ An illustrating Example
 Assuming Linux installation and `mconvert` available in path.
 Code works analogous in Mac and Windows.
 
-Consider a file `example.m` with the following content: ::
+Consider a file `example.m` with the following content::
 
     function y=f(x)
         y = x+4
@@ -64,7 +71,7 @@ Run conversion on the file: ::
 This will create two files: `example.m.hpp` and `example.m.py`.
 
 In example.m.hpp, the translated C++ code is placed. It looks as
-follows: ::
+follows::
 
     #include <armadillo>
     using namespace arma ;
@@ -86,7 +93,7 @@ follows: ::
 Matlab doesn't declare variables explicitly, so Matlab2cpp is unable to complete
 the translation.  To create a full conversion, the variables must be declared.
 Declarations can be done in the file `example.m.py`. After the first run, it
-will look as follows: ::
+will look as follows::
 
     # Supplement file
     #
@@ -118,12 +125,12 @@ In addition to defining includes at the bottom, it is possible to declare
 variables manually by inserting type names into the respective empty strings.
 However, some times it is possible to guess some of the variable types from
 context.  To let the software try to guess variable types, run conversion with
-the `-s` flag: ::
+the `-s` flag::
 
     $ mconvert example.m -s
 
 The file `example.m.py` will then automatically be populated with data types
-from context: ::
+from context::
 
     # ...
 
@@ -146,7 +153,7 @@ some cases be wrong.  It is therefore also possible to adjust these
 values manually at any time.
 
 Having run the conversion with the variables converted, creates a
-new output for `example.m.hpp`: ::
+new output for `example.m.hpp`::
 
     #include <armadillo>
     using namespace arma ;
