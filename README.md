@@ -23,7 +23,11 @@ Requirements:
 * Python 2.7.3
 * Armadillo (Not required for running, but generator
   creates armadillo code.)
+
+Optional:
+
 * Sphinx (for compiling documentation)
+* Argcomplete (for tab-completion support)
 
 Linux/Mac:
 
@@ -46,6 +50,13 @@ Sphinx::
     pip install sphinxcontrib-autoprogram
     pip install sphinxcontrib-napoleon
     pip install sphinx-argparse
+
+Argcomplete::
+
+    pip intall argcomplete
+    activate-global-python-argcomplete
+
+This only works for Bash and would require a restart of terminal emulator.
 
 
 An illustrating Example
