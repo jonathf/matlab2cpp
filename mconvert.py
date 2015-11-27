@@ -58,8 +58,8 @@ parser.add_argument("-l", '--line', type=int, dest="line",
 try:
     import argcomplete
     argcomplete.autocomplete(parser)
-except:
-    print "argcomplete raised exception"
+except Exception as e:
+    print "Error: " + str(e)
 
 args = parser.parse_args()
 
