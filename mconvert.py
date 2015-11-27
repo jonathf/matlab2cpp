@@ -58,9 +58,10 @@ parser.add_argument("-l", '--line', type=int, dest="line",
 try:
     import argcomplete
     argcomplete.autocomplete(parser)
+except:
+    print "argcomplete raised exception"
 
 args = parser.parse_args()
-
 
 import matlab2cpp
 matlab2cpp.main(args)
