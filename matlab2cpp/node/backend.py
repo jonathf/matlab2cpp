@@ -507,6 +507,8 @@ def include(node, name, **kws):
 
         elif name == "arma":
             include_code = "#include <armadillo>"
+        elif name == "iostream":
+            include_code = "#include <iostream>"
         else:
             include_code = ""
 
