@@ -17,6 +17,8 @@ equivalent C++ declarations.
 +-----------------+-----------------------+
 | func_lambda     | std::function<...>    |
 +-----------------+-----------------------+
+| string          | std::string           |
++-----------------+-----------------------+
 
 Args:
     node (Node): location in tree
@@ -59,6 +61,9 @@ Returns:
     # struct array type
     elif node.type == "structs":
         return "_" + node.name.capitalize()
+
+    elif node.type == "string":
+        return "std::string"
 
     return node.type
 
