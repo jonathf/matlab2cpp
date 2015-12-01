@@ -367,6 +367,7 @@ Return:
     def plotting(self):
         return backend.plotting(self)
 
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

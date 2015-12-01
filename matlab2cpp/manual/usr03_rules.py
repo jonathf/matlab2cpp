@@ -51,8 +51,8 @@ available in interpolation. The children are indexed by number, counting from
 0. Consider the simple example of a simple addition::
 
     >>> print mc.qtree("2+3", core=True) # doctest: +NORMALIZE_WHITESPACE
-     1  1Block      code_block   int
-     1  1| Statement  code_block   int
+     1  1Block      code_block   TYPE
+     1  1| Statement  code_block   TYPE
      1  1| | Plus       expression   int
      1  1| | | Int        int          int
      1  3| | | Int        int          int

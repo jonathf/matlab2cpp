@@ -28,7 +28,7 @@ or the python function :py:func:`~matlab2cpp.qtree`. For example::
     1 1| | | Returns    func_return  TYPE
     1 1| | | Params     func_return  TYPE
     1 1| | | Block      code_block   TYPE
-    1 1| | | | Assign     unknown      TYPE
+    1 1| | | | Assign     unknown      int
     1 1| | | | | Var        unknown      (int)   a
     1 5| | | | | Plus       expression   int
     1 5| | | | | | Int        int          int
@@ -97,12 +97,12 @@ upon how the configuration is set up. Intuitively enough, if datatype is set to
        | | Include    program      TYPE    using namespace arma ;
     1 1| Funcs      program      TYPE    unamed
     1 1| | Main       func_return  TYPE    main
-    1 1| | | Declares   func_return  int
+    1 1| | | Declares   func_return  TYPE
     1 1| | | | Var        int          int     a
     1 1| | | Returns    func_return  TYPE
     1 1| | | Params     func_return  TYPE
     1 1| | | Block      code_block   TYPE
-    1 1| | | | Assign     unknown      TYPE
+    1 1| | | | Assign     unknown      int
     1 1| | | | | Var        int          int     a
     1 5| | | | | Plus       expression   int
     1 5| | | | | | Int        int          int
@@ -126,3 +126,7 @@ Builder class
 
 """
 import matlab2cpp as mc
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

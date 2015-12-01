@@ -44,6 +44,7 @@ Example:
        0   Statement     codeblock.codeblock  'a'
        0     Expression  expression.create    'a'
        0     Var         variables.variable   'a'
+    >>> builder.configure(suggest=False)
     >>> print mc.qtree(builder) # doctest: +NORMALIZE_WHITESPACE
        Program    program      TYPE    unamed
        | Includes   program      TYPE
@@ -124,6 +125,7 @@ Example:
          Program     functions.program
        0 Function        functions.function   'function f()'
       12 Codeblock   codeblock.codeblock 
+    >>> builder.configure(suggest=False)
     >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
     1  1Funcs      program      TYPE    unnamed
     1  1| Func       func_returns TYPE    f
@@ -279,16 +281,16 @@ Example:
 
     cur = self.create_codeblock(func, cur)
 
-    if len(returns) == 1:
-        func.backend = "func_return"
-        func[0].backend = "func_return"
-        func[1].backend = "func_return"
-        func[2].backend = "func_return"
-    else:
-        func.backend = "func_returns"
-        func[0].backend = "func_returns"
-        func[1].backend = "func_returns"
-        func[2].backend = "func_returns"
+    # if len(returns) == 1:
+    #     func.backend = "func_return"
+    #     func[0].backend = "func_return"
+    #     func[1].backend = "func_return"
+    #     func[2].backend = "func_return"
+    # else:
+    #     func.backend = "func_returns"
+    #     func[0].backend = "func_returns"
+    #     func[1].backend = "func_returns"
+    #     func[2].backend = "func_returns"
 
     # Postfix
     for var in returns:
@@ -324,6 +326,7 @@ Example:
        0   Statement     codeblock.codeblock  'a'
        0     Expression  expression.create    'a'
        0     Var         variables.variable   'a'
+    >>> builder.configure(suggest=False)
     >>> print mc.qtree(builder) # doctest: +NORMALIZE_WHITESPACE
        Program    program      TYPE    unnamed
        | Includes   program      TYPE
@@ -347,9 +350,9 @@ Example:
 
     func = mc.collection.Main(parent)
 
-    mc.collection.Declares(func, backend="func_return")
-    mc.collection.Returns(func, backend="func_return")
-    mc.collection.Params(func, backend="func_return")
+    mc.collection.Declares(func)#, backend="func_return")
+    mc.collection.Returns(func)#, backend="func_return")
+    mc.collection.Params(func)#, backend="func_return")
 
     return self.create_codeblock(func, cur)
 
@@ -384,36 +387,37 @@ Example:
        9     Int         misc.number          '2'
       11     Expression  expression.create    'x'
       11     Var         variables.variable   'x'
+    >>> builder.configure(suggest=False)
     >>> print mc.qtree(builder) # doctest: +NORMALIZE_WHITESPACE
-        Program    program      TYPE    unnamed
-        | Includes   program      TYPE
-    1  1| Funcs      program      TYPE    unnamed
-    1  1| | Main       func_return  TYPE    main
-    1  1| | | Declares   func_return  TYPE
-    1  1| | | | Var        unknown      func_lambdaf
-    1  1| | | Returns    func_return  TYPE
-    1  1| | | Params     func_return  TYPE
-    1  1| | | Block      code_block   TYPE
-    1  1| | | | Assign     func_lambda  TYPE
-    1  1| | | | | Var        unknown      func_lambdaf
-    1  1| | | | | Lambda     func_lambda  func_lambda_f
-    1  5| | Func       func_lambda  TYPE    _f
-    1  5| | | Declares   func_lambda  TYPE
-    1  5| | | | Var        unknown      TYPE    _retval
-    1  5| | | Returns    func_lambda  TYPE
-    1  5| | | | Var        unknown      TYPE    _retval
-    1  5| | | Params     func_lambda  TYPE
-    1  7| | | | Var        unknown      TYPE    x
-    1  5| | | Block      code_block   TYPE
-    1  5| | | | Assign     unknown      TYPE
-    1  5| | | | | Var        unknown      TYPE    _retval
-    1 10| | | | | Mul        expression   TYPE
-    1 10| | | | | | Int        int          int
-    1 12| | | | | | Var        unknown      TYPE    x
-        | Inlines    program      TYPE    unnamed
-        | Structs    program      TYPE    unnamed
-        | Headers    program      TYPE    unnamed
-        | Log        program      TYPE    unnamed
+         Program    program      TYPE    unnamed
+         | Includes   program      TYPE
+     1  1| Funcs      program      TYPE    unnamed
+     1  1| | Main       func_return  TYPE    main
+     1  1| | | Declares   func_return  TYPE
+     1  1| | | | Var        func_lambda  func_lambdaf
+     1  1| | | Returns    func_return  TYPE
+     1  1| | | Params     func_return  TYPE
+     1  1| | | Block      code_block   TYPE
+     1  1| | | | Assign     func_lambda  func_lambda
+     1  1| | | | | Var        func_lambda  func_lambdaf
+     1  1| | | | | Lambda     func_lambda  func_lambda_f
+     1  5| | Func       func_lambda  TYPE    _f
+     1  5| | | Declares   func_lambda  TYPE
+     1  5| | | | Var        unknown      TYPE    _retval
+     1  5| | | Returns    func_lambda  TYPE
+     1  5| | | | Var        unknown      TYPE    _retval
+     1  5| | | Params     func_lambda  TYPE
+     1  7| | | | Var        unknown      TYPE    x
+     1  5| | | Block      code_block   TYPE
+     1  5| | | | Assign     unknown      TYPE
+     1  5| | | | | Var        unknown      TYPE    _retval
+     1 10| | | | | Mul        expression   TYPE
+     1 10| | | | | | Int        int          int
+     1 12| | | | | | Var        unknown      TYPE    x
+         | Inlines    program      TYPE    unnamed
+         | Structs    program      TYPE    unnamed
+         | Headers    program      TYPE    unnamed
+         | Log        program      TYPE    unnamed
     """
 
     if  self.code[cur] not in c.letters:
@@ -428,11 +432,9 @@ Example:
         print repr(self.code[cur:self.code.find("\n", cur)]),
         print "functions.lambda_assign"
 
-    assign = mc.collection.Assign(node, cur=cur, backend="func_lambda")
+    assign = mc.collection.Assign(node, cur=cur)#, backend="func_lambda")
 
     self.create_assign_variable(assign, cur, eq_loc)
-    assign[0].declare.type = "func_lambda"
-    assign[0].type = "func_lambda"
 
     k = eq_loc+1
     while self.code[k] in " \t":
@@ -524,16 +526,16 @@ Returns:
             n.create_declare()
 
 
-    func.backend = "func_lambda"
-    returns.backend = "func_lambda"
-    params.backend = "func_lambda"
-    declares.backend = "func_lambda"
+    # func.backend = "func_lambda"
+    # returns.backend = "func_lambda"
+    # params.backend = "func_lambda"
+    # declares.backend = "func_lambda"
 
     var = mc.collection.Var(returns, "_retval")
     var.create_declare()
 
     lamb = mc.collection.Lambda(node, name)
-    lamb.type = "func_lambda"
+    # lamb.type = "func_lambda"
 
     lamb.reference = func
 

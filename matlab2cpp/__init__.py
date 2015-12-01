@@ -51,6 +51,7 @@ import configure
 import rules
 import manual
 
+
 __all__ = ["main"]
 
 from qfunctions import *
@@ -254,4 +255,5 @@ Args:
                 break
     else:
         print program[1].str.replace("__percent__", "%")
+
 

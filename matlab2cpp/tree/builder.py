@@ -17,23 +17,23 @@ the code. The various constructors uses the support modules in the
 follows::
 
     >>> print builder # doctest: +NORMALIZE_WHITESPACE
-         Project    program      TYPE    project
-         | Program    program      TYPE    file1.m
-         | | Includes   program      TYPE
-     1  1| | Funcs      program      TYPE    file1.m
-     1  1| | | Main       func_return  TYPE    main
-     1  1| | | | Declares   func_return  TYPE
+         Project    unknown      TYPE    project
+         | Program    unknown      TYPE    file1.m
+         | | Includes   unknown      TYPE
+     1  1| | Funcs      unknown      TYPE    file1.m
+     1  1| | | Main       unknown      TYPE    main
+     1  1| | | | Declares   unknown      TYPE
      1  1| | | | | Var        unknown      TYPE    a
-     1  1| | | | Returns    func_return  TYPE
-     1  1| | | | Params     func_return  TYPE
-     1  1| | | | Block      code_block   TYPE
+     1  1| | | | Returns    unknown      TYPE
+     1  1| | | | Params     unknown      TYPE
+     1  1| | | | Block      unknown      TYPE
      1  1| | | | | Assign     unknown      TYPE
      1  1| | | | | | Var        unknown      TYPE    a
-     1  5| | | | | | Int        int          int
-         | | Inlines    program      TYPE    file1.m
-         | | Structs    program      TYPE    file1.m
-         | | Headers    program      TYPE    file1.m
-         | | Log        program      TYPE    file1.m
+     1  5| | | | | | Int        unknown      TYPE
+         | | Inlines    unknown      TYPE    file1.m
+         | | Structs    unknown      TYPE    file1.m
+         | | Headers    unknown      TYPE    file1.m
+         | | Log        unknown      TYPE    file1.m
 
 If is possible to get a detailed output of how this process is done, by turning
 the `disp` flag on::
@@ -65,12 +65,12 @@ configure. To configure datatypes, use the `configure` method::
          | | Includes   program      TYPE
      1  1| | Funcs      program      TYPE    file1.m
      1  1| | | Main       func_return  TYPE    main
-     1  1| | | | Declares   func_return  int
+     1  1| | | | Declares   func_return  TYPE
      1  1| | | | | Var        int          int     a
      1  1| | | | Returns    func_return  TYPE
      1  1| | | | Params     func_return  TYPE
      1  1| | | | Block      code_block   TYPE
-     1  1| | | | | Assign     unknown      TYPE
+     1  1| | | | | Assign     unknown      int
      1  1| | | | | | Var        int          int     a
      1  5| | | | | | Int        int          int
          | | Inlines    program      TYPE    file1.m
@@ -174,17 +174,17 @@ Example::
 
     >>> builder = mc.Builder()
     >>> print builder
-         Project    program      TYPE    project
+         Project    unknown      TYPE    project
     >>> builder.load("unnamed.m", "")
     >>> print builder # doctest: +NORMALIZE_WHITESPACE
-         Project    program      TYPE    project
-         | Program    program      TYPE    unnamed.m
-         | | Includes   program      TYPE
-     1  1| | Funcs      program      TYPE    unnamed.m
-         | | Inlines    program      TYPE    unnamed.m
-         | | Structs    program      TYPE    unnamed.m
-         | | Headers    program      TYPE    unnamed.m
-         | | Log        program      TYPE    unnamed.m
+         Project    unknown      TYPE    project
+         | Program    unknown      TYPE    unnamed.m
+         | | Includes   unknown      TYPE
+     1  1| | Funcs      unknown      TYPE    unnamed.m
+         | | Inlines    unknown      TYPE    unnamed.m
+         | | Structs    unknown      TYPE    unnamed.m
+         | | Headers    unknown      TYPE    unnamed.m
+         | | Log        unknown      TYPE    unnamed.m
         """
 
         if self.disp:
@@ -242,31 +242,31 @@ Example::
     >>> builder = mc.Builder()
     >>> builder.load("unnamed.m", "a=1; b=2.; c='c'")
     >>> print builder # doctest: +NORMALIZE_WHITESPACE
-         Project    program      TYPE    project
-         | Program    program      TYPE    unnamed.m
-         | | Includes   program      TYPE
-     1  1| | Funcs      program      TYPE    unnamed.m
-     1  1| | | Main       func_return  TYPE    main
-     1  1| | | | Declares   func_return  TYPE
+         Project    unknown      TYPE    project
+         | Program    unknown      TYPE    unnamed.m
+         | | Includes   unknown      TYPE
+     1  1| | Funcs      unknown      TYPE    unnamed.m
+     1  1| | | Main       unknown      TYPE    main
+     1  1| | | | Declares   unknown      TYPE
      1  1| | | | | Var        unknown      TYPE    a
      1  1| | | | | Var        unknown      TYPE    b
      1  1| | | | | Var        unknown      TYPE    c
-     1  1| | | | Returns    func_return  TYPE
-     1  1| | | | Params     func_return  TYPE
-     1  1| | | | Block      code_block   TYPE
+     1  1| | | | Returns    unknown      TYPE
+     1  1| | | | Params     unknown      TYPE
+     1  1| | | | Block      unknown      TYPE
      1  1| | | | | Assign     unknown      TYPE
      1  1| | | | | | Var        unknown      TYPE    a
-     1  3| | | | | | Int        int          int
+     1  3| | | | | | Int        unknown      TYPE
      1  6| | | | | Assign     unknown      TYPE
      1  6| | | | | | Var        unknown      TYPE    b
-     1  8| | | | | | Float      double       double
+     1  8| | | | | | Float      unknown      TYPE
      1 12| | | | | Assign     unknown      TYPE
      1 12| | | | | | Var        unknown      TYPE    c
-     1 14| | | | | | String     string       string
-         | | Inlines    program      TYPE    unnamed.m
-         | | Structs    program      TYPE    unnamed.m
-         | | Headers    program      TYPE    unnamed.m
-         | | Log        program      TYPE    unnamed.m
+     1 14| | | | | | String     unknown      TYPE
+         | | Inlines    unknown      TYPE    unnamed.m
+         | | Structs    unknown      TYPE    unnamed.m
+         | | Headers    unknown      TYPE    unnamed.m
+         | | Log        unknown      TYPE    unnamed.m
     >>> builder.configure(suggest=True)
     >>> print builder # doctest: +NORMALIZE_WHITESPACE
          Project    program      TYPE    project
@@ -281,13 +281,13 @@ Example::
      1  1| | | | Returns    func_return  TYPE
      1  1| | | | Params     func_return  TYPE
      1  1| | | | Block      code_block   TYPE
-     1  1| | | | | Assign     unknown      TYPE
+     1  1| | | | | Assign     unknown      int 
      1  1| | | | | | Var        int          int     a
      1  3| | | | | | Int        int          int
-     1  6| | | | | Assign     unknown      TYPE
+     1  6| | | | | Assign     unknown      double
      1  6| | | | | | Var        double       double  b
      1  8| | | | | | Float      double       double
-     1 12| | | | | Assign     unknown      TYPE
+     1 12| | | | | Assign     unknown      string
      1 12| | | | | | Var        string       string  c
      1 14| | | | | | String     string       string
          | | Inlines    program      TYPE    unnamed.m

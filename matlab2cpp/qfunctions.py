@@ -1,3 +1,4 @@
+
 """
 Various function for creating quick translations.
 
@@ -507,6 +508,7 @@ Example:
 
     if ftypes:
         tree_.ftypes = ftypes
+
     tree_.translate()
 
     out = ""

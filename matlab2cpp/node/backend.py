@@ -177,6 +177,7 @@ def auxillary(node, type, convert):
     swap_var.parent, node.parent = node.parent, swap_var.parent
 
     # generate code
+    node.translate()
     swap_var.translate(only=True)
     aux_var.translate(only=True)
     if convert:
@@ -210,7 +211,7 @@ def resize(node):
     ps = line.parent.children
     line.parent.children = ps[:i] + ps[-1:] + ps[i:-1]
 
-    resize.translate_one(False)
+    resize.translate(False, only=True)
 
 
 def error(node, msg, onlyw=False):
@@ -242,11 +243,11 @@ def error(node, msg, onlyw=False):
         return
 
     if onlyw:
-        matlab2cpp.collection.Warning(errors, name=name,
-                line=node.line, cur=pos, value=msg, code=code)
+        matlab2cpp.collection.Warning(errors, name=name, line=node.line,
+                cur=pos, value=msg, code=code, backend="program")
     else:
-        matlab2cpp.collection.Error(errors, name=name,
-                line=node.line, cur=pos, value=msg, code=code)
+        matlab2cpp.collection.Error(errors, name=name, line=node.line, cur=pos,
+                value=msg, code=code, backend="program")
 
 
 def create_declare(node):
@@ -384,11 +385,12 @@ def suggest_datatype(node):
 mid_translation = [0]
 def translate(node, opt=None):
 
+    # translate for every program
     if node.cls == "Project":
         map(translate, node)
         return node
 
-    if not mid_translation[0]:
+    if mid_translation[0] == 0:
         log = node.program[5]
         log.children = []
 
@@ -413,8 +415,10 @@ def translate(node, opt=None):
 
 def translate_one(node, opt):
 
+    # e.g. Get_a from user
     value = node.program.parent.kws.get(node.cls+"_"+node.name, None)
 
+    # e.g. Get from user
     if value is None:
         value = node.program.parent.kws.get(node.cls, None)
 
@@ -427,9 +431,11 @@ def translate_one(node, opt):
         target = matlab2cpp.rules.__dict__["_"+backend]
         spesific_name = node.cls + "_" + node.name
 
+        # e.g. Get_a (reserved typically)
         if spesific_name in target.__dict__:
             value = target.__dict__[spesific_name]
 
+        # e.g. Get (normal behavior)
         elif node.cls in target.__dict__:
             value = target.__dict__[node.cls]
 
@@ -440,9 +446,11 @@ def translate_one(node, opt):
                             (node.cls, node.backend))
 
 
+    # let rule create a translation
     if not isinstance(value, (unicode, str, list, tuple)):
         value = value(node)
 
+    # not quite right format
     if isinstance(value, (unicode, matlab2cpp.node.frontend.Node)):
         value = str(value)
 
@@ -452,6 +460,7 @@ def translate_one(node, opt):
 
     node.ret = repr(value)
 
+    # interpolate tuples/lists
     if not isinstance(value, str):
 
         value = list(value)
@@ -476,6 +485,7 @@ def translate_one(node, opt):
                 out += children[i] + value[i+1]
             value = out
 
+    # interperlate string
     try:
         value = value % node.properties()
     except:
@@ -512,11 +522,12 @@ def include(node, name, **kws):
 
     includes = node.program[0]
     if include_code and include_code not in includes.names:
-        matlab2cpp.collection.Include(includes, include_code, value=includes.value)
+        matlab2cpp.collection.Include(includes, include_code,
+                value=includes.value, backend="program")
 
     inlines_ = node.program[2]
     if library_code and library_code not in inlines_.names:
-        matlab2cpp.collection.Inline(inlines_, library_code)
+        matlab2cpp.collection.Inline(inlines_, library_code, backend="program")
 
 
 def wall_clock(node):
@@ -537,7 +548,8 @@ def plotting(node):
     node.include("SPlot")
 
     # add a variable for Splot in declare
-    matlab2cpp.collection.Var(declares, name="_plot", type="SPlot")
+    matlab2cpp.collection.Var(declares, name="_plot", type="SPlot",
+            backend="SPlot")
 
     # get function variable
     func = node.func
@@ -546,7 +558,7 @@ def plotting(node):
     block = func[3]
 
     # create new statement
-    statement = matlab2cpp.collection.Statement(block)
+    statement = matlab2cpp.collection.Statement(block, backend="code_block")
     # fill it with new Get _splot
     matlab2cpp.collection.Get(statement, backend="reserved", name="_splot")
 

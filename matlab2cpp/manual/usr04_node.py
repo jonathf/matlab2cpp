@@ -52,14 +52,14 @@ a good startingpoint. This can either be done through the function
          | | | Include    program      TYPE    using namespace arma ;
      1  1| | Funcs      program      TYPE    unnamed
      1  1| | | Func       func_return  TYPE    f
-     1  1| | | | Declares   func_return  double
+     1  1| | | | Declares   func_return  TYPE
      1  1| | | | | Var        double       double  y
-     1  1| | | | Returns    func_return  double
+     1  1| | | | Returns    func_return  TYPE
      1 10| | | | | Var        double       double  y
-     1 13| | | | Params     func_return  int
+     1 13| | | | Params     func_return  TYPE
      1 14| | | | | Var        int          int     x
      1 16| | | | Block      code_block   TYPE
-     1 18| | | | | Assign     unknown      TYPE
+     1 18| | | | | Assign     unknown      int
      1 18| | | | | | Var        double       double  y
      1 20| | | | | | Plus       expression   int
      1 20| | | | | | | Var        int          int     x

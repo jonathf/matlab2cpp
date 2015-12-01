@@ -41,6 +41,7 @@ Example:
        0   Statement     codeblock.codeblock  '42.'
        0     Expression  expression.create    '42.'
        0     Float       misc.number          '42.'
+    >>> builder.configure()
     >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Statement  code_block   TYPE
@@ -165,6 +166,7 @@ Example:
        0 Codeblock   codeblock.codeblock 
        0   Statement     codeblock.codeblock  "'abc'"
        0     String  misc.string          "'abc'"
+    >>> builder.configure()
     >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Statement  code_block   TYPE
@@ -214,14 +216,15 @@ Example:
        1     Int         misc.number          '2'
        3     Expression  expression.create    '-3'
        4     Int         misc.number          '3'
+    >>> builder.configure(suggest=False)
     >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
-    1 1Block      code_block   TYPE
-    1 1| Statement  code_block   TYPE
-    1 1| | Matrix     matrix       TYPE
-    1 2| | | Vector     matrix       TYPE
-    1 2| | | | Int        int          int
-    1 4| | | | Neg        expression   TYPE
-    1 5| | | | | Int        int          int
+     1  1Block      code_block   TYPE
+     1  1| Statement  code_block   TYPE
+     1  1| | Matrix     matrix       irowvec
+     1  2| | | Vector     matrix       irowvec
+     1  2| | | | Int        int          int
+     1  4| | | | Neg        expression   int
+     1  5| | | | | Int        int          int
     """
 
     if  self.code[cur] not in "({":
@@ -265,6 +268,7 @@ Example:
        0     Expression  expression.create    '4'
        0     Int         misc.number          '4'
        2   Comment       misc.comment         '% comment'
+    >>> builder.configure(suggest=False)
     >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
     1  1Block      code_block   TYPE
     1  1| Statement  code_block   TYPE
@@ -369,19 +373,20 @@ Example:
        8     Int         misc.number          '3'
       10     Expression  expression.create    '4'
       10     Int         misc.number          '4'
+    >>> builder.configure(suggest=False)
     >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
-    1  1Block      code_block   TYPE
-    1  1| Statement  code_block   TYPE
-    1  1| | Matrix     matrix       TYPE
-    1  2| | | Vector     matrix       TYPE
-    1  2| | | | Matrix     matrix       TYPE
-    1  3| | | | | Vector     matrix       TYPE
-    1  3| | | | | | Int        int          int
-    1  5| | | | | | Int        int          int
-    1  8| | | | Matrix     matrix       TYPE
-    1  9| | | | | Vector     matrix       TYPE
-    1  9| | | | | | Int        int          int
-    1 11| | | | | | Int        int          int
+     1   1Block      code_block   TYPE
+     1   1| Statement  code_block   TYPE
+     1   1| | Matrix     matrix       irowvec
+     1   2| | | Vector     matrix       irowvec
+     1   2| | | | Matrix     matrix       irowvec
+     1   3| | | | | Vector     matrix       irowvec
+     1   3| | | | | | Int        int          int
+     1   5| | | | | | Int        int          int
+     1   8| | | | Matrix     matrix       irowvec
+     1   9| | | | | Vector     matrix       irowvec
+     1   9| | | | | | Int        int          int
+     1  11| | | | | | Int        int          int
     """
 
     if  self.code[cur] != "[":
@@ -454,6 +459,7 @@ Example:
        1     Int         misc.number          '1'
        4     Expression  expression.create    '2'
        4     Int         misc.number          '2'
+    >>> builder.configure(suggest=False)
     >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Statement  code_block   TYPE

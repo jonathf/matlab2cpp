@@ -39,6 +39,7 @@ Example:
        3     Var         variables.assign     'b'
        8     Expression  expression.create    'c'
        8     Var         variables.variable   'c'
+    >>> builder.configure()
     >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Assigns    code_block   TYPE    c
@@ -112,6 +113,7 @@ Example:
        0     Var         variables.assign     'a'
        2     Expression  expression.create    'b'
        2     Var         variables.variable   'b'
+    >>> builder.configure()
     >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Assign     unknown      TYPE    b

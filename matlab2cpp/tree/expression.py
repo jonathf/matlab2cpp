@@ -50,6 +50,7 @@ Examples::
        4     Var         variables.variable   'c'
        6     Expression  expression.create    'd'
        6     Var         variables.variable   'd'
+    >>> builder.configure(suggest=False)
     >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Statement  code_block   TYPE
