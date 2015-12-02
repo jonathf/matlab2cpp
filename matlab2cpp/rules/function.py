@@ -30,8 +30,15 @@ Returns:
     if node.type == "func_lambda":
 
         # link to actual lambda-function
+        func = None
+
         if hasattr(node.declare, "reference"):
             func = node.declare.reference
+
+        elif "_"+node.name in node.program[1].names:
+            func = node.program[1]["_"+node.name]
+
+        if not (func is None):
 
             # no returns in lambda
             if len(func[1]) == 0:

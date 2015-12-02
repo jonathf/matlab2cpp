@@ -58,11 +58,10 @@ def funcs(node):
     elif node.backend == "func_lambda":
 
         ret = func[1][0]
-        if ret.type != "TYPE" and node.type == "TYPE":
-            node.type = ret.type
-        elif ret.type == "TYPE" and node.type != "TYPE":
-            ret.type = node.type
-        node.declare.type = "func_lambda"
+        node.suggest = ret.type
+        ret.suggest = node.type
+        if node.type != "TYPE":
+            node.declare.type = "func_lambda"
 
         params = func[2]
         for i in xrange(len(node)):

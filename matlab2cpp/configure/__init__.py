@@ -54,7 +54,6 @@ def loop(root, suggest):
                 else:
                     backend(node)
 
-
         # determine if done
         if suggest:
 

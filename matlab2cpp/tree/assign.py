@@ -41,11 +41,11 @@ Example:
        8     Var         variables.variable   'c'
     >>> builder.configure()
     >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
-    1 1Block      code_block   TYPE
-    1 1| Assigns    code_block   TYPE    c
-    1 2| | Var        unknown      TYPE    a
-    1 4| | Var        unknown      TYPE    b
-    1 9| | Var        unknown      TYPE    c
+     1  1Block      code_block   TYPE
+     1  1| Assigns    unknown      TYPE    c
+     1  2| | Var        unknown      TYPE    a
+     1  4| | Var        unknown      TYPE    b
+     1  9| | Var        unknown      TYPE    c
     """
 
     if  self.code[cur] != "[":

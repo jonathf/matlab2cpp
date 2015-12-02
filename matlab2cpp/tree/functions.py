@@ -394,12 +394,12 @@ Example:
      1  1| Funcs      program      TYPE    unnamed
      1  1| | Main       func_return  TYPE    main
      1  1| | | Declares   func_return  TYPE
-     1  1| | | | Var        func_lambda  func_lambdaf
+     1  1| | | | Var        func_lambda  TYPE    f
      1  1| | | Returns    func_return  TYPE
      1  1| | | Params     func_return  TYPE
      1  1| | | Block      code_block   TYPE
      1  1| | | | Assign     func_lambda  func_lambda
-     1  1| | | | | Var        func_lambda  func_lambdaf
+     1  1| | | | | Var        func_lambda  TYPE    f
      1  1| | | | | Lambda     func_lambda  func_lambda_f
      1  5| | Func       func_lambda  TYPE    _f
      1  5| | | Declares   func_lambda  TYPE

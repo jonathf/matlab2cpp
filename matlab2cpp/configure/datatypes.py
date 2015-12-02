@@ -7,6 +7,9 @@ def Var(node):
 
     if funcs(node):
         return
+
+    if node.parent.cls == "Assign" and node.parent[0] is node:
+        node.declare.suggest = node.parent[1].type
     
     if node.declare.type != "TYPE":
         node.type = node.declare.type
@@ -17,6 +20,33 @@ def Get(node):
     if funcs(node):
         return
 
+    if node.parent.cls == "Assign" and node.parent[0] is node:
+        node.declare.suggest = node.parent[1].type
+
+    if node.declare.type != "TYPE":
+        node.type = node.declare.type
+
+def Fvar(node):
+
+    if node.parent.cls == "Assign" and node.parent[0] is node:
+        node.declare.suggest = node.parent[1].type
+
+    if node.declare.type != "TYPE":
+        node.type = node.declare.type
+
+def Fset(node):
+
+    if node.parent.cls == "Assign":
+        node.declare.suggest = node.parent[1].type
+
+    if node.declare.type != "TYPE":
+        node.type = node.declare.type
+
+def Sset(node):
+
+    if node.parent.cls == "Assign":
+        node.declare.suggest = node.parent[1].type
+
     if node.declare.type != "TYPE":
         node.type = node.declare.type
 
@@ -24,9 +54,8 @@ def Get(node):
 def Assign(node):
     if node[1].type == "TYPE":
         return
-
     node.type = node[1].type
-    node[0].declare.suggest = node[1].type
+    # node[0].declare.suggest = node[1].type
     
 
 def Vector(node):
@@ -169,6 +198,10 @@ def Minus(node):
     if node.mem == 0:
         node.mem = 1
 Elmul = opr
+def Exp(node):
+    opr(node)
+    if node.num and node.mem < 2:
+        node.mem = 2
 
 Int = "int"
 Float = "double"

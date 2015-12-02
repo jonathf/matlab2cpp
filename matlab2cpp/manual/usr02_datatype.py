@@ -95,7 +95,7 @@ through the name prefix ``@``.  For example::
     >>> print mc.qscript("function f(); g = @(x) x^2; g(4)")
     void f()
     {
-      std::function<int(int)> g ;
+      std::function<float(int)> g ;
       g = [] (int x) {pow(x,2) ; } ;
       g(4) ;
     }

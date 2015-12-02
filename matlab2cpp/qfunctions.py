@@ -121,7 +121,7 @@ Example::
     {
       double b ;
       int a ;
-      string c ;
+      std::string c ;
       a = 4 ;
       b = 5. ;
       c = "abc" ;

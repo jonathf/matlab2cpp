@@ -76,7 +76,7 @@ Contains: Var*
 
 Examples:
     >>> print mc.qscript("f = @(x,y,z) x+y+z; f(1,2.,'3')")
-    f = [] (int x, double y, string z) {x+y+z ; } ;
+    f = [] (int x, double y, std::string z) {x+y+z ; } ;
     f(1, 2., "3") ;
     """
     return ", ".join(["%s %s" % (type_string(n), n.name) for n in node])
