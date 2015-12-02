@@ -19,7 +19,7 @@ reserved = {
 "_conv_to", "_reshape",
 "interp1", "linspace", "varargins",
 "sum", "conj", "real", "imag",
-"tic", "toc", "diag",
+"tic", "toc", "diag", "disp",
 "figure", "clf", "cla", "show", "xlabel", "ylabel", "hold",
 "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
 "xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
@@ -802,6 +802,18 @@ def Get_toc(node):
 def Get_diag(node):
     return "diagmat(", ", ", ")"
 
+def Get_disp(node):
+    node.include("iostream")
+    
+    if len(node) == 1:
+        arg = node[0]
+        if not arg.num or arg.dim == 0:
+            return "std::cout << %(0)s << std::endl"
+        else:
+            return "%(0)s.print()"
+    else:
+        node.error("disp should take one argument")
+    return "std::cout << ", "<< ", " << std::endl"
 
 #SPlot reserved words
 def Get_figure(node):

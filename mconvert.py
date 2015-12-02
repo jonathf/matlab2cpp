@@ -63,7 +63,6 @@ except:
 
 args = parser.parse_args()
 
-
 import matlab2cpp
 matlab2cpp.main(args)
 
