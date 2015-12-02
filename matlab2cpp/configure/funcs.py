@@ -47,8 +47,8 @@ def funcs(node):
             params[j].suggest = node[j].type
             node[j].suggest = params[j].type
 
-        if node.parent.cls == "assigns":
-            node.parent.backend = "func_returns"
+        if node.parent.cls == "Assigns":
+            # node.parent.backend = "func_returns"
 
             returns = func[1]
             for j in xrange(len(returns)):
@@ -62,6 +62,7 @@ def funcs(node):
             node.type = ret.type
         elif ret.type == "TYPE" and node.type != "TYPE":
             ret.type = node.type
+        node.declare.type = "func_lambda"
 
         params = func[2]
         for i in xrange(len(node)):

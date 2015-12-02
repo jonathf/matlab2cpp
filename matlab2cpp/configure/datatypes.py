@@ -19,7 +19,6 @@ def Get(node):
 
     if node.declare.type != "TYPE":
         node.type = node.declare.type
-        return
 
 
 def Assign(node):
@@ -165,6 +164,10 @@ def opr(node):
     node.type = [n.type for n in node]
 
 Plus = opr
+def Minus(node):
+    opr(node)
+    if node.mem == 0:
+        node.mem = 1
 Elmul = opr
 
 Int = "int"
@@ -220,7 +223,11 @@ def Lambda(node):
     mc.configure.configure(lfunc)
     # declare list in lambda function
     if ldeclares["_retval"].type != "TYPE":
-        node.type = "func_lambda"
         declares[node.name[1:]].type = "func_lambda"
         node.parent.type = "func_lambda"
         node.parent[0].type = "func_lambda"
+    node.type = "func_lambda"
+
+def Assigns(node):
+    if node[-1].type != "TYPE":
+        node.type = node[-1].type

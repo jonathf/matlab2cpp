@@ -29,7 +29,12 @@ Tryblock = "code_block"
 Try = "code_block"
 Catch = "code_block"
 Statement = "code_block"
-Assigns = "code_block"
+def Assigns(node):
+    backend = node[-1].backend
+    if backend in ("func_returns",):
+        node.backend = backend
+    elif backend != "unknown":
+        node.backend = "code_block"
 Expr = "expression"
 Exp = "expression"
 Elexp = "expression"
@@ -134,5 +139,5 @@ def Declares(node):
 
 
 def Assign(node):
-    if node[1].type == "func_lambda":
+    if node[1].backend == "func_lambda":
         node.backend = "func_lambda"
