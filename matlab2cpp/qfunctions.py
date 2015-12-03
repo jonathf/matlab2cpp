@@ -3,17 +3,23 @@
 For simplest use of the module, these function works as an alternative frontend
 to the ``mconvert`` script.
 
-==============================  ===========
-Function                        Description
-==============================  ===========
-:py:func:`~matlab2cpp.build`    Build token tree
-:py:func:`~matlab2cpp.qcpp`     Create content of `.cpp` file
-:py:func:`~matlab2cpp.qhpp`     Create content of `.hpp` file
-:py:func:`~matlab2cpp.qpy`      Create content of supplement `.py` file
-:py:func:`~matlab2cpp.qlog`     Create content of `.log` file
-:py:func:`~matlab2cpp.qscript`  Create quick code translation
-:py:func:`~matlab2cpp.qtree`    Create summary of node tree
-==============================  ===========
++--------------------------------+-----------------------------------------+
+| Function                       | Description                             |
++================================+=========================================+
+| :py:func:`~matlab2cpp.build`   | Build token tree representation of code |
++--------------------------------+-----------------------------------------+
+| :py:func:`~matlab2cpp.qcpp`    | Create content of `.cpp` file           |
++--------------------------------+-----------------------------------------+
+| :py:func:`~matlab2cpp.qhpp`    | Create content of `.hpp` file           |
++--------------------------------+-----------------------------------------+
+| :py:func:`~matlab2cpp.qpy`     | Create content of supplement `.py` file |
++--------------------------------+-----------------------------------------+
+| :py:func:`~matlab2cpp.qlog`    | Create content of `.log` file           |
++--------------------------------+-----------------------------------------+
+| :py:func:`~matlab2cpp.qscript` | Create script translation               |
++--------------------------------+-----------------------------------------+
+| :py:func:`~matlab2cpp.qtree`   | Create summary of node tree             |
++--------------------------------+-----------------------------------------+
 """
 
 import supplement

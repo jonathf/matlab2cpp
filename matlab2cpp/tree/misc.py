@@ -17,6 +17,8 @@ import matlab2cpp as mc
 import constants as c
 import findend
 import expression
+import iterate
+import identify
 
 
 def number(self, node, start):
@@ -231,7 +233,7 @@ Example:
         self.syntaxerror(cur, "start of list character")
 
     end = cur
-    for vector in self.iterate_comma_list(cur):
+    for vector in iterate.comma_list(self, cur):
         for start,end in vector:
             self.create_expression(parent, start, end)
 
@@ -398,7 +400,10 @@ Example:
         print "%-20s" % "misc.matrix",
         print repr(self.code[cur:end+1])
 
-    L = self.iterate_list(cur)
+    if identify.space_delimited(self, cur):
+        L = iterate.space_list(self, cur)
+    else:
+        L = iterate.comma_list(self, cur)
     matrix = mc.collection.Matrix(node, cur=cur, code=self.code[cur:end+1])
 
     for array in L:
@@ -477,7 +482,10 @@ Example:
         print "%-20s" % "misc.cell",
         print repr(self.code[cur:end+1])
 
-    L = self.iterate_list(cur)
+    if identify.space_delimited(self, cur):
+        L = iterate.space_list(self, cur)
+    else:
+        L = iterate.comma_list(self, cur)
     cell = mc.collection.Cell(node, cur=cur, code=self.code[cur:end+1])
 
     for array in L:

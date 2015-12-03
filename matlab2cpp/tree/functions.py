@@ -21,6 +21,8 @@ Functions, programs and meta-nodes
 import matlab2cpp as mc
 import constants as c
 import findend
+import iterate
+import identify
 
 
 def program(self, name):
@@ -196,7 +198,10 @@ Example:
 
         # multi-return
         if self.code[start] == "[":
-            L = self.iterate_list(start)
+            if identify.space_delimited(self, start):
+                L = iterate.space_list(self, start)
+            else:
+                L = iterate.comma_list(self, start)
             end = START
             for array in L:
                 for s,e in array:
@@ -263,7 +268,7 @@ Example:
         end = findend.paren(self, cur)
         params.code = self.code[cur+1:end]
 
-        L = self.iterate_comma_list(cur)
+        L = iterate.comma_list(self, cur)
         for array in L:
             for s,e in array:
 
@@ -280,17 +285,6 @@ Example:
     cur += 1
 
     cur = self.create_codeblock(func, cur)
-
-    # if len(returns) == 1:
-    #     func.backend = "func_return"
-    #     func[0].backend = "func_return"
-    #     func[1].backend = "func_return"
-    #     func[2].backend = "func_return"
-    # else:
-    #     func.backend = "func_returns"
-    #     func[0].backend = "func_returns"
-    #     func[1].backend = "func_returns"
-    #     func[2].backend = "func_returns"
 
     # Postfix
     for var in returns:

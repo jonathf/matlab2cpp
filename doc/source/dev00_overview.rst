@@ -1,4 +1,4 @@
-.. dev00:
+.. _dev00:
 
 Module overview
 ===============

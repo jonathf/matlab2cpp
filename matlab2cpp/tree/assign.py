@@ -13,6 +13,8 @@ import matlab2cpp as mc
 
 import findend
 import constants as c
+import identify
+import iterate
 
 def multi(self, parent, cur, eq_loc):
     """
@@ -67,7 +69,10 @@ Example:
         print "%-20s" % "assign.multi",
         print repr(self.code[cur:end+1])
 
-    l = self.iterate_list(cur)
+    if identify.space_delimited(self, cur):
+        l = iterate.space_list(self, cur)
+    else:
+        l = iterate.comma_list(self, cur)
 
     if len(l[0]) == 1:
         return self.create_assign(parent, l[0][0][0], eq_loc)
