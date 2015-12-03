@@ -1,6 +1,7 @@
 
 """
-Various function for creating quick translations.
+For simplest use of the module, these function works as an alternative frontend
+to the ``mconvert`` script.
 
 ==============================  ===========
 Function                        Description
@@ -411,7 +412,26 @@ a node.  Each line will typically look as follows::
 
       1  10 | | | Var        unknown      TYPE    y
 
-The content is described in details in :py:mod:`~matlab2cpp.tree`.
+The line can be interpreted as follows:
+
++--------+-------------------------------+------------------------------------+
+| Column | Description                   | Object                             |
++========+===============================+====================================+
+| 1      | Matlab code line number       | :py:obj:`~matlab2cpp.Node.line`    |
++--------+-------------------------------+------------------------------------+
+| 2      | Matlab code cursor number     | :py:obj:`~matlab2cpp.Node.cur`     |
++--------+-------------------------------+------------------------------------+
+| 3      | The node categorization type  | :py:class:`~matlab2cpp.Node.cls`   |
++--------+-------------------------------+------------------------------------+
+| 4      | The rule used for translation | :py:obj:`~matlab2cpp.Node.backend` |
++--------+-------------------------------+------------------------------------+
+| 5      | The data type of the node     | :py:mod:`~matlab2cpp.Node.type`    |
++--------+-------------------------------+------------------------------------+
+| 6      | Name of the node (if any)     | :py:obj:`~matlab2cpp.Node.name`    |
++--------+-------------------------------+------------------------------------+
+
+The vertical bars represents branches. The right most bar on each line points
+upwards towards its node parent.
 
 Args:
     code (str, Builder, Node): Representation of the node tree.
@@ -420,7 +440,7 @@ Args:
     **kws: Additional arguments passed to :py:obj:`~matlab2cpp.Builder`.
 
 Returns:
-	str: A summary of the node tree.
+    str: A summary of the node tree.
 
 Example::
     >>> print mc.qtree("function y=f(x); y=x+4") #doctest: +NORMALIZE_WHITESPACE

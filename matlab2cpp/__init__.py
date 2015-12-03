@@ -8,16 +8,15 @@ The toolbox is sorted into the following modules:
 | :py:mod:`~matlab2cpp.qfunctions` | Functions for performing simple        |
 |                                  | translations                           |
 +----------------------------------+----------------------------------------+
-| :py:mod:`~matlab2cpp.tree`       | Constructing a tree from Matlab code   |
+| :py:class:`~matlab2cpp.Builder`  | Constructing a tree from Matlab code   |
 +----------------------------------+----------------------------------------+
-| :py:mod:`~matlab2cpp.node`       | Node behavior                          |
-+----------------------------------+----------------------------------------+
-| :py:mod:`~matlab2cpp.datatype`   | The various node data types            |
-+----------------------------------+----------------------------------------+
-| :py:mod:`~matlab2cpp.configure`  | Rutine for setting datatype            |
-|                                  | automatically                          |
+| :py:class:`~matlab2cpp.Node`     | Components in the tree representation  |
+|                                  | of the code                            |
 +----------------------------------+----------------------------------------+
 | :py:mod:`~matlab2cpp.collection` | The collcetion of various node         |
++----------------------------------+----------------------------------------+
+| :py:mod:`~matlab2cpp.configure`  | Rutine for setting datatypes and       |
+|                                  | backends of the various nodes          |
 +----------------------------------+----------------------------------------+
 | :py:mod:`~matlab2cpp.rules`      | Translation rules                      |
 +----------------------------------+----------------------------------------+

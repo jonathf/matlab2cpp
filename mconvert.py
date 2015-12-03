@@ -61,8 +61,9 @@ try:
 except:
     pass
 
-args = parser.parse_args()
+if __name__ == "__main__":
+    args = parser.parse_args()
 
-import matlab2cpp
-matlab2cpp.main(args)
+    import matlab2cpp
+    matlab2cpp.main(args)
 

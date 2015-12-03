@@ -13,7 +13,6 @@ User Manual
     usr02_datatype
     usr03_rules
     usr04_node
-    usr05_tree
 
 ================
 Developer Manual
