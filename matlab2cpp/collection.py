@@ -205,7 +205,7 @@ __all__ = [
 ]
 
 class Project(Node):
-    def __init__(self, name="project", cur=0, line=0, code="", file="unnamed", **kws):
+    def __init__(self, name="", cur=0, line=0, code="", **kws):
         """
 Root of the node tree. Every other node should inherant from this one.
 
@@ -220,7 +220,7 @@ All keyword arguments are passed to `mc.Node.__init__`.
         self.parent = self
         self._program = self
         Node.__init__(self, self, name=name, cur=cur,
-                line=line, code=code, file=file, **kws)
+                line=line, code=code, **kws)
 
 class Program(Node):
     def __init__(self, parent, name, **kws):
@@ -234,7 +234,7 @@ Children:
 All keyword arguments are passed to `mc.Node.__init__`.
     """
         self._program = self
-        Node.__init__(self, parent, name=name, file=name, **kws)
+        Node.__init__(self, parent, name=name, **kws)
 
 class Includes(Node):
     def __init__(self, parent, **kws):

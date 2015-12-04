@@ -31,7 +31,7 @@ forward in the code. The various constructors uses the support modules in the
 follows::
 
     >>> print builder # doctest: +NORMALIZE_WHITESPACE
-         Project    unknown      TYPE    project
+         Project    unknown      TYPE
          | Program    unknown      TYPE    file1.m
          | | Includes   unknown      TYPE
      1  1| | Funcs      unknown      TYPE    file1.m
@@ -76,7 +76,7 @@ respectivly.  To configure backends and datatypes, use the
 
     >>> builder.configure(suggest=True)
     >>> print builder # doctest: +NORMALIZE_WHITESPACE
-         Project    program      TYPE    project
+         Project    program      TYPE
          | Program    program      TYPE    file1.m
          | | Includes   program      TYPE
      1  1| | Funcs      program      TYPE    file1.m
@@ -162,7 +162,7 @@ a good startingpoint. This can either be done through the function
     >>> builder[0].ftypes = {"f" : {"x": "int", "y": "double"}}
     >>> builder.translate()
     >>> print builder # doctest: +NORMALIZE_WHITESPACE
-         Project    program      TYPE    project
+         Project    program      TYPE
          | Program    program      TYPE    unnamed
          | | Includes   program      TYPE
          | | | Include    program      TYPE    #include <armadillo>

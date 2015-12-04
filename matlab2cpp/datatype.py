@@ -206,7 +206,8 @@ It represents the number of dimension a numerical object represents:
 
 The variable can be both read and set in real time:
 
-    >>> node = mc.Var(None, "name", type="float")
+    >>> node = mc.Var(None, "name")
+    >>> node.type="float"
     >>> print node.dim
     0
     >>> node.dim = 3
@@ -247,7 +248,8 @@ It represents the internal basic datatype represented in memory:
 
 The variable can be both read and set in real time:
 
-    >>> node = mc.Var(None, "name", type="float")
+    >>> node = mc.Var(None, "name")
+    >>> node.type="float"
     >>> print node.mem
     2
     >>> node.mem = 3
