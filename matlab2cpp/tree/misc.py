@@ -496,6 +496,8 @@ Example:
 
 
 def reserved(self, node, start):
+    """Reserved keywords
+    """
 
     k = start
 

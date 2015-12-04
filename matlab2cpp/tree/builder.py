@@ -30,7 +30,7 @@ through indexing the Builder instance. For example::
     Program prg2.m
 
 Programs that are loaded, configured and translated, can be converted into C++
-code through the front end functions in :py:mod:`~matlab2cpp.qfunctions`::
+code through the front end functions in :py:mod:`matlab2cpp.qfunctions`::
 
     >>> print mc.qhpp(prg1)
     #include <armadillo>
@@ -61,7 +61,7 @@ Args:
     comments (bool):
         Include comments in the code interpretation
     **kws: 
-        Optional arguments are passed to :py:mod:`~matlab2cpp.rules`
+        Optional arguments are passed to :py:mod:`matlab2cpp.rules`
         """
 
         self.disp = disp
@@ -97,17 +97,17 @@ Example:
         """
 Summary of all node trees
 
-Same as :py:func:`~matlab2cpp.Node.summary`, but for the whole project.
+Same as :py:func:`matlab2cpp.Node.summary`, but for the whole project.
 
 str(builder) <=> Builder.__str__(builder)
 
 Example:
     >>> builder = mc.Builder()
-    >>> print builder
-         Project    unknown      TYPE    project
+    >>> print builder # doctest: +NORMALIZE_WHITESPACE
+         Project    unknown      TYPE
 
 See also:
-    :py:func:`~matlab2cpp.Node.summary`
+    :py:func:`matlab2cpp.Node.summary`
         """
         return self.project.summary()
 
@@ -117,7 +117,7 @@ See also:
 Load a Matlab code into the node tree.
 
 The code is inserted into the attribute `self.code` and initiate the
-:py:func:`~matlab2cpp.Builder.create_program`, which evoces various other
+:py:func:`matlab2cpp.Builder.create_program`, which evoces various other
 ``create_*`` methods. Each method creates nodes and/or pushes the job over to
 other create methods.
 
@@ -132,7 +132,7 @@ Example::
     >>> builder = mc.Builder()
     >>> builder.load("unnamed.m", "")
     >>> print builder # doctest: +NORMALIZE_WHITESPACE
-         Project    unknown      TYPE    project
+         Project    unknown      TYPE
          | Program    unknown      TYPE    unnamed.m
          | | Includes   unknown      TYPE
      1  1| | Funcs      unknown      TYPE    unnamed.m
@@ -216,7 +216,7 @@ Example::
     >>> builder = mc.Builder()
     >>> builder.load("unnamed.m", "a=1; b=2.; c='c'")
     >>> print builder # doctest: +NORMALIZE_WHITESPACE
-         Project    unknown      TYPE    project
+         Project    unknown      TYPE
          | Program    unknown      TYPE    unnamed.m
          | | Includes   unknown      TYPE
      1  1| | Funcs      unknown      TYPE    unnamed.m
@@ -243,7 +243,7 @@ Example::
          | | Log        unknown      TYPE    unnamed.m
     >>> builder.configure(suggest=True)
     >>> print builder # doctest: +NORMALIZE_WHITESPACE
-         Project    program      TYPE    project
+         Project    program      TYPE
          | Program    program      TYPE    unnamed.m
          | | Includes   program      TYPE
      1  1| | Funcs      program      TYPE    unnamed.m
@@ -284,7 +284,7 @@ Perform translation on all nodes in all programs in builder.
 Also runs configure if not done already.
 
 See also:
-    :py:mod:`~matlab2cpp.rules`
+    :py:mod:`matlab2cpp.rules`
         """
 
         if not self.configured:
