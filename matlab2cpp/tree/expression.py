@@ -1,9 +1,5 @@
 """
 Expression interpretor
-
-functions
-~~~~~~~~~
-expression          Expression interpretor
 """
 
 import matlab2cpp as mc
@@ -272,6 +268,14 @@ Examples::
 
 
 def retrieve_operator(self, opr):
+    """
+Retrieve operator class by string
+
+Args:
+    opr (str): operator string
+Returns:
+    Node: class of corrensponding operator
+    """
 
     if opr == "^":      return mc.collection.Exp
     elif opr == ".^":   return mc.collection.Elexp

@@ -1,19 +1,19 @@
 """
 Iterpretors related to branches, loops and try.
 
-+------------------------------------------------+-----------------------------+
-| Function                                       | Description                 |
-+================================================+=============================+
-| :py:func:`~matlab2cpp.tree.branches.trybranch` | Try-catch block             |
-+------------------------------------------------+-----------------------------+
-| :py:func:`~matlab2cpp.tree.branches.switch`    | Switch-case branch          |
-+------------------------------------------------+-----------------------------+
-| :py:func:`~matlab2cpp.tree.branches.whileloop` | While loop                  |
-+------------------------------------------------+-----------------------------+
-| :py:func:`~matlab2cpp.tree.branches.forloop`   | For loop                    |
-+------------------------------------------------+-----------------------------+
-| :py:func:`~matlab2cpp.tree.branchesifbranch`   | If-ifelse-else branch       |
-+------------------------------------------------+-----------------------------+
++------------------------------------------------+-----------------------+
+| Function                                       | Description           |
++================================================+=======================+
+| :py:func:`~matlab2cpp.tree.branches.trybranch` | Try-catch block       |
++------------------------------------------------+-----------------------+
+| :py:func:`~matlab2cpp.tree.branches.switch`    | Switch-case branch    |
++------------------------------------------------+-----------------------+
+| :py:func:`~matlab2cpp.tree.branches.whileloop` | While loop            |
++------------------------------------------------+-----------------------+
+| :py:func:`~matlab2cpp.tree.branches.forloop`   | For loop              |
++------------------------------------------------+-----------------------+
+| :py:func:`~matlab2cpp.tree.branches.ifbranch`  | If-ifelse-else branch |
++------------------------------------------------+-----------------------+
 """
 
 import matlab2cpp as mc

@@ -1,7 +1,3 @@
-"""
-Contains the Builder class definition.
-"""
-
 import expression
 import functions
 import variables
@@ -55,12 +51,7 @@ code through the front end functions in :py:mod:`~matlab2cpp.qfunctions`::
       prg1(4) ;
       return 0 ;
     }
-
     """
-    ftypes = suppliment.Fbuilder()
-    stypes = suppliment.Sbuilder()
-    itypes = suppliment.Ibuilder()
-    vtypes = suppliment.Vbuilder()
 
     def __init__(self, disp=False, comments=True, **kws):
         """
@@ -106,12 +97,17 @@ Example:
         """
 Summary of all node trees
 
+Same as :py:func:`~matlab2cpp.Node.summary`, but for the whole project.
+
 str(builder) <=> Builder.__str__(builder)
 
 Example:
     >>> builder = mc.Builder()
     >>> print builder
          Project    unknown      TYPE    project
+
+See also:
+    :py:func:`~matlab2cpp.Node.summary`
         """
         return self.project.summary()
 
@@ -121,7 +117,7 @@ Example:
 Load a Matlab code into the node tree.
 
 The code is inserted into the attribute `self.code` and initiate the
-:py:method:`~matlab2cpp.Builder.create_program`, which evoces various other
+:py:func:`~matlab2cpp.Builder.create_program`, which evoces various other
 ``create_*`` methods. Each method creates nodes and/or pushes the job over to
 other create methods.
 
@@ -285,6 +281,7 @@ Raises:
     def translate(self):
         """
 Perform translation on all nodes in all programs in builder.
+Also runs configure if not done already.
 
 See also:
     :py:mod:`~matlab2cpp.rules`
@@ -337,12 +334,25 @@ Example::
 
     def create_program(self, name):
         """
-Create program container
+Create program meta variables and initiates to fill them
+
+| Structure:
+|   Program
+|   | Includes
+|   | Funcs
+|   | Inlines
+|   | Structs
+|   | Headers
+|   | Log
 
 Args:
-    name (str, int): name or index of program
+    name (str): filename of program
+
 Returns:
-    int: position in program scanning is complete.
+    int: position in program when scanning is complete.
+
+See also:
+    :py:func:`matlab2cpp.tree.functions.program`
     """
         assert isinstance(name, (int, str))
         return functions.program(self, name)
@@ -352,11 +362,22 @@ Returns:
         """
 Create function (not main)
 
+| Structure:
+|   Func
+|   | Declares
+|   | Returns
+|   | Params
+|   | <code block>
+
 Args:
     parent (Funcs): Reference to parent node
     cur (int): position where function is identified
+
 Returns:
     int: position where function ends
+
+See also:
+    :py:func:`matlab2cpp.tree.functions.function`
     """
         assert isinstance(parent, mc.collection.Funcs)
         return functions.function(self, parent, cur)
@@ -366,11 +387,22 @@ Returns:
         """
 Create main function
 
+| Structure:
+|   Main
+|   | Declares
+|   | Returns
+|   | Params
+|   | <code block>
+
 Args:
     parent (Funcs): Reference to parent node
     cur (int): position where main function is identified
+
 Returns:
-    int: position where main function ends<+description+>
+    int: position where main function ends
+
+See also:
+    :py:func:`matlab2cpp.tree.functions.main`
     """
         assert isinstance(parent, mc.collection.Funcs)
         return functions.main(self, parent, cur)
@@ -380,12 +412,21 @@ Returns:
         """
 Create assignments involving lambda functions
 
+| Structure:
+|   Assign
+|   | <assign variable>
+|   | <lambda function>
+
 Args:
     parent (Block): Reference to parent node
-    cur (int): position where <+node+> is identified
+    cur (int): position where Lambda assignment is identified
     eq_loc (int): position of assignment equal sign
+
 Returns:
-    int: position where <+node+> ends
+    int: position where Lambda assignment ends
+
+See also:
+    :py:func:`matlab2cpp.tree.functions.lambda_assign`
     """
         assert isinstance(parent, mc.collection.Block)
         return functions.lambda_assign(self, parent, cur, eq_loc)
@@ -393,13 +434,32 @@ Returns:
 
     def create_lambda_func(self, parent, cur):
         """
-Create lambda_func
+Create lambda function
+
+| Structure (function part):
+|   Func
+|   | Declares
+|   | Returns
+|   | | Var (_retval)
+|   | Params
+|   | Block
+|   | | Assign
+|   | | | Var (_retval)
+|   | | | <expression>
+|
+| Structure (lambda part):
+|   Lambda
+
 
 Args:
-    parent (<+type+>): Reference to parent node
-    cur (int): position where <+node+> is identified
+    parent (Assign): Reference to parent node
+    cur (int): position where Lambda function is identified
+
 Returns:
-    int: position where <+node+> ends
+    int: position where Lambda function ends
+
+See also:
+    :py:func:`matlab2cpp.tree.functions.lambda_func`
     """
         assert isinstance(parent, mc.collection.Assign)
         return functions.lambda_func(self, parent, cur)
@@ -407,119 +467,243 @@ Returns:
 
     def create_codeblock(self, parent, cur):
         """
-Create codeblock
+Create codeblock Block
+
+| Structure:
+|   Assign|Assigns|Bcomment|Ecomment|Lcomment|Statement
+
+`Statements` are handled locally and evoces <expression>
+
+Legal parents:
+Case, Catch, Elif, Else, For, Func, If, Main, Otherwise, Switch, Try, While
 
 Args:
-    parent (<+type+>): Reference to parent node
-    cur (int): position where <+node+> is identified
+    parent (Node): Reference to parent node
+    cur (int): position where codeblock is identified
+
 Returns:
-    int: position where <+node+> ends
+    int: position where codeblock ends
+
+See also:
+    :py:func:`matlab2cpp.tree.codeblock.codeblock`
     """
+        pnames = [ "Case", "Catch", "Elif", "Else", "For", "Func", "If",
+                "Main", "Otherwise", "Switch", "Try", "While"]
+        pnodes = [getattr(mc.collection, name) for name in pnames]
+        ppart = [isinstance(parent, node) for node in pnodes]
+        if not any(ppart):
+            raise AssertionError(
+                    "parent of Block: %s not valid group parent\n%s" %\
+                    (parent.cls, str(pnames)))
+            
         return codeblock.codeblock(self, parent, cur)
 
 
     def create_assigns(self, parent, cur, eq_loc):
         """
-Create assigns
+Create assignment with multiple returns
+
+| Structure:
+|   Assigns
+|   | <list of return vars>
+|   | Get|Var
 
 Args:
-    parent (<+type+>): Reference to parent node
-    cur (int): position where <+node+> is identified
+    parent (Block): Reference to parent node
+    cur (int): position where assignments is identified
     eq_loc (int): position of assignment equal sign
+
 Returns:
-    int: position where <+node+> ends
+    int: position where assignments ends
+
+See also:
+    :py:func:`matlab2cpp.tree.assign.multi`
     """
+        assert isinstance(parent, mc.collection.Block)
         return assign.multi(self, parent, cur, eq_loc)
 
 
     def create_assign(self, parent, cur, eq_loc):
         """
-Create assign
+Create assignment with single return
+
+| Structure:
+|   Assign
+|   | <return var>
+|   | Get|Var
 
 Args:
-    parent (<+type+>): Reference to parent node
-    cur (int): position where <+node+> is identified
+    parent (Block): Reference to parent node
+    cur (int): position where assignment is identified
     eq_loc (int): position of assignment equal sign
+
 Returns:
-    int: position where <+node+> ends
+    int: position where assignment ends
+
+See also:
+    :py:func:`matlab2cpp.tree.assign.single`
     """
+        assert isinstance(parent, mc.collection.Block)
         return assign.single(self, parent, cur, eq_loc)
 
 
     def create_for(self, parent, cur):
         """
-Create for
+Create For-loop
+
+| Structure:
+|   For
+|   | <loop variable>
+|   | <loop expression>
+|   | <code block>
 
 Args:
-    parent (<+type+>): Reference to parent node
-    cur (int): position where <+node+> is identified
+    parent (Block): Reference to parent node
+    cur (int): position where for-loop is identified
+
 Returns:
-    int: position where <+node+> ends
+    int: position where for-loop ends
+
+See also:
+    :py:func:`matlab2cpp.tree.branches.forloop`
     """
+        assert isinstance(parent, mc.collection.Block)
         return branches.forloop(self, parent, cur)
 
 
     def create_if(self, parent, cur):
         """
-Create if
+Create if-branch
+
+| Structure (main):
+|   Branch
+|   | If
+|   | | <cond expression>
+|   | | <code block>
+|   | <else if>*
+|   | <else>?
+|
+| Structure (else if):
+|   Elif
+|   | <cond expression>
+|   | <code block>
+|
+| Structure (else):
+|   Else
+|   | <code block>
 
 Args:
-    parent (<+type+>): Reference to parent node
-    cur (int): position where <+node+> is identified
+    parent (Block): Reference to parent node
+    cur (int): position where if-branch is identified
+
 Returns:
-    int: position where <+node+> ends
+    int: position where if-branch ends
+
+See also:
+    :py:func:`matlab2cpp.tree.branches.ifbranch`
     """
+        assert isinstance(parent, mc.collection.Block)
         return branches.ifbranch(self, parent, cur)
 
 
     def create_while(self, parent, cur):
         """
-Create while
+Create while-loop
+
+| Structure:
+|   While
+|   | <cond expression>
+|   | <code block>
 
 Args:
-    parent (<+type+>): Reference to parent node
-    cur (int): position where <+node+> is identified
+    parent (Block): Reference to parent node
+    cur (int): position where while-loop is identified
+
 Returns:
-    int: position where <+node+> ends
+    int: position where while-loop ends
+
+See also:
+    :py:func:`matlab2cpp.tree.branches.whileloop`
     """
+        assert isinstance(parent, mc.collection.Block)
         return branches.whileloop(self, parent, cur)
 
 
     def create_switch(self, parent, cur):
         """
-Create switch
+Create switch-branch
+
+| Structure (main):
+|   Switch
+|   | <cond expression>
+|   | <case>+
+|   | <otherwise>?
+|
+| Structure (case):
+|   Case
+|   | <cond expression>
+|   | <code block>
+|
+| Structure (otherwise):
+|   Otherwise
+|   | <code block>
 
 Args:
-    parent (<+type+>): Reference to parent node
-    cur (int): position where <+node+> is identified
+    parent (Block): Reference to parent node
+    cur (int): position where switch is identified
+
 Returns:
-    int: position where <+node+> ends
+    int: position where switch ends
+
+See also:
+    :py:func:`matlab2cpp.tree.branches.switch`
     """
+        assert isinstance(parent, mc.collection.Block)
         return branches.switch(self, parent, cur)
 
 
     def create_try(self, parent, cur):
         """
-Create try
+Create try-block
+
+| Structure:
+|   Tryblock
+|   | Try
+|   | | <code block>
+|   | Catch
+|   | | <code block>
 
 Args:
-    parent (<+type+>): Reference to parent node
-    cur (int): position where <+node+> is identified
+    parent (Block): Reference to parent node
+    cur (int): position where try-block is identified
+
 Returns:
-    int: position where <+node+> ends
+    int: position where try-block ends
+
+See also:
+    :py:func:`matlab2cpp.tree.branches.trybranch`
     """
+        assert isinstance(parent, mc.collection.Block)
         return branches.trybranch(self, parent, cur)
 
 
     def create_cell(self, parent, cur):
         """
-Create cell
+Create cell-structure (expression)
+
+| Structure:
+|   Cell
+|   | <expression>+
 
 Args:
-    parent (<+type+>): Reference to parent node
-    cur (int): position where <+node+> is identified
+    parent (Node): Reference to parent node
+    cur (int): position where cell is identified
+
 Returns:
-    int: position where <+node+> ends
+    int: position where cell ends
+
+See also:
+    :py:func:`matlab2cpp.tree.misc.cell`
     """
         return misc.cell(self, parent, cur)
 
@@ -528,117 +712,197 @@ Returns:
         """
 Create comment
 
+| Structure:
+|   Bcomment|Ecomment|Lcomment
+
 Args:
-    parent (<+type+>): Reference to parent node
-    cur (int): position where <+node+> is identified
+    parent (Block): Reference to parent node
+    cur (int): position where comment is identified
+
 Returns:
-    int: position where <+node+> ends
+    int: position where comment ends
+
+See also:
+    :py:func:`matlab2cpp.tree.misc.comment`
     """
+        assert isinstance(parent, mc.collection.Block)
         return misc.comment(self, parent, cur)
 
 
     def create_verbatim(self, parent, cur):
         """
-Create verbatim
+Create verbatim translation
+
+A manual overrides switch provided by the user to perform translations.
+
+| Structure:
+|   Verbatim
 
 Args:
-    parent (<+type+>): Reference to parent node
-    cur (int): position where <+node+> is identified
+    parent (Block): Reference to parent node
+    cur (int): position where verbatim is identified
+    
 Returns:
-    int: position where <+node+> ends
+    int: position where verbatim ends
+
+See also:
+    :py:func:`matlab2cpp.tree.misc.verbatim`
     """
         return misc.verbatim(self, parent, cur)
     
 
     def create_string(self, parent, cur):
         """
-Create string
+Create string (Expression)
+
+| Structure:
+|   String
 
 Args:
-    parent (<+type+>): Reference to parent node
-    cur (int): position where <+node+> is identified
+    parent (Node): Reference to parent node
+    cur (int): position where string is identified
+
 Returns:
-    int: position where <+node+> ends
+    int: position where string ends
+
+See also:
+    :py:func:`matlab2cpp.tree.misc.string`
     """
         return misc.string(self, parent, cur)
 
 
     def create_list(self, parent, cur):
         """
-Create list
+Create list of expressions
+
+| Structure:
+|   <expression>*
 
 Args:
-    parent (<+type+>): Reference to parent node
-    cur (int): position where <+node+> is identified
+    parent (Node): Reference to parent node
+    cur (int): position where list is identified
+
 Returns:
-    int: position where <+node+> ends
+    int: position where list ends
+
+See also:
+    :py:func:`matlab2cpp.tree.misc.list`
     """
         return misc.list(self, parent, cur)
 
 
     def create_matrix(self, parent, cur):
         """
-Create matrix
+Create matrix (Expression)
+
+| Structure (main):
+|   Matrix
+|   | <vector>*
+|
+| Structure (vector):
+|   Vector
+|   | <expression>*
 
 Args:
-    parent (<+type+>): Reference to parent node
-    cur (int): position where <+node+> is identified
+    parent (Node): Reference to parent node
+    cur (int): position where matrix is identified
+
 Returns:
-    int: position where <+node+> ends
+    int: position where matrix ends
+
+See also:
+    :py:func:`matlab2cpp.tree.misc.matrix`
     """
         return misc.matrix(self, parent, cur)
 
 
     def create_number(self, parent, cur):
         """
-Create number
+Create number (Expression)
+
+| Structure:
+|   Int|Float|Imag
 
 Args:
-    parent (<+type+>): Reference to parent node
-    cur (int): position where <+node+> is identified
+    parent (Node): Reference to parent node
+    cur (int): position where number is identified
+
 Returns:
-    int: position where <+node+> ends
+    int: position where number ends
+
+See also:
+    :py:func:`matlab2cpp.tree.misc.number`
     """
         return misc.number(self, parent, cur)
 
 
     def create_reserved(self, parent, cur):
         """
-Create reserved
+Create Matlab reserved keywords.
+
+Some words like "hold", "grid" and "clear", behaves differently than regular
+Matlab. They take arguments after space, not in parenthesis.
+
+| Structure (main):
+|   Get
+|   | <string>*
+|
+| Structure (string):
+|   String
 
 Args:
-    parent (<+type+>): Reference to parent node
-    cur (int): position where <+node+> is identified
+    parent (Block): Reference to parent node
+    cur (int): position where reserved statement is identified
+
 Returns:
-    int: position where <+node+> ends
+    int: position where reserved statement ends
+
+See also:
+    :py:func:`matlab2cpp.tree.misc.reserved`
     """
+        assert isinstance(parent, mc.collection.Block)
         return misc.reserved(self, parent, cur)
 
 
     def create_variable(self, parent, cur):
         """
-Create variable
+Create left-hand-side variable (Expression)
+
+| Structure:
+|   Cget|Cvar|Fget|Fvar|Get|Nget|Var|Sget|Svar
+|   | <list of expression>?
 
 Args:
-    parent (<+type+>): Reference to parent node
-    cur (int): position where <+node+> is identified
+    parent (Node): Reference to parent node
+    cur (int): position where variable is identified
+
 Returns:
-    int: position where <+node+> ends
+    int: position where variable ends
+
+See also:
+    :py:func:`matlab2cpp.tree.variables.variable`
     """
         return variables.variable(self, parent, cur)
 
 
     def create_assign_variable(self, parent, cur, end=None):
         """
-Create assign_variable
+Create right-hand-side variable (Expression)
+
+| Structure:
+|   Cset|Cvar|Fset|Fvar|Nset|Var|Set|Sset|Svar
+|   | <list of expression>?
 
 Args:
-    parent (<+type+>): Reference to parent node
-    cur (int): position where <+node+> is identified
-    end (int, optional): position where <+node+> ends
+    parent (Node): Reference to parent node
+    cur (int): position where variable is identified
+    end (int, optional): position where variable ends
 
 Returns:
-    int: position where <+node+> ends
+    int: position where variable ends
+
+See also:
+    :py:func:`matlab2cpp.tree.variables.assign`
     """
         return variables.assign(self, parent, cur, end)
 
@@ -647,13 +911,18 @@ Returns:
         """
 Create expression
 
+Main engine for creating expression.
+
 Args:
-    parent (<+type+>): Reference to parent node
-    cur (int): position where <+node+> is identified
-    end (int, optional): position where <+node+> ends
+    parent (Node): Reference to parent node
+    cur (int): position where expression is identified
+    end (int, optional): position where expression ends
 
 Returns:
-    int: position where <+node+> ends
+    int: position where expression ends
+
+See also:
+    :py:func:`matlab2cpp.tree.expression.create`
     """
         return expression.create(self, parent, cur, end)
 

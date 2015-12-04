@@ -2,15 +2,6 @@
 
 """
 Interpretors that didn't fit other places
-
-Functions
-~~~~~~~~~
-number          Verbatim number
-string          Verbatim string
-list            A list (both comma or space delimited)
-comment         Comments on any form
-matrix          Verbatim matrices
-cell            Verbatim cells
 """
 
 import matlab2cpp as mc

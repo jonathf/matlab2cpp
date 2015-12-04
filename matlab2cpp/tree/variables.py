@@ -1,11 +1,5 @@
 """
 Variable interpretor
-
-Functions
-~~~~~~~~~
-assign      Variable left side of an assignment
-variable    Variable not on the left side of an assignment
-cell_arg    Argument of a cell call
 """
 
 import matlab2cpp as mc

@@ -520,16 +520,10 @@ Returns:
             n.create_declare()
 
 
-    # func.backend = "func_lambda"
-    # returns.backend = "func_lambda"
-    # params.backend = "func_lambda"
-    # declares.backend = "func_lambda"
-
     var = mc.collection.Var(returns, "_retval")
     var.create_declare()
 
     lamb = mc.collection.Lambda(node, name)
-    # lamb.type = "func_lambda"
 
     lamb.reference = func
 

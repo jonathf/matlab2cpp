@@ -1,34 +1,31 @@
-# encoding: utf-8
-
 """
 Look-ahead routines to find end character.
 
-
-+------------------------------------------------------+-----------------------+
-| Function                                             | Description           |
-+======================================================+=======================+
-| :py:func:`~matlab2cpp.tree.findend.expression`       | Find end of expression|
-|                                                      | (non-space delimited) |
-+------------------------------------------------------+-----------------------+
-| :py:func:`~matlab2cpp.tree.findend.expression_space` | Find end of expression|
-|                                                      | (space delimited)     |
-+------------------------------------------------------+-----------------------+
-| :py:func:`~matlab2cpp.tree.findend.matrix            | Find end of matrix    |
-|                                                      | construction          |
-+------------------------------------------------------+-----------------------+
-| :py:func:`~matlab2cpp.tree.findend.string            | Find end of string    |
-+------------------------------------------------------+-----------------------+
-| :py:func:`~matlab2cpp.tree.findend.comment           | Find end of comment   |
-+------------------------------------------------------+-----------------------+
-| :py:func:`~matlab2cpp.tree.findend.dots              | Find continuation     |
-|                                                      | after ellipse         |
-+------------------------------------------------------+-----------------------+
-| :py:func:`~matlab2cpp.tree.findend.paren             | Find matching         |
-|                                                      | parenthesis           |
-+------------------------------------------------------+-----------------------+
-| :py:func:`~matlab2cpp.tree.findend.cell              | Find matching         |
-|                                                      | cell-parenthesis      |
-+------------------------------------------------------+-----------------------+
++------------------------------------------------------+------------------------+
+| Function                                             | Description            |
++======================================================+========================+
+| :py:func:`~matlab2cpp.tree.findend.expression`       | Find end of expression |
+|                                                      | (non-space delimited)  |
++------------------------------------------------------+------------------------+
+| :py:func:`~matlab2cpp.tree.findend.expression_space` | Find end of expression |
+|                                                      | (space delimited)      |
++------------------------------------------------------+------------------------+
+| :py:func:`~matlab2cpp.tree.findend.matrix`           | Find end of matrix     |
+|                                                      | construction           |
++------------------------------------------------------+------------------------+
+| :py:func:`~matlab2cpp.tree.findend.string`           | Find end of string     |
++------------------------------------------------------+------------------------+
+| :py:func:`~matlab2cpp.tree.findend.comment`          | Find end of comment    |
++------------------------------------------------------+------------------------+
+| :py:func:`~matlab2cpp.tree.findend.dots`             | Find continuation      |
+|                                                      | after ellipse          |
++------------------------------------------------------+------------------------+
+| :py:func:`~matlab2cpp.tree.findend.paren`            | Find matching          |
+|                                                      | parenthesis            |
++------------------------------------------------------+------------------------+
+| :py:func:`~matlab2cpp.tree.findend.cell`             | Find matching          |
+|                                                      | cell-parenthesis       |
++------------------------------------------------------+------------------------+
 """
 
 import constants as c

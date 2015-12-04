@@ -1,14 +1,17 @@
 """
-The module :py:mod:`~matlab2cpp.tree` contains the following submodule:
+Parsing of Matlab code is solely done through the
+:py:class:`~matlab2cpp.Builder` class. It contains three main use methods:
+:py:func:`~matlab2cpp.Builder.load`, :py:func:`~matlab2cpp.Builder.configure`
+and :py:func:`~matlab2cpp.Builder.translate`. In addition there are
+a collection of method with names starting with ``create_`` that creates
+various structures of the node tree.
+
+In addition to :py:class:`~matlab2cpp.Builder` there are submodules with
+support function for modules. The modules are as follows.
 
 +--------------------------------------+---------------------------------------+
 | Module                               | Description                           |
 +===========+==========================+=======================================+
-| :py:mod:`~matlab2cpp.tree.Builder`   | Contains the                          |
-|                                      | :py:class:`~matlab2cpp.Builder` class |
-|                                      | that is used to convert Matlab code   |
-|                                      | into node tree representation         |
-+--------------------------------------+---------------------------------------+
 | :py:mod:`~matlab2cpp.tree.constants` | A collection of usefull constants     |
 |                                      | used by various interpretation  rules |
 +--------------------------------------+---------------------------------------+
