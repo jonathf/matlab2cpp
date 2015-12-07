@@ -55,3 +55,5 @@ def Get_zeros(node):
     # triple arg create cube
     elif len(node) == 3:
         node.dim = 4
+
+Get_eye = "mat"

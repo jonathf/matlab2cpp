@@ -95,7 +95,7 @@ through the name prefix ``@``.  For example::
     void f()
     {
       std::function<float(int)> g ;
-      g = [] (int x) {pow(x,2) ; } ;
+      g = [] (int x) {pow(x, 2) ; } ;
       g(4) ;
     }
 

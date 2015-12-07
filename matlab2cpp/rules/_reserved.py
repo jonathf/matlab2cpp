@@ -626,7 +626,7 @@ def Get_rand(node):
 def Get_floor(node):
 
     # unknown input
-    if node.type == "TYPE":
+    if node[0].type == "TYPE":
         return "floor(", ", ", ")"
 
     # returns int

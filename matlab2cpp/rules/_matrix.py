@@ -22,7 +22,10 @@ def Vector(node):
     if node.value == "scalarsonly":
         return "", ", ", ""
 
-    return reduce(lambda x,y: ("arma::join_rows(%s, %s)" % (x, y)), nodes)
+    nodes = map(str, node)
+    if nodes:
+        return reduce(lambda x,y: ("arma::join_rows(%s, %s)" % (x, y)), nodes)
+    return ""
 
 
 def Matrix(node):

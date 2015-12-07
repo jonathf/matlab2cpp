@@ -197,7 +197,9 @@ def Minus(node):
     opr(node)
     if node.mem == 0:
         node.mem = 1
+Mul = opr
 Elmul = opr
+Paren = opr
 def Exp(node):
     opr(node)
     if node.num and node.mem < 2:
@@ -207,6 +209,14 @@ Int = "int"
 Float = "double"
 String = "string"
 Imag = "cx_double"
+def division(node):
+    opr(node)
+    if node.num and node.mem < 2:
+        node.mem = 2
+Matrixdivision = division
+Elementdivision =  division
+Leftmatrixdivision = division
+Leftelementdivition = division
 
 def Lambda(node):
 
