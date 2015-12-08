@@ -573,7 +573,7 @@ def plotting(node):
     block = func[3]
 
     # create new statement
-    statement = matlab2cpp.collection.Statement(block)
+    statement = matlab2cpp.collection.Statement(block, code="")
     statement.backend="code_block"
     # fill it with new Get _splot
     get = matlab2cpp.collection.Get(statement, name="_splot")
