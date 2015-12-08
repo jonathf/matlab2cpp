@@ -19,7 +19,7 @@ reserved = {
 "_conv_to", "_reshape",
 "interp1", "linspace", "varargins",
 "sum", "conj", "real", "imag",
-"tic", "toc", "diag", "disp",
+"tic", "toc", "diag", "disp", "convmtx", "conv2",
 "figure", "clf", "cla", "show", "xlabel", "ylabel", "hold",
 "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
 "xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
@@ -828,6 +828,14 @@ def Get_disp(node):
     else:
         node.error("disp should take one argument")
     return "std::cout << ", "<< ", " << std::endl"
+
+def Get_convmtx(node):
+    node.include("m2cpp")
+    return "m2cpp::convmtx(", ", ", ")"
+
+def Get_conv2(node):
+    node.include("m2cpp")
+    return "m2cpp::conv2(", ", ", ")"
 
 #SPlot reserved words
 def Get_figure(node):
