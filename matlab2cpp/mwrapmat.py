@@ -1,4 +1,7 @@
-import mlabraw
+try:
+    import mlabraw
+except:
+    pass
 
 class Wrapmat:
     #run matlab code with mlabraw
