@@ -19,116 +19,36 @@ def Vector(node):
     """A (row-)vector
     """
 
-    # dimensionality in vector
-    dims = {n.dim for n in node}
-
-    # non-numerical elements in vector
-    if None in dims or [n for n in node if not n.num]:
+    if node.value == "scalarsonly":
         return "", ", ", ""
 
-    # single element in vector
-    if len(node) == 1:
-
-        if dims == {0}:
-            # holder value to determine if vector is in decomposed state
-            node.value = "decomposed"
-        else:
-            node.value = ""
-
-        node.dim = list(dims)[0]
-        return "%(0)s"
-
-    # only colvecs
-    elif dims == {1}:
-        node.value = ""
-        node.dim = 1
-        nodes = [str(n) for n in node]
-
-    # Decomposed row
-    if dims == {0}:
-        node.value = "decomposed"
-        node.dim = 2
-        return "", ", ", ""
-
-    # only rowvecs
-    elif dims == {2}:
-
-        node.value = "", ", ", ""
-        node.dim = 2
-        nodes = [str(n) for n in node]
-
-    # mix of scalars and rowvecs
-    elif dims == {0,2}:
-
-        node.value = ""
-        node.dim = 2
-
-        nodes = []
-        for i in xrange(len(node)):
-            if node[i].dim == 0:
-                node[i].include("srow")
-                nodes.append("m2cpp::srow("+ str(node[i]) + ")")
-            else:
-                nodes.append(str(node[i]))
-
-
-    # mix of matrices and colvecs
-    elif dims in ({3}, {1,3}):
-
-        node.value = ""
-        node.dim = 3
-        nodes = [str(n) for n in node]
-
-    else:
-        types = "{"+", ".join([n.type for n in node])+"}"
-        node.error("Row-wise concatination trouble: %s" % types)
-        nodes = [str(n) for n in node]
-
-    node.value = ""
-    if len(nodes) == 0:
-        return ""
-
-    elif len(nodes) == 1:
-        return "%(0)s"
-
-    return reduce(lambda x,y: ("arma::join_rows(%s, %s)" % (x, y)), nodes)
+    nodes = map(str, node)
+    if nodes:
+        return reduce(lambda x,y: ("arma::join_rows(%s, %s)" % (x, y)), nodes)
+    return ""
 
 
 def Matrix(node):
 
     # ensure all vectors in matrix same length
     m = len(node[0])
-    if any([len(n)-m for n in node if n.value == "decomposed"]):
-        shape = str([len(n) for n in node if n.value == "decomposed"])
+    if any([len(n)-m for n in node if n.value == "scalarsonly"]):
+        shape = str([len(n) for n in node if n.value == "scalarsonly"])
         node.error("shape missmatch %s" % shape)
 
-    dims = {n.dim for n in node}
-
     # non-numerical elements in matrix
-    if None in dims:
-        return "[", ", ", "]"
+    if not node.num:
+        return "{", ", ", "}"
+
+    dims = {n.dim for n in node}
 
     # single vector with no content
     if len(node) == 1 and len(node[0]) == 0:
         node.num = False
-        return ""
+        return "{", ", ", "}"
 
-    # everything on decomposed form
+    # everything on scalarsonly form
     elif all([n.value for n in node]):
-        node.value = "decomposed"
-
-        # set dimensions
-        ax0, ax1 = len(node), len(node[0])
-        if ax0 > 1:
-            if ax1 > 1:
-                node.dim = 3#matrix
-            else:
-                node.dim = 1#rowvec
-        else:
-            if ax1 > 1:
-                node.dim = 2#colvec
-            else:
-                node.dim = 0#scalar
 
         # Inline matrices are moved to own lines
         if node.parent.cls not in ("Assign", "Statement") and \
@@ -146,44 +66,15 @@ def Matrix(node):
         return "{", ", ", "}"
 
 
-    # only scalars in matrix
-    # should be the same as decomposed form
-    elif dims == {0}:
-
-        # configure dimensions
-        if len(node) > 1:
-            if len(node[0]) > 1:
-                node.dim = 3#matrix
-            else:
-                node.dim = 2#rowvec
-        else:
-            if len(node[0]) > 1:
-                node.dim = 1#colvec
-            else:
-                node.dim = 0#scalar
-
-        if node.parent.cls in ("Assign", "Statement"):
-            node.parent.backend = "matrix"
-            return ""
-        if node.parent.cls in ("Get", "Set") and node.mem != 0:
-            node.type = (node.dim, 0)
-        return str(node.auxiliary())
-
     # mix of scalars and colvecs
     elif dims in ({0,1}, {1}):
-
-        # configure dimensions
-        if len(node[0])>1:
-            node.dim = 3#matrix
-        else:
-            node.dim = 1#colvec
 
         # make string of each vector in matrix
         nodes = []
         for i in xrange(len(node)):
 
             # scalars must be converted first
-            if node[i].value or node[i].dim == 0: # value=decomposed
+            if node[i].value or node[i].dim == 0: # value=scalarsonly
                 node[i].include("scol")
                 nodes.append("m2cpp::scol(" + str(node[i]) + ")")
 
@@ -192,12 +83,6 @@ def Matrix(node):
 
     # mix of rowvecs and matrices
     elif dims in ({2}, {3}, {2,3}):
-
-        # configure dimensiosn
-        if dims == {2} and len(node)==1:
-            node.dim = 2#rowvec
-        else:
-            node.dim = 3#matrix
 
         # make string of each vector in matrix
         nodes = []

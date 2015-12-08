@@ -13,6 +13,8 @@ import matlab2cpp as mc
 
 import findend
 import constants as c
+import identify
+import iterate
 
 def multi(self, parent, cur, eq_loc):
     """
@@ -39,12 +41,13 @@ Example:
        3     Var         variables.assign     'b'
        8     Expression  expression.create    'c'
        8     Var         variables.variable   'c'
+    >>> builder.configure()
     >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
-    1 1Block      code_block   TYPE
-    1 1| Assigns    code_block   TYPE    c
-    1 2| | Var        unknown      TYPE    a
-    1 4| | Var        unknown      TYPE    b
-    1 9| | Var        unknown      TYPE    c
+     1  1Block      code_block   TYPE
+     1  1| Assigns    unknown      TYPE    c
+     1  2| | Var        unknown      TYPE    a
+     1  4| | Var        unknown      TYPE    b
+     1  9| | Var        unknown      TYPE    c
     """
 
     if  self.code[cur] != "[":
@@ -66,7 +69,10 @@ Example:
         print "%-20s" % "assign.multi",
         print repr(self.code[cur:end+1])
 
-    l = self.iterate_list(cur)
+    if identify.space_delimited(self, cur):
+        l = iterate.space_list(self, cur)
+    else:
+        l = iterate.comma_list(self, cur)
 
     if len(l[0]) == 1:
         return self.create_assign(parent, l[0][0][0], eq_loc)
@@ -112,6 +118,7 @@ Example:
        0     Var         variables.assign     'a'
        2     Expression  expression.create    'b'
        2     Var         variables.variable   'b'
+    >>> builder.configure()
     >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Assign     unknown      TYPE    b

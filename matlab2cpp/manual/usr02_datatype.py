@@ -4,12 +4,12 @@
 Configuring translation
 =======================
 
-One of the translation challenges is how each variable type determined. In C++
-all variables have to be explicitly declared, while in Matlab they are declared
-implicitly at creation.  When translating between the two languages, there are
-many variables where the data types are unknown and impossible for the
-Matlab2cpp software to translate.  How to translate the behavior of an integer
-is vastly different from an float matrix.
+One of the translation challenges is how each variable type is determined. In
+C++ all variables have to be explicitly declared, while in Matlab they are
+declared implicitly at creation.  When translating between the two languages,
+there are many variables where the data types are unknown and impossible for
+the Matlab2cpp software to translate.  How to translate the behavior of an
+integer is vastly different from an float matrix.
 
 To differentiate between types, each node have an attribute
 :py:attr:`~matlab2cpp.Node.type` which represents the node datatype.
@@ -83,7 +83,6 @@ For example::
       // Empty block
     }
 
-
 .. _func_lambda:
 
 Anonymous functions
@@ -95,8 +94,8 @@ through the name prefix ``@``.  For example::
     >>> print mc.qscript("function f(); g = @(x) x^2; g(4)")
     void f()
     {
-      std::function<int(int)> g ;
-      g = [] (int x) {pow(x,2) ; } ;
+      std::function<float(int)> g ;
+      g = [] (int x) {pow(x, 2) ; } ;
       g(4) ;
     }
 

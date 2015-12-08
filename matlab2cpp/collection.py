@@ -205,7 +205,7 @@ __all__ = [
 ]
 
 class Project(Node):
-    def __init__(self, backend="program", name="project", cur=0, line=0, code="", file="unnamed", **kws):
+    def __init__(self, name="", cur=0, line=0, code="", **kws):
         """
 Root of the node tree. Every other node should inherant from this one.
 
@@ -219,11 +219,11 @@ All keyword arguments are passed to `mc.Node.__init__`.
         assert "parent" not in kws
         self.parent = self
         self._program = self
-        Node.__init__(self, self, name=name, backend=backend, cur=cur,
-                line=line, code=code, file=file, **kws)
+        Node.__init__(self, self, name=name, cur=cur,
+                line=line, code=code, **kws)
 
 class Program(Node):
-    def __init__(self, parent, name, backend="program", **kws):
+    def __init__(self, parent, name, **kws):
         """
 Represents one stand-alone script or program. Each child represents the various
 aspects of script/program.
@@ -234,62 +234,61 @@ Children:
 All keyword arguments are passed to `mc.Node.__init__`.
     """
         self._program = self
-        Node.__init__(self, parent, name=name, backend=backend, file=name, **kws)
+        Node.__init__(self, parent, name=name, **kws)
 
 class Includes(Node):
-    def __init__(self, parent, backend="program", **kws):
-        Node.__init__(self, parent, backend=backend, **kws)
+    def __init__(self, parent, **kws):
+        Node.__init__(self, parent, **kws)
 
 class Funcs(Node):
-    def __init__(self, parent, backend="program", line=1, **kws):
-        Node.__init__(self, parent, line=line, backend=backend, **kws)
+    def __init__(self, parent, line=1, **kws):
+        Node.__init__(self, parent, line=line, **kws)
 
 class Inlines(Node):
-    def __init__(self, parent, backend="program", **kws):
-        Node.__init__(self, parent, backend=backend, **kws)
+    def __init__(self, parent, **kws):
+        Node.__init__(self, parent, **kws)
 
 class Structs(Node):
-    def __init__(self, parent, backend="program", **kws):
-        Node.__init__(self, parent, backend=backend,**kws)
+    def __init__(self, parent, **kws):
+        Node.__init__(self, parent, **kws)
 
 class Headers(Node):
-    def __init__(self, parent, backend="program", **kws):
-        Node.__init__(self, parent, backend=backend, **kws)
+    def __init__(self, parent, **kws):
+        Node.__init__(self, parent, **kws)
 
 class Log(Node):
-    def __init__(self, parent, backend="program", **kws):
-        Node.__init__(self, parent, backend=backend, **kws)
+    def __init__(self, parent, **kws):
+        Node.__init__(self, parent, **kws)
 
 class Header(Node):
-    def __init__(self, parent, name, backend="program", **kws):
-        Node.__init__(self, parent, name=name, backend=backend, **kws)
+    def __init__(self, parent, name, **kws):
+        Node.__init__(self, parent, name=name, **kws)
 
 class Main(Node):
-    def __init__(self, parent, name="main", backend="func_return", **kws):
-        Node.__init__(self, parent, name=name, backend=backend, **kws)
+    def __init__(self, parent, name="main", **kws):
+        Node.__init__(self, parent, name=name, **kws)
 
 class Error(Node):
-    def __init__(self, parent, name, value, backend="program", **kws):
-        Node.__init__(self, parent, name, value=value, backend=backend, **kws)
+    def __init__(self, parent, name, value, **kws):
+        Node.__init__(self, parent, name, value=value, **kws)
         self.prop["cls"] = name[10:]
 class Warning(Node):
-    def __init__(self, parent, name, value, backend="program", **kws):
-        Node.__init__(self, parent, name, value=value, backend=backend, **kws)
+    def __init__(self, parent, name, value, **kws):
+        Node.__init__(self, parent, name, value=value, **kws)
         self.prop["cls"] = name[10:]
 
 class Counter(Node):
-    def __init__(self, parent, name, value,
-            backend="structs", type="structs", **kws):
+    def __init__(self, parent, name, value, **kws):
         Node.__init__(self, parent, name,
-                value=value, backend=backend, type=type, **kws)
+                value=value, **kws)
 
 class Inline(Node):
-    def __init__(self, parent, name, backend="program", **kws):
-        Node.__init__(self, parent, name, backend=backend, **kws)
+    def __init__(self, parent, name, **kws):
+        Node.__init__(self, parent, name, **kws)
 
 class Include(Includes):
-    def __init__(self, parent, name, backend="program", **kws):
-        Node.__init__(self, parent, name=name, backend=backend, **kws)
+    def __init__(self, parent, name, **kws):
+        Node.__init__(self, parent, name=name, **kws)
 
 class Struct(Structs):          pass
 
@@ -299,9 +298,8 @@ class Params(Node):         pass
 class Declares(Node):       pass
 
 class Block(Node):
-    def __init__(self, parent, backend="code_block", **kws):
-        Node.__init__(self, parent, backend=backend, **kws)
-# class Condline(Block):      pass
+    def __init__(self, parent, **kws):
+        Node.__init__(self, parent, **kws)
 class For(Block):           pass
 class While(Block):         pass
 class Switch(Block):        pass
@@ -311,7 +309,6 @@ class Branch(Block):        pass
 class If(Block):            pass
 class Elif(Block):          pass
 class Else(Block):          pass
-# class Cond(Block):          pass
 class Tryblock(Block):      pass
 class Try(Block):           pass
 class Catch(Block):         pass
@@ -319,12 +316,12 @@ class Statement(Block):     pass
 
 class Assign(Node):         pass
 class Assigns(Node):
-    def __init__(self, parent, backend="code_block", **kws):
-        Node.__init__(self, parent, backend=backend, **kws)
+    def __init__(self, parent, **kws):
+        Node.__init__(self, parent, **kws)
 
 class Expr(Node):
-    def __init__(self, parent, backend="expression", **kws):
-        Node.__init__(self, parent, backend=backend, **kws)
+    def __init__(self, parent, **kws):
+        Node.__init__(self, parent, **kws)
 class Opr(Expr):            pass
 class Exp(Opr):             pass
 class Elexp(Opr):           pass
@@ -349,13 +346,13 @@ class Land(Opr):            pass
 class Lor(Opr):             pass
 
 class Matrix(Node):
-    def __init__(self, parent, backend="matrix", **kws):
-        Node.__init__(self, parent, backend=backend, **kws)
+    def __init__(self, parent, **kws):
+        Node.__init__(self, parent, **kws)
 class Vector(Matrix):       pass
 
 class Cell(Node):
-    def __init__(self, parent, backend="cell", **kws):
-        Node.__init__(self, parent, backend=backend, **kws)
+    def __init__(self, parent, **kws):
+        Node.__init__(self, parent, **kws)
 
 class Paren(Expr):          pass
 class Neg(Expr):            pass
@@ -368,41 +365,41 @@ class Break(Expr):          pass
 class Return(Expr):         pass
 
 class Int(Node):
-    def __init__(self, parent, value, backend="int", type="int", **kws):
-        Node.__init__(self, parent, value=value, backend=backend, type=type, **kws)
+    def __init__(self, parent, value, **kws):
+        Node.__init__(self, parent, value=value, **kws)
 
 class Float(Node):
-    def __init__(self, parent, value, backend="double", type="double", **kws):
+    def __init__(self, parent, value, **kws):
         if value[0] == ".": value = "0" + value
-        Node.__init__(self, parent, value=value, backend=backend, type=type, **kws)
+        Node.__init__(self, parent, value=value, **kws)
 
 class Imag(Node):
-    def __init__(self, parent, value, backend="cx_double", type="cx_double", **kws):
-        Node.__init__(self, parent, backend=backend, type=type, **kws)
+    def __init__(self, parent, value, **kws):
+        Node.__init__(self, parent, **kws)
 
 class String(Node):
-    def __init__(self, parent, value, backend="string", type="string", **kws):
+    def __init__(self, parent, value, **kws):
         value = value.replace("%", "__percent__")
-        Node.__init__(self, parent, value=value, backend=backend, type=type, **kws)
+        Node.__init__(self, parent, value=value, **kws)
 
 class Lambda(Node):
-    def __init__(self, parent, name="", backend="func_lambda", **kws):
-        Node.__init__(self, parent, name=name, backend=backend, **kws)
+    def __init__(self, parent, name="", **kws):
+        Node.__init__(self, parent, name=name, **kws)
 
 class Lcomment(Node):
-    def __init__(self, parent, value, backend="code_block", **kws):
+    def __init__(self, parent, value, **kws):
         value = value.replace("%", "__percent__")
-        Node.__init__(self, parent, value=value, backend=backend, **kws)
+        Node.__init__(self, parent, value=value, **kws)
 
 class Bcomment(Node):
-    def __init__(self, parent, value, backend="code_block", **kws):
+    def __init__(self, parent, value, **kws):
         value = value.replace("%", "__percent__")
-        Node.__init__(self, parent, value=value, backend=backend, **kws)
+        Node.__init__(self, parent, value=value, **kws)
 
 class Ecomment(Node):
-    def __init__(self, parent, value, backend="code_block", **kws):
+    def __init__(self, parent, value, **kws):
         value = value.replace("%", "__percent__")
-        Node.__init__(self, parent, value=value, backend=backend, **kws)
+        Node.__init__(self, parent, value=value, **kws)
 
 class Var(Node):
     def __init__(self, parent, name, **kws):
@@ -411,49 +408,49 @@ class Get(Var):         pass
 class Set(Var):         pass
 
 class Fvar(Node):
-    def __init__(self, parent, name, value, backend="struct", **kws):
-        Node.__init__(self, parent, name=name, value=value, backend=backend, **kws)
+    def __init__(self, parent, name, value, **kws):
+        Node.__init__(self, parent, name=name, value=value, **kws)
 
 class Cvar(Node):
-    def __init__(self, parent, name, backend="cell", **kws):
-        Node.__init__(self, parent, name, backend=backend, **kws)
+    def __init__(self, parent, name, **kws):
+        Node.__init__(self, parent, name, **kws)
 
 class Cget(Node):
-    def __init__(self, parent, name, backend="cell", **kws):
-        Node.__init__(self, parent, name=name, backend=backend, **kws)
+    def __init__(self, parent, name, **kws):
+        Node.__init__(self, parent, name=name, **kws)
 
 class Fget(Node):
-    def __init__(self, parent, name, value, backend="structs", **kws):
-        Node.__init__(self, parent, name=name, value=value, backend=backend, **kws)
+    def __init__(self, parent, name, value, **kws):
+        Node.__init__(self, parent, name=name, value=value, **kws)
 
 class Sget(Node):
-    def __init__(self, parent, name, value, backend="structs", **kws):
-        Node.__init__(self, parent, name=name, value=value, backend=backend, **kws)
+    def __init__(self, parent, name, value, **kws):
+        Node.__init__(self, parent, name=name, value=value, **kws)
 
 class Nget(Node):
-    def __init__(self, parent, name, backend="struct", **kws):
-        Node.__init__(self, parent, backend=backend, name=name, **kws)
+    def __init__(self, parent, name, **kws):
+        Node.__init__(self, parent, name=name, **kws)
 
 class Cset(Node):
-    def __init__(self, parent, name, backend="cell", **kws):
-        Node.__init__(self, parent, name=name, backend=backend, **kws)
+    def __init__(self, parent, name, **kws):
+        Node.__init__(self, parent, name=name, **kws)
 
 class Fset(Node):
-    def __init__(self, parent, name, value, backend="structs", **kws):
-        Node.__init__(self, parent, name=name, value=value, backend=backend, **kws)
+    def __init__(self, parent, name, value, **kws):
+        Node.__init__(self, parent, name=name, value=value, **kws)
 
 class Sset(Node):
-    def __init__(self, parent, name, value, backend="structs", **kws):
-        Node.__init__(self, parent, name=name, value=value, backend=backend, **kws)
+    def __init__(self, parent, name, value, **kws):
+        Node.__init__(self, parent, name=name, value=value, **kws)
 
 class Nset(Node):
-    def __init__(self, parent, name, backend="struct", **kws):
-        Node.__init__(self, parent, name=name, backend=backend, **kws)
+    def __init__(self, parent, name, **kws):
+        Node.__init__(self, parent, name=name, **kws)
 
 class Resize(Node):
-    def __init__(self, parent, backend="cube_common", **kws):
-        Node.__init__(self, parent, backend=backend, **kws)
+    def __init__(self, parent, **kws):
+        Node.__init__(self, parent, **kws)
 
 class Verbatim(Node):
-    def __init__(self, parent, name, value, backend="verbatim", **kws):
-        Node.__init__(self, parent, name=name, value=value, backend=backend, **kws)
+    def __init__(self, parent, name, value, **kws):
+        Node.__init__(self, parent, name=name, value=value, **kws)

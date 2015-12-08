@@ -5,8 +5,7 @@ Translation rules
 =================
 
 In Matlab2cpp, the simplest form for translation is a simple string saved to
-a variable.
-For example::
+a variable.  For example::
 
     >>> Int = "6"
 
@@ -51,8 +50,8 @@ available in interpolation. The children are indexed by number, counting from
 0. Consider the simple example of a simple addition::
 
     >>> print mc.qtree("2+3", core=True) # doctest: +NORMALIZE_WHITESPACE
-     1  1Block      code_block   int
-     1  1| Statement  code_block   int
+     1  1Block      code_block   TYPE
+     1  1| Statement  code_block   TYPE
      1  1| | Plus       expression   int
      1  1| | | Int        int          int
      1  3| | | Int        int          int
@@ -166,7 +165,7 @@ Reserved rules
 The example above with `sum(x)` is handled by two rules. In the second
 iteration, it is a :py:mod:`~matlab2cpp.datatype` of type `irowvec` and is
 therefore processed in the corresponding rule for `irowvec`. However, in the
-former case, `sum` is a function from the matlab standard library. In priciple
+former case, `sum` is a function from the Matlab standard library. In principle
 there is only one rule for all function calls like this. However, since the
 standard library is large, the rules are segmented into rules for each name. 
 
@@ -176,9 +175,9 @@ variable `rules.reserved`. The context for reserved function manifest itself
 into the rules for function calls :py:class:`~matlab2cpp.collection.Get`,
 variables :py:class:`~matlab2cpp.collection.Var` and in some cases,
 multivariate assignment :py:class:`~matlab2cpp.collection.Assigns`. As
-described above, the rules should then have these names respectivly. However to
-indicate the name, the rules also includes node names as sufix. For example,
-the function call for `sum` is handled in the rule
+described above, the rules should then have these names respectively. However
+to indicate the name, the rules also includes node names as suffix. For
+example, the function call for `sum` is handled in the rule
 :py:func:`~matlab2cpp.rules._reserved.Get_sum`.
 
 In practice this allows us to create specific rules for any node with names,
@@ -199,5 +198,7 @@ applied for other functions::
 
 There are many rules to translation rule backends in matlab2cpp. This is mainly
 because each datatype have a corresponding backend.
+
+
 """
 import matlab2cpp as mc

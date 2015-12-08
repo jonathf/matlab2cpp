@@ -36,6 +36,7 @@ Example:
        8   Statement     codeblock.codeblock  '3'
        8     Expression  expression.create    '3'
        8     Int         misc.number          '3'
+    >>> builder.configure()
     >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
     1  1Block      code_block   TYPE
     1  1| Statement  code_block   TYPE

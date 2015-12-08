@@ -161,10 +161,12 @@ def include(node):
         return
 
     if arma not in includes:
-        mc.collection.Include(includes, arma, value=includes.value)
+        include = mc.collection.Include(includes, arma, value=includes.value)
+        include.backend = "program"
 
     if namespace not in includes:
-        mc.collection.Include(includes, namespace, value=includes.value)
+        include = mc.collection.Include(includes, namespace, value=includes.value)
+        include.backend = "program"
 
     includes.translate()
 

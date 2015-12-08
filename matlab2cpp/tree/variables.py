@@ -1,11 +1,5 @@
 """
 Variable interpretor
-
-Functions
-~~~~~~~~~
-assign      Variable left side of an assignment
-variable    Variable not on the left side of an assignment
-cell_arg    Argument of a cell call
 """
 
 import matlab2cpp as mc
@@ -39,10 +33,11 @@ Example:
        0     Var         variables.assign     'a'
        4     Expression  expression.create    '4'
        4     Int         misc.number          '4'
+    >>> builder.configure(suggest=False)
     >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
-    1 1| Assign     unknown      TYPE
-    1 1| | Var        unknown      TYPE    a
+    1 1| Assign     unknown      int 
+    1 1| | Var        unknown      (int)   a
     1 5| | Int        int          int
     """
 
@@ -264,6 +259,7 @@ Example:
        0   Statement     codeblock.codeblock  'a'
        0     Expression  expression.create    'a'
        0     Var         variables.variable   'a'
+    >>> builder.configure()
     >>> print mc.qtree(builder, core=True) #doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Statement  code_block   TYPE
@@ -503,6 +499,7 @@ Example:
        0     Cvar        variables.variable   'a{b}'
        2     Expression  expression.create    'b'
        2     Var         variables.variable   'b'
+    >>> builder.configure()
     >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Statement  code_block   TYPE

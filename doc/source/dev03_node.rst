@@ -1,19 +1,18 @@
 .. _dev03:
 
-Node class
-==========
+Node representation
+===================
 .. automodule:: matlab2cpp.node
 
+The Node class
+--------------
 .. autoclass:: matlab2cpp.Node
-
-Node attributes
----------------
-.. automodule:: matlab2cpp.node.frontend
-
-Quick references
-----------------
-.. automodule:: matlab2cpp.node.reference
+   :members: 
 
 Node backend
 ------------
 .. automodule:: matlab2cpp.node.backend
+
+Quick references
+----------------
+.. automodule:: matlab2cpp.node.reference

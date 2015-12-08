@@ -2,21 +2,14 @@
 
 """
 Interpretors that didn't fit other places
-
-Functions
-~~~~~~~~~
-number          Verbatim number
-string          Verbatim string
-list            A list (both comma or space delimited)
-comment         Comments on any form
-matrix          Verbatim matrices
-cell            Verbatim cells
 """
 
 import matlab2cpp as mc
 import constants as c
 import findend
 import expression
+import iterate
+import identify
 
 
 def number(self, node, start):
@@ -41,6 +34,7 @@ Example:
        0   Statement     codeblock.codeblock  '42.'
        0     Expression  expression.create    '42.'
        0     Float       misc.number          '42.'
+    >>> builder.configure()
     >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Statement  code_block   TYPE
@@ -165,6 +159,7 @@ Example:
        0 Codeblock   codeblock.codeblock 
        0   Statement     codeblock.codeblock  "'abc'"
        0     String  misc.string          "'abc'"
+    >>> builder.configure()
     >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Statement  code_block   TYPE
@@ -214,21 +209,22 @@ Example:
        1     Int         misc.number          '2'
        3     Expression  expression.create    '-3'
        4     Int         misc.number          '3'
+    >>> builder.configure(suggest=False)
     >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
-    1 1Block      code_block   TYPE
-    1 1| Statement  code_block   TYPE
-    1 1| | Matrix     matrix       TYPE
-    1 2| | | Vector     matrix       TYPE
-    1 2| | | | Int        int          int
-    1 4| | | | Neg        expression   TYPE
-    1 5| | | | | Int        int          int
+     1  1Block      code_block   TYPE
+     1  1| Statement  code_block   TYPE
+     1  1| | Matrix     matrix       irowvec
+     1  2| | | Vector     matrix       irowvec
+     1  2| | | | Int        int          int
+     1  4| | | | Neg        expression   int
+     1  5| | | | | Int        int          int
     """
 
     if  self.code[cur] not in "({":
         self.syntaxerror(cur, "start of list character")
 
     end = cur
-    for vector in self.iterate_comma_list(cur):
+    for vector in iterate.comma_list(self, cur):
         for start,end in vector:
             self.create_expression(parent, start, end)
 
@@ -265,6 +261,7 @@ Example:
        0     Expression  expression.create    '4'
        0     Int         misc.number          '4'
        2   Comment       misc.comment         '% comment'
+    >>> builder.configure(suggest=False)
     >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
     1  1Block      code_block   TYPE
     1  1| Statement  code_block   TYPE
@@ -369,19 +366,20 @@ Example:
        8     Int         misc.number          '3'
       10     Expression  expression.create    '4'
       10     Int         misc.number          '4'
+    >>> builder.configure(suggest=False)
     >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
-    1  1Block      code_block   TYPE
-    1  1| Statement  code_block   TYPE
-    1  1| | Matrix     matrix       TYPE
-    1  2| | | Vector     matrix       TYPE
-    1  2| | | | Matrix     matrix       TYPE
-    1  3| | | | | Vector     matrix       TYPE
-    1  3| | | | | | Int        int          int
-    1  5| | | | | | Int        int          int
-    1  8| | | | Matrix     matrix       TYPE
-    1  9| | | | | Vector     matrix       TYPE
-    1  9| | | | | | Int        int          int
-    1 11| | | | | | Int        int          int
+     1   1Block      code_block   TYPE
+     1   1| Statement  code_block   TYPE
+     1   1| | Matrix     matrix       irowvec
+     1   2| | | Vector     matrix       irowvec
+     1   2| | | | Matrix     matrix       irowvec
+     1   3| | | | | Vector     matrix       irowvec
+     1   3| | | | | | Int        int          int
+     1   5| | | | | | Int        int          int
+     1   8| | | | Matrix     matrix       irowvec
+     1   9| | | | | Vector     matrix       irowvec
+     1   9| | | | | | Int        int          int
+     1  11| | | | | | Int        int          int
     """
 
     if  self.code[cur] != "[":
@@ -393,7 +391,10 @@ Example:
         print "%-20s" % "misc.matrix",
         print repr(self.code[cur:end+1])
 
-    L = self.iterate_list(cur)
+    if identify.space_delimited(self, cur):
+        L = iterate.space_list(self, cur)
+    else:
+        L = iterate.comma_list(self, cur)
     matrix = mc.collection.Matrix(node, cur=cur, code=self.code[cur:end+1])
 
     for array in L:
@@ -454,6 +455,7 @@ Example:
        1     Int         misc.number          '1'
        4     Expression  expression.create    '2'
        4     Int         misc.number          '2'
+    >>> builder.configure(suggest=False)
     >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Statement  code_block   TYPE
@@ -471,7 +473,10 @@ Example:
         print "%-20s" % "misc.cell",
         print repr(self.code[cur:end+1])
 
-    L = self.iterate_list(cur)
+    if identify.space_delimited(self, cur):
+        L = iterate.space_list(self, cur)
+    else:
+        L = iterate.comma_list(self, cur)
     cell = mc.collection.Cell(node, cur=cur, code=self.code[cur:end+1])
 
     for array in L:
@@ -491,6 +496,8 @@ Example:
 
 
 def reserved(self, node, start):
+    """Reserved keywords
+    """
 
     k = start
 

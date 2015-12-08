@@ -325,7 +325,7 @@ def Matrixdivision(node):
 
             # integer handle
             elif child.cls == "Int":
-                out = "out/" + str(child) + ".0"
+                out = out + "/" + str(child) + ".0"
 
             # avoid integer division
             elif child.mem < 2 and mem < 2:
@@ -475,7 +475,7 @@ def Exp(node):
 
     out = str(node[0])
     for child in node[1:]:
-        out = "pow(" + str(out) + "," + str(child) + ")"
+        out = "pow(" + str(out) + ", " + str(child) + ")"
 
     return out
 
@@ -485,7 +485,7 @@ def Elexp(node):
 
     out = str(node[0])
     for child in node[1:]:
-        out = "pow(" + str(out) + "," + str(child) + ")"
+        out = "pow(" + str(out) + ", " + str(child) + ")"
     return out
 
 

@@ -57,7 +57,7 @@ int main(int argc, char** argv)
   int a ;
   irowvec d ;
   ivec e ;
-  string c ;
+  std::string c ;
   a = 1 ;
   b = 2. ;
   c = "3" ;
