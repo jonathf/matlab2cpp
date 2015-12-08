@@ -178,6 +178,13 @@ def Get_size(node):
     # matrix (returns two values)
     elif node[0].dim == 3:
         node.type = "urowvec"
+
+        if node.parent.cls == "Get":
+            if node.parent.backend in ("reserved", "func_return",
+                    "func_returns", "func_lambda", "unknown"):
+                return "%(0)s.n_rows, %(0)s.n_cols"
+            return "%(0)s.n_rows-1, %(0)s.n_cols"
+
         # inline calls moved to own line
         if node.parent.cls not in ("Statement", "Assign"):
             return str(node.auxiliary())
@@ -189,6 +196,13 @@ def Get_size(node):
     # cube (return three values)
     elif node[0].dim == 4:
         node.type = "urowvec"
+
+        if node.parent.cls == "Get":
+            if node.parent.backend in ("reserved", "func_return",
+                    "func_returns", "func_lambda", "unknown"):
+                return "%(0)s.n_rows, %(0)s.n_cols, %(0)s.n_slices"
+            return "%(0)s.n_rows-1, %(0)s.n_cols-1, %(0)s.n_slices"
+
         # inline calls moved to own line
         if node.parent.cls not in ("Statement", "Assign"):
             return str(node.auxiliary())

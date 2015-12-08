@@ -495,7 +495,9 @@ def translate_one(node, opt):
         value = value % node.properties()
     except:
         raise SyntaxError("interpolation in " + node.backend + "." +\
-                node.cls + " is misbehaving\n'" + value + "'\n"+str(node.prop))
+                node.cls + " is misbehaving\n'" + value + "'\n" +\
+                str(node.prop)  + "\nCrash on line " + str(node.line) +\
+                ":\n" + node.code)
 
     node.str = value
 
