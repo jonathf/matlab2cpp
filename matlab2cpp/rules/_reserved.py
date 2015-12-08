@@ -830,11 +830,9 @@ def Get_disp(node):
     return "std::cout << ", "<< ", " << std::endl"
 
 def Get_convmtx(node):
-    node.include("m2cpp")
     return "m2cpp::convmtx(", ", ", ")"
 
 def Get_conv2(node):
-    node.include("m2cpp")
     return "m2cpp::conv2(", ", ", ")"
 
 #SPlot reserved words
