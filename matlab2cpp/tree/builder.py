@@ -53,7 +53,7 @@ code through the front end functions in :py:mod:`matlab2cpp.qfunctions`::
     }
     """
 
-    def __init__(self, disp=False, comments=True, **kws):
+    def __init__(self, disp=False, comments=True, original=False, **kws):
         """
 Args:
     disp (bool):
@@ -66,6 +66,7 @@ Args:
 
         self.disp = disp
         self.comments = comments
+        self.original = original
         self.project = mc.collection.Project()
         self.project.kws = kws
         self.project.builder = self

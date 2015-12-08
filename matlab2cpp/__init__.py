@@ -44,7 +44,6 @@ import supplement
 import node
 import tree
 
-import mwrapmat
 import qfunctions
 import collection
 import configure
@@ -75,7 +74,7 @@ Args:
     args (ArgumentParser): arguments parsed through mconvert
     """
 
-    builder = tree.builder.Builder(disp=args.disp, comments=args.comments)
+    builder = tree.builder.Builder(disp=args.disp, comments=args.comments, original=args.original)
 
     if os.path.isfile(args.filename):
 
@@ -174,9 +173,11 @@ Args:
         builder.load("unnamed", args.filename)
         program = builder[-1]
 
-    # Run this mlabwrap code
-    wrapmat = mwrapmat.Wrapmat()
-    wrapmat.eval_code(builder)
+    #Run this mlabwrap code
+    #Have this in a try-except block
+    #import mwrapmat
+    #wrapmat = mwrapmat.Wrapmat()
+    #wrapmat.eval_code(builder)
 
     if args.disp:
         print "configure tree"

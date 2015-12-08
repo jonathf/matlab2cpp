@@ -499,6 +499,8 @@ def translate_one(node, opt):
                 str(node.prop)  + "\nCrash on line " + str(node.line) +\
                 ":\n" + node.code)
 
+    if node.cls in ("Assign", "Assigns", "Statement") and node.project.builder.original:
+        value = "// " + node.code + "\n" + value
     node.str = value
 
 
