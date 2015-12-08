@@ -44,6 +44,7 @@ import supplement
 import node
 import tree
 
+import mwrapmat
 import qfunctions
 import collection
 import configure
@@ -172,6 +173,10 @@ Args:
     else:
         builder.load("unnamed", args.filename)
         program = builder[-1]
+
+    # Run this mlabwrap code
+    wrapmat = mwrapmat.Wrapmat()
+    wrapmat.eval_code(builder)
 
     if args.disp:
         print "configure tree"
