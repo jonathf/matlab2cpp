@@ -509,7 +509,7 @@ def All(node):
     else:
         return "span::all"
 
-    return "m2cpp::uspan(0, " + arg + "-1)"
+    return "arma::span(0, " + arg + "-1)"
 
 Neg = "-(", "", ")"
 Not = "not ", "", ""
