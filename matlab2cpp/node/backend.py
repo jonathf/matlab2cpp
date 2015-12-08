@@ -562,7 +562,6 @@ def plotting(node):
     # add a variable for Splot in declare
     var = matlab2cpp.collection.Var(declares, name="_plot")
     var.type = "SPlot"
-    var.backend="SPlot"
 
     # get function variable
     func = node.func
