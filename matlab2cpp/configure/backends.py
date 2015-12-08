@@ -95,6 +95,9 @@ def Var(node):
 def Get(node):
     if node.type != "TYPE":
         node.backend = node.type
+def Set(node):
+    if node.type != "TYPE":
+        node.backend = node.type
 
 def Vector(node):
     node.backend = "matrix"
