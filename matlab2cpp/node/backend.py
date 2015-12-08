@@ -482,6 +482,8 @@ def translate_one(node, opt):
         raise SyntaxError("interpolation in " + node.backend + "." +\
                 node.cls + " is misbehaving\n'" + value + "'\n"+str(node.prop))
 
+    if node.cls in ("Assign", "Assigns", "Statement") and node.project.builder.original:
+        value = "// " + node.code + "\n" + value
     node.str = value
 
 

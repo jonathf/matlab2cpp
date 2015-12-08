@@ -137,7 +137,7 @@ Convert Matlab-code to a tree of nodes.
     itypes = suppliment.Ibuilder()
     vtypes = suppliment.Vbuilder()
 
-    def __init__(self, disp=False, comments=True, **kws):
+    def __init__(self, disp=False, comments=True, original=False, **kws):
         """
 Args:
     disp (bool):
@@ -153,6 +153,7 @@ See also:
 
         self.disp = disp
         self.comments = comments
+        self.original = original
         self.project = mc.collection.Project()
         self.project.kws = kws
         self.project.builder = self

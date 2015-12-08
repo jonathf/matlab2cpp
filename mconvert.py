@@ -53,6 +53,8 @@ Strip away all the comments in the output of the translation.""")
 
 parser.add_argument("-l", '--line', type=int, dest="line",
         help="Only display code related to code line number `<line>`.")
+parser.add_argument("-o", '--original', action="store_true",
+        help="Include original matlab code line as comment before C++ translation")
 
 
 try:
