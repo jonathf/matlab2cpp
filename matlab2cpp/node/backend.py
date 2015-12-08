@@ -501,6 +501,7 @@ def translate_one(node, opt):
 
     if node.cls in ("Assign", "Assigns", "Statement") and node.project.builder.original:
         value = "// " + node.code + "\n" + value
+        value = value.replace("%", "__percent__")
     node.str = value
 
 
