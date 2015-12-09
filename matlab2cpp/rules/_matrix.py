@@ -109,6 +109,11 @@ def Assign(node):
     if len(rhs[0]) == 0:
         return "%(0)s.reset() ;"
 
+    if len(rhs) == 1 and len(rhs[0]) == 1:
+        element = rhs[0][0]
+        if element.type == "structs":
+            pass
+
     # non-numerical values in matrix or variable assign
     if not lhs.num or not rhs.num:
         return "%(0)s = %(1)s ;"

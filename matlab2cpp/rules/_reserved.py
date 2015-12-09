@@ -750,7 +750,6 @@ def Get_interp1(node):
     return "arma::interp1(", ", ", ")" 
 
 def Get_linspace(node):
-    node.type = "rowvec"
     return "arma::linspace<%(type)s>(", ", ", ")"
 
 

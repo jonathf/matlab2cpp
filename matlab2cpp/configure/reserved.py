@@ -1,4 +1,6 @@
 Var_i = "cx_double"
+Get_linspace = "rowvec"
+
 def Get_abs(node):
     node.type = node[0].type
 
