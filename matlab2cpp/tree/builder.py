@@ -256,13 +256,13 @@ Example::
      1  1| | | | Returns    func_return  TYPE
      1  1| | | | Params     func_return  TYPE
      1  1| | | | Block      code_block   TYPE
-     1  1| | | | | Assign     unknown      int 
+     1  1| | | | | Assign     int          int 
      1  1| | | | | | Var        int          int     a
      1  3| | | | | | Int        int          int
-     1  6| | | | | Assign     unknown      double
+     1  6| | | | | Assign     double       double
      1  6| | | | | | Var        double       double  b
      1  8| | | | | | Float      double       double
-     1 12| | | | | Assign     unknown      string
+     1 12| | | | | Assign     string       string
      1 12| | | | | | Var        string       string  c
      1 14| | | | | | String     string       string
          | | Inlines    program      TYPE    unnamed.m

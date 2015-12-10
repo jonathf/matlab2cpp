@@ -463,7 +463,7 @@ Example::
      1  13| | | Params     func_return  TYPE
      1  14| | | | Var        unknown      TYPE    x
      1  16| | | Block      code_block   TYPE
-     1  18| | | | Assign     unknown      TYPE
+     1  18| | | | Assign     expression   TYPE
      1  18| | | | | Var        unknown      TYPE    y
      1  20| | | | | Plus       expression   TYPE
      1  20| | | | | | Var        unknown      TYPE    x

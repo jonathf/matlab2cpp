@@ -445,43 +445,15 @@ def Get_flipud(node):
 
 def Get_ones(node):
 
-    node.type = "uword"
-    dim, mem = node.suggest_datatype()
-
-    # set memory type
-    if not (mem is None):
-        node.mem = mem
-        if dim in (1,2):
-            node.dim = dim
-    else:
-        node.mem = 3
-
-    # reset to uword if arg to array-node
-    if node.group.cls in ("Get", "Cget", "Fget", "Nget", "Sget", "Set", "Cset",
-            "Fset", "Nset", "Sset"):
-        node.mem = 0
-
     # not vector
     if dim not in (1,2):
 
-        # single arg creates colvec
-        if len(node) == 1:
-            node.dim = 2
-
         # double argument creates colvec/rowvec/matrix after context
-        elif len(node) == 2:
+        if len(node) == 2:
             if node[0].cls == "Int" and node[0].value == "1":
-                node.dim = 2
                 return "arma::ones<%(type)s>(%(1)s)"
             elif node[1].cls == "Int" and node[1].value == "1":
-                node.dim = 1
                 return "arma::ones<%(type)s>(%(0)s)"
-            else:
-                node.dim = 3
-
-        # triple arg create cube
-        if len(node) == 3:
-            node.dim = 4
 
     # arg input is vector
     if node[0].num and node[0].dim in (1,2):
@@ -510,20 +482,6 @@ def Get_ones(node):
 
 def Get_zeros(node):
 
-    node.type = "uword"
-    dim, mem = node.suggest_datatype()
-
-    # set memory type
-    if not (mem is None):
-        node.mem = mem
-    else:
-        node.mem = 3
-
-    # reset to uword if arg of array-node
-    if node.group.cls in ("Get", "Cget", "Fget", "Nget", "Sget", "Set", "Cset",
-            "Fset", "Nset", "Sset") and node.group.num:
-        node.mem = 0
-
     # one argument
     if len(node) == 1:
 
@@ -542,38 +500,16 @@ def Get_zeros(node):
             if node.dim == 4:
                 return "arma::zeros<%(type)s>(%(0)s(0), %(0)s(1), %(0)s(2))"
 
-        else:
-
-            # use suggestions or defualts
-            if dim in (1,2,3):
-                node.dim = dim
-            else:
-                node.dim = 1 # default
-
     # double argument creates colvec/rowvec/matrix depending on context
     elif len(node) == 2:
 
-        # use matrix, if suggested
-        if dim == 3:
-            node.dim = 3
-
         # use colvec if first index is '1'
-        elif node[0].cls == "Int" and node[0].value == "1":
-            node.dim = 1
+        if node[0].cls == "Int" and node[0].value == "1":
             return "arma::zeros<%(type)s>(%(1)s)"
 
         # use rowvec if second index is '1'
         elif node[1].cls == "Int" and node[1].value == "1":
-            node.dim = 2
             return "arma::zeros<%(type)s>(%(0)s)"
-
-        # default to matrix
-        else:
-            node.dim = 3
-
-    # triple arg create cube
-    elif len(node) == 3:
-        node.dim = 4
 
     return "arma::zeros<%(type)s>(", ", ", ")"
 

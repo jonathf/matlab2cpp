@@ -1,4 +1,5 @@
 import matlab2cpp as mc
+from assign import Assign
 
 def Paren(node):
     """Parenthesis surounding expression.

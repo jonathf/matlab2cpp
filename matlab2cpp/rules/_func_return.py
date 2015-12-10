@@ -26,6 +26,7 @@ import matlab2cpp as mc
 
 from function import type_string
 from variables import Get
+from assign import Assign
 
 
 def Var(node):

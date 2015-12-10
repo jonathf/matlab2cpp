@@ -403,7 +403,7 @@ Example:
      1  5| | | Params     func_lambda  TYPE
      1  7| | | | Var        unknown      TYPE    x
      1  5| | | Block      code_block   TYPE
-     1  5| | | | Assign     unknown      TYPE
+     1  5| | | | Assign     expression   TYPE
      1  5| | | | | Var        unknown      TYPE    _retval
      1 10| | | | | Mul        expression   TYPE
      1 10| | | | | | Int        int          int

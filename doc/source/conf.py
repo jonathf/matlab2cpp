@@ -31,7 +31,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 # ones.
 
 extensions = ["sphinx.ext.autodoc", "sphinx.ext.napoleon",
-    "sphinxcontrib.autoprogram"]
+    "sphinxcontrib.autoprogram", "sphinxarg.ext"]
 
 napoleon_google_docstring = True
 napoleon_numpy_docstring = True

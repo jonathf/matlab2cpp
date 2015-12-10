@@ -67,6 +67,7 @@ End = "expression"
 Break = "expression"
 Return = "expression"
 Matrix = "matrix"
+Vector = "matrix"
 Cell = "cell"
 Int = "int"
 Float = "double"
@@ -76,7 +77,11 @@ Lambda = "func_lambda"
 Lcomment = "code_block"
 Bcomment = "code_block"
 Ecomment = "code_block"
-Fvar = "struct"
+def Fvar(node):
+    declare = node.func[0][node.name]
+    if declare.type != "TYPE":
+        node.backend = declare.backend
+
 Cvar = "cell"
 Cget = "cell"
 Fget = "structs"
@@ -98,15 +103,6 @@ def Get(node):
 def Set(node):
     if node.type != "TYPE":
         node.backend = node.type
-
-def Vector(node):
-    node.backend = "matrix"
-
-    # matrix surround struct converts it to array
-    if node and node[0].backend == "struct":
-        declare = node.func[0][node.func[0].names.index(node[0].name)]
-        if declare.backend == "structs":
-            node.backend = "structs"
 
 def Func(node):
     returns = node[1]
@@ -140,7 +136,5 @@ def Declares(node):
     else:
         node.backend = "func_returns"
 
-
 def Assign(node):
-    if node[1].backend == "func_lambda":
-        node.backend = "func_lambda"
+    node.backend = node[1].backend

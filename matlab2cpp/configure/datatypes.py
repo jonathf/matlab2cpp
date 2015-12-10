@@ -112,11 +112,11 @@ def Vector(node):
 def Matrix(node):
 
     # matrix surround struct converts it to array
-    if node[0] and node[0][0].backend == "struct":
-        declare = node.func[0][
-                node.func[0].names.index(node[0][0].name)]
-        if declare.backend == "structs":
-            node.backend = "structs"
+
+    if not all([n.num for n in node]):
+        
+        if len(node) == 1 and len(node[0]) == 1:
+            node.type = node[0][0]
         return
 
     node.type = [n.type for n in node]

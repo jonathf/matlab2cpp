@@ -86,7 +86,7 @@ respectivly.  To configure backends and datatypes, use the
      1  1| | | | Returns    func_return  TYPE
      1  1| | | | Params     func_return  TYPE
      1  1| | | | Block      code_block   TYPE
-     1  1| | | | | Assign     unknown      int
+     1  1| | | | | Assign     int          int
      1  1| | | | | | Var        int          int     a
      1  5| | | | | | Int        int          int
          | | Inlines    program      TYPE    file1.m
@@ -176,7 +176,7 @@ a good startingpoint. This can either be done through the function
      1 13| | | | Params     func_return  TYPE
      1 14| | | | | Var        int          int     x
      1 16| | | | Block      code_block   TYPE
-     1 18| | | | | Assign     unknown      int
+     1 18| | | | | Assign     expression   int
      1 18| | | | | | Var        double       double  y
      1 20| | | | | | Plus       expression   int
      1 20| | | | | | | Var        int          int     x

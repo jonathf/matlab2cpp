@@ -58,4 +58,6 @@ def Get_zeros(node):
     elif len(node) == 3:
         node.dim = 4
 
+Get_ones = Get_zeros
+
 Get_eye = "mat"

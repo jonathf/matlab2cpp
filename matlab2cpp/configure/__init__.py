@@ -27,6 +27,7 @@ def loop(root, suggest):
         # loop and configure
         for node in nodes:
 
+            # reserved stuff
             if node.cls + "_" + node.name in reserved.__dict__:
                 rule = reserved.__dict__[node.cls+"_"+node.name]
                 if isinstance(rule, str):
@@ -34,6 +35,7 @@ def loop(root, suggest):
                 else:
                     rule(node)
 
+            # Datatype stuff
             if node.type != "TYPE":
                 pass
 
@@ -44,6 +46,7 @@ def loop(root, suggest):
                 else:
                     datatype(node)
 
+            # Backend stuff
             if node.backend != "unknown":
                 pass
 

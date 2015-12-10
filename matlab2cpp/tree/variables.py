@@ -36,7 +36,7 @@ Example:
     >>> builder.configure(suggest=False)
     >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
-    1 1| Assign     unknown      int 
+    1 1| Assign     int          int 
     1 1| | Var        unknown      (int)   a
     1 5| | Int        int          int
     """
