@@ -9,3 +9,10 @@ def Fget(node):
 
 def Fset(node):
     return "%(name)s.%(value)s[", ", ", "-1]"
+
+
+def Matrix(node):
+    return ""
+
+def Assign(node):
+    return ""

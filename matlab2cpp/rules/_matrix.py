@@ -94,8 +94,11 @@ def Matrix(node):
             else:
                 nodes.append(str(node[i]))
 
-    return reduce(lambda a,b: ("arma::join_cols(%s, %s)" % (a,b)), nodes)
-
+    try:
+        return reduce(lambda a,b: ("arma::join_cols(%s, %s)" % (a,b)), nodes)
+    except:
+        node.error("No match for handling matrix arg found")
+        return "{", ", ", "}"
 
 
 def Assign(node):
@@ -109,10 +112,19 @@ def Assign(node):
     if len(rhs[0]) == 0:
         return "%(0)s.reset() ;"
 
+    # assign a my_var = [a.val], a is a structs, my_var should be a vec
     if len(rhs) == 1 and len(rhs[0]) == 1:
         element = rhs[0][0]
-        if element.type == "structs":
-            pass
+        if element.backend == "structs":
+            size = rhs.str[1:-1]
+            var = lhs.name
+            name = element.name
+            value = element.value
+            
+            string = var + ".resize(" + size + ") ;\n" +\
+              "for (int _i = 0, _N = " + size + "; _i < _N; ++_i)\n  "+\
+              var + "[_i] = " + name + "[_i]." + value + " ;"
+            return string
 
     # non-numerical values in matrix or variable assign
     if not lhs.num or not rhs.num:

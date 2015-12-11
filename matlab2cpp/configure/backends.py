@@ -66,7 +66,17 @@ All = "expression"
 End = "expression"
 Break = "expression"
 Return = "expression"
-Matrix = "matrix"
+def Matrix(node):
+    # matrix surround struct converts it to array
+    if len(node) == 1 and len(node[0]) == 1:
+        elem = node[0][0]
+        if elem.backend != "unknown":
+            node.backend = elem.backend
+        elif elem.num:
+            node.backend = "matrix"
+    else:
+        node.backend = "matrix"
+
 Vector = "matrix"
 Cell = "cell"
 Int = "int"

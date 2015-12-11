@@ -111,14 +111,6 @@ def Vector(node):
 
 def Matrix(node):
 
-    # matrix surround struct converts it to array
-
-    if not all([n.num for n in node]):
-        
-        if len(node) == 1 and len(node[0]) == 1:
-            node.type = node[0][0]
-        return
-
     node.type = [n.type for n in node]
 
     dims = {n.dim for n in node}

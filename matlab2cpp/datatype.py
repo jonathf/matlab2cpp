@@ -142,7 +142,7 @@ def get_dim(val):
     elif val in dim4:   dim = 4
     elif val in others: dim = None
     else:
-        raise ValueError("%s not recognized" % val)
+        raise ValueError("Datatype '%s' not recognized" % val)
     return dim
 
 
@@ -158,7 +158,7 @@ def get_mem(val):
     elif val in mem4:  mem = 4
     elif val in others: mem = None
     else:
-        raise ValueError("%s not recognized" % val)
+        raise ValueError("Datatype '%s' not recognized" % val)
 
     return mem
 
