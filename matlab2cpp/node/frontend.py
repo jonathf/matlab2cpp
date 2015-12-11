@@ -233,15 +233,6 @@ Example:
 Create a auxiliary variable and rearange nodes to but current node on its own
 line before.
 
-Many statements that works inline in Matlab, must be done on multiple lines in
-C++. Take for example the statement ``[1,2]+3``. In C++, the rowvec ``[1,2]``
-must first be initialized before arithmetics can be used::
-
-    >>> print mc.qscript("[1,2]+3")
-    sword __aux_irowvec_1 [] = {1, 2} ;
-    _aux_irowvec_1 = irowvec(__aux_irowvec_1, 2, false) ;
-    _aux_irowvec_1+3 ;
-
 Args:
     type (str, None):
         If provided, auxiliary variable type will be converted
@@ -250,6 +241,18 @@ Args:
         Armadillo.
 
 Example:
+    Many statements that works inline in Matlab, must be done on multiple lines in
+    C++. Take for example the statement ``[1,2]+3``. In C++, the rowvec ``[1,2]``
+    must first be initialized and converted into ``rowvec`` before arithmetics can
+    be used::
+
+    >>> print mc.qscript("[1,2]+3")
+    sword __aux_irowvec_1 [] = {1, 2} ;
+    _aux_irowvec_1 = irowvec(__aux_irowvec_1, 2, false) ;
+    _aux_irowvec_1+3 ;
+
+    The difference in tree structure is as follows:
+
     >>> print mc.qtree("[1,2]", core=True) # doctest: +NORMALIZE_WHITESPACE
      1  1Block      code_block   TYPE
      1  1| Statement  matrix       TYPE
@@ -274,6 +277,14 @@ Example:
 
 
     def resize(self):
+        """
+Resize function.
+
+Very similar to the function :py:func:`~matlab2cpp.Node.auxiliary`, but
+specific for reshaping cubes into slices.
+
+Might need to be rewritten.
+        """
         backend.resize(self)
 
 
