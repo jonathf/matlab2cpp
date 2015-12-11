@@ -116,7 +116,8 @@ def Matrix(node):
     if not all([n.num for n in node]):
         
         if len(node) == 1 and len(node[0]) == 1:
-            node.type = node[0][0]
+            #node.type = node[0][0]
+            node.type = "vec"
         return
 
     node.type = [n.type for n in node]
