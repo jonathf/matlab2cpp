@@ -287,23 +287,85 @@ Might need to be rewritten.
         """
         backend.resize(self)
 
-
     def include(self, name, **kws):
+        """
+Include library in the header of the file.
+
+These include::
+
++--------------+--------------------------+
+| Name         | Description              |
++==============+==========================+
+| ``SPlot``    | Local SPlot library      |
++--------------+--------------------------+
+| ``m2cpp``    | Local M2cpp library      |
++--------------+--------------------------+
+| ``arma``     | Global Armadillo library |
++--------------+--------------------------+
+| ``iostream`` | Global iostream library  |
++--------------+--------------------------+
+
+Args:
+    name (str): Name of header to include
+    **kws (str, optional): Optional args for header. Mostly not in use.
+    """
         backend.include(self, name, **kws)
 
     def warning(self, msg):
+        """
+Add a warning to the log file.
+
+Args:
+    msg (str): Content of the warning
+
+See also:
+    :py:func:`~matlab2cpp.Node.error`
+    """
         backend.error(self, msg, True)
 
     def error(self, msg):
+        """
+Add an error to the log file.
+
+Args:
+    msg (str): Content of the error
+
+Example:
+    >>> print mc.qlog("  a")
+    Error in class Var on line 1:
+      a
+      ^
+    unknown data type
+    """
         backend.error(self, msg, False)
 
     def create_declare(self):
+        """
+Investigate if the current node is declared (either in Params, Declares or in
+Structs), and create such a node if non exists in Declares.
+
+The declared variable's datatype will be the same as current node.
+
+Returns:
+    Node : the (newly) declared node
+        """
         backend.create_declare(self)
 
     def suggest_datatype(self):
+        """
+Try to figure out from context, what the datatype should be for current node.
+
+Returns:
+    (tuple): Suggestion on the form ``(dim, mem)``
+        """
         return backend.suggest_datatype(self)
 
     def wall_clock(self):
+        """
+Prepare for the use of ``tic`` and ``toc`` functionality in code.
+
+Does nothing if called before.
+        """
         return backend.wall_clock(self)
 
     def __getitem__(self, index):
@@ -357,15 +419,16 @@ Examples:
 
 
     def __contains__(self, i):
+        """
+Test if (Node with) name ``i`` is contained in code.
+        """
+
         if isinstance(i, str):
             return i in self.names
         return i.name in self.names
 
     def __setitem__(self, key, val):
         self.prop[key] = val
-
-    def __hasitem__(self, key):
-        return key in self.prop
 
     def __len__(self):
         return len(self.children)
@@ -404,14 +467,14 @@ Return a list of all nodes
 | Sorted [o]rdered, [r]everse and [i]nverse:
 |
 | ori
-| nnn : A B D E C F G
-| ynn : A B C D E F G
-| nyn : A C G F B E D
-| nny : D E B F G C A
-| yyn : A C B G F E D
-| yny : D E F G B C A
-| nyy : E D B G F C A
-| yyy : G F E D C B A
+| ___ : A B D E C F G
+| o__ : A B C D E F G
+| _r_ : A C G F B E D
+| __i : D E B F G C A
+| or_ : A C B G F E D
+| o_i : D E F G B C A
+| _ri : E D B G F C A
+| ori : G F E D C B A
 
 Args:
     node (Node): Root node to start from
@@ -425,6 +488,9 @@ Return:
         return backend.flatten(self, ordered, reverse, inverse)
 
     def plotting(self):
+        """
+Prepare the code for plotting functionality.
+        """
         return backend.plotting(self)
 
 
