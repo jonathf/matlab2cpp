@@ -64,7 +64,6 @@ except:
     pass
 
 if __name__ == "__main__":
-    print type(args)
 
     import matlab2cpp
     matlab2cpp.main(args)
