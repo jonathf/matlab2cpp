@@ -64,7 +64,7 @@ except:
     pass
 
 if __name__ == "__main__":
-    args = parser.parse_args()
+    print type(args)
 
     import matlab2cpp
     matlab2cpp.main(args)
