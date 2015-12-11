@@ -5,6 +5,18 @@ import reference
 import matlab2cpp
 
 def flatten(node, ordered=False, reverse=False, inverse=False):
+    """
+Backend for the :py:func:`~matlab2cpp.Node.flatten` function.
+
+Args:
+    node (Node): Root node to start from
+    ordered (bool): If True, make sure the nodes are hierarcically ordered.
+    reverse (bool): If True, children are itterated in reverse order.
+    inverse (bool): If True, tree is itterated in reverse order.
+
+See also:
+    :py:func:`~matlab2cpp.Node.flatten`
+    """
 
     o = bool(ordered)
     r = bool(reverse)
@@ -112,6 +124,21 @@ See also:
 
 
 def auxillary(node, type, convert):
+    """
+Backend for the :py:func:`~matlab2cpp.Node.auxillary` function.
+
+Args:
+    node (Node):
+        Root of the tree where split into new line will occour.
+    type (str, None):
+        If provided, auxiliary variable type will be converted
+    convert (bool):
+        If true, add an extra function call ``conv_to`` to convert datatype in
+        Armadillo.
+
+See also:
+    :py:func:`~matlab2cpp.Node.auxiliary`
+    """
 
     assert node.parent.cls != "Assign",\
             ".auxiliary() must be triggered mid expression."
@@ -192,6 +219,15 @@ def auxillary(node, type, convert):
 
 
 def resize(node):
+    """
+Backend for the :py:func:`~matlab2cpp.Node.resize` function.
+
+Args:
+    node (Node): node to be resized
+
+See also:
+    :py:func:`~matlab2cpp.Node.resize`
+    """
 
     if node["_resize"]:
         return
@@ -216,6 +252,18 @@ def resize(node):
 
 
 def error(node, msg, onlyw=False):
+    """
+Add an error or warning to the log subtree.
+
+Args:
+    node (Node): node where error occoured
+    msg (str): error message content
+    onlyw (bool): if true, use warning instead of error
+
+See also:
+    :py:func:`~matlab2cpp.Node.error`
+    :py:func:`~matlab2cpp.Node.warning`
+    """
 
     msg = msg % node.properties()
 
@@ -253,6 +301,15 @@ def error(node, msg, onlyw=False):
 
 
 def create_declare(node):
+    """
+Backend for the :py:func:`~matlab2cpp.Node.create_declare` function.
+
+Args:
+    node (Node): Node to create declare from
+
+Returns:
+    Node : the (newly) declared node
+    """
 
     if not (node is node.declare):
         return node
@@ -308,6 +365,18 @@ def create_declare(node):
 
 
 def suggest_datatype(node):
+    """
+Backend for the :py:func:`~matlab2cpp.Node.suggest_datatype` function.
+
+Args:
+    node (Node): Node to suggest datatype for.
+
+Returns:
+    (tuple): Suggestion on the form ``(dim, mem)``
+
+See also:
+    :py:func:`~matlab2cpp.Node.suggest_datatype`
+    """
 
     if node.group.cls in ("Transpose", "Ctranspose"):
 
@@ -386,9 +455,19 @@ def suggest_datatype(node):
 
     return None, None
 
-# small hack to ensure that log isn't clean mid translation
+# small hack to ensure that log isn't cleaned mid translation
 mid_translation = [0]
 def translate(node, opt=None):
+    """
+Backend for performing translation of subtree
+
+Args:
+    node (Node): Root of the translation
+    opt (argparse.Namespace, optional): optional arguments from frontend
+
+See also:
+    :py:func:`~matlab2cpp.Node.translate`
+    """
 
     # translate for every program
     if node.cls == "Project":
@@ -419,6 +498,16 @@ def translate(node, opt=None):
 
 
 def translate_one(node, opt):
+    """
+Backend for performing translation of single node
+
+Args:
+    node (Node): Node to perform translation on
+    opt (argparse.Namespace, optional): optional arguments from frontend
+
+See also:
+    :py:func:`~matlab2cpp.Node.translate`
+    """
 
     # e.g. Get_a from user
     value = node.program.parent.kws.get(node.cls+"_"+node.name, None)
@@ -506,6 +595,17 @@ def translate_one(node, opt):
 
 
 def include(node, name, **kws):
+    """
+Backend for the :py:func:`~matlab2cpp.Node.include` function.
+
+Args:
+    node (Node): node in program where to where the header is placed
+    name (str): name of header
+    **kws (str, optional): Optional args for header. Mostly not in use.
+
+See also:
+    :py:func:`~matlab2cpp.Node.include`
+    """
 
     if os.path.isfile(name):
 
@@ -545,6 +645,16 @@ def include(node, name, **kws):
 
 
 def wall_clock(node):
+    """
+Backend for the :py:func:`~matlab2cpp.Node.wall_clock` function.
+
+Args:
+    node (Node):
+        node in function where ``wall_clock _timer`` should be declared.
+
+See also:
+    :py:func:`~matlab2cpp.Node.wall_clock`
+    """
     declares = node.func[0]
     if "_timer" not in declares:
         clock = matlab2cpp.collection.Var(declares, name="_timer")
@@ -552,6 +662,15 @@ def wall_clock(node):
 
 
 def plotting(node):
+    """
+Backend of the :py:func:`~matlab2cpp.Node.plotting` function.
+
+Args:
+    node (Node): node in the function where plotting should be implemented.
+
+See also:
+    :py:func:`~matlab2cpp.Node.plotting`
+    """
 
     declares = node.func[0]
 
@@ -586,7 +705,4 @@ def plotting(node):
     if len(block)>1 and block[-2] and block[-2][0].cls == "Return":
         block.children[-1], block.children[-2] = \
                 block.children[-2], block.children[-1]
-
-
-        
 
