@@ -40,13 +40,13 @@ Attributes:
     itype (list): Input/output include scope statements
     line (int): The codeline number in original code where this  node was
         concived. It takes the value 0 for nodes  not created from code.
-    name (str): The name of the node. Available in the string  format as
-        `%(name)s`.
-    names (list): A list of the names (if any) of the nodes children.
     mem (int): The amount of type-space reserved per element in a  numerical
         datatype.  The value 0 through 4  represents unsigned int, int, float,
         double and  complex.  The value is None if datatype is not  numerical.
         Interconnected with `type`.
+    name (str): The name of the node. Available in the string  format as
+        `%(name)s`.
+    names (list): A list of the names (if any) of the nodes children.
     num (bool): A bool value that is true if and only if the  datatype is
         numerical.  Interconnected with `type`.
     parent (Node): A reference to the direct node parent above the  current
@@ -153,7 +153,14 @@ See also:
 
 
     def translate(self, opt=None, only=False):
-        """Generate code"""
+        """Generate code translation
+
+Args:
+    opt (argparse.Namespace, optional): Extra arguments provided by argparse
+    only (bool): If true, translate current node only.
+        """
+
+        # configure if not configured
         if not self.project.builder.configured:
             self.project.builder.configure()
 
@@ -164,6 +171,50 @@ See also:
 
 
     def properties(self):
+        """
+Retrieve local node properties.
+
+The following properties are included:
++-------------+-------------------------------------+-----------------------------+
+| Name        | Attribute                           | Description                 |
++=============+=====================================+=============================+
+| ``backend`` | :py:attr:`~matlab2cpp.Node.backend` | Name of translation backend |
++-------------+-------------------------------------+-----------------------------+
+| ``class``   | :py:attr:`~matlab2cpp.Node.cls`     | Node class name             |
++-------------+-------------------------------------+-----------------------------+
+| ``code``    | :py:attr:`~matlab2cpp.Node.code`    | Matlab code equivalent      |
++-------------+-------------------------------------+-----------------------------+
+| ``cur``     | :py:attr:`~matlab2cpp.Node.cur`     | Position in Matlab code     |
++-------------+-------------------------------------+-----------------------------+
+| ``line``    | :py:attr:`~matlab2cpp.Node.line`    | Line number in Matlab code  |
++-------------+-------------------------------------+-----------------------------+
+| ``name``    | :py:attr:`~matlab2cpp.Node.name`    | Node name                   |
++-------------+-------------------------------------+-----------------------------+
+| ``pointer`` | :py:attr:`~matlab2cpp.Node.pointer` | Pointer reference object    |
++-------------+-------------------------------------+-----------------------------+
+| ``str``     | :py:attr:`~matlab2cpp.Node.str`     | Node translation            |
++-------------+-------------------------------------+-----------------------------+
+| ``suggest`` | :py:attr:`~matlab2cpp.Node.suggest` | Suggested datatype          |
++-------------+-------------------------------------+-----------------------------+
+| ``type``    | :py:attr:`~matlab2cpp.Node.type`    | Node datatype               |
++-------------+-------------------------------------+-----------------------------+
+| ``value``   | :py:attr:`~matlab2cpp.Node.value`   | Node value                  |
++-------------+-------------------------------------+-----------------------------+
+
+In addition will number keys (in string format) represents the node
+children's ``node.str`` in order.
+
+Returns:
+    dict: dictionary with all properties and references to other assosiated
+    nodes.
+
+Example:
+    >>> var = mc.collection.Var(None, name="A", value="B", line=1, cur=0, code="C")
+    >>> print var.properties() # doctest: +NORMALIZE_WHITESPACE
+    {'code': 'C', 'cur': 0, 'suggest': 'TYPE', 'value': 'B', 'ret': '', 'str':
+    '', 'type': 'TYPE', 'line': 1, 'backend': 'unknown', 'pointer': 0, 'class':
+    'Var', 'name': 'A'}
+        """
 
         prop = self.prop.copy()
         for key in self.prop:
@@ -179,11 +230,45 @@ See also:
 
     def auxiliary(self, type=None, convert=False):
         """
-Create a auxiliary variablele and
-move actual calcuations to own line.
+Create a auxiliary variable and rearange nodes to but current node on its own
+line before.
+
+Many statements that works inline in Matlab, must be done on multiple lines in
+C++. Take for example the statement ``[1,2]+3``. In C++, the rowvec ``[1,2]``
+must first be initialized before arithmetics can be used::
+
+    >>> print mc.qscript("[1,2]+3")
+    sword __aux_irowvec_1 [] = {1, 2} ;
+    _aux_irowvec_1 = irowvec(__aux_irowvec_1, 2, false) ;
+    _aux_irowvec_1+3 ;
 
 Args:
-    type (str, None): If provided, auxiliary variable type will be converted
+    type (str, None):
+        If provided, auxiliary variable type will be converted
+    convert (bool):
+        If true, add an extra function call ``conv_to`` to convert datatype in
+        Armadillo.
+
+Example:
+    >>> print mc.qtree("[1,2]", core=True) # doctest: +NORMALIZE_WHITESPACE
+     1  1Block      code_block   TYPE
+     1  1| Statement  matrix       TYPE
+     1  1| | Matrix     matrix       irowvec
+     1  2| | | Vector     matrix       irowvec
+     1  2| | | | Int        int          int
+     1  4| | | | Int        int          int
+    >>> print mc.qtree("[1,2]+3", core=True) # doctest: +NORMALIZE_WHITESPACE
+     1  1Block      code_block   TYPE
+     1  1| Assign     matrix       int
+     1  1| | Var        irowvec      irowvec _aux_irowvec_1
+     1  1| | Matrix     matrix       irowvec
+     1  2| | | Vector     matrix       irowvec
+     1  2| | | | Int        int          int
+     1  4| | | | Int        int          int
+     1  1| Statement  code_block   TYPE
+     1  1| | Plus       expression   irowvec
+     1  1| | | Var        unknown      irowvec _aux_irowvec_1
+     1  7| | | Int        int          int
         """
         return backend.auxillary(self, type, convert)
 
