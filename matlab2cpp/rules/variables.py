@@ -6,17 +6,11 @@ def Var(node):
 
 def Fvar(node):
 
-    #var = node.func[0][node.func[0].names.index(node.name)]
-    #var = node
-
     if node.backend == "structs":
         if node.parent.cls == "Vector":
-            #size = node.declare.parent[node.declare.parent.names.index("_size")]
-            size = node.declare.parent["_size"]
-
-            #return "m2cpp::extract(%(name)s, " + size.value + ")"
-            #return "int _N = " + size.value
-            return size.value
+            if len(node.parent) == 1:
+                size = node.declare.parent["_size"]
+                return size.value
         return "%(name)s[0].%(value)s"
     return "%(name)s.%(value)s"
 

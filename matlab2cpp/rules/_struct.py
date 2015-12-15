@@ -1,11 +1,8 @@
 from assign import Assign
 from variables import *
 
-def Fvar(node):
-    return "%(name)s.%(value)s"
+#def Fvar(node): #defined in variables.py
+#    return "%(name)s.%(value)s"
 
 def Matrix(node):
-    return ""
-
-def Assign(node):
-    return ""
+    return "", ", ", ""
