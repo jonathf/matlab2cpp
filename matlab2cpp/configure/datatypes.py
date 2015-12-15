@@ -137,9 +137,6 @@ def Matrix(node):
             else:
                 node.dim = 0#scalar
 
-        if node.parent.cls == "Assign":
-            node.parent.backend = "matrix"
-
     elif dims in ({0,1}, {1}):
 
         # configure dimensions

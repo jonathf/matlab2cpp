@@ -100,6 +100,14 @@ Examples:
     if not node[0].num:
         return "", "*", ""
 
+    if len(node) == 2 and node.dim == 0:
+        if node[0].backend == "reserved" and node[0].name == "i" and node[1].mem < 4:
+            node.value = node[1].value
+            return "cx_double(0, %(1)s)"
+        elif node[1].backend == "reserved" and node[1].name == "i" and node[0].mem < 4:
+            node.value = node[0].value
+            return "cx_double(0, %(0)s)"
+
     dim = node[0].dim
     mem = max(node[0].mem, 2)
 
@@ -194,6 +202,15 @@ Examples:
     # non-numerical addition
     if not node.num:
         node.error("non-numerical addition %s" % str([n.type for n in node]))
+
+    if node.mem == 4 and node.dim == 0:
+        out = []
+        for child in node:
+            if child.mem < 4:
+                out.append("cx_double(" + str(child) + ", 0)")
+            else:
+                out.append(str(child))
+        return "+".join(out)
 
     return "", "+", ""
 

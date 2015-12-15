@@ -60,8 +60,8 @@ def Matrix(node):
                     node.type = (node.dim, 0)
             return str(node.auxiliary())
 
-        if node.parent.cls in ("Assign", "Statement"):
-            node.parent.backend = "matrix"
+        # if node.parent.cls in ("Assign", "Statement"):
+        #     node.parent.backend = "matrix"
 
         return "{", ", ", "}"
 

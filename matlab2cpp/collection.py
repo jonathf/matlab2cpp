@@ -375,7 +375,7 @@ class Float(Node):
 
 class Imag(Node):
     def __init__(self, parent, value, **kws):
-        Node.__init__(self, parent, **kws)
+        Node.__init__(self, parent, value=value, **kws)
 
 class String(Node):
     def __init__(self, parent, value, **kws):
