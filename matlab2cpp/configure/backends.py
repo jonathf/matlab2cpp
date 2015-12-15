@@ -147,4 +147,4 @@ def Declares(node):
         node.backend = "func_returns"
 
 def Assign(node):
-    node.backend = node[1].backend
+    node.backend = node[-1].backend

@@ -255,7 +255,7 @@ Example:
 
     >>> print mc.qtree("[1,2]", core=True) # doctest: +NORMALIZE_WHITESPACE
      1  1Block      code_block   TYPE
-     1  1| Statement  matrix       TYPE
+     1  1| Statement  code_block   TYPE
      1  1| | Matrix     matrix       irowvec
      1  2| | | Vector     matrix       irowvec
      1  2| | | | Int        int          int
