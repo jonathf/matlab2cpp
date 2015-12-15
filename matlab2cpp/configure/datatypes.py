@@ -9,7 +9,12 @@ def Var(node):
         return
 
     if node.parent.cls == "Assign" and node.parent[0] is node:
-        node.declare.suggest = node.parent[1].type
+        #assign b = [a.val], a is a structs, suggest vec -> dim=1
+        if node.parent[1].cls == "Matrix" and \
+          node.parent[1].backend == "structs" and len(node.parent[1][0]) == 1:
+            node.declare.suggest = (1, node.parent[1].mem)
+        else:
+            node.declare.suggest = node.parent[1].type
     
     if node.declare.type != "TYPE":
         node.type = node.declare.type
