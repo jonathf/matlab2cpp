@@ -1,3 +1,4 @@
+from assign import Assign
 from variables import *
 
 Declare = "cx_double %(name)s ;"
