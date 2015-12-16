@@ -88,7 +88,7 @@ def Get_all(node):
 def Var_return(node):
 
     # multi-return does not return a value
-    if node.func["backend"] == "func_returns":
+    if node.func.backend == "func_returns":
         return "return"
     return "return " + str(node.func[0])
 
@@ -105,7 +105,6 @@ def Get_size(node):
     if len(node) > 1:
 
         # determine ax from second arg
-        node.type = "uword"
         arg2 = node[1].value
         if arg2 == "1":
             return var+".n_rows"
