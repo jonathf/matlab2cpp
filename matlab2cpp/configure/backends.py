@@ -1,3 +1,4 @@
+import matlab2cpp as mc
 
 Project = "program"
 Program = "program"
@@ -72,8 +73,6 @@ def Matrix(node):
         elem = node[0][0]
         if elem.backend != "unknown":
             node.backend = elem.backend
-        elif elem.num:
-            node.backend = "matrix"
     else:
         node.backend = "matrix"
 
@@ -88,8 +87,21 @@ Lcomment = "code_block"
 Bcomment = "code_block"
 Ecomment = "code_block"
 def Fvar(node):
+    """
+Example:
+    >>> print mc.qtree("a.b = 4.4; c = [a.b]", core=True, suggest=True) #doctest: +NORMALIZE_WHITESPACE
+    1   1Block      code_block   TYPE    
+    1   1| Assign     double       double  
+    1   1| | Fvar       struct       double  a
+    1   7| | Float      double       double  
+    1  12| Assign     struct       double  
+    1  12| | Var        double       double  c
+    1  16| | Matrix     struct       double  
+    1  17| | | Vector     matrix       double  
+    1  17| | | | Fvar       struct       double  a
+    """
     declare = node.func[0][node.name]
-    if declare.type != "TYPE":
+    if declare.backend in ("struct", "structs"):
         node.backend = declare.backend
 
 Cvar = "cell"
@@ -148,3 +160,8 @@ def Declares(node):
 
 def Assign(node):
     node.backend = node[-1].backend
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

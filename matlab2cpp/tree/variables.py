@@ -135,7 +135,7 @@ Example:
                     code=self.code[cur:end], pointer=1)
 
             last = self.create_list(node, k)
-            cur = end
+            cur = end-1
 
         else:
 
