@@ -61,13 +61,12 @@ Returns:
             node.warning("lambda function content not found")
             return "std::function"
 
-    # struct type
-    elif node.type == "struct":
-        return "_"+node.name.capitalize()
-
-    # struct array type
-    elif node.type == "structs":
-        return "_" + node.name.capitalize()
+    # struct scalar and array type
+    elif node.type in ("struct", "structs"):
+        declare = node.declare
+        if declare.parent.cls == "Struct":
+            declare = declare.parent
+        return "_" + declare.name.capitalize()
 
     elif node.type == "string":
         return "std::string"

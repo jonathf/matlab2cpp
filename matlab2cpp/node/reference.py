@@ -147,6 +147,10 @@ class Names(object):
 class Declare_reference(object):
 
     def __get__(self, instance, owner):
+
+        if hasattr(instance, "_declare"):
+            return instance._declare
+
         if instance.cls in nondeclares:
             return instance
 
@@ -170,7 +174,9 @@ class Declare_reference(object):
             if value not in struct.names:
                 return instance
 
-            return struct[struct.names.index(value)]
+            out = struct[struct.names.index(value)]
+            instance._declare = out
+            return out
 
         elif instance.parent.cls in "Struct":
             return instance
@@ -178,10 +184,14 @@ class Declare_reference(object):
         else:
 
             if instance in instance.func[0]:
-                return instance.func[0][instance]
+                out = instance.func[0][instance]
+                instance._declare = out
+                return out
 
             if instance in instance.func[2]:
-                return instance.func[2][instance]
+                out = instance.func[2][instance]
+                instance._declare = out
+                return out
 
 
         return instance

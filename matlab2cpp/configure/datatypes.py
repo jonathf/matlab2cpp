@@ -13,6 +13,21 @@ def Var(node):
         if node.parent[1].cls == "Matrix" and \
           node.parent[1].backend == "structs" and len(node.parent[1][0]) == 1:
             node.declare.suggest = (1, node.parent[1].mem)
+
+        elif node.parent[1].cls in ("Var",)\
+                and node.parent[1].backend in ("struct", "structs"):
+
+            backend = node.parent[1].backend
+
+            node.parent[1].declare
+            if hasattr(node.parent[1], "_declare"):
+
+                node.declare.type = backend
+                node.declare.backend = backend
+                node.declare._declare = node.parent[1]._declare
+                node._declare = node.parent[1]._declare
+                node.backend = backend
+
         else:
             node.declare.suggest = node.parent[1].type
     
