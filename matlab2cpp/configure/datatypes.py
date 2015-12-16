@@ -4,6 +4,25 @@ import matlab2cpp as mc
 Counter = "structs"
 
 def Var(node):
+    """
+Example:
+    >>> print mc.qcpp("a.b = 4; c = a")
+    #include <armadillo>
+    using namespace arma ;
+    <BLANKLINE>
+    struct _A
+    {
+      int b ;
+    } ;
+    <BLANKLINE>
+    int main(int argc, char** argv)
+    {
+      _A a, c ;
+      a.b = 4 ;
+      c = a ;
+      return 0 ;
+    }
+    """
 
     if funcs(node):
         return
@@ -283,3 +302,8 @@ def Lambda(node):
 def Assigns(node):
     if node[-1].type != "TYPE":
         node.type = node[-1].type
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
