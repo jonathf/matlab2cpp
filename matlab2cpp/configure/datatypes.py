@@ -32,7 +32,8 @@ Example:
         if node.parent[1].cls == "Matrix" and \
           node.parent[1].backend == "structs" and len(node.parent[1][0]) == 1:
             node.declare.suggest = (1, node.parent[1].mem)
-
+        #assign b = a, where a is a struct/structs.
+        #This code sets b backend and type to a's backend and type
         elif node.parent[1].cls in ("Var",)\
                 and node.parent[1].backend in ("struct", "structs"):
 
