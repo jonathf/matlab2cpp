@@ -44,11 +44,9 @@ Var_NaN = "datum::nan"
 # Special handle of 'i'-variable
 
 def Var_i(node):
-    node.type = "cx_double"
     return "cx_complex(0, 1)"
 
 def Get_abs(node):
-    node.type = node[0].type
     return "abs(", ", ", ")"
 
 def Get_and(node):
@@ -68,36 +66,9 @@ def Get_any(node):
     if not node[0].num:
         return "any(", ", ", ")"
 
-    node.type = node[0].type
-
     # unknown datatype
     if node[0].dim == 0:
         return "%(0)s"
-
-    # colvec or rowvec
-    elif node.dim in (1,2):
-        node.dim = 0
-
-    # matrix
-    elif node.dim == 3:
-
-        # axis input decides by second input
-        if len(node) == 2:
-
-            if  node[1].cls == "Int":
-                val = node[1].value
-                if val == "1":
-                    node.dim = 2
-                elif val == "2":
-                    node.dim = 1
-
-            # problem if arg not explicit
-            else:
-                node.num = False
-
-    # cube
-    else:
-        node.dim = 3
 
     return "any(", ", ", ")"
 
@@ -107,36 +78,9 @@ def Get_all(node):
     if not node[0].num:
         return "all(", ", ", ")"
 
-    node.type = node[0].type
-
     # scalar value
     if node[0].dim == 0:
         return "%(0)s"
-
-    # colvec or rowvec
-    elif node.dim in (1,2):
-        node.dim = 0
-
-    # matrix
-    elif node.dim == 3:
-
-        # axis input decides by second input
-        if len(node) == 2:
-
-            if  node[1].cls == "Int":
-                val = node[1].value
-                if val == "1":
-                    node.dim = 2
-                elif val == "2":
-                    node.dim = 1
-
-            # problem if arg not explicit
-            else:
-                node.num = False
-
-    # cube
-    else:
-        node.dim = 3
 
     return "all(", ", ", ")"
 
@@ -172,12 +116,10 @@ def Get_size(node):
 
     # colvec or rowvec
     elif node[0].dim in (1,2):
-        node.type = "uword"
         return var+".n_elem"
 
     # matrix (returns two values)
     elif node[0].dim == 3:
-        node.type = "urowvec"
 
         if node.parent.cls == "Get":
             if node.parent.backend in ("reserved", "func_return",
@@ -189,13 +131,10 @@ def Get_size(node):
         if node.parent.cls not in ("Statement", "Assign"):
             return str(node.auxiliary())
 
-        node.parent.backend = "reserved"
-        node.parent.name = "size"
         return "{%(0)s.n_rows, %(0)s.n_cols}"
 
     # cube (return three values)
     elif node[0].dim == 4:
-        node.type = "urowvec"
 
         if node.parent.cls == "Get":
             if node.parent.backend in ("reserved", "func_return",
@@ -207,8 +146,6 @@ def Get_size(node):
         if node.parent.cls not in ("Statement", "Assign"):
             return str(node.auxiliary())
 
-        node.parent.backend = "reserved"
-        node.parent.name = "size"
         return "{%(0)s.n_rows, %(0)s.n_cols, %(0)s.n_slices}"
 
     return "size(", ", ", ")"
@@ -228,18 +165,11 @@ def Assigns_size(node):
 
     # suggest some types for matrix
     if len(node)==3:
-        node[0].suggest = "int"
-        node[1].suggest = "int"
-
         return "%(0)s = " +val+ ".n_rows ;\n%(1)s = " +val+ ".n_cols ;"
 
 
     # suggest some types for cube
     if len(node)==4:
-
-        node[0].suggest = "int"
-        node[1].suggest = "int"
-        node[2].suggest = "int"
 
         return  "%(0)s = "+val+".n_rows ;\n"+\
                 "%(1)s = "+val+".n_cols ;\n"+\
@@ -249,9 +179,6 @@ def Assigns_size(node):
 
 
 def Get_length(node):
-    node.type = "uword"
-    node.include("length")
-
     # array-type uses n_elem
     if node.cls == "Var":
         return "%(0)s.n_elem"
@@ -265,17 +192,8 @@ def Get_min(node):
     if not all([n.num for n in node]) or  all([(n.dim < 2) for n in node]):
         return "std::min(", ", ", ")"
 
-    node.type = node[0].type
-
     # single arg
     if len(node) == 1:
-
-        # determine node dimensions
-        if node.dim == 2:
-            node.dim = 0
-        else:
-            node.dim = node.dim-1
-
         return "arma::min(%(0)s)"
 
     # two args
@@ -289,13 +207,10 @@ def Get_min(node):
             # assues third arg is int and sets axis
             val = node[2].value
             if val == "1":
-                node.dim = 2
                 return "arma::min(%(0)s, 1)"
             elif val == "2":
-                node.dim = 1
                 return "arma::min(%(0)s, 0)"
 
-            node.num = False
             return "arma::min(%(0)s, %(2)s-1)"
 
     assert False
@@ -308,9 +223,6 @@ def Assigns_min(node):
     # non-numerical assignment
     if not var.num:
         return "[", ", ", "] = max(", ") ;"
-
-    node[0].suggest = (0, var.mem)
-    node[1].suggest = "int"
 
     # multi-assignmens on own line
     if var.cls != "Var":
@@ -329,17 +241,8 @@ def Get_max(node):
     if all([(n.dim<2) for n in node]):
         return "std::max(", ", ", ")"
 
-    node.type = node[0].type
-
     # number of args is ...
     if len(node) == 1:
-
-        # determine dimensionality
-        if node.dim == 2:
-            node.dim = 0
-        else:
-            node.dim = node.dim-1
-
         return "arma::max(%(0)s)"
 
     if len(node) == 2:
@@ -351,13 +254,10 @@ def Get_max(node):
             # thrid argument sets axis to take max over
             val = node[2]["value"]
             if val == "1":
-                node.dim = 2
                 return "arma::max(%(0)s, 1)"
             elif val == "2":
-                node.dim = 1
                 return "arma::max(%(0)s, 0)"
 
-            node.num = False
             return "arma::max(%(0)s, %(2)s-1)"
 
     assert False
@@ -372,9 +272,6 @@ def Assigns_max(node):
     if not var.num:
         return "[", ", ", "] = max(", ") ;"
 
-    node[0].suggest = (0, var.mem)
-    node[1].suggest = "int"
-
     # multi-assign max on own line
     if var.cls != "Var":
         var = var.auxiliary()
@@ -385,8 +282,6 @@ def Assigns_max(node):
 Var_eye = "1"
 
 def Get_eye(node):
-
-    node.type = "mat"
 
     # not numerical input
     if not node[0].num:
@@ -408,36 +303,13 @@ def Get_transpose(node):
     """Simple transpose
     """
 
-    # colvec -> rowvec 
-    if node[0].dim == 1:
-        node.type = (2, node[0].mem)
-
-    # rowvec -> colvec
-    elif node[0].dim == 2:
-        node.type = (1, node[0].mem)
-
-    else:
-        node.type = node[0].type
-
     return "arma::strans(%(0)s)"
 
 def Get_ctranspose(node):
     """Complex transpose
     """
 
-    # colvec -> rowvec 
-    if node[0].dim == 1:
-        node.type = (2, node[0].mem)
-
-    # rowvec -> colvec
-    elif node[0].dim == 2:
-        node.type = (1, node[0].mem)
-
-    else:
-        node.type = node[0].type
-
     return "arma::trans(%(0)s)"
-
 
 def Get_flipud(node):
     return "arma::flipud(%(0)s)"
@@ -542,8 +414,7 @@ def Get_round(node):
 
 
 def Var_rand(node):
-    node.type = "float"
-    return "arma::randu(1)"
+    return "arma::randu<arma::vec>(1)"
 
 
 def Get_rand(node):
@@ -556,17 +427,14 @@ def Get_rand(node):
 
     # one arg -> vec
     if len(node) == 1:
-        node.type = "vec"
         return "arma::randu<vec>(%(0)s)"
 
     # two args -> mat
     elif len(node) == 2:
-        node.type = "mat"
         return "arma::randu<mat>(%(0)s, %(1)s)"
 
     # three args -> cube
     elif len(node) == 3:
-        node.type = "cube"
         return "arma::randu<cube>(%(0)s, %(1)s, %(2)s)"
 
     else:
@@ -578,10 +446,6 @@ def Get_floor(node):
     # unknown input
     if node[0].type == "TYPE":
         return "floor(", ", ", ")"
-
-    # returns int
-    if node[0].mem > 1:
-        node.type = (node[0].dim, 1)
 
     # scalar done through std
     if node[0].dim == 0:
@@ -615,10 +479,6 @@ def Get_nextpow2(node):
 
 def Get_fft(node):
 
-    node.type = node[0].type
-    if node.mem == 4:
-        node.mem = 3
-
     # arma & matlab fft same for n_args in (1,2)
     if len(node) in (1,2):
         return "arma::fft(", ", ", ")"
@@ -642,13 +502,9 @@ def Get_fft(node):
 
 def Get_ifft(node):
 
-    node.type = node[0].type
-
     # unknown input
     if not node.num:
         return "ifft(", ", ", ")"
-
-    node.mem = 4
 
     if len(node) == 1:
         return "arma::ifft(%(0)s)"
@@ -678,8 +534,6 @@ def Get_ifft(node):
 
 
 def Get_hankel(node):
-
-    node.include("hankel")
     return "m2cpp::hankel(", ", ", ")"
 
 def Get_interp1(node):
@@ -698,21 +552,6 @@ def Get_sum(node):
         node.error("sum over non-array")
         return "arma::sum(", ", ", ")"
 
-    node.type = arg.type
-
-    # determine output dimensions
-    if arg.dim == 2:
-        dim = 0
-    elif arg.dim == 3:
-        # sum along an axis
-        if len(node) == 2 and node[1].cls == "Int" and node[1].value == "2":
-            dim = 1
-        else:
-            dim = 2
-    else:
-        dim = arg.dim-1
-    node.dim = dim
-
     return "arma::sum(", ", ", "-1)"
 
 
@@ -723,11 +562,7 @@ def Get_imag(node):
     return "arma::imag(", ", ", ")"
 
 def Get_real(node):
-    arg = node[0]
     # output always real
-    if arg.num and arg.mem == 4:
-        node.type = arg.type
-        node.mem = 3
     return "arma::real(", ", ", ")"
 
 def Var_tic(node):
@@ -735,7 +570,6 @@ def Var_tic(node):
 
 def Get_tic(node):
     node.wall_clock()
-    node.type = "string"
     return "_timer.tic()"
 
 def Var_toc(node):
@@ -743,7 +577,6 @@ def Var_toc(node):
 
 def Get_toc(node):
     node.wall_clock()
-    node.type = "string"
     if node.parent.cls != "Statement":
         return "_time.toc()"
     return 'cout << "Ellapsed time = " << _timer.toc() << endl'
