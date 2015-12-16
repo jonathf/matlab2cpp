@@ -1,5 +1,6 @@
 #from assign import Assign
 from variables import *
+import matlab2cpp as mc
 
 def Counter(node):
     return "%(name)s = %(value)s"
@@ -30,9 +31,16 @@ def Assign(node):
             var = lhs.name
             name = element.name
             value = element.value
+
+            declares = node.func[0]
+            if "_i" not in declares:
+                declare = mc.collection.Var(declares, "_i")
+                declare.type = "int"
+                declare.backend = "int"
+                declares.translate()
             
             string = var + ".resize(" + size + ") ;\n" +\
-                "for (int _i = 0, _N = " + size + "; _i < _N; ++_i)\n  "+\
+                "for (_i=0; _i<" + size + "; ++_i)\n  "+\
                 var + "[_i] = " + name + "[_i]." + value + " ;"
 
             return string

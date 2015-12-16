@@ -8,7 +8,7 @@ def Fvar(node):
 
     if node.backend == "structs":
         if node.parent.cls == "Vector":
-            if len(node.parent) == 1:
+            if len(node.parent) == 1 and len(node.parent.parent) == 1:
                 size = node.declare.parent["_size"]
                 return size.value
         return "%(name)s[0].%(value)s"
