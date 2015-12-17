@@ -117,7 +117,7 @@ Examples:
     for child in node[:]:
 
         type = type_string(child)
-
+        
         if type not in declares:
             declares[type] = []
 

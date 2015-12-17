@@ -164,12 +164,11 @@ See also:
     block = line.parent
 
     # Create new var
-    var = "_aux_" + type + "_"
-    if var not in line.prop:
-        line.prop[var] = 1
-    else:
-        line.prop[var] += 1
-    var = var + str(line.prop[var])
+    i = 1
+    declares = node.func[0]
+    while "_aux_" + type + "_" + str(i) in declares:
+        i += 1
+    var = "_aux_" + type + "_" + str(i)
 
     # Create Assign
     assign = matlab2cpp.collection.Assign(block)
@@ -318,7 +317,7 @@ Returns:
         if node.cls in ("Nget", "Nset"):
             if node[0].cls == "String":
                 return None
-            value = node[0]["value"]
+            value = node[0].value
         else:
             value = node.value
 
@@ -340,11 +339,13 @@ Returns:
             if sname not in struct.names:
                 matlab2cpp.collection.Counter(struct, sname, value="100")
 
-            var = matlab2cpp.collection.Var(declares, name=node.name, value=value)
-            var.type="structs"
+            if node.name not in declares.names:
+                var = matlab2cpp.collection.Var(declares, name=node.name, value=value)
+                var.type="structs"
         else:
-            var = matlab2cpp.collection.Var(declares, name=node.name, value=value)
-            var.type="struct"
+            if node.name not in declares.names:
+                var = matlab2cpp.collection.Var(declares, name=node.name, value=value)
+                var.type="struct"
 
         return matlab2cpp.collection.Var(struct, name=value)
         parent = struct
