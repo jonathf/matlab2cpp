@@ -316,6 +316,8 @@ def Get_flipud(node):
 
 def Get_ones(node):
 
+    dim, mem = node.suggest_datatype()
+    
     # not vector
     if dim not in (1,2):
 

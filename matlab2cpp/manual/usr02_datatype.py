@@ -190,7 +190,7 @@ Quick retrieving and inserting struct variables can be done through the
     int main(int argc, char** argv)
     {
       _A a ;
-      a.b = (double) 4 ;
+      a.b = 4 ;
       return 0 ;
     }
 

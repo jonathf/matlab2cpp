@@ -36,7 +36,7 @@ def loop(root, suggest):
                     rule(node)
 
             # Datatype stuff
-            if node.type != "TYPE":
+            if node.prop["type"] != "TYPE":
                 pass
 
             elif node.cls in datatypes.__dict__:
