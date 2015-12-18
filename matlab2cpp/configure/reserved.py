@@ -229,11 +229,11 @@ def Get_zeros(node):
 
         # use colvec if first index is '1'
         elif node[0].cls == "Int" and node[0].value == "1":
-            node.dim = 1
+            node.dim = 2
 
         # use rowvec if second index is '1'
         elif node[1].cls == "Int" and node[1].value == "1":
-            node.dim = 2
+            node.dim = 1
 
         # default to matrix
         else:
