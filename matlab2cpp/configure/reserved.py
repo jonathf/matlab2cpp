@@ -276,6 +276,9 @@ def Get_floor(node):
     # returns int
     elif node[0].mem > 1:
         node.type = (node[0].dim, 1)
+
+def Get_nextpow2(node):
+    node.type = "int"
     
 def Get_fft(node):
 
