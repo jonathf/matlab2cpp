@@ -1,8 +1,10 @@
 import re
 import os
+from os.path import sep
 
 import reference
 import matlab2cpp
+import matlab2cpp.m2cpp
 
 def flatten(node, ordered=False, reverse=False, inverse=False):
     """
@@ -624,8 +626,19 @@ See also:
             include_code = '#include "SPlot.h"'
 
         elif name == "m2cpp":
-            include_code = '#include "m2cpp.h"'
+            include_code = '#include "mconvert.h"'
 
+            #check if file in directory
+            file_path = node.program[1].name
+            index = file_path.rindex(sep)
+            output_file_path = file_path[:index] + sep + "mconvert.h"
+
+            #if mconvert.h not found in directory, create the file
+            if not os.path.isfile(output_file_path):
+                file = open(output_file_path, "w")
+                file.write(matlab2cpp.m2cpp.code)
+                file.close()
+                
         elif name == "arma":
             include_code = "#include <armadillo>"
         elif name == "iostream":

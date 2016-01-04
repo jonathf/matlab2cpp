@@ -475,7 +475,8 @@ def Get__reshape(node):
     return "%(value)s(", ", ", ")"
 
 def Get_nextpow2(node):
-    node.include("nextpow2")
+    #node.include("nextpow2")
+    node.include("m2cpp")
     return "m2cpp::nextpow2(", ", ", ")"
 
 def Get_fft(node):
