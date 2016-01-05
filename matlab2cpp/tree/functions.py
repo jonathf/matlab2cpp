@@ -78,8 +78,8 @@ Example:
     mc.collection.Headers(program, name=name)
     mc.collection.Log(program, name=name)
 
-    includes.include("armadillo")
-    includes.include("mconvert")
+    #includes.include("armadillo")
+    #includes.include("mconvert")
     # Start processing
 
     cur = 0
@@ -103,7 +103,7 @@ Example:
             break
         cur += 1
 
-    includes.include("namespace_arma")
+    #includes.include("namespace_arma")
 
     return program
 

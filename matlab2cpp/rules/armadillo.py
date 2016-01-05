@@ -127,22 +127,23 @@ convert scalar to various array types
 
     # as colvec
     elif lhs.dim == 1:
-        node.include("scol")
+        node.include("m2cpp")
         rhs = "m2cpp::scol(" + rhs + ")"
 
     # as rowvec
     elif lhs.dim == 2:
-        node.include("srow")
+        node.include("m2cpp")
         rhs = "m2cpp::srow(" + rhs + ")"
 
     # as matrix
     elif lhs.dim == 3:
-        node.include("smat")
+        node.include("m2cpp")
         rhs = "m2cpp::smat(" + rhs + ")"
 
     # as cube
     elif lhs.dim == 4:
-        node.include("scube")
+        #scube is not implemented in mconvert.h, namespace m2cpp at the moment
+        node.include("m2cpp")
         rhs = "m2cpp::scube(" + rhs + ")"
 
     return "%(0)s = " + rhs + " ;"

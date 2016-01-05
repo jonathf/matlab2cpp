@@ -75,7 +75,7 @@ def Matrix(node):
 
             # scalars must be converted first
             if node[i].value or node[i].dim == 0: # value=scalarsonly
-                node[i].include("scol")
+                node[i].include("m2cpp")
                 nodes.append("m2cpp::scol(" + str(node[i]) + ")")
 
             else:
