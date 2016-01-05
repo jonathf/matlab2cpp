@@ -44,7 +44,6 @@ def Matrix(node):
 
     # single vector with no content
     if len(node) == 1 and len(node[0]) == 0:
-        node.num = False
         return "{", ", ", "}"
 
     # everything on scalarsonly form
