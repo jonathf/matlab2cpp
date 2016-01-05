@@ -245,6 +245,14 @@ def Get_zeros(node):
 
 Get_ones = Get_zeros
 
+def Get_round(node):
+    if len(node) == 1:
+        #int, float, double, uword
+        if node[0].dim == 0 and node[0].mem != 4:
+            node.type = "double"
+        #arma types
+        elif node[0].dim != 0:
+            node.type = node[0].type
 Var_rand = "vec"
 
 def Get_rand(node):
