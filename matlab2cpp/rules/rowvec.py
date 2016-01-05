@@ -23,8 +23,8 @@ def Get(node):
     if dim == -1:
         return "%(name)s(", "-1, ", "-1)"
 
-    if dim == 0:
-        node.dim = 0
+    #if dim == 0:
+    #    node.dim = 0
 
     return "%(name)s(" + arg + ")"
 
@@ -48,8 +48,8 @@ def Set(node):
 
     arg, dim = arma.configure_arg(node_, 0)
 
-    if dim == 0:
-        node.dim = 0
+    #if dim == 0:
+    #    node.dim = 0
 
     if dim == -1:
         return "%(name)s(", "-1, ", "-1)"

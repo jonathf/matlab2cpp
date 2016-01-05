@@ -34,8 +34,8 @@ def Get(node):
             return "%(name)s(%(0)s-1)"
 
         # scalar begets scalar
-        if dim == 0:
-            node.dim = 0
+        #if dim == 0:
+        #    node.dim = 0
 
         return "%(name)s(" + arg + ")"
 
@@ -50,16 +50,16 @@ def Get(node):
             return "%(name)s(", ", ", ")"
 
         # Configure dimensions
-        if dim0:
-            if dim1:
-                node.dim = 3#matrix
-            else:
-                node.dim = 1#colvec
-        else:
-            if dim1:
-                node.dim = 2#rowvec
-            else:
-                node.dim = 0#scalar
+        #if dim0:
+        #    if dim1:
+        #        node.dim = 3#matrix
+        #    else:
+        #        node.dim = 1#colvec
+        #else:
+        #    if dim1:
+        #        node.dim = 2#rowvec
+        #    else:
+        #        node.dim = 0#scalar
 
         # All + All
         if node[0].cls == node[1].cls == "All":
@@ -118,11 +118,11 @@ def Set(node):
         arg, dim = arma.configure_arg(node[0], 0)
 
         # scalar arg is scalar
-        if dim == 0:
-            node.dim = 0
+        #if dim == 0:
+        #    node.dim = 0
 
         # unknown datatype
-        elif dim == -1:
+        if dim == -1:
             return "%(name)s(", "-1, ", "-1)"
 
         return "%(name)s(" + arg + ")"
@@ -139,16 +139,16 @@ def Set(node):
             return "%(name)s(", "-1, ", "-1)"
 
         # Configure dimensions
-        if dim0:
-            if dim1:
-                node.dim = 3#matrix
-            else:
-                node.dim = 1#colvec
-        else:
-            if dim1:
-                node.dim = 2#rowvec
-            else:
-                node.dim = 0#scalar
+        #if dim0:
+        #    if dim1:
+        #        node.dim = 3#matrix
+        #    else:
+        #        node.dim = 1#colvec
+        #else:
+        #    if dim1:
+        #        node.dim = 2#rowvec
+        #    else:
+        #        node.dim = 0#scalar
 
         # All + All
         if node[0].cls == node[1].cls == "All":

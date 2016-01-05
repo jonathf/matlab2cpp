@@ -1,5 +1,6 @@
 from funcs import funcs
 import matlab2cpp as mc
+import armadillo
 
 Counter = "structs"
 
@@ -59,6 +60,22 @@ def Get(node):
 
     if funcs(node):
         return
+
+    #vec
+    if node.declare.dim == 1:
+        armadillo.vec(node)
+
+    #rowvec
+    if node.declare.dim == 2:
+        armadillo.rowvec(node)
+
+    #mat
+    if node.declare.dim == 3:
+        armadillo.mat(node)
+
+    #cube
+    if node.declare.dim == 4:
+        armadillo.cube(node)
 
     if node.parent.cls == "Assign" and node.parent[0] is node:
         node.declare.suggest = node.parent[1].type

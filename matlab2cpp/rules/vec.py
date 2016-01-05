@@ -22,8 +22,8 @@ def Get(node):
     if dim == -1:
         return "%(name)s(%(0)s)"
 
-    if dim == 0:
-        node.dim = 0
+    #if dim == 0:
+    #    node.dim = 0
 
     return "%(name)s(" + arg + ")"
 
@@ -47,7 +47,7 @@ def Set(node):
     if dim == -1:
         return "%(name)s(%(0)s)"
 
-    if dim == 0:
-        node.dim = 0
+    #if dim == 0:
+    #    node.dim = 0
 
     return "%(name)s(" + arg + ")"

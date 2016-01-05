@@ -24,8 +24,8 @@ def Get(node):
             return "%(name)s(%(0)s-1)"
 
         # scalar input
-        if dim == 0:
-            node.dim = 0
+        #if dim == 0:
+        #    node.dim = 0
 
         return "%(name)s(" + arg + ")"
 
@@ -41,16 +41,16 @@ def Get(node):
             return "%(name)s(", "-1, ", "-1)"
 
         # Configure dimensions
-        if dim0:
-            if dim1:
-                node.dim = 3
-            else:
-                node.dim = 1
-        else:
-            if dim1:
-                node.dim = 2
-            else:
-                node.dim = 0
+        #if dim0:
+        #    if dim1:
+        #        node.dim = 3
+        #    else:
+        #        node.dim = 1
+        #else:
+        #    if dim1:
+        #        node.dim = 2
+        #    else:
+        #        node.dim = 0
 
         node = node.resize() # matlab to armadillo fix for cubes
 
@@ -68,30 +68,30 @@ def Get(node):
             return "%(name)s(", "-1, ", "-1)"
 
         # Configure dimensions
-        if dim0:
-            if dim1:
-                if dim2:
-                    node.dim = 4#cube
-                else:
-                    node.dim = 3#matrix
-            else:
-                if dim2:
-                    node.dim = 3#matrix
-                else:
-                    node.dim = 1#colvec
-
-        else:
-            if dim1:
-                if dim2:
-                    node.dim = 3#matrix
-                else:
-                    node.dim = 1#colvec
-            else:
-                if dim2:
-                    node.dim = 1#colvec
-                else:
-                    node.dim = 0#scalar
-
+        #if dim0:
+        #    if dim1:
+        #        if dim2:
+        #            node.dim = 4#cube
+        #        else:
+        #            node.dim = 3#matrix
+        #    else:
+        #        if dim2:
+        #            node.dim = 3#matrix
+        #        else:
+        #            node.dim = 1#colvec
+        
+        #else:
+        #    if dim1:
+        #        if dim2:
+        #            node.dim = 3#matrix
+        #        else:
+        #            node.dim = 1#colvec
+        #    else:
+        #        if dim2:
+        #            node.dim = 1#colvec
+        #        else:
+        #            node.dim = 0#scalar
+        
         return "%(name)s(" + arg0 + ", " + arg1 + ", " + arg2 + ")"
 
 
@@ -116,8 +116,8 @@ def Set(node):
             return "%(name)s(%(0)s-1)"
 
         # if scalar arg, set node as scalar
-        if dim == 0:
-            node.dim = 0
+        #if dim == 0:
+        #    node.dim = 0
 
         return "%(name)s(" + arg + ")"
 
@@ -135,17 +135,17 @@ def Set(node):
         node = node.resize() # matlab to armadillo fix for cubes
 
         # Configure dimensions
-        if dim0:
-            if dim1:
-                node.dim = 3#matrix
-            else:
-                node.dim = 1#colvec
-        else:
-            if dim1:
-                node.dim = 2#rowvec
-            else:
-                node.dim = 0#scalar
-
+        #if dim0:
+        #    if dim1:
+        #        node.dim = 3#matrix
+        #    else:
+        #        node.dim = 1#colvec
+        #else:
+        #    if dim1:
+        #        node.dim = 2#rowvec
+        #    else:
+        #        node.dim = 0#scalar
+        
         return "%(name)s(" + arg0 + ", " + arg1 + ", 1)"
 
     # triple argument
@@ -160,30 +160,30 @@ def Set(node):
             return "%(name)s(", ", ", ")"
 
         # Configure dimensions
-        if dim0:
-            if dim1:
-                if dim2:
-                    node.dim = 4#cube
-                else:
-                    node.dim = 3#matrix
-            else:
-                if dim2:
-                    node.dim = 3#matrix
-                else:
-                    node.dim = 1#colvec
-
-        else:
-            if dim1:
-                if dim2:
-                    node.dim = 3#matrix
-                else:
-                    node.dim = 1#colvec
-            else:
-                if dim2:
-                    node.dim = 1#colvec
-                else:
-                    node.dim = 0#scaler
-
+        #if dim0:
+        #    if dim1:
+        #        if dim2:
+        #            node.dim = 4#cube
+        #        else:
+        #            node.dim = 3#matrix
+        #    else:
+        #        if dim2:
+        #            node.dim = 3#matrix
+        #        else:
+        #            node.dim = 1#colvec
+        
+        #else:
+        #    if dim1:
+        #        if dim2:
+        #            node.dim = 3#matrix
+        #        else:
+        #            node.dim = 1#colvec
+        #    else:
+        #        if dim2:
+        #            node.dim = 1#colvec
+        #        else:
+        #            node.dim = 0#scaler
+        
         return "%(name)s(" + arg0 + ", " + arg1 + ", " + arg2 + ")"
 
 
