@@ -182,7 +182,7 @@ def Get_length(node):
     if node.cls == "Var":
         return "%(0)s.n_elem"
 
-    #length not implemented in m2cpp
+    node.include("m2cpp")
     return "m2cpp::length(%(0)s)"
 
 
@@ -491,12 +491,10 @@ def Get_fft(node):
             return "arma::fft(%(0)s, %(1)s)"
 
         if node[1].cls == "Matrix":
-            #node.include("fft")
-            #not implemented in m2cpp
+            node.include("m2cpp")
             return "m2cpp::fft<" + node[0].type + ">(%(0)s, %(2)s)"
         else:
-            #node.include("fftn")
-            #not implemented in m2cpp
+            node.include("m2cpp")
             return "m2cpp::fft<" + node[0].type + ">(", ", ", ")"
 
     else:
@@ -522,12 +520,10 @@ def Get_ifft(node):
             return "arma::ifft(%(0)s, %(1)s)"
 
         if node[1].cls == "Matrix":
-            #node.include("ifft")
-            #length not implemented in m2cpp
+            node.include("m2cpp")
             return "m2cpp::ifft<" + node[0].type + ">(%(0)s, %(2)s)"
         else:
-            #node.include("ifftn")
-            #not implemented in m2cpp
+            node.include("m2cpp")
             return "m2cpp::ifft<" + node[0].type + ">(", ", ", ")"
 
     else:
@@ -605,11 +601,11 @@ def Get_disp(node):
     return "std::cout << ", "<< ", " << std::endl"
 
 def Get_convmtx(node):
-    #not implemented in m2cpp
+    node.include("m2cpp")
     return "m2cpp::convmtx(", ", ", ")"
 
 def Get_conv2(node):
-    #not implemented in m2cpp
+    node.include("m2cpp")
     return "m2cpp::conv2(", ", ", ")"
 
 #SPlot reserved words
