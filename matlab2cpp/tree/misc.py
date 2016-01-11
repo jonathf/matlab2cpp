@@ -391,17 +391,6 @@ Example:
         print "%-20s" % "misc.matrix",
         print repr(self.code[cur:end+1])
 
-    #Insert " " after ...\n
-    l = cur
-    while l != -1:  #str.find returns -1 if not found
-        l = self.code.find("...", l, end)
-        if l != -1:
-            m = self.code.find("\n", l, end)
-            if m != -1:
-                m = m+1
-                self.code = self.code[:m] + " " + self.code[m:]
-            l = m
-        
     if identify.space_delimited(self, cur):
         L = iterate.space_list(self, cur)
     else:
