@@ -138,8 +138,7 @@ Returns:
 
         elif self.code[k] == "'":
             #if self.code[k-1] in c.s_start:
-            #    return True
-            pass
+            return True
 
         elif self.code[k:k+3] == "...":
             k = findend.dots(self, k)

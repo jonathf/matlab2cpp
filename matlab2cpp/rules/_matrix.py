@@ -23,7 +23,7 @@ def Vector(node):
         return "", ", ", ""
 
     if node.type == "string":
-        return "", " ", "" 
+        return "", " + ", "" 
 
     nodes = map(str, node)
     if nodes:
@@ -39,8 +39,8 @@ def Matrix(node):
         shape = str([len(n) for n in node if n.value == "scalarsonly"])
         node.error("shape missmatch %s" % shape)
 
-    if len(node) == 1 and node.type == "string":
-        return "std::string(%(0)s)"
+    if node.type == "string":
+        return "", " ", ""
         
     # non-numerical elements in matrix
     if not node.num:
