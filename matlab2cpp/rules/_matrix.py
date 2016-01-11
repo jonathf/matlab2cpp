@@ -22,6 +22,9 @@ def Vector(node):
     if node.value == "scalarsonly":
         return "", ", ", ""
 
+    if node.type == "string":
+        return "", " ", "" 
+
     nodes = map(str, node)
     if nodes:
         return reduce(lambda x,y: ("arma::join_rows(%s, %s)" % (x, y)), nodes)
@@ -36,6 +39,9 @@ def Matrix(node):
         shape = str([len(n) for n in node if n.value == "scalarsonly"])
         node.error("shape missmatch %s" % shape)
 
+    if len(node) == 1 and node.type == "string":
+        return "std::string(%(0)s)"
+        
     # non-numerical elements in matrix
     if not node.num:
         return "{", ", ", "}"
