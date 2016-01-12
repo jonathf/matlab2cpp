@@ -2,4 +2,10 @@ from assign import Assign
 from variables import *
 
 Declare = "string %(name)s ;"
-String = '"%(value)s"'
+
+def String(node):
+    if node.name or node.parent.backend != "matrix":
+        return '"%(value)s"'
+    else:
+        return 'std::string("%(value)s")'
+        
