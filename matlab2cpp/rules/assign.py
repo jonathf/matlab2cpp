@@ -55,8 +55,8 @@ Examples:
                         (rhs.type, lhs.type))
 
         # fill array with scalar value
-        elif lhs.dim > 0 and rhs.dim == 0:
-            return arma.scalar_assign(node)
+        #elif lhs.dim > 0 and rhs.dim == 0:
+        #    return arma.scalar_assign(node)
 
         # dimensions that works just fine
         elif lhs.dim in (1,2) and rhs.dim in (3, 4):
