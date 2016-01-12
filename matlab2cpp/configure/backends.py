@@ -73,6 +73,9 @@ def Matrix(node):
         elem = node[0][0]
         if elem.backend != "unknown":
             node.backend = elem.backend
+
+        if elem.backend != "unknown" and elem.backend not in ("struct", "structs"):
+            node.backend = "matrix"
     else:
         node.backend = "matrix"
 
