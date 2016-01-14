@@ -249,7 +249,7 @@ Paren = opr
 def Exp(node):
     opr(node)
     if node.num and node.mem < 2:
-        node.mem = 2
+        node.mem = 3
 
 Int = "int"
 Float = "double"
@@ -258,7 +258,7 @@ Imag = "cx_double"
 def division(node):
     opr(node)
     if node.num and node.mem < 2:
-        node.mem = 2
+        node.mem = 3
 Matrixdivision = division
 Elementdivision =  division
 Leftmatrixdivision = division
