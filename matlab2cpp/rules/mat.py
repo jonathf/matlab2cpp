@@ -47,7 +47,7 @@ def Get(node):
 
         # unknown input
         if -1 in (dim0, dim1):
-            return "%(name)s(", ", ", ")"
+            return "%(name)s(", "-1, ", "-1)"
 
         # Configure dimensions
         #if dim0:

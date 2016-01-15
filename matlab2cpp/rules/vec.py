@@ -20,7 +20,7 @@ def Get(node):
     arg, dim = arma.configure_arg(node[0], 0)
 
     if dim == -1:
-        return "%(name)s(%(0)s)"
+        return "%(name)s(", "-1, ", "-1)"
 
     #if dim == 0:
     #    node.dim = 0
@@ -45,7 +45,7 @@ def Set(node):
     arg, dim = arma.configure_arg(node[0], 0)
 
     if dim == -1:
-        return "%(name)s(%(0)s)"
+        return "%(name)s(", "-1, ", "-1)"
 
     #if dim == 0:
     #    node.dim = 0
