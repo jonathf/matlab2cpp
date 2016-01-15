@@ -158,6 +158,7 @@ def Assigns_max(node):
         node[1].suggest = "int"
 
 Get_eye = "mat"
+Get_diag = "mat"
 
 def Get_transpose(node):
     """Simple transpose
@@ -204,7 +205,7 @@ def Get_zeros(node):
     if node.group.cls in ("Get", "Cget", "Fget", "Nget", "Sget", "Set", "Cset",
             "Fset", "Nset", "Sset") and node.group.num:
         node.mem = 0
-
+    
     # one argument
     if len(node) == 1:
 
