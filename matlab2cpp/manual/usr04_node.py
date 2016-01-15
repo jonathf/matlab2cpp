@@ -212,8 +212,8 @@ is is placed. For example, consider the following::
      1  1Block      code_block   TYPE
      1  1| Statement  code_block   TYPE
      1  1| | Get        unknown      TYPE    x
-     1  3| | | End        expression   TYPE
-     1  8| | | End        expression   TYPE
+     1  3| | | End        expression   int
+     1  8| | | End        expression   int
     >>> def End(node):
     ...     if node is node.parent[0]:
     ...         return node.parent.name + ".n_rows"
