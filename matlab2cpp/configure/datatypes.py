@@ -60,7 +60,7 @@ def Get(node):
 
     if funcs(node):
         return
-
+    """
     #vec
     if node.declare.dim == 1:
         armadillo.vec(node)
@@ -76,7 +76,7 @@ def Get(node):
     #cube
     if node.declare.dim == 4:
         armadillo.cube(node)
-
+    """
     if node.parent.cls == "Assign" and node.parent[0] is node:
         node.declare.suggest = node.parent[1].type
 
@@ -251,6 +251,7 @@ def Exp(node):
     if node.num and node.mem < 2:
         node.mem = 3
 
+End = "int"
 Int = "int"
 Float = "double"
 String = "string"
