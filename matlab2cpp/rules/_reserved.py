@@ -847,7 +847,7 @@ def Get_subplot(node):
 
 def Get_colormap(node):
     node.plotting()
-    return "_plot.axis(", ", ", ")"
+    return "_plot.colormap(", ", ", ")"
 
 def Get__splot(node):
     return "_plot.show()"
