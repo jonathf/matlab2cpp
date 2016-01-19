@@ -70,6 +70,22 @@ Examples:
     # push the job over to Get
     return Get(node)
 
+def Assign(node):
+    """The function have multiple returns, but only one lhs return.
+
+    """
+    # existence of parameters in function call
+    if node[-1]:
+        params = [s.str for s in node[-1]]
+        params = ", ".join(params) + ", "
+
+    else:
+        params = ""
+
+    returns = [s.str for s in node[:-1]]
+    returns = ", ".join(returns)
+
+    return "%(name)s(" + params + returns + ")"
 
 def Assigns(node):
     """Assignment where rhs is a function call and lhs are multiple returns.
