@@ -13,7 +13,7 @@ reserved = {
 "false", "true", "pi", "inf", "Inf", "nan", "NaN",
 "eye", "flipud", "length", "max", "min", "size",
 "transpose", "ctranspose",
-"abs", "nextpow2", "fft", "ifft", "hankel",
+"abs", "sqrt", "nextpow2", "fft", "ifft", "hankel",
 "zeros", "ones", "round", "return", "rand", "floor",
 "clear", "close", 
 "_conv_to", "_reshape",
@@ -48,6 +48,12 @@ def Var_i(node):
 
 def Get_abs(node):
     return "abs(", ", ", ")"
+
+def Get_sqrt(node):
+    #if len(node) > 0 ...
+    if len(node) and node[0].cls == "Neg":
+        return "cx_complex(0, " + node[0][0].str + ")"
+    return "sqrt(", ", ", ")"
 
 def Get_and(node):
     return "(", "*", ")"

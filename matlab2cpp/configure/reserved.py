@@ -1,6 +1,13 @@
 Var_i = "cx_double"
 Get_linspace = "rowvec"
 
+def Get_sqrt(node):
+    #if len(node) > 0 ...
+    if len(node) and node[0].cls == "Neg":
+        node.type = "cx_double"
+    elif len(node):
+        node.type = node[0].type
+
 def Get_abs(node):
     node.type = node[0].type
 
