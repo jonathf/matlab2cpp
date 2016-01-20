@@ -636,7 +636,16 @@ Examples:
         elif len(node) == 3:
             args = "(%(0)s, %(1)s, %(2)s)"
 
-        return "m2cpp::span"+args
+        #Sets template type to LHS:
+        # ex, ti is type vec: ti = (m2cpp::span<vec>(0, 1, nt-1))*dt ;
+        #should probably change the if statement above, context: assignment
+        if node.group.cls == "Assign":
+            #print node.group
+            #print node.group.cls
+            #print node.group[0].type
+            #print "\n\n\n"
+            return "m2cpp::span<" + node.group[0].type + ">" +args
+        return "m2cpp::span<" + node.type + ">" +args
 
 
 if __name__ == "__main__":
