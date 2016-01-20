@@ -324,7 +324,7 @@ def Get_flipud(node):
 def Get_ones(node):
 
     dim, mem = node.suggest_datatype()
-    
+
     # not vector
     if dim not in (1,2):
 
@@ -334,6 +334,14 @@ def Get_ones(node):
                 return "arma::ones<%(type)s>(%(1)s)"
             elif node[1].cls == "Int" and node[1].value == "1":
                 return "arma::ones<%(type)s>(%(0)s)"
+    
+     #size as argument: zeros(size(A))
+    if node[0].backend == "reserved" and node[0].name == "size":
+        #Take the type of the LHS, normally it is the other way around
+        if node.parent.cls == "Assign" and node.parent[0] != node:
+            out = "arma::zeros<" + node.parent[0].type + ">("
+            return out, ", ", ")"
+        #return "arma::zeros<%(type)s>(", ", ", ")"
 
     # arg input is vector
     if node[0].num and node[0].dim in (1,2):
@@ -364,6 +372,14 @@ def Get_zeros(node):
 
     # one argument
     if len(node) == 1:
+
+        #size as argument: zeros(size(A))
+        if node[0].backend == "reserved" and node[0].name == "size":
+            #Take the type of the LHS, normally it is the other way around
+            if node.parent.cls == "Assign" and node.parent[0] != node:
+                out = "arma::zeros<" + node.parent[0].type + ">("
+                return out, ", ", ")"
+            #return "arma::zeros<%(type)s>(", ", ", ")"
 
         # arg input is vector
         if node[0].num and node[0].dim in (1,2):

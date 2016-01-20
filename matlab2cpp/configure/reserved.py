@@ -201,21 +201,28 @@ def Get_zeros(node):
 
     node.type = "uword"
     dim, mem = node.suggest_datatype()
-
+    
     # set memory type
     if not (mem is None):
         node.mem = mem
     else:
         node.mem = 3
 
+    """
     # reset to uword if arg of array-node
     if node.group.cls in ("Get", "Cget", "Fget", "Nget", "Sget", "Set", "Cset",
             "Fset", "Nset", "Sset") and node.group.num:
         node.mem = 0
+    """
     
     # one argument
     if len(node) == 1:
-
+        #print node.code
+        #print "\n\n\n\n"
+        #print "hello"
+        #print node.dim
+        #print "\n\n\n\n"
+        
         # arg input is vector
         if node[0].num and node[0].dim in (1,2):
             pass
