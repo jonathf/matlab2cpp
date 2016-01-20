@@ -26,6 +26,23 @@ def Vector(node):
         return "", " + ", "" 
 
     nodes = map(str, node)
+
+    #Get index value for type list below
+    dim = 0
+    for i in node:
+        dim = max(dim, int(i.mem))
+    print dim
+
+    #type list
+    type = ["uword", "sword", "float", "double", "cx_double"]
+    
+    #Join columns: a = [0, my_rowvec, b]
+    for i in xrange(len(nodes)):
+        # scalars must be converted first
+        if node[i].value or node[i].dim == 0: # value=scalarsonly
+            node[i].include("m2cpp")
+            nodes[i] = "m2cpp::srow<" + type[dim] + ">(" + nodes[i] + ")"
+
     if nodes:
         return reduce(lambda x,y: ("arma::join_rows(%s, %s)" % (x, y)), nodes)
     return ""

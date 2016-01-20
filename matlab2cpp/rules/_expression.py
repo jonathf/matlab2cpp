@@ -599,11 +599,11 @@ Examples:
                 "Set", "Cset", "Nset", "Fset", "Sset") and node.parent.num:
         node.type = "uvec"
 
-        # two arguments
+        # two arguments, use Armadillo span from:to
         if len(node) == 2:
             return "arma::span(%(0)s-1, %(1)s-1)"
 
-        # three arguments
+        # three arguments, not supported in Armadillo
         elif len(node) == 3:
             return "m2cpp::uspan(%(0)s-1, %(1)s, %(2)s-1)"
 
@@ -623,13 +623,19 @@ Examples:
 
         # context: assignment
         elif node.group.cls in ("Assign",) and node.group[0].num:
-            node.type = "uvec"
+            #Below the span is set to have the same type as LHS
+            #Had to change here ass well or there will be an strans,
+            #LHS have  rowvec, while node.type (RHS) have vec dim
+            node.type = node.parent[0].type
+            #node.type = "uvec"
 
         else:
             node.type = "ivec"
 
         # <start>:<stop>
         if len(node) == 2:
+            if node.group.cls == "Assign":
+                return "m2cpp::span<" + node.group[0].type + ">" + "(%(0)s, %(1)s)"
             return "arma::span(%(0)s, %(1)s)"
 
         # <start>:<step>:<stop>
