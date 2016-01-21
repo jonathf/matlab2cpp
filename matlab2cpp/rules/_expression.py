@@ -614,40 +614,30 @@ Examples:
 
         # context: matrix concatination
         if node.group.cls in ("Matrix",) and node.group.num:
-            node.type = "ivec"
+            node.type = "rowvec"
 
         # context: pass to function
         elif node.parent.cls in ("Get", "Cget", "Nget", "Fget", "Sget",
                 "Set", "Cset", "Nset", "Fset", "Sset"):
-            node.type = "ivec"
+            node.type = "rowvec"
 
         # context: assignment
         elif node.group.cls in ("Assign",) and node.group[0].num:
             #Below the span is set to have the same type as LHS
             #Had to change here ass well or there will be an strans,
             #LHS have  rowvec, while node.type (RHS) have vec dim
-            node.type = node.parent[0].type
-            #node.type = "uvec"
+            #node.type = node.group[0].type
+            node.type = "rowvec"
+            #print node.group[0].mem
+            #node.mem = node.group[0].mem
 
-        #Solves: q = qmin+dq*[0:1:nq-1];, [0:1:nq-1] is the node.group
-        #The span from [0:1:nq-1] get the same type as LHS
-        elif node.group.cls == "Matrix":
-            #print node.cls
-            #print node.group.cls
-            #print node.group.group.cls
-            #print "\n\n"
-            
-            if node.group.group.cls == "Assign":
-                node.type = node.group.group[0].type
-            else:
-                node.type = "ivec"
         else:
-            node.type = "ivec"
+            node.type = "rowvec"
 
         # <start>:<stop>
         if len(node) == 2:
             if node.group.cls == "Assign":
-                return "m2cpp::span<" + node.group[0].type + ">" + "(%(0)s, %(1)s)"
+                return "m2cpp::span<" + node.type + ">" + "(%(0)s, %(1)s)"
             return "arma::span(%(0)s, %(1)s)"
 
         # <start>:<step>:<stop>
@@ -657,12 +647,12 @@ Examples:
         #Sets template type to LHS:
         # ex, ti is type vec: ti = (m2cpp::span<vec>(0, 1, nt-1))*dt ;
         #should probably change the if statement above, context: assignment
-        if node.group.cls == "Assign":
+        #if node.group.cls == "Assign":
             #print node.group
             #print node.group.cls
             #print node.group[0].type
             #print "\n\n\n"
-            return "m2cpp::span<" + node.group[0].type + ">" +args
+        #    return "m2cpp::span<" + node.group[0].type + ">" +args
         return "m2cpp::span<" + node.type + ">" +args
 
 
