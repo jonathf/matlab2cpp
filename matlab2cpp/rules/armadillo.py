@@ -122,6 +122,11 @@ convert scalar to various array types
     else:
         rhs = "%(1)s"
 
+    if lhs.cls == "Set":
+        return "%(0)s.fill(" + rhs + ") ;"
+
+    #Earlier stuff, replaced with code right above
+    """
     if lhs.dim == 0:
         pass
 
@@ -145,7 +150,8 @@ convert scalar to various array types
         #scube is not implemented in mconvert.h, namespace m2cpp at the moment
         node.include("m2cpp")
         rhs = "m2cpp::scube(" + rhs + ")"
-
+    """
+    
     return "%(0)s = " + rhs + " ;"
 
 
