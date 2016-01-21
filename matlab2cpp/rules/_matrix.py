@@ -31,7 +31,7 @@ def Vector(node):
     dim = 0
     for i in node:
         dim = max(dim, int(i.mem))
-    print dim
+    #print dim
 
     #type list
     type = ["uword", "sword", "float", "double", "cx_double"]
@@ -61,6 +61,8 @@ def Matrix(node):
         
     # non-numerical elements in matrix
     if not node.num:
+        if len(node[0]) == 1 and node[0][0].cls == "Colon":
+            return "", ", ", ""
         return "{", ", ", "}"
 
     dims = {n.dim for n in node}

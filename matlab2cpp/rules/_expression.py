@@ -629,6 +629,18 @@ Examples:
             node.type = node.parent[0].type
             #node.type = "uvec"
 
+        #Solves: q = qmin+dq*[0:1:nq-1];, [0:1:nq-1] is the node.group
+        #The span from [0:1:nq-1] get the same type as LHS
+        elif node.group.cls == "Matrix":
+            #print node.cls
+            #print node.group.cls
+            #print node.group.group.cls
+            #print "\n\n"
+            
+            if node.group.group.cls == "Assign":
+                node.type = node.group.group[0].type
+            else:
+                node.type = "ivec"
         else:
             node.type = "ivec"
 
