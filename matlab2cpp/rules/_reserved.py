@@ -51,7 +51,7 @@ def Get_abs(node):
 
 def Get_sqrt(node):
     #if len(node) > 0 ...
-    if len(node) and node[0].cls == "Neg":
+    if len(node) and node[0].cls == "Neg" and len(node[0]) == 1:
         return "cx_complex(0, " + node[0][0].str + ")"
     return "sqrt(", ", ", ")"
 
