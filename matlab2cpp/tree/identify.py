@@ -137,9 +137,9 @@ Returns:
             k = findend.cell(self, k)
 
         elif self.code[k] == "'" and string(self, k):
-            k = findend.string(self, k)
+            #k = findend.string(self, k)
             #if self.code[k-1] in c.s_start:
-            #return True
+            return True
 
         elif self.code[k:k+3] == "...":
             k = findend.dots(self, k)
