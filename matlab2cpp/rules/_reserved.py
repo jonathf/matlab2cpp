@@ -195,7 +195,8 @@ def Get_length(node):
 def Get_min(node):
 
     # everything scalar
-    if not all([n.num for n in node]) or  all([(n.dim < 2) for n in node]):
+    if not all([n.num for n in node]) or  all([(n.dim < 1) for n in node]):
+        node.include("algorithm")
         return "std::min(", ", ", ")"
 
     # single arg
@@ -244,7 +245,8 @@ def Get_max(node):
         return "max(", ", ", ")"
 
     # everything scalar
-    if all([(n.dim<2) for n in node]):
+    if all([(n.dim<1) for n in node]):
+        node.include("algorithm")
         return "std::max(", ", ", ")"
 
     # number of args is ...

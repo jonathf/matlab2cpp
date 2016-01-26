@@ -645,6 +645,8 @@ See also:
             include_code = "#include <iostream>"
         elif name == "math":
             include_code = "#include <cmath>"
+        elif name == "algorithm":
+            include_code = "#include <algorithm>"
         else:
             include_code = ""
 
