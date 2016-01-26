@@ -172,12 +172,12 @@ Examples:
 
     # unknown input
     if node.type == "TYPE":
-        return "", ".*", ""
+        return "", "*", ""
 
     # not numerical
     if not node.num:
         node.error("non-numerical multiplication %s" % str([n.type for n in node]))
-        return "", ".*", ""
+        return "", "*", ""
 
     # scalar multiplication
     if node.dim == 0:
