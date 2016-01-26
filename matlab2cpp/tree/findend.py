@@ -200,7 +200,7 @@ Returns:
             elif self.code[k] == "%":
                 k = comment(self, k)
 
-            elif self.code[k] == "'": #and self.code[k-1] in c.s_start:
+            elif self.code[k] == "'" and identify.string(self, k): #and self.code[k-1] in c.s_start:
                 k = string(self, k)
 
             k += 1
