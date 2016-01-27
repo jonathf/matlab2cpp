@@ -634,6 +634,9 @@ Examples:
         else:
             node.type = "rowvec"
 
+        #include mconvert.h, which contain namespace m2cpp
+        node.include("m2cpp")
+        
         # <start>:<stop>
         if len(node) == 2:
             if node.group.cls == "Assign":
@@ -643,6 +646,7 @@ Examples:
         # <start>:<step>:<stop>
         elif len(node) == 3:
             args = "(%(0)s, %(1)s, %(2)s)"
+            return "m2cpp::span<" + node.type + ">" + args
 
         #Sets template type to LHS:
         # ex, ti is type vec: ti = (m2cpp::span<vec>(0, 1, nt-1))*dt ;
@@ -653,7 +657,7 @@ Examples:
             #print node.group[0].type
             #print "\n\n\n"
         #    return "m2cpp::span<" + node.group[0].type + ">" +args
-        return "m2cpp::span<" + node.type + ">" +args
+        return "m2cpp::span<" + node.type + ">(", ", ", ")"
 
 
 if __name__ == "__main__":
