@@ -10,7 +10,10 @@ def Get_sqrt(node):
         node.type = node[0].type
 
 def Get_abs(node):
-    node.type = node[0].type
+    if node[0].type in ("cx_double", "cx_mat"):
+        node.type = "mat"
+    else:
+        node.type = node[0].type
 
 def Get_any(node):
     if not node[0].num:

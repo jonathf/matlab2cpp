@@ -8,17 +8,17 @@ namespace m2cpp {
 
 	
   template<typename eT> 
-  inline arma::Col<eT>  scol(const eT a) {
+  inline arma::Col<eT> scol(eT a) {
     return arma::Col<eT>(&a, 1, true);
   }
 
   template<typename eT>
-  inline arma::Row<eT> srow(const eT a) {
-    return arma::Row<eT>((eT*)&a, 1, true);
+  inline arma::Row<eT> srow(eT a) {
+    return arma::Row<eT>(&a, 1, true);
   }
 
   template<typename eT>
-  inline arma::Mat<eT> smat(const eT a) {
+  inline arma::Mat<eT> smat(eT a) {
     return arma::Mat<eT>(&a, 1, 1, true);
   }
 
@@ -151,7 +151,7 @@ namespace m2cpp {
   inline arma::uword length(const T1& A) {
     return A.n_elem;
   }
-
+/*
   template<typename T>
   inline arma::Mat <typename T::elem_type> convmtx(const T& v, int m) {
 
@@ -187,7 +187,7 @@ namespace m2cpp {
 	  arma::Mat<typename eT> out = arma::ifft2(fft2(A, n, m) % fft2(B, n, m));
 	  return out;
   }
-
+*/
 
 }
 

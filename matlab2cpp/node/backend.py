@@ -646,7 +646,7 @@ See also:
             include_code = "#include <armadillo>"
         elif name == "iostream":
             include_code = "#include <iostream>"
-        elif name == "math":
+        elif name == "cmath":
             include_code = "#include <cmath>"
         elif name == "algorithm":
             include_code = "#include <algorithm>"

@@ -47,6 +47,12 @@ def Var_i(node):
     return "cx_complex(0, 1)"
 
 def Get_abs(node):
+    if len(node) and node[0].dim == 0:
+        if node[0].mem == 4: #cx_double
+            node.include("m2cpp")
+            return "abs(m2cpp::smat(%(0)s))"
+        node.include("cmath")
+        return "std::abs(", ", ", ")"
     return "abs(", ", ", ")"
 
 def Get_sqrt(node):
@@ -428,7 +434,7 @@ def Get_round(node):
 
     # hack to cut-off for scalars
     if node[0].dim == 0:
-        node.include("math")
+        node.include("cmath")
         if decimals == "0":
             return "std::round(%(0)s)"
         return "std::round(%(0)s*std::pow(10, %(1)s))*std::pow(10, -%(1)s)"
