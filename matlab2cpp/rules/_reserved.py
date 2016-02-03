@@ -44,7 +44,7 @@ Var_NaN = "datum::nan"
 # Special handle of 'i'-variable
 
 def Var_i(node):
-    return "cx_complex(0, 1)"
+    return "cx_double(0, 1)"
 
 def Get_abs(node):
     if len(node) and node[0].dim == 0:
@@ -58,7 +58,7 @@ def Get_abs(node):
 def Get_sqrt(node):
     #if len(node) > 0 ...
     if len(node) and node[0].cls == "Neg" and len(node[0]) == 1:
-        return "cx_complex(0, " + node[0][0].str + ")"
+        return "cx_double(0, " + node[0][0].str + ")"
     return "sqrt(", ", ", ")"
 
 def Get_and(node):
