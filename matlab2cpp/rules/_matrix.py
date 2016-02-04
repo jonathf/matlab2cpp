@@ -27,24 +27,22 @@ def Vector(node):
 
     nodes = map(str, node)
 
-    #Get index value for type list below
-    #All variables have to have type
-    dim = -1
-    if all([n.num for n in node]): 
-        for i in node:
-            dim = max(dim, int(i.mem))
-    #print dim
-
-    #type list
-    type = ["uword", "sword", "float", "double", "cx_double"]
+    #max mem in list and type list
+    try:
+        mem = max([int(n.mem) if n.num else -1 for n in node])
+    except:
+        mem = -1
+    mem_type = ["uword", "sword", "float", "double", "cx_double"]
     
     #Join columns: a = [0, my_rowvec, b]
-    if dim != -1:
-        for i in xrange(len(nodes)):
-            # scalars must be converted first
-            if node[i].dim == 0: # value=scalarsonly
-                node[i].include("m2cpp")
-                nodes[i] = "m2cpp::srow<" + type[dim] + ">(" + nodes[i] + ")"
+    for i in xrange(len(nodes)):
+        # scalars must be converted first
+        if node[i].value or node[i].dim == 0: # value=scalarsonly
+            node[i].include("m2cpp")
+            if mem != -1:
+                nodes[i] = "m2cpp::srow<" + mem_type[mem] + ">(" + nodes[i] + ")"
+            else:
+                nodes[i] = "m2cpp::srow(" + nodes[i] + ")"
 
     if nodes:
         return reduce(lambda x,y: ("arma::join_rows(%s, %s)" % (x, y)), nodes)
@@ -93,18 +91,27 @@ def Matrix(node):
         return "{", ", ", "}"
 
 
-    # mix of scalars and colvecs
-    elif dims in ({0,1}, {1}):
+    # mix of scalars and colvecs, scalar and matrix, scalar and vec and matrix
+    elif dims in ({0,1}, {1}, {0,3}, {0,1,3}):
 
         # make string of each vector in matrix
         nodes = []
         for i in xrange(len(node)):
 
+            #max mem in list and type list
+            try:
+                mem = max([int(n.mem) if n.num else -1 for n in node])
+            except:
+                mem = -1
+            mem_type = ["uword", "sword", "float", "double", "cx_double"]
+            
             # scalars must be converted first
             if node[i].value or node[i].dim == 0: # value=scalarsonly
                 node[i].include("m2cpp")
-                nodes.append("m2cpp::scol(" + str(node[i]) + ")")
-
+                if mem != -1:
+                    nodes.append("m2cpp::scol<" + mem_type[mem] + ">(" + str(node[i]) + ")")
+                else:
+                    nodes.append("m2cpp::scol(" + str(node[i]) + ")")
             else:
                 nodes.append(str(node[i]))
 
