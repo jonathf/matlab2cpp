@@ -338,33 +338,39 @@ def Get_ones(node):
 
         # double argument creates colvec/rowvec/matrix after context
         if len(node) == 2:
-            if node[0].cls == "Int" and node[0].value == "1":
-                return "arma::ones<%(type)s>(%(1)s)"
-            elif node[1].cls == "Int" and node[1].value == "1":
-                return "arma::ones<%(type)s>(%(0)s)"
-    
-     #size as argument: zeros(size(A))
-    if node[0].backend == "reserved" and node[0].name == "size":
-        #Take the type of the LHS, normally it is the other way around
-        if node.parent.cls == "Assign" and node.parent[0] != node:
-            out = "arma::zeros<" + node.parent[0].type + ">("
-            return out, ", ", ")"
-        #return "arma::zeros<%(type)s>(", ", ", ")"
+            return "arma::ones<%(type)s>(%(0)s, %(1)s)"
+        return "arma::ones<%(type)s>(", ", ", ")"
+        """
+        if node[0].cls == "Int" and node[0].value == "1":
+            return "arma::ones<%(type)s>(%(1)s)"
+        elif node[1].cls == "Int" and node[1].value == "1":
+            return "arma::ones<%(type)s>(%(0)s)"
+        """
 
-    # arg input is vector
-    if node[0].num and node[0].dim in (1,2):
+    # one argument
+    if len(node) == 1:
+        #size as argument: zeros(size(A))
+        if node[0].backend == "reserved" and node[0].name == "size":
+            #Take the type of the LHS, normally it is the other way around
+            if node.parent.cls == "Assign" and node.parent[0] != node:
+                out = "arma::zeros<" + node.parent[0].type + ">("
+                return out, ", ", ")"
+            #return "arma::zeros<%(type)s>(", ", ", ")"
 
-        # non-trivial variables moved out to own line
-        if node[0].cls != "Var":
-            node[0].auxiliary()
+        # arg input is vector
+        if node[0].num and node[0].dim in (1,2):
 
-        # indexing arg as input
-        if node.dim in (1,2):
-            return "arma::ones<%(type)s>(%(0)s(0))"
-        if node.dim == 3:
-            return "arma::ones<%(type)s>(%(0)s(0), %(0)s(1))"
-        if node.dim == 4:
-            return "arma::ones<%(type)s>(%(0)s(0), %(0)s(1), %(0)s(2))"
+            # non-trivial variables moved out to own line
+            if node[0].cls != "Var":
+                node[0].auxiliary()
+
+            # indexing arg as input
+            if node.dim in (1,2):
+                return "arma::ones<%(type)s>(%(0)s(0))"
+            if node.dim == 3:
+                return "arma::ones<%(type)s>(%(0)s(0), %(0)s(1))"
+            if node.dim == 4:
+                return "arma::ones<%(type)s>(%(0)s(0), %(0)s(1), %(0)s(2))"
 
     # two args where one vector and other "1" handled specially
     elif len(node) == 2 and node.dim in (1,2):
@@ -377,6 +383,14 @@ def Get_ones(node):
 
 
 def Get_zeros(node):
+
+    dim, mem = node.suggest_datatype()
+
+    # not vector
+    if dim not in (1,2):
+        if len(node) == 2:
+            return "arma::zeros<%(type)s>(%(0)s, %(1)s)"
+        return "arma::zeros<%(type)s>(", ", ", ")"
 
     # one argument
     if len(node) == 1:
