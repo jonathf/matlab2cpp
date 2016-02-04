@@ -108,8 +108,8 @@ def Matrix(node):
             else:
                 nodes.append(str(node[i]))
 
-    # mix of rowvecs and matrices
-    elif dims in ({2}, {3}, {2,3}):
+    # mix of rowvecs and matrices, mix of columnvecs and matrices
+    elif dims in ({2}, {3}, {2,3}, {1,3}):
 
         # make string of each vector in matrix
         nodes = []
