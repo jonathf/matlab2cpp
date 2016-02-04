@@ -60,29 +60,82 @@ def Get(node):
 
     if funcs(node):
         return
-    """
+
+    #in backends.py backend is set to datatype. If a is rowvec,
+    #i want a(2) to have backend rowvec and and datatype double
+    #This code sets backend to rowvec, and below datatype is set
+    #Thus backend is set before datatype is changed to double
+    #mc.configure.backends.Get(node)
+    
     #vec
     if node.declare.dim == 1:
+        mc.configure.backends.Get(node)
         armadillo.vec(node)
+        return
 
     #rowvec
     if node.declare.dim == 2:
+        mc.configure.backends.Get(node)
         armadillo.rowvec(node)
+        return
 
     #mat
     if node.declare.dim == 3:
+        mc.configure.backends.Get(node)
         armadillo.mat(node)
+        return
 
     #cube
     if node.declare.dim == 4:
+        mc.configure.backends.Get(node)
         armadillo.cube(node)
-    """
+        return
+    
     if node.parent.cls == "Assign" and node.parent[0] is node:
         node.declare.suggest = node.parent[1].type
 
     if node.declare.type != "TYPE":
         node.type = node.declare.type
 
+def Set(node):
+
+    #in backends.py backend is set to datatype. If a is rowvec,
+    #i want a(2) to have backend rowvec and and datatype double
+    #This code sets backend to rowvec, and below datatype is set
+    #Thus backend is set before datatype is changed to double
+    #mc.configure.backends.Get(node)
+    
+    #vec
+    if node.declare.dim == 1:
+        mc.configure.backends.Get(node)
+        armadillo.vec(node)
+        return
+
+    #rowvec
+    if node.declare.dim == 2:
+        mc.configure.backends.Get(node)
+        armadillo.rowvec(node)
+        return
+
+    #mat
+    if node.declare.dim == 3:
+        mc.configure.backends.Get(node)
+        armadillo.mat(node)
+        return
+
+    #cube
+    if node.declare.dim == 4:
+        mc.configure.backends.Get(node)
+        armadillo.cube(node)
+        return
+    
+    if node.parent.cls == "Assign":
+        node.declare.suggest = node.parent[1].type
+
+    if node.declare.type != "TYPE":
+        node.type = node.declare.type
+        
+    
 def Fvar(node):
 
     if node.parent.cls == "Assign" and node.parent[0] is node:

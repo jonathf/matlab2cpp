@@ -151,7 +151,7 @@ namespace m2cpp {
   inline arma::uword length(const T1& A) {
     return A.n_elem;
   }
-/*
+
   template<typename T>
   inline arma::Mat <typename T::elem_type> convmtx(const T& v, int m) {
 
@@ -187,7 +187,7 @@ namespace m2cpp {
 	  arma::Mat<typename eT> out = arma::ifft2(fft2(A, n, m) % fft2(B, n, m));
 	  return out;
   }
-*/
+
 
 }
 
