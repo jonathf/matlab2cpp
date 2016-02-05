@@ -202,7 +202,7 @@ def Get_min(node):
 
     # non.numerical input
     if not all([n.num for n in node]):
-        return "max(", ", ", ")"
+        return "min(", ", ", ")"
 
     # everything scalar
     if all([(n.dim < 1) for n in node]):
@@ -324,12 +324,12 @@ def Get_eye(node):
     # single argument constructor
     if len(node) == 1:
         if node[0].dim == 0:
-            return "arma::eye<mat>(%(0)s, %(0)s)"
-        return "arma::eye<mat>(%(0)s(0), %(0)s(1))"
+            return "arma::eye<%(type)s>(%(0)s, %(0)s)"
+        return "arma::eye<%(type)s>(%(0)s(0), %(0)s(1))"
 
     # double arguments
     if len(node) == 2:
-        return "arma::eye<mat>(%(0)s, %(1)s)"
+        return "arma::eye<%(type)s>(%(0)s, %(1)s)"
 
     raise NotImplementedError
 

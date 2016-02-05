@@ -194,7 +194,7 @@ applied for other functions::
 
     >>> Get_sum = "std::accumulate(", ", ", ")"
     >>> print mc.qscript("min(x)", Get_sum=Get_sum)
-    std::min(x) ;
+    min(x) ;
 
 There are many rules to translation rule backends in matlab2cpp. This is mainly
 because each datatype have a corresponding backend.
