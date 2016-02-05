@@ -114,7 +114,9 @@ def Get_length(node):
 def Get_min(node):
 
     # everything scalar
-    if not all([n.num for n in node]) or  all([(n.dim < 2) for n in node]):
+    if not all([n.num for n in node]) or  all([(n.dim < 1) for n in node]):
+        if any([n.mem == 4 for n in node]):
+            node.type = "cx_mat"
         return
 
     node.type = node[0].type

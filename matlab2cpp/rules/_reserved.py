@@ -200,8 +200,20 @@ def Get_length(node):
 
 def Get_min(node):
 
+    # non.numerical input
+    if not all([n.num for n in node]):
+        return "max(", ", ", ")"
+
     # everything scalar
-    if not all([n.num for n in node]) or  all([(n.dim < 1) for n in node]):
+    if all([(n.dim < 1) for n in node]):
+
+        if any([n.mem == 4 for n in node]):
+            node.include("m2cpp")
+            nodes = map(str, node)
+            nodes = ["m2cpp::smat<cx_double>(" + name + ")" for name in nodes]
+            arg = ", ".join(nodes)
+            return "arma::min(" + arg + ")"
+
         node.include("algorithm")
         return "std::min(", ", ", ")"
 
@@ -252,6 +264,13 @@ def Get_max(node):
 
     # everything scalar
     if all([(n.dim<1) for n in node]):
+
+        if any([n.mem == 4 for n in node]):
+            node.include("m2cpp")
+            nodes = map(str, node)
+            nodes = ["m2cpp::smat<cx_double>(" + name + ")" for name in nodes]
+            return "arma::max(" + nodes[0] + ", " + nodes[1] + ")"
+        
         node.include("algorithm")
         return "std::max(", ", ", ")"
 
