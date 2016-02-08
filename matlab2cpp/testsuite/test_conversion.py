@@ -358,7 +358,7 @@ void ar_modeling(cx_vec x, int lf, double mu, cx_vec& yf, cx_vec& yb)
   M = m2cpp::hankel(C, R) ;
   B = arma::trans(M)*M ;
   beta = B(0, 0)*mu/100.0 ;
-  ab = arma::solve((B+beta*arma::eye<mat>(lf, lf)), arma::trans(M))*y ;
+  ab = arma::solve((B+beta*arma::eye<cx_mat>(lf, lf)), arma::trans(M))*y ;
   temp = M*ab ;
   temp = arma::join_cols(temp, arma::zeros<cx_mat>(lf, 1)) ;
   yb = temp ;
@@ -368,7 +368,7 @@ void ar_modeling(cx_vec x, int lf, double mu, cx_vec& yf, cx_vec& yb)
   M = toeplitz(C, R) ;
   B = arma::trans(M)*M ;
   beta = B(0, 0)*mu/100.0 ;
-  af = arma::solve((B+beta*arma::eye<mat>(lf, lf)), arma::trans(M))*y ;
+  af = arma::solve((B+beta*arma::eye<cx_mat>(lf, lf)), arma::trans(M))*y ;
   temp = M*af ;
   temp = arma::join_cols(arma::zeros<cx_mat>(lf, 1), temp) ;
   yf = temp ;

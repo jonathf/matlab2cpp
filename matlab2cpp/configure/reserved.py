@@ -177,7 +177,8 @@ def Get_eye(node):
     else:
         node.type = "mat"
     
-Get_diag = "mat"
+Get_diag = Get_eye
+Var_eye = Get_eye
 
 def Get_transpose(node):
     """Simple transpose
