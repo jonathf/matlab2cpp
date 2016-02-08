@@ -108,11 +108,15 @@ Returns:
 
         if self.code[k:k+3] == "...":
             k = findend.dots(self, k)
-
-        elif self.code[k] in ";\n":
+            
+        if self.code[k] in ";\n":
             out.append([])
+            count = False
+            if self.code[k] == ";": # and self.code[k+1] == "\n":
+                while self.code[k] != "\n":
+                    k += 1
 
-        elif self.code[k] in c.e_start:
+        if self.code[k] in c.e_start:
 
             if count:
                 self.syntaxerror(k, "expression start")

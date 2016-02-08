@@ -157,6 +157,8 @@ Returns:
                 return False
             elif self.code[k] != ";":
                 return True
+            elif self.code[k] == "\n":
+                return True
 
             while self.code[k+1] in " \t":
                 k += 1

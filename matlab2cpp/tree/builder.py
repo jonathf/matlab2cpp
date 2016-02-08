@@ -147,7 +147,18 @@ Example::
 
         if self.disp:
             print "loading", name
-
+        
+        #Replace ... [stuff] \n with ... [stuff] \n " "
+        l = 0
+        while l != -1:  #str.find returns -1 if not found
+            l = code.find("...", l)
+            if l != -1:
+                m = code.find("\n", l)
+                if m != -1:
+                    #m = m+1
+                    code = code[:m+1] + " " + code[m+1:]
+                l = m
+        
         self.code = code + "\n\n\n"
         self.create_program(name)
 
