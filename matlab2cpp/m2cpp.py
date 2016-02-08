@@ -155,8 +155,8 @@ namespace m2cpp {
   template<typename T>
   inline arma::Mat <typename T::elem_type> convmtx(const T& v, int m) {
 
-	  arma::Mat<T::elem_type> out = zeros(v.n_elem + m - 1, m);
-	  arma::Col<T::elem_type> aux((typename T::elem_type*)v.memptr(), v.n_elem);
+	  arma::Mat<typename T::elem_type> out = zeros(v.n_elem + m - 1, m);
+	  arma::Col<typename T::elem_type> aux((typename T::elem_type*)v.memptr(), v.n_elem);
 
 	  for (int ii = 0; ii < m; ii++) {
 		  out.submat(ii, ii, ii + v.n_elem - 1, ii) = v;
@@ -168,23 +168,23 @@ namespace m2cpp {
   }
 
   template <typename eT>
-  inline typename arma::enable_if2< arma::is_real<typename eT>::value, typename arma::Mat<typename eT> >::result
-	  conv2(const arma::Mat<typename eT>& A, const arma::Mat<typename eT>& B) {
+	  inline typename arma::enable_if2< arma::is_real<typename eT::elem_type>::value, typename arma::Mat<typename eT::elem_type> >::result
+	  conv2(const arma::Mat<typename eT::elem_type>& A, const arma::Mat<typename eT::elem_type>& B) {
 	  uword n = A.n_rows + B.n_rows - 1;
 	  uword m = A.n_rows + B.n_rows - 1;
 
-	  arma::Mat<typename eT> out = arma::real(arma::ifft2(fft2(A, n, m) % fft2(B, n, m)));
+	  arma::Mat<typename eT::elem_type> out = arma::real(arma::ifft2(fft2(A, n, m) % fft2(B, n, m)));
 	  return out;
   }
 
   template <typename eT, typename fT>
-  inline typename arma::enable_if2 < arma::is_complex<typename eT>::value || arma::is_complex<typename fT>::value,
+	  inline typename arma::enable_if2 < arma::is_complex<typename eT::elem_type>::value || arma::is_complex<typename fT::elem_type>::value,
 	  arma::Mat<typename std::complex< typename arma::get_pod_type<eT>::result > > >::result
-	  conv2(const arma::Mat<typename eT>& A, const arma::Mat<typename fT>& B) {
+	  conv2(const arma::Mat<typename eT::elem_type>& A, const arma::Mat<typename fT::elem_type>& B) {
 	  uword n = A.n_rows + B.n_rows - 1;
 	  uword m = A.n_rows + B.n_rows - 1;
 
-	  arma::Mat<typename eT> out = arma::ifft2(fft2(A, n, m) % fft2(B, n, m));
+	  arma::Mat<typename eT::elem_type> out = arma::ifft2(fft2(A, n, m) % fft2(B, n, m));
 	  return out;
   }
 
@@ -192,4 +192,5 @@ namespace m2cpp {
 }
 
 
-#endif"""
+#endif
+"""
