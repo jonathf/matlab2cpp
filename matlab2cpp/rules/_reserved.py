@@ -351,22 +351,6 @@ def Get_flipud(node):
 
 def Get_ones(node):
 
-    dim, mem = node.suggest_datatype()
-
-    # not vector
-    if dim not in (1,2):
-
-        # double argument creates colvec/rowvec/matrix after context
-        if len(node) == 2:
-            return "arma::ones<%(type)s>(%(0)s, %(1)s)"
-        return "arma::ones<%(type)s>(", ", ", ")"
-        """
-        if node[0].cls == "Int" and node[0].value == "1":
-            return "arma::ones<%(type)s>(%(1)s)"
-        elif node[1].cls == "Int" and node[1].value == "1":
-            return "arma::ones<%(type)s>(%(0)s)"
-        """
-
     # one argument
     if len(node) == 1:
         #size as argument: zeros(size(A))
@@ -376,6 +360,12 @@ def Get_ones(node):
                 out = "arma::zeros<" + node.parent[0].type + ">("
                 return out, ", ", ")"
             #return "arma::zeros<%(type)s>(", ", ", ")"
+
+        #arg input is a scalar
+        if node[0].num and node[0].dim == 0:
+            #dim is matrix
+            if node.dim == 3:
+                return "arma::ones<%(type)s>(%(0)s, %(0)s)"
 
         # arg input is vector
         if node[0].num and node[0].dim in (1,2):
@@ -393,24 +383,21 @@ def Get_ones(node):
                 return "arma::ones<%(type)s>(%(0)s(0), %(0)s(1), %(0)s(2))"
 
     # two args where one vector and other "1" handled specially
-    elif len(node) == 2 and node.dim in (1,2):
-        if node[0].cls == "Int" and node[0].value == "1":
-            return "arma::ones<%(type)s>(%(1)s)"
-        if node[1].cls == "Int" and node[1].value == "1":
-            return "arma::ones<%(type)s>(%(0)s)"
+    elif len(node) == 2:
+
+        if node.dim == 3:
+            return "arma::ones<%(type)s>(%(0)s, %(1)s)"
+
+        if node.dim in (1,2):
+            if node[0].cls == "Int" and node[0].value == "1":
+                return "arma::ones<%(type)s>(%(1)s)"
+            if node[1].cls == "Int" and node[1].value == "1":
+                return "arma::ones<%(type)s>(%(0)s)"
 
     return "arma::ones<%(type)s>(", ", ", ")"
 
 
 def Get_zeros(node):
-
-    dim, mem = node.suggest_datatype()
-
-    # not vector
-    if dim not in (1,2):
-        if len(node) == 2:
-            return "arma::zeros<%(type)s>(%(0)s, %(1)s)"
-        return "arma::zeros<%(type)s>(", ", ", ")"
 
     # one argument
     if len(node) == 1:
@@ -423,6 +410,12 @@ def Get_zeros(node):
                 return out, ", ", ")"
             #return "arma::zeros<%(type)s>(", ", ", ")"
 
+        #arg input is a scalar
+        if node[0].num and node[0].dim == 0:
+            #dim is matrix
+            if node.dim == 3:
+                return "arma::zeros<%(type)s>(%(0)s, %(0)s)"
+            
         # arg input is vector
         if node[0].num and node[0].dim in (1,2):
 
@@ -441,13 +434,17 @@ def Get_zeros(node):
     # double argument creates colvec/rowvec/matrix depending on context
     elif len(node) == 2:
 
-        # use colvec if first index is '1'
-        if node[0].cls == "Int" and node[0].value == "1":
-            return "arma::zeros<%(type)s>(%(1)s)"
+        if node.dim == 3:
+            return "arma::zeros<%(type)s>(%(0)s, %(1)s)"
 
-        # use rowvec if second index is '1'
-        elif node[1].cls == "Int" and node[1].value == "1":
-            return "arma::zeros<%(type)s>(%(0)s)"
+        if node.dim in (1,2):
+            # use colvec if first index is '1'
+            if node[0].cls == "Int" and node[0].value == "1":
+                return "arma::zeros<%(type)s>(%(1)s)"
+            
+            # use rowvec if second index is '1'
+            elif node[1].cls == "Int" and node[1].value == "1":
+                return "arma::zeros<%(type)s>(%(0)s)"
 
     return "arma::zeros<%(type)s>(", ", ", ")"
 

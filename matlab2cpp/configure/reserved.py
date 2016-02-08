@@ -171,7 +171,7 @@ def Assigns_max(node):
         node[1].suggest = "int"
 
 def Get_eye(node):
-    print node.group.cls
+    #set eye type to cx_mat if LHS is complex type
     if node.group.cls == "Assign" and node.group[0].mem == 4:
         node.type = "cx_mat"
     else:
@@ -230,11 +230,6 @@ def Get_zeros(node):
     
     # one argument
     if len(node) == 1:
-        #print node.code
-        #print "\n\n\n\n"
-        #print "hello"
-        #print node.dim
-        #print "\n\n\n\n"
         
         # arg input is vector
         if node[0].num and node[0].dim in (1,2):
