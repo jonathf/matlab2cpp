@@ -170,7 +170,13 @@ def Assigns_max(node):
         node[0].suggest = (0, var.mem)
         node[1].suggest = "int"
 
-Get_eye = "mat"
+def Get_eye(node):
+    print node.group.cls
+    if node.group.cls == "Assign" and node.group[0].mem == 4:
+        node.type = "cx_mat"
+    else:
+        node.type = "mat"
+    
 Get_diag = "mat"
 
 def Get_transpose(node):
