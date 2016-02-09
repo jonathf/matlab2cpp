@@ -58,6 +58,8 @@ def Matrix(node):
         node.error("shape missmatch %s" % shape)
 
     if node.type == "string":
+        if len(node) > 1:
+            return "", " + ", ""
         return "", " ", ""
         
     # non-numerical elements in matrix

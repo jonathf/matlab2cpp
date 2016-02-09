@@ -103,19 +103,24 @@ Returns:
 
     out = [[]]
     count = False
+    dots = False
 
     while True:
 
         if self.code[k:k+3] == "...":
             k = findend.dots(self, k)
+            dots = True
             
         if self.code[k] in ";\n":
-            out.append([])
+            if not dots:
+                out.append([])
+                dots = False
+                
             count = False
             if self.code[k] == ";": # and self.code[k+1] == "\n":
-                while self.code[k] != "\n":
+                while self.code[k+1] in " \n":
                     k += 1
-
+            
         if self.code[k] in c.e_start:
 
             if count:
