@@ -256,7 +256,7 @@ Args:
         nodes = program[1].flatten(False, False, False)
         for node_ in nodes:
             if node_.line == args.line and node_.cls != "Block":
-                print node.str.replace("__percent__", "%")
+                print node_.str.replace("__percent__", "%")
                 break
     else:
         print program[1].str.replace("__percent__", "%")
