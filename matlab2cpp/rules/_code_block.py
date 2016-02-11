@@ -503,6 +503,83 @@ Examples:
 
     return out
 
+def Parfor(node):
+    """
+Parfor-loop
+
+Args:
+    node (For): Current position in node-tree
+
+Return:
+    str : Translation of current node.
+
+Children:
+    Var Expression Block
+
+    Var:
+        Variable running the loop
+    Expression:
+        Container for loop (special handle for Colon)
+    Block:
+        Content to loop over
+
+Examples:
+    >>> print mc.qscript("parfor i=1:10; a")
+    #pragma omp parallel for
+    for (i=1; i<=10; i++)
+    {
+      a ;
+    }
+    >>> print mc.qscript("parfor i=1:2:10; a")
+    #pragma omp parallel for
+    for (i=1; i<=10; i+=2)
+    {
+      a ;
+    }
+    >>> print mc.qscript("parfor i=a; b")
+    #pragma omp parallel for
+    for (int _i=0; _i<length(a); _i++)
+    {
+      i = a[_i] ;
+      b ;
+    }
+    """
+    var, range = node[:2]
+
+    if range.cls == "Colon":
+
+        # <start>:<stop>
+        if len(range) == 2:
+            start, stop = range
+            step = "1"
+        
+        # <start>:<step>:<stop>
+        elif len(range) == 3:
+            start, step, stop = range
+        start, step, stop = map(str, [start, step, stop])
+
+        # return
+        out = "#pragma omp parallel for\nfor (%(0)s=" + start + \
+            "; %(0)s<=" + stop + "; %(0)s"
+
+        # special case for '+= 1'
+        if step == "1":
+            out += "++"
+        else:
+            out += "+=" + step
+
+        out += ")\n{\n%(2)s\n}"
+
+        return out
+
+    # default
+    return """#pragma omp parallel for
+for (int _%(0)s=0; _%(0)s<length(%(1)s); _%(0)s++)
+{
+%(0)s = %(1)s[_%(0)s] ;
+%(2)s
+}"""
+
 def For(node):
     """
 For-loop
@@ -576,6 +653,8 @@ Examples:
 %(2)s
 }"""
 
+def Pragma_for(node):
+    return "#pragma omp parallel for %(value)s"
 
 def Bcomment(node):
     """

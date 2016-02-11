@@ -142,7 +142,11 @@ A full summary of all nodes.
 +---------------------+--------------------+----------------+------------------------------+
 | Params              | `Var*`             |                | Function parameter container |
 +---------------------+--------------------+----------------+------------------------------+
+| Parfor              | `Var Expr Block`   | `parfor a=b;end`| Parallel for-loop container |
++---------------------+--------------------+----------------+------------------------------+
 | Plus                | `Expr Expr+`       | `a+b`          | Addition operator            |
++---------------------+--------------------+----------------+------------------------------+
+| Pragma_for          |                    | `%%PARFOR str` | For-loop pragma              |
 +---------------------+--------------------+----------------+------------------------------+
 | Program             | `Includes Funcs`   |                | Program root                 |
 |                     | `Inlines Structs`  |                |                              |
@@ -194,7 +198,7 @@ __all__ = [
 "Counter", "Cset", "Ctranspose", "Cvar", 
 "Declares", "Ecomment",
 "Elementdivision", "Elexp", "Elif", "Elmul", "Else", "End", "Eq", "Error",
-"Exp", "Expr", "Fget", "Float", "For", "Fset", "Func", "Funcs", "Fvar", "Ge",
+"Exp", "Expr", "Fget", "Float", "Parfor", "For", "Fset", "Func", "Funcs", "Fvar", "Ge",
 "Get", "Gt", "Header", "Headers", "If", "Imag", "Include", "Includes", "Inline",
 "Inlines", "Int", "Lambda", "Land", "Lcomment", "Le", "Leftelementdivision",
 "Leftmatrixdivision", "Log", "Lor", "Lt", "Main", "Matrix", "Matrixdivision",
@@ -300,6 +304,7 @@ class Declares(Node):       pass
 class Block(Node):
     def __init__(self, parent, **kws):
         Node.__init__(self, parent, **kws)
+class Parfor(Block):        pass
 class For(Block):           pass
 class While(Block):         pass
 class Switch(Block):        pass
@@ -385,6 +390,10 @@ class String(Node):
 class Lambda(Node):
     def __init__(self, parent, name="", **kws):
         Node.__init__(self, parent, name=name, **kws)
+
+class Pragma_for(Node):
+    def __init__(self, parent, value, **kws):
+        Node.__init__(self, parent, value=value, **kws)
 
 class Lcomment(Node):
     def __init__(self, parent, value, **kws):

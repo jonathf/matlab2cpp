@@ -247,6 +247,14 @@ Returns:
 
     return k
 
+def pragma_for(self,start):
+    end = self.code.find("\n", start)
+    #while self.code[end+1] == "%"
+    #    end = self.code.find("\n", start+1)
+
+    if end <= -1:
+        self.syntaxerror(start, "comment end")
+    return end
 
 def comment(self, start):
     """

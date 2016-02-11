@@ -63,6 +63,10 @@ Example:
             if len(self.code)-cur < 3:
                 break
 
+        #%%PARFOR token
+        elif self.code[cur:cur+8] == "%%PARFOR":
+            cur = self.create_pragma_parfor(block, cur)
+            
         elif self.code[cur] == "%":
             cur = self.create_comment(block, cur)
 
@@ -125,6 +129,9 @@ Example:
 
         elif self.code[cur:cur+6] == "elseif" and self.code[cur+6] in c.k_end:
             break
+
+        elif self.code[cur:cur+6] == "parfor" and self.code[cur+6] in c.k_end:
+            cur = self.create_parfor(block, cur)
 
         elif self.code[cur:cur+3] == "for" and self.code[cur+3] in c.k_end:
             cur = self.create_for(block, cur)

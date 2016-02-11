@@ -237,6 +237,25 @@ Example:
 
     return end
 
+def pragma_for(self, parent, cur):
+
+    assert parent.cls == "Block"
+
+    if  self.code[cur:cur+8] != "%%PARFOR":
+        self.syntaxerror(cur, "pragma_parfor")
+
+    k = cur+8
+
+    end = findend.pragma_for(self, k)
+    
+    if self.disp:
+        print "%4d   Pragma_for     " % cur,
+        print "%-20s" % "misc.pragma_for",
+        print repr(self.code[cur+9:end])
+        
+        mc.collection.Pragma_for(parent, self.code[cur+9:end], cur=cur)
+        
+    return end
 
 def comment(self, parent, cur):
     """

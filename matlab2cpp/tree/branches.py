@@ -309,7 +309,54 @@ Example:
 
     return end
 
+def parforloop(self, parent, cur):
+    if  self.code[cur:cur+6] != "parfor":
+        self.syntaxerror(cur, "parfor loop start")
 
+    start = cur
+
+    if self.disp:
+        print "%4d   Parfor          " % cur,
+        print repr(self.code[cur:self.code.find("\n", cur)]),
+        print "branches.parforloop"
+
+    parfor_loop = mc.collection.Parfor(parent, cur=cur)
+
+    cur = cur+6
+    while self.code[cur] in "( \t":
+        cur += 1
+
+    cur = self.create_variable(parfor_loop, cur)
+    parfor_loop[0].create_declare()
+
+    cur += 1
+    while self.code[cur] in " \t":
+        cur += 1
+
+    if  self.code[cur] != "=":
+        self.syntaxerror(cur, "for-loop assignment (=)")
+    cur += 1
+
+    while self.code[cur] in " \t":
+        cur += 1
+
+    cur = self.create_expression(parfor_loop, cur)
+    cur += 1
+
+    while self.code[cur] in ") \t":
+        cur += 1
+
+    if self.code[cur] == ",":
+        cur += 1
+
+    while self.code[cur] in " \t\n;":
+        cur += 1
+
+    end = self.create_codeblock(parfor_loop, cur)
+
+    parfor_loop.code = self.code[start:end]
+
+    return end
 
 def forloop(self, parent, cur):
     '''

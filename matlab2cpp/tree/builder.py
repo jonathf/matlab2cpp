@@ -499,7 +499,7 @@ Returns:
 See also:
     :py:func:`matlab2cpp.tree.codeblock.codeblock`
     """
-        pnames = [ "Case", "Catch", "Elif", "Else", "For", "Func", "If",
+        pnames = [ "Case", "Catch", "Elif", "Else", "Parfor", "For", "Func", "If",
                 "Main", "Otherwise", "Switch", "Try", "While"]
         pnodes = [getattr(mc.collection, name) for name in pnames]
         ppart = [isinstance(parent, node) for node in pnodes]
@@ -558,7 +558,27 @@ See also:
         assert isinstance(parent, mc.collection.Block)
         return assign.single(self, parent, cur, eq_loc)
 
+    def create_parfor(self, parent, cur):
+        """
+Create parfor-loop
 
+| Structure:
+|   Parfor
+|   | <loop variable>
+|   | <loop expression>
+|   | <code block>
+
+Args:
+    parent (Block): Reference to parent node
+    cur (int): position where for-loop is identified
+
+Returns:
+    int: position where for-loop ends
+        """
+
+        assert isinstance(parent, mc.collection.Block)
+        return branches.parforloop(self, parent, cur)
+    
     def create_for(self, parent, cur):
         """
 Create For-loop
@@ -719,6 +739,10 @@ See also:
     """
         return misc.cell(self, parent, cur)
 
+    def create_pragma_parfor(self, parent, cur):
+        
+        assert isinstance(parent, mc.collection.Block)
+        return misc.pragma_for(self, parent, cur)
 
     def create_comment(self, parent, cur):
         """
