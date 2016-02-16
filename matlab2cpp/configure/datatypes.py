@@ -318,6 +318,30 @@ Elementdivision =  division
 Leftmatrixdivision = division
 Leftelementdivition = division
 
+def Colon(node):
+    # context: array argument (must always be uvec)
+    if node.parent.cls in ("Get", "Cget", "Nget", "Fget", "Sget",
+                "Set", "Cset", "Nset", "Fset", "Sset") and node.parent.num:
+        node.type = "uvec"
+
+    else:
+
+        # context: matrix concatination
+        if node.group.cls in ("Matrix",) and node.group.num:
+            node.type = "rowvec"
+
+        # context: pass to function
+        elif node.parent.cls in ("Get", "Cget", "Nget", "Fget", "Sget",
+                "Set", "Cset", "Nset", "Fset", "Sset"):
+            node.type = "rowvec"
+
+        # context: assignment
+        elif node.group.cls in ("Assign",) and node.group[0].num:
+            node.type = "rowvec"
+
+        else:
+            node.type = "rowvec"
+
 def Lambda(node):
 
     # lambda function are created as full functions, but referenced to be
