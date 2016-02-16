@@ -597,7 +597,7 @@ Examples:
     # context: array argument (must always be uvec)
     if node.parent.cls in ("Get", "Cget", "Nget", "Fget", "Sget",
                 "Set", "Cset", "Nset", "Fset", "Sset") and node.parent.num:
-        node.type = "uvec"
+        #node.type = "uvec"
 
         # two arguments, use Armadillo span from:to
         if len(node) == 2:
@@ -613,26 +613,26 @@ Examples:
     else:
 
         # context: matrix concatination
-        if node.group.cls in ("Matrix",) and node.group.num:
-            node.type = "rowvec"
+        #if node.group.cls in ("Matrix",) and node.group.num:
+        #    node.type = "rowvec"
 
         # context: pass to function
-        elif node.parent.cls in ("Get", "Cget", "Nget", "Fget", "Sget",
-                "Set", "Cset", "Nset", "Fset", "Sset"):
-            node.type = "rowvec"
+        #elif node.parent.cls in ("Get", "Cget", "Nget", "Fget", "Sget",
+        #        "Set", "Cset", "Nset", "Fset", "Sset"):
+        #    node.type = "rowvec"
 
         # context: assignment
-        elif node.group.cls in ("Assign",) and node.group[0].num:
+        #elif node.group.cls in ("Assign",) and node.group[0].num:
             #Below the span is set to have the same type as LHS
             #Had to change here ass well or there will be an strans,
             #LHS have  rowvec, while node.type (RHS) have vec dim
             #node.type = node.group[0].type
-            node.type = "rowvec"
+        #    node.type = "rowvec"
             #print node.group[0].mem
             #node.mem = node.group[0].mem
 
-        else:
-            node.type = "rowvec"
+        #else:
+        #    node.type = "rowvec"
 
         #include mconvert.h, which contain namespace m2cpp
         node.include("m2cpp")
@@ -641,7 +641,7 @@ Examples:
         if len(node) == 2:
             if node.group.cls == "Assign":
                 return "m2cpp::span<" + node.type + ">" + "(%(0)s, %(1)s)"
-            return "arma::span(%(0)s, %(1)s)"
+            return "m2cpp::span<" + node.type + ">" + "(%(0)s, %(1)s)"
 
         # <start>:<step>:<stop>
         elif len(node) == 3:

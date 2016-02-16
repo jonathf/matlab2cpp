@@ -37,10 +37,11 @@ Examples:
 
     # numerical
     if lhs.num and rhs.num:
-
+        
         # mismatch between colvec and rowvec, do transpose
         if (lhs.dim == 2 and rhs.dim == 1) or\
-                (lhs.dim == 1 and rhs.dim == 2):
+                (lhs.dim == 1 and rhs.dim == 2): #or lhs.mem != rhs.mem:
+            #out = "arma::conv_to<" + lhs.type + ">::from(%(1)s)"
             out = "arma::strans(%(1)s)"
         else:
             out = "%(1)s"

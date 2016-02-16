@@ -77,6 +77,11 @@ Examples:
     elif node.mem > 1 and node.dim == 0:
         out = "(uword) " + out
 
+    #Float or double, vec or rowvec
+        """
+    elif node.mem not in (0, 4) and node.dim in (1, 2):
+        out = "arma::conv_to<uvec>::from(" + out + ")"
+        """
     # rowvec (-> colvec)
     elif node.dim == 2:
         out = "arma::strans(" + out + ")"
