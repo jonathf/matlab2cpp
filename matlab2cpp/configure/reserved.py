@@ -221,12 +221,13 @@ def Get_zeros(node):
     else:
         node.mem = 3
 
-    """
     # reset to uword if arg of array-node
     if node.group.cls in ("Get", "Cget", "Fget", "Nget", "Sget", "Set", "Cset",
             "Fset", "Nset", "Sset") and node.group.num:
         node.mem = 0
-    """
+        if len(node) == 2 and node[0].cls == "Int" and node[0].value == "1":
+            node.dim = 1
+            return
     
     # one argument
     if len(node) == 1:

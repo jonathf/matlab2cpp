@@ -318,11 +318,13 @@ Elementdivision =  division
 Leftmatrixdivision = division
 Leftelementdivition = division
 
+All = "uvec"
+"""
 def Colon(node):
     # context: array argument (must always be uvec)
     if node.parent.cls in ("Get", "Cget", "Nget", "Fget", "Sget",
                 "Set", "Cset", "Nset", "Fset", "Sset") and node.parent.num:
-        node.type = "uvec"
+        node.type = "urowvec"
 
     else:
 
@@ -341,7 +343,7 @@ def Colon(node):
 
         else:
             node.type = "rowvec"
-
+"""
 def Lambda(node):
 
     # lambda function are created as full functions, but referenced to be

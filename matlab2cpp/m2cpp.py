@@ -65,6 +65,15 @@ namespace m2cpp {
    }
   
 
+   template <typename T>
+   inline arma::cx_mat fft(arma::Mat<typename T::elem_type> X, int dim)
+   {
+	   if (dim == 1)
+		   return arma::fft(X);
+	   else
+		   return arma::strans(arma::fft(arma::strans(X)));
+
+   }
 
    template <typename T>
    inline arma::cx_mat fft(arma::Mat<typename T::elem_type> X, int n, int dim)
