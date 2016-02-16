@@ -242,7 +242,7 @@ def Get_zeros(node):
             if dim in (1,2,3):
                 node.dim = dim
             else:
-                node.dim = 1 # default
+                node.dim = 3 # default
 
     # double argument creates colvec/rowvec/matrix depending on context
     elif len(node) == 2:
