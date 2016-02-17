@@ -603,7 +603,21 @@ def Get_hankel(node):
     return "m2cpp::hankel(", ", ", ")"
 
 def Get_interp1(node):
-    return "arma::interp1(", ", ", ")" 
+
+    if node.parent.cls == "Assign":
+        out = "arma::interp1(%(0)s, %(1)s, %(2)s, " + node.parent[0].str
+
+        if node[-1].type == "string":
+            out = out + ", %(3)s)"
+        else:
+            out = out + ")"
+    else:
+        out = "arma::interp1(", ", ", ")"
+        
+    return out
+
+def Assign_interp1(node):
+    return "%(1)s ;"
 
 def Get_linspace(node):
     return "arma::linspace<%(type)s>(", ", ", ")"

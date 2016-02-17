@@ -329,7 +329,11 @@ def Get_ifft(node):
         pass
     else:
         node.mem = 4
-    
+
+def Get_interp1(node):
+    if len(node):
+        node.type = node[0].type
+
 def Get_sum(node):
 
     arg = node[0]
