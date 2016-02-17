@@ -273,7 +273,11 @@ def Get_max(node):
             nodes = ["m2cpp::smat<cx_double>(" + name + ")" for name in nodes]
             arg = ", ".join(nodes)
             return "arma::max(" + arg + ")"
-        
+
+        # single element, uword (returned from size(a))
+        if len(node) == 1 and node[0].dim == 0:
+            return "%(0)s"
+            
         node.include("algorithm")
         return "std::max(", ", ", ")"
 
