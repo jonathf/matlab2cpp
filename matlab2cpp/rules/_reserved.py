@@ -582,10 +582,10 @@ def Get_ifft(node):
 
         if node[1].cls == "Matrix":
             node.include("m2cpp")
-            return "m2cpp::ifft<" + node[0].type + ">(%(0)s, %(2)s)"
+            return "m2cpp::ifft<" + node.type + ">(%(0)s, %(2)s)"
         else:
             node.include("m2cpp")
-            return "m2cpp::ifft<" + node[0].type + ">(", ", ", ")"
+            return "m2cpp::ifft<" + node.type + ">(", ", ", ")"
 
     else:
         node.error("Number of args in 'ifft' should be between 1 and 3")
