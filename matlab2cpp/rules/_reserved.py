@@ -9,7 +9,7 @@ import matlab2cpp as mc
 
 # List of function names that should be handled by reserved.py:
 reserved = {
-"i", "and", "or", "not", "all", "any",
+"i", "and", "or", "not", "all", "any", "isequal",
 "false", "true", "pi", "inf", "Inf", "nan", "NaN",
 "eye", "flipud", "length", "max", "min", "size",
 "transpose", "ctranspose",
@@ -96,6 +96,8 @@ def Get_all(node):
 
     return "all(", ", ", ")"
 
+def Get_isequal(node):
+    return "%(0)s == %(1)s"
 
 def Var_return(node):
 

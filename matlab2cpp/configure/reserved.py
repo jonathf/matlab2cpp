@@ -48,6 +48,8 @@ def Get_any(node):
 
 Get_all = Get_any
 
+Get_isequal = "int"
+
 def Get_size(node):
 
     # unknown input
