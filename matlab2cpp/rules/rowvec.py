@@ -10,7 +10,23 @@ def Get(node):
 
         elif len(node) == 2 and node[0].cls == "Int" and node[0].value == "1":
             node_ = node[1]
-
+            
+        #special case hh = h0F(:,ones(1,M)) with h0F rowvec, and ones
+        elif len(node) == 2 and node[0].name == "ones" or \
+            node[1].name == "ones":
+            out = "%(name)s("
+            if node[0].name == "ones":
+                out = out + "%(0)s-1, "
+                #return "%(name)s(%(0)s-1, %(1)s)"
+            else:
+                out = out + "%(0)s, "
+            if node[1].name == "ones":
+                out = out + "%(1)s-1)"
+                #return "%(name)s(%(0)s, %(1)s-1)"
+            else:
+                out = out + "%(1)s)"
+            return out
+            
         else:
             node.error("More than one arguments in a rowvec call")
             return "%(name)s(", "-1, ", "-1)"
