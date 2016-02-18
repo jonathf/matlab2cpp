@@ -28,7 +28,8 @@ reserved = {
 
 # Common attribute
 
-Assign = "%(0)s = %(1)s ;"
+from assign import Assign
+#Assign = "%(0)s = %(1)s ;"
 
 def Var(node):
     return "%(name)s"
