@@ -8,3 +8,6 @@ def Assigns(node):
     lhs = "[" + ", ".join(lhs) + "]"
     rhs = str(node[-1])
     return lhs + " = " + rhs + " ;"
+
+def Matrix(node):
+    return "", ", ", ""
