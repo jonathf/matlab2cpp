@@ -458,6 +458,12 @@ See also:
 
     return None, None
 
+# Try to overload funtions
+def modify(node):
+    print "Start\n\n"
+    print node.summary()
+    print "\n\nhello world\n\n\n"
+
 # small hack to ensure that log isn't cleaned mid translation
 mid_translation = [0]
 def translate(node, opt=None):

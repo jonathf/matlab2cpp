@@ -151,6 +151,20 @@ See also:
         """
         return backend.summary(self, args)
 
+    def modify(self):
+        """Modify the Abstract Syntax Tree (AST). Like a compiler pass to modify/optimize
+the AST before translation.
+
+What I want to do is to do function overloading on functions with multiple return values
+        """
+        
+        # configure if not configured
+        if not self.project.builder.configured:
+            self.project.builder.configure()
+
+        # overload functions with multiple returns
+        backend.modify(self)
+            
 
     def translate(self, opt=None, only=False):
         """Generate code translation

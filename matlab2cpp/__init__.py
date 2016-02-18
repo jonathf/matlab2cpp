@@ -173,17 +173,24 @@ Args:
         builder.load("unnamed", args.filename)
         program = builder[-1]
 
+    #--- work in progress ---
     #Run this mlabwrap code
     #Have this in a try-except block
     #import mwrapmat
     #wrapmat = mwrapmat.Wrapmat()
     #wrapmat.eval_code(builder)
+    #------------------------
 
     if args.disp:
         print "configure tree"
 
     builder.configure(suggest=2*args.suggest)
 
+    #--- work in progress ---
+    #Modify the Abstract Syntax Tree (AST)
+    #builder.modify()
+    #------------------------
+    
     if args.disp:
         print builder.project.summary()
         print "generate translation"
