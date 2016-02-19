@@ -519,10 +519,13 @@ def reserved(self, node, start):
     """
 
     k = start
-
+    
+    newline = self.code.find("\n", start)
+    
     if self.code[k:k+4] == "hold":
 
-        statement = mc.collection.Statement(node, cur=start)
+        statement = mc.collection.Statement(node, cur=start,
+                                            code=self.code[start:newline])
         
         l = k+4
         while self.code[l] in " \t":
@@ -553,7 +556,8 @@ def reserved(self, node, start):
 
     if self.code[k:k+4] == "grid":
 
-        statement = mc.collection.Statement(node, cur=start)
+        statement = mc.collection.Statement(node, cur=start,
+                                            code=self.code[k:newline])
         
         l = k+4
         while self.code[l] in " \t":
