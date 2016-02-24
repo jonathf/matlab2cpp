@@ -364,6 +364,12 @@ def Get_real(node):
         node.type = arg.type
         node.mem = 3
 
+def Get_convmtx(node):
+    node.type = node[0].type
+
+def Get_conv2(node):
+    node.type = [node[0].type, node[1].type]
+
 Get_tic = "string"
 
 Get_toc = "string"

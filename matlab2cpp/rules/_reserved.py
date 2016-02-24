@@ -690,7 +690,8 @@ def Get_convmtx(node):
 
 def Get_conv2(node):
     node.include("m2cpp")
-    return "m2cpp::conv2(", ", ", ")"
+    return "m2cpp::conv2<%(type)s>(", ", ", ")"
+    #return "m2cpp::conv2<" + node[0].type + "," + node[1].type + ">(", ", ", ")"
 
 #SPlot reserved words
 def Get_figure(node):
