@@ -637,8 +637,10 @@ def Get_sum(node):
         node.error("sum over non-array")
         return "arma::sum(", ", ", ")"
 
-    return "arma::sum(", ", ", "-1)"
-
+    # second argument should be dim, matlab uses dim 1/2, and armadillo 0/1
+    if len(node) == 2:
+        return "arma::sum(", ", ", "-1)"
+    return "arma::sum(", ", ", ")"
 
 def Get_conj(node):
     return "arma::conj(", ", ", ")"
