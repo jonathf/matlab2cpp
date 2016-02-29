@@ -38,13 +38,13 @@ Examples:
     a(7, 4)
     """
     # Cosmetic fix
-    for p0,p1,p2 in set(re.findall(r"(([ ,(\[])(-?\d+)-1)", text)):
+    for p0,p1,p2 in set(re.findall(r"(([ ,(\[])(-?\d+)-1(?![*/]))", text)):
         val = int(p2)-1
         val = p1+str(val)
         text = val.join(text.split(p0))
 
     for p0,p1,p2 in \
-            set(re.findall(r"(([+\- ])(\d+)-1)", text)):
+            set(re.findall(r"(([+\- ])(\d+)-1(?![*/]))", text)):
         if p1=="-":     val = int(p2)+1
         else:           val = int(p2)-1
         if val:         val = p1+str(val)
