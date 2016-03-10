@@ -52,7 +52,8 @@ Example:
     last = k-1
 
     integer = True
-    if self.code[k] == ".":
+    if self.code[k] == "." and \
+      (self.code[k+1:k+3] != ".." and self.code[k+1] not in "*/"): 
         integer = False
 
         k += 1
