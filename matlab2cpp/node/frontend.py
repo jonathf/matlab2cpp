@@ -163,7 +163,7 @@ What I want to do is to do function overloading on functions with multiple retur
             self.project.builder.configure()
 
         # overload functions with multiple returns
-        backend.modify(self)
+        backend.modify(self.project)
             
 
     def translate(self, opt=None, only=False):

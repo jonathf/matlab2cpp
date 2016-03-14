@@ -458,11 +458,32 @@ See also:
 
     return None, None
 
-# Try to overload funtions
+
 def modify(node):
-    print "Start\n\n"
-    print node.summary()
-    print "\n\nhello world\n\n\n"
+    # Modify the abstract syntax tree (AST), also try to overload funtions
+    #node is project node
+    
+    nodes = flatten(node, False, False, False)
+
+    # remove the nodes for clear, close and clc so they are not included
+    # in the translation
+    for n in nodes:
+        if n.name in ("clear", "close", "clc"):
+            index = n.parent.parent.children.index(n.parent)
+            del n.parent.parent.children[index]
+
+    # move the "using namespace arma ;" node last in the includes list
+    for program in node:
+        includes = program[0]
+        index = 0
+
+        for include in includes:
+            if include != includes[-1] and \
+              include.name == "using namespace arma ;":
+                includes += [includes.pop(index)] # remove and append arma include node
+
+            index += 1
+
 
 # small hack to ensure that log isn't cleaned mid translation
 mid_translation = [0]

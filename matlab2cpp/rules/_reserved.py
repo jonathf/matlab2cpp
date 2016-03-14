@@ -15,7 +15,7 @@ reserved = {
 "transpose", "ctranspose",
 "abs", "sqrt", "nextpow2", "fft", "ifft", "hankel",
 "zeros", "ones", "round", "return", "rand", "floor",
-"clear", "close", 
+"clear", "close", "clc", 
 "_conv_to", "_reshape",
 "interp1", "linspace", "varargins",
 "sum", "conj", "real", "imag",
@@ -525,6 +525,11 @@ def Get_floor(node):
 
 
 def Var_clear(node):
+    #index = node.parent.children.index(node)
+    #print node.parent.parent.names
+    #del node.parent.parent.children[0]
+    #print node.parent.summary()
+    #return ""
     return "// clear"
 
 def Get_clear(node):
@@ -536,6 +541,11 @@ def Var_close(node):
 def Get_close(node):
     return "// close(", ", ", ")"
 
+def Var_clc(node):
+    return "// clc"
+
+def Get_close(node):
+    return "// clc(", ", ", ")"
 
 def Get__conv_to(node):
     return "conv_to<%(type)s>::from(%(0)s)"

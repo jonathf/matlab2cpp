@@ -70,7 +70,7 @@ Example:
 
     # Create intial nodes
     program = mc.collection.Program(self.project, name=name, cur=0, code=self.code)
-    includes = mc.collection.Includes(program, value=name)
+    includes = mc.collection.Includes(program, value=name, code='')
     funcs = mc.collection.Funcs(program, name=name)
 
     mc.collection.Inlines(program, name=name)
