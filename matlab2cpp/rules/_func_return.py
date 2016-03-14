@@ -180,6 +180,13 @@ Examples:
         retval = node[2][node[1].names.index(retname)]
     rettype = type_string(retval)
 
+    # empty code_block function with return statement
+    if len(node[-1]) == 0:
+        return rettype + """ %(name)s(%(2)s)
+{
+return %(1)s
+}"""
+    
     # function ends with a return statement
     if node[-1][-1] and node[-1][-1][-1].cls == "Return":
         return rettype + """ %(name)s(%(2)s)

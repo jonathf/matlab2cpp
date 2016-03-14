@@ -483,8 +483,37 @@ def modify(node):
                 includes += [includes.pop(index)] # remove and append arma include node
 
             index += 1
+    
+    # Remove if statements with nargin
+    # node is project
+    for program in node:
+        #for func in funcs
+        funcs = program[1]
+        for func in funcs:
+            block = func[3]
 
+            # find node.name == nargin
+            found_nargin = True
+            while found_nargin:
+                found_nargin = False;
+                nodes = flatten(block, False, False, False)
 
+                #remove if node.group is branch
+                for n in nodes:
+                    if n.name == "nargin":
+                        #remove branch
+                        if n.group.cls in ("Branch", "Switch"):
+                            parent = n.group.parent
+                            #print parent.summary()
+                            del parent.children[parent.children.index(n.group)]
+                            #node.group.parent.children.index(node.group)
+                            found_nargin = True
+                            break
+                        else: # node.group is not a branch
+                            found_nargin = False
+                            break
+    
+    
 # small hack to ensure that log isn't cleaned mid translation
 mid_translation = [0]
 def translate(node, opt=None):
