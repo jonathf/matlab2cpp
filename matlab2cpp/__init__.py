@@ -188,7 +188,7 @@ Args:
 
     #--- work in progress ---
     #Modify the Abstract Syntax Tree (AST)
-    builder.modify()
+    builder.modify(args.nargin)
     #------------------------
     
     if args.disp:

@@ -55,6 +55,8 @@ parser.add_argument("-l", '--line', type=int, dest="line",
         help="Only display code related to code line number `<line>`.")
 parser.add_argument("-o", '--original', action="store_true",
         help="Include original matlab code line as comment before C++ translation")
+parser.add_argument("-n", '--nargin', action="store_true",
+        help="Remove if and switch braches which use nargin variable")
 
 
 try:
