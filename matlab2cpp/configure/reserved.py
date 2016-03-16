@@ -66,6 +66,9 @@ def Get_size(node):
 
     # colvec or rowvec
     elif node[0].dim in (1,2):
+        if len(node) == 1:
+            node.type = "urowvec"
+            return
         node.type = "uword"
 
     # matrix (returns two values)

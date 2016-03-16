@@ -15,7 +15,7 @@ reserved = {
 "transpose", "ctranspose",
 "abs", "sqrt", "nextpow2", "fft", "ifft", "hankel",
 "zeros", "ones", "round", "return", "rand", "floor",
-"clear", "close", "clc", 
+"clear", "close", "clc", "clf", 
 "_conv_to", "_reshape",
 "interp1", "linspace", "varargins",
 "sum", "conj", "real", "imag",
@@ -130,6 +130,10 @@ def Get_size(node):
 
     # colvec or rowvec
     elif node[0].dim in (1,2):
+        if node[0].dim == 1:
+            return "{%(0)s.n_elem, 1}"
+        elif node[0].dim == 2:
+            return "{1, %(0)s.n_elem}"
         return var+".n_elem"
 
     # matrix (returns two values)
@@ -165,8 +169,11 @@ def Get_size(node):
     return "size(", ", ", ")"
 
 def Assign_size(node):
-    num = node[-1][0].dim == 3 and "2" or "3"
-    return "uword _%(0)s [] = %(1)s ;\n"+\
+    num = node[-1][0].dim == 3 and "2" or "2"
+    if len(node[-1]) == 2 and (node[-1][1].str == "1" or node[-1][1].str == "2"):
+        return "%(0)s = %(1)s ;"
+    else:
+        return "uword _%(0)s [] = %(1)s ;\n"+\
             "%(0)s = urowvec(_%(0)s, " + num + ", false) ;"
 
 def Assigns_size(node):
@@ -543,6 +550,15 @@ def Get_close(node):
 
 def Var_clc(node):
     return "// clc"
+
+def Get_clc(node):
+    return "// clc"
+
+def Var_clf(node):
+    return "// clf"
+
+def Get_clf(node):
+    return "// clf"
 
 def Get_close(node):
     return "// clc(", ", ", ")"
