@@ -1,5 +1,4 @@
 Var_pi = "double"
-Var_i = "cx_double"
 Get_linspace = "rowvec"
 
 def Get_sqrt(node):
