@@ -322,7 +322,7 @@ All = "uvec"
 
 def Colon(node):
     # context: array argument (must always be uvec)
-    if node.parent.cls in ("Get", "Cget", "Nget", "Fget", "Sget",
+    if node.group.cls in ("Get", "Cget", "Nget", "Fget", "Sget",
                 "Set", "Cset", "Nset", "Fset", "Sset") and \
                 node.parent.backend not in ("func_return", "func_returns", "func_lambda"):
         node.type = "uvec"
