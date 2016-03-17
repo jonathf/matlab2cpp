@@ -9,7 +9,7 @@ import matlab2cpp as mc
 
 # List of function names that should be handled by reserved.py:
 reserved = {
-"i", "and", "or", "not", "all", "any", "isequal",
+"and", "or", "not", "all", "any", "isequal",
 "false", "true", "pi", "inf", "Inf", "nan", "NaN",
 "eye", "flipud", "length", "max", "min", "size", "chol",
 "transpose", "ctranspose",
@@ -43,10 +43,10 @@ Var_nan = "datum::nan"
 Var_NaN = "datum::nan"
 
 # Special handle of 'i'-variable
-
+""" removed from reserved: "i",
 def Var_i(node):
     return "cx_double(0, 1)"
-
+"""
 def Get_abs(node):
     if len(node) and node[0].dim == 0:
         if node[0].mem == 4: #cx_double
