@@ -359,7 +359,9 @@ def Get_sum(node):
     else:
         dim = arg.dim-1
     node.dim = dim
-    
+
+Get_conj = "cx_mat"
+
 def Get_real(node):
     arg = node[0]
     # output always real

@@ -11,7 +11,7 @@ import matlab2cpp as mc
 reserved = {
 "i", "and", "or", "not", "all", "any", "isequal",
 "false", "true", "pi", "inf", "Inf", "nan", "NaN",
-"eye", "flipud", "length", "max", "min", "size",
+"eye", "flipud", "length", "max", "min", "size", "chol",
 "transpose", "ctranspose",
 "abs", "sqrt", "nextpow2", "fft", "ifft", "hankel",
 "zeros", "ones", "round", "return", "rand", "floor",
@@ -198,7 +198,36 @@ def Assigns_size(node):
 
     raise NotImplementedError
 
+def Get_chol(node):
+    return "", ", ", ""
 
+
+def Assign_chol(node):
+    lhs, rhs = node
+    my_list = []
+    for n in rhs:
+        my_list.append(n.str)
+    my_string = ", ".join(my_list)
+
+    return "%(0)s = chol(" + my_string + ") ;"
+
+def Assigns_chol(node):
+    lhs = node[:-1]
+    rhs = node[-1]
+
+    if len(lhs) == 2:
+        rhs_string = lhs[0].str + ", " + rhs.str
+        # flip p bool value, to get same value as matlab
+        ret_bool = lhs[1].str + " = !" + lhs[1].str + " ;"
+        return lhs[1].str + " = chol(" + rhs_string + ") ;\n" + ret_bool
+
+    # Default out. If more lhs values, then write new if statement
+    lhs_list = [n.str for n in lhs]
+    rhs_list = [n.str for n in rhs]
+    lhs_string = ", ".join(lhs_list)
+    rhs_string = ", ".join(rhs_list)
+    return "[" + lhs_string + "]" + " = chol(" + rhs_string + ") ;"
+    
 def Get_length(node):
     # array-type uses n_elem
     if node.cls == "Var":
