@@ -258,27 +258,33 @@ def Elementdivision(node):
 
     out = str(node[0])
 
+    
+    # I commented out the the code below
     # force float output
-    mem = node[0].mem
-    if mem<2:
-        mem = 2
-
+    #mem = node[0].mem
+    #if mem<2:
+    #    mem = 2
+    mem = max(node[0].mem, node[1].mem)
+    
+    # I think node will always have length 2,
+    # thus for child in node[1:] should be same as child = node[1:]
+    # but why fix whats not broken? commented out mem = max(...) and node.mem = mem
     for child in node[1:]:
 
         # convert ints to floats
         if child.cls == "Int":
             out = out + "/" + str(child) + ".0"
 
-        # avoid int/uword division
+        # avoid int/uword division, or int/int division
         elif mem < 2:
             out = out + "*1.0/" + str(child)
 
         else:
             out = out + "/" + str(child)
 
-        mem = max(mem, child.mem)
+        #mem = max(mem, child.mem)
 
-    node.mem = mem
+    #node.mem = mem
 
     return out
 
