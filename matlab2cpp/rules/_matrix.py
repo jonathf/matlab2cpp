@@ -196,10 +196,10 @@ def Assign(node):
         # matrix
         elif rhs.dim == 3:
             # save number of rows and columns
-            node["cols"] = len(node[1][0])
-            node["rows"] = len(node[1])
+            node["rows"] = len(node[1][0])
+            node["cols"] = len(node[1])
             return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
-        "%(0)s = %(ctype)s(_" + node[0].name + ", %(rows)s, %(cols)s, false) ;"
+        "%(0)s = arma::strans(%(ctype)s(_" + node[0].name + ", %(rows)s, %(cols)s, false)) ;"
 
         assert False
 

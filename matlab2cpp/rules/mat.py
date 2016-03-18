@@ -172,11 +172,13 @@ def Set(node):
 
         # scalar + uvec
         if dim0 == 0 and dim1 > 0:
-            arg0 = "m2cpp::asuvec(" + arg0 + ")"
+            #arg0 = "m2cpp::asuvec(" + arg0 + ")"
+            return "%(name)s.col(" + arg0 + ").rows(" + arg1 + ")"
 
         # uvec + scalar
         elif dim0 > 0 and dim1 == 0:
-            arg1 = "m2cpp::asuvec(" + arg1 + ")"
+            #arg1 = "m2cpp::asuvec(" + arg1 + ")"
+            return "%(name)s.row(" + arg0 + ").cols(" + arg1 + ")"
 
         return "%(name)s(" + arg0 + ", " + arg1 + ")"
 
