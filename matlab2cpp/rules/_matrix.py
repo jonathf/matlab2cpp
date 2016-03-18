@@ -63,8 +63,12 @@ def Matrix(node):
         return "", " ", ""
 
     #clims in imagesc needs two {{ and }} for the python implementation
-    if node.parent.name == "imagesc":
-        return "{{", ", ", "}}"
+    if node.parent.name in ("imagesc", "wigb"):
+        if all([n.dim == 0 for n in node[0]]):
+            return "{{", ", ", "}}"
+        if node.parent.name == "wigb":
+            return "{", ", ", "}"
+        return "", ", ", ""
         
     # non-numerical elements in matrix
     if not node.num:

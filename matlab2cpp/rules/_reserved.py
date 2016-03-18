@@ -130,11 +130,26 @@ def Get_size(node):
 
     # colvec or rowvec
     elif node[0].dim in (1,2):
-        if node[0].dim == 1:
-            return "{%(0)s.n_elem, 1}"
-        elif node[0].dim == 2:
-            return "{1, %(0)s.n_elem}"
-        return var+".n_elem"
+        #if node.parent.backend == "reserved" and\
+        #  node.parent.name in ("min", "max"):
+        #    return var+".n_elem"
+
+        #if node[0].dim == 1:
+        #    return "%(0)s.n_elem, 1"
+        #elif node[0].dim == 2:
+        #    return "1, %(0)s.n_elem"
+        #return var+".n_elem"
+    
+        if node.parent.cls == "Get":
+            if node.parent.backend in ("reserved", "func_return",
+                "func_returns", "func_lambda", "unknown"):
+                return "%(0)s.n_rows, %(0)s.n_cols"
+
+        # inline calls moved to own line
+        if node.parent.cls not in ("Statement", "Assign"):
+            return str(node.auxiliary())
+
+        return "{%(0)s.n_rows, %(0)s.n_cols}"
 
     # matrix (returns two values)
     elif node[0].dim == 3:
@@ -286,7 +301,7 @@ def Assigns_min(node):
 
     # non-numerical assignment
     if not var.num:
-        return "[", ", ", "] = max(", ") ;"
+        return "[", ", ", "] = min(", ") ;"
 
     # multi-assignmens on own line
     if var.cls != "Var":
@@ -312,8 +327,8 @@ def Get_max(node):
             return "arma::max(" + arg + ")"
 
         # single element, uword (returned from size(a))
-        if len(node) == 1 and node[0].dim == 0:
-            return "%(0)s"
+        #if len(node) == 1 and node[0].dim == 0:
+        #    return "%(0)s"
             
         node.include("algorithm")
         return "std::max(", ", ", ")"

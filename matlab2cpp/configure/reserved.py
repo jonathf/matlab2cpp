@@ -65,14 +65,42 @@ def Get_size(node):
 
     # colvec or rowvec
     elif node[0].dim in (1,2):
+        """
+        if node.parent.backend == "reserved" and\
+          node.parent.name in ("min", "max"):
+            node.type = "uword"
+            return
         if len(node) == 1:
             node.type = "urowvec"
             return
         node.type = "uword"
+        """
+        
+        node.type = "urowvec"
 
+        if node.parent.backend == "reserved" and\
+          node.parent.name in ("min", "max"):
+            node.type = "uword"
+            return
+        
+        if node.parent.cls == "Get":
+            return
+
+        # inline calls moved to own line
+        if node.parent.cls not in ("Statement", "Assign"):
+            return
+
+        node.parent.backend = "reserved"
+        node.parent.name = "size"
+        
     # matrix (returns two values)
     elif node[0].dim == 3:
         node.type = "urowvec"
+
+        if node.parent.backend == "reserved" and\
+          node.parent.name in ("min", "max"):
+            node.type = "uword"
+            return
 
         if node.parent.cls == "Get":
             return
