@@ -337,11 +337,11 @@ mat fx_decon(mat DATA, double dt, int lf, double mu, double flow, int fhigh)
     DATA_FX_b.row(k-1) = arma::conj(DATA_FX_b.row(nf-k+1)) ;
   }
   DATA_f = arma::real(m2cpp::ifft<cx_mat>(DATA_FX_f, 1)) ;
-  DATA_f = DATA_f.rows(m2cpp::span<uvec>(0, nt-1)) ;
+  DATA_f = DATA_f.rows(arma::span(0, nt-1)) ;
   DATA_b = arma::real(m2cpp::ifft<cx_mat>(DATA_FX_b, 1)) ;
-  DATA_b = DATA_b.rows(m2cpp::span<uvec>(0, nt-1)) ;
+  DATA_b = DATA_b.rows(arma::span(0, nt-1)) ;
   DATA_f = (DATA_f+DATA_b) ;
-  DATA_f.cols(m2cpp::span<uvec>(lf, ntraces-lf-1)) = DATA_f.cols(m2cpp::span<uvec>(lf, ntraces-lf-1))/2.0 ;
+  DATA_f.cols(arma::span(lf, ntraces-lf-1)) = DATA_f.cols(arma::span(lf, ntraces-lf-1))/2.0 ;
   return DATA_f ;
 }
 
@@ -352,9 +352,9 @@ void ar_modeling(cx_vec x, int lf, double mu, cx_vec& yf, cx_vec& yb)
   cx_vec C, R, ab, af, y ;
   uword nx ;
   nx = m2cpp::length(x) ;
-  y = x(m2cpp::span<uvec>(0, nx-lf-1)) ;
-  C = x(m2cpp::span<uvec>(1, nx-lf)) ;
-  R = x(m2cpp::span<uvec>(nx-lf, nx-1)) ;
+  y = x(arma::span(0, nx-lf-1)) ;
+  C = x(arma::span(1, nx-lf)) ;
+  R = x(arma::span(nx-lf, nx-1)) ;
   M = m2cpp::hankel(C, R) ;
   B = arma::trans(M)*M ;
   beta = B(0, 0)*mu/100.0 ;
@@ -362,9 +362,9 @@ void ar_modeling(cx_vec x, int lf, double mu, cx_vec& yf, cx_vec& yb)
   temp = M*ab ;
   temp = arma::join_cols(temp, arma::zeros<cx_mat>(lf, 1)) ;
   yb = temp ;
-  y = x(m2cpp::span<uvec>(lf, nx-1)) ;
-  C = x(m2cpp::span<uvec>(lf-1, nx-2)) ;
-  R = arma::flipud(x(m2cpp::span<uvec>(0, lf-1))) ;
+  y = x(arma::span(lf, nx-1)) ;
+  C = x(arma::span(lf-1, nx-2)) ;
+  R = arma::flipud(x(arma::span(0, lf-1))) ;
   M = toeplitz(C, R) ;
   B = arma::trans(M)*M ;
   beta = B(0, 0)*mu/100.0 ;
