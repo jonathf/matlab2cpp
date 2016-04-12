@@ -415,9 +415,9 @@ def Get_ones(node):
         if node[0].backend == "reserved" and node[0].name == "size":
             #Take the type of the LHS, normally it is the other way around
             if node.parent.cls == "Assign" and node.parent[0] != node:
-                out = "arma::zeros<" + node.parent[0].type + ">("
+                out = "arma::ones<" + node.parent[0].type + ">("
                 return out, ", ", ")"
-            #return "arma::zeros<%(type)s>(", ", ", ")"
+            #return "arma::ones<%(type)s>(", ", ", ")"
 
         #arg input is a scalar
         if node[0].num and node[0].dim == 0:
