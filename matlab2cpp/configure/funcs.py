@@ -51,7 +51,9 @@ def funcs(node):
             # node.parent.backend = "func_returns"
 
             returns = func[1]
-            for j in xrange(len(returns)):
+            # Got out_of_bounds error, len(returns) where longer than LHS,
+            # so i changed for range to min LHS vars and returns from function
+            for j in xrange(min(len(node.parent), len(returns))):
                 returns[j].suggest = node.parent[j].type
                 node.parent[j].suggest = returns[j].type
 

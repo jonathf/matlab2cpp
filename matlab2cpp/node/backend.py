@@ -173,7 +173,7 @@ See also:
     var = "_aux_" + type + "_" + str(i)
 
     # Create Assign
-    assign = matlab2cpp.collection.Assign(block)
+    assign = matlab2cpp.collection.Assign(block, code=node.code)
     assign.type = type
     if matrix_mode:
         assign.backend = "matrix"
