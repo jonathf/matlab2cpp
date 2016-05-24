@@ -1,5 +1,4 @@
 code=r"""function whos_f()
-function whos_f()
     %Static variables
     %persistent l %cellFile counter
     %persistent m %cellFunc counter
