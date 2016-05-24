@@ -1,4 +1,4 @@
-code = """#ifndef MCONVERT_H
+code = r"""#ifndef MCONVERT_H
 #define MCONVERT_H
 
 #include <armadillo>

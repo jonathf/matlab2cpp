@@ -695,9 +695,9 @@ See also:
 
                 #if mconvert.h not found in directory, create the file
                 if not os.path.isfile(output_file_path):
-                    file = open(output_file_path, "w")
-                    file.write(matlab2cpp.m2cpp.code)
-                    file.close()
+                    f = open(output_file_path, "w")
+                    f.write(matlab2cpp.m2cpp.code)
+                    f.close()
             except:
                 pass
                 

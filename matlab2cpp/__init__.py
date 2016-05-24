@@ -181,6 +181,13 @@ Args:
     #wrapmat.eval_code(builder)
     #------------------------
 
+    #--- work in progress ---
+    #Get data types from matlab
+    if args.matlab_suggest:
+        import matlab_types
+        builder = matlab_types.mtypes(builder)
+    #------------------------
+
     if args.disp:
         print "configure tree"
 
