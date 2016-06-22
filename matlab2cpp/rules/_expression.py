@@ -345,7 +345,7 @@ def Matrixdivision(node):
 
             # matrix handle
             if child.dim == 3:
-                out = "arma::solve(" + str(child) + ".t(), " + out + ".t()).t()"
+                out = "arma::solve(" + str(child) + ".t(), " + out + ".t(), solve_opts::fast).t()"
 
             # integer handle
             elif child.cls == "Int":
@@ -432,7 +432,7 @@ def Leftmatrixdivision(node):
 
             # classical array inversion
             if child.dim > 0:
-                out = "arma::solve(" + out + ", " + str(child) + ")"
+                out = "arma::solve(" + out + ", " + str(child) + ", solve_opts::fast)"
 
             # avoid integer division
             # backwords since left division is reverse
