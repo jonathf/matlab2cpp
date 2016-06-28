@@ -96,7 +96,7 @@ namespace m2cpp {
 		return X;
 	}
 
-
+/*
    template<typename eT>
    inline typename arma::enable_if2<arma::is_real<eT>::value, arma::Col<eT> >::result fspan(eT a, eT step, eT b) {
       arma::Col<eT> s;
@@ -108,7 +108,21 @@ namespace m2cpp {
         s(ii) = step * ii + a;
       return s;
   }
+*/
 
+   //template<typename eT>
+   inline rowvec fspan(double a, double step, double b) {
+	   //arma::Col<eT> s;
+	   rowvec s;
+	   int n = (int) round((b - a) / step);
+      if (n < 0) return s;
+
+      //s.set_size(n + 1);
+	  s.set_size(n+1);
+      for (int ii = 0; ii <= n; ii++)
+        s(ii) = step * ii + a;
+      return s;
+  }
 
   inline int nextpow2(int n) {
     n = abs(n);

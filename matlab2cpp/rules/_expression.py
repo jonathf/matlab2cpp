@@ -34,6 +34,12 @@ Examples:
     index = pnode.parent.children.index(pnode)
     name = pnode = pnode.parent.name
 
+    if len(node.group) == 1:
+        if node.group.dim == 1:
+            return name + ".n_rows"
+        if node.group.dim == 2:
+            return name + ".n_cols"
+    
     # what end is referring to
     if index == 0:
         return name + ".n_rows"
@@ -654,7 +660,9 @@ Examples:
         # <start>:<step>:<stop>
         elif len(node) == 3:
             args = "(%(0)s, %(1)s, %(2)s)"
-            return "m2cpp::span<" + node.type + ">" + args
+            #return "m2cpp::span<" + node.type + ">" + args
+            #return "arma::strans(arma::linspace(%(0)s, %(2)s, (%(2)s%(1)s))"
+            return "m2cpp::fspan" + args
 
         #Sets template type to LHS:
         # ex, ti is type vec: ti = (m2cpp::span<vec>(0, 1, nt-1))*dt ;
