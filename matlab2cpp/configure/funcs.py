@@ -36,16 +36,22 @@ def funcs(node):
         params = func[2]
 
         for i in xrange(len(node)):
-            params[i].suggest = node[i].type
-            node[i].suggest = params[i].type
+            try:
+                params[i].suggest = node[i].type
+                node[i].suggest = params[i].type
+            except:
+                pass
 
     elif node.backend == "func_returns":
         node.backend = func.backend
         params = func[2]
 
         for j in xrange(len(params)):
-            params[j].suggest = node[j].type
-            node[j].suggest = params[j].type
+            try:
+                params[j].suggest = node[j].type
+                node[j].suggest = params[j].type
+            except:
+                pass
 
         if node.parent.cls == "Assigns":
             # node.parent.backend = "func_returns"

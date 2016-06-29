@@ -24,7 +24,7 @@ Examples:
     sword _a [] = {1, 2, 2, 1} ;
     a = irowvec(_a, 4, false) ;
     sword _b [] = {2, 1, 1, 2} ;
-    b = imat(_b, 2, 2, false) ;
+    b = arma::strans(imat(_b, 2, 2, false)) ;
     a = b ;
     """
 

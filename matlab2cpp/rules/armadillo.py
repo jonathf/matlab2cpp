@@ -35,7 +35,7 @@ Examples:
     sword _x [] = {1, 2} ;
     x = irowvec(_x, 2, false) ;
     uword __aux_umat_1 [] = {1, 2, 2, 1} ;
-    _aux_umat_1 = umat(__aux_umat_1, 2, 2, false) ;
+    _aux_umat_1 = arma::strans(umat(__aux_umat_1, 2, 2, false)) ;
     x(_aux_umat_1-1) ;
     >>> print mc.qscript("x=[1,2]; x(x')")
     sword _x [] = {1, 2} ;
