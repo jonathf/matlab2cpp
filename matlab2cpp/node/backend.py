@@ -5,6 +5,7 @@ from os.path import sep
 import reference
 import matlab2cpp
 import matlab2cpp.m2cpp
+import matlab2cpp.pyplot
 
 def flatten(node, ordered=False, reverse=False, inverse=False):
     """
@@ -683,6 +684,21 @@ See also:
         library_code = ""
         if name == "SPlot":
             include_code = '#include "SPlot.h"'
+
+            #check if file in directory
+            try:
+                file_path = node.program[1].name
+                index = file_path.rindex(sep)
+                output_file_path = file_path[:index] + sep + "SPlot.h"
+
+                #if mconvert.h not found in directory, create the file
+                if not os.path.isfile(output_file_path):
+                    f = open(output_file_path, "w")
+                    f.write(matlab2cpp.pyplot.code)
+                    f.close()
+            except:
+                pass
+                
 
         elif name == "m2cpp":
             include_code = '#include "mconvert.h"'
