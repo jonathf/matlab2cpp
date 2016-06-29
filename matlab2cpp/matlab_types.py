@@ -1,4 +1,5 @@
 import os
+import shutil #copy files from current dir to m2cpp_temp
 #import re
 import matlab2cpp.mwhos
 
@@ -14,18 +15,29 @@ def lstripped(s):
 #    return lstripped(s), rstripped(s)
 
 def mtypes(builder):
-    dir = "m2cpp_temp"
+    dir_parts = builder.project[0].name.split(os.path.sep)[:-1]
+    src_dir = ""
+    for part in dir_parts:
+        src_dir = src_dir + part + os.path.sep
+    #src_dir = src_dir
+    dst_dir = src_dir + "m2cpp_temp"
     
     #if directory m2cpp_temp does not exist, create it
-    if not os.path.isdir(dir):
-        os.mkdir(dir)
+    if not os.path.isdir(dst_dir):
+        os.mkdir(dst_dir)
 
-    #dir = m2cpp_temp -> dir = m2cpp_temp/
-    dir += os.path.sep
-
+    #copy file in directory to m2cpp_temp
+    #print src_dir
+    #print dst_dir
+    src_files = os.listdir(src_dir)
+    for file_name in src_files:
+        full_file_name = os.path.join(src_dir, file_name)
+        if (os.path.isfile(full_file_name)):
+            shutil.copy(full_file_name, dst_dir)
+    
     #write whos_f.m to folder. Similar to matlab whos function,
     #but writes to file
-    f = open(dir + "whos_f.m", "w")
+    f = open(dst_dir + "whos_f.m", "w")
     f.write(matlab2cpp.mwhos.code)
     f.close()
 
@@ -39,7 +51,7 @@ def mtypes(builder):
         f.close()
 
         #Get name of file after splitting path, set file path "m2cpp_temp/file"
-        file_path = dir + program.name.split(os.path.sep)[-1]
+        file_path = dst_dir + program.name.split(os.path.sep)[-1]
         #print file_path
 
         #Program is main script file, add whos_f at end of file
@@ -80,7 +92,7 @@ def mtypes(builder):
     for program in builder.project:
         #reset funcs_types dictionary for each iteration
         funcs_types = {}
-        file_path = dir + program.name.split(os.path.sep)[-1] + ".txt"
+        file_path = dst_dir + program.name.split(os.path.sep)[-1] + ".txt"
         #print file_path
         funcs_types = extract_ftypes(funcs_types, file_path)
     
@@ -99,7 +111,7 @@ def mtypes(builder):
         #set ftypes for the current program
         builder[program_number].ftypes = funcs
         program_number += 1
-
+    
     return builder
         
 
