@@ -33,8 +33,10 @@ def mtypes(builder):
     #Loop for each script and function .m file
     #print "- Program loop start\n\n"
     for program in builder.project:
-        #print program.code
-        code = program.code
+        #get program code from matlab file
+        f = open(program.name, "r")
+        code = f.read()
+        f.close()
 
         #Get name of file after splitting path, set file path "m2cpp_temp/file"
         file_path = dir + program.name.split(os.path.sep)[-1]
