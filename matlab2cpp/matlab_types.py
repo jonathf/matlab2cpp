@@ -17,11 +17,12 @@ def lstripped(s):
 def mtypes(builder):
     dir_parts = builder.project[0].name.split(os.path.sep)[:-1]
     src_dir = ""
+
     for part in dir_parts:
         src_dir = src_dir + part + os.path.sep
     #src_dir = src_dir
-    dst_dir = src_dir + "m2cpp_temp"
-    
+    dst_dir = src_dir + "m2cpp_temp" + os.path.sep
+
     #if directory m2cpp_temp does not exist, create it
     if not os.path.isdir(dst_dir):
         os.mkdir(dst_dir)
@@ -81,6 +82,7 @@ def mtypes(builder):
         
         #write file to m2cpp_temp/
         #print "writing file: " + file_path
+
         f = open(file_path, "w")
         f.write(code)
         f.close()
