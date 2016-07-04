@@ -86,7 +86,20 @@ def mtypes(builder):
         f = open(file_path, "w")
         f.write(code)
         f.close()
-    
+
+    try:
+        import matlab.engine
+        cwdir = os.getcwd()
+        os.chdir(dst_dir)
+        engine = matlab.engine.start_matlab()
+        file = open(file_path, "r")
+        file_name = (program.name.split(os.path.sep)[-1])[:-2]
+        engine.eval(file_name, nargout=0)
+        file.close()
+        os.chdir(cwdir)
+    except:
+        pass
+
     ##Process .m.txt files to extract data types
     #I could have this under the previous loop,
     #but then the loop becomes so long
