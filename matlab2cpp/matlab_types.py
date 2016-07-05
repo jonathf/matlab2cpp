@@ -98,6 +98,7 @@ def mtypes(builder):
         file.close()
         os.chdir(cwdir)
     except:
+        print "matlab did not load correctly, check that you have matlab engine API for python installed"
         pass
 
     ##Process .m.txt files to extract data types
