@@ -99,7 +99,6 @@ def mtypes(builder):
         os.chdir(cwdir)
     except:
         print "matlab did not load correctly, check that you have matlab engine API for python installed"
-        pass
 
     ##Process .m.txt files to extract data types
     #I could have this under the previous loop,
@@ -206,23 +205,14 @@ def datatype_string(cols):
                     
             #vec
             if M > 1 and N == 1:
-                if integer:
-                    data_type = "ivec"
-                else:
                     data_type = "vec"
                     
             #rowvec
             if M == 1 and N > 1:
-                if integer:
-                    data_type = "irowvec"
-                else:
                     data_type = "rowvec"
                     
             #matrix
             if M > 1 and N > 1:
-                if integer:
-                    data_type = "imat"
-                else:
                     data_type = "mat"
                     
         #complex value
