@@ -59,6 +59,7 @@ def mtypes(builder):
         #program[1][0].cls is Main if script file
         if program[1][0].cls == "Main":
             #Modify the code, main file
+            file_name = (program.name.split(os.path.sep)[-1])[:-2]
             code += "\nwhos_f"
         else:
             #Modify the code, funtion file
@@ -92,10 +93,7 @@ def mtypes(builder):
         cwdir = os.getcwd()
         os.chdir(dst_dir)
         engine = matlab.engine.start_matlab()
-        file = open(file_path, "r")
-        file_name = (program.name.split(os.path.sep)[-1])[:-2]
         engine.eval(file_name, nargout=0)
-        file.close()
         os.chdir(cwdir)
     except:
         print "matlab did not load correctly, check that you have matlab engine API for python installed"
