@@ -203,23 +203,14 @@ def datatype_string(cols):
                     
             #vec
             if M > 1 and N == 1:
-                if integer:
-                    data_type = "ivec"
-                else:
                     data_type = "vec"
                     
             #rowvec
             if M == 1 and N > 1:
-                if integer:
-                    data_type = "irowvec"
-                else:
                     data_type = "rowvec"
                     
             #matrix
             if M > 1 and N > 1:
-                if integer:
-                    data_type = "imat"
-                else:
                     data_type = "mat"
                     
         #complex value
