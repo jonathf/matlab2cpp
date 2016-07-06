@@ -405,9 +405,12 @@ def Get_conv2(node):
 def Get_logspace(node):
     node.type = "rowvec"
 
+<<<<<<< HEAD
 def Get_find(node):
     node.type = "uvec"
 
+=======
+>>>>>>> added translation for logspace
 Get_tic = "string"
 
 Get_toc = "string"
