@@ -402,6 +402,9 @@ def Get_convmtx(node):
 def Get_conv2(node):
     node.type = [node[0].type, node[1].type]
 
+def Get_logspace(node):
+    node.type = "rowvec"
+
 Get_tic = "string"
 
 Get_toc = "string"
