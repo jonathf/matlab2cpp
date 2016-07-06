@@ -23,7 +23,7 @@ reserved = {
 "figure", "clf", "cla", "show", "xlabel", "ylabel", "hold",
 "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
 "xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
-"_splot",
+"_splot", "logspace",
 }
 
 # Common attribute
@@ -1013,6 +1013,15 @@ def Get_colormap(node):
 
 def Get__splot(node):
     return "_plot.show()"
+
+def Get_logspace(node):
+    if len(node) == 2:
+        return "logspace<%(type)s>(%(0)s, %(1)s, 50)"
+
+    if len(node) == 3:
+        return "logspace<%(type)s>(%(0)s, %(1)s, %(2)s)"
+
+    return "logspace<%(type)s>(", ", ", ")"
 
 if __name__ == "__main__":
     import doctest
