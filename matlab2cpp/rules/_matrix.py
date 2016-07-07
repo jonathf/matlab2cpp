@@ -45,6 +45,8 @@ def Vector(node):
                 nodes[i] = "m2cpp::srow(" + nodes[i] + ")"
 
     if nodes:
+        if node.parent.name in ("imagesc", "wigb", "plot"):
+            return reduce(lambda x,y: ("{arma::join_rows(%s, %s)}" % (x, y)), nodes)
         return reduce(lambda x,y: ("arma::join_rows(%s, %s)" % (x, y)), nodes)
     return ""
 
@@ -66,8 +68,8 @@ def Matrix(node):
     if node.parent.name in ("imagesc", "wigb"):
         if all([n.dim == 0 for n in node[0]]):
             return "{{", ", ", "}}"
-        if node.parent.name == "wigb":
-            return "{", ", ", "}"
+        #if node.parent.name == "wigb":
+        #    return "{", ", ", "}"
         return "", ", ", ""
         
     # non-numerical elements in matrix
@@ -139,6 +141,8 @@ def Matrix(node):
                 nodes.append(str(node[i]))
 
     try:
+        if node.parent.name in ("imagesc", "wigb", "plot"):
+            return reduce(lambda a,b: ("{arma::join_cols(%s, %s)}" % (a,b)), nodes)
         return reduce(lambda a,b: ("arma::join_cols(%s, %s)" % (a,b)), nodes)
     except:
         node.error("No match for handling matrix arg found")
