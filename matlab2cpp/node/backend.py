@@ -485,9 +485,9 @@ def modify(node, nargin = False):
 
             index += 1
 
-    # remove nargin if args.nargin == True
+    # remove nargin if args.nargin == False
     #print args.nargin
-    if nargin == True:
+    if nargin == False:
         # Remove if statements with nargin
         # node is project
         for program in node:
@@ -499,7 +499,7 @@ def modify(node, nargin = False):
                 # find node.name == nargin
                 found_nargin = True
                 while found_nargin:
-                    found_nargin = False;
+                    found_nargin = False
                     nodes = flatten(block, False, False, False)
                     
                     #remove if node.group is branch
