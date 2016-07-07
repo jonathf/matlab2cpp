@@ -603,7 +603,7 @@ Examples:
     >>> print mc.qscript("a = [1,2,3]; a(1:2:2)")
     sword _a [] = {1, 2, 3} ;
     a = irowvec(_a, 3, false) ;
-    a(m2cpp::span<uvec>(0, 2, 1)) ;
+    arma::strans(a(m2cpp::span<uvec>(0, 2, 1))) ;
     """
 
     # context: array argument (must always be uvec)

@@ -42,8 +42,9 @@ def Get(node):
     #if dim == 0:
     #    node.dim = 0
 
-    # a(uvec array)
-    if node[0].type == "uvec":
+    # a(uvec array) or a(1:2:5)
+    if (node[0].type == "uvec" and node[0].cls == "Var") or \
+        node[0].cls == "Colon" and len(node[0]) == 3:
         return "arma::strans(%(name)s(" + arg + "))"
 
     return "%(name)s(" + arg + ")"
