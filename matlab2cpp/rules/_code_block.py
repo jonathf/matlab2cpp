@@ -646,6 +646,14 @@ Examples:
 
         return out
 
+    # i = [1, 2, 3, 4]
+    if len(node) == 3:
+        if node[1].dim in [1, 2]:
+            return """for (auto %(0)s : %(1)s)
+{
+%(2)s
+}
+""" 
     # default
     return """for (int _%(0)s=0; _%(0)s<length(%(1)s); _%(0)s++)
 {
