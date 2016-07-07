@@ -23,7 +23,7 @@ reserved = {
 "figure", "clf", "cla", "show", "xlabel", "ylabel", "hold",
 "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
 "xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
-"_splot", "logspace",
+"_splot", "logspace", "find",
 }
 
 # Common attribute
@@ -1022,6 +1022,18 @@ def Get_logspace(node):
         return "logspace<%(type)s>(%(0)s, %(1)s, %(2)s)"
 
     return "logspace<%(type)s>(", ", ", ")"
+
+def Get_find(node):
+    if len(node) == 1:
+        return "find(%(0)s)"
+
+    if len(node) == 2:
+        return "find(%(0)s, %(1)s)"
+
+    if len(node) == 3:
+        return "find(%(0)s, %(1)s, %(2)s)"
+
+    return "find(", ", ", ")"
 
 if __name__ == "__main__":
     import doctest

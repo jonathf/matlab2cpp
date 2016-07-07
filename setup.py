@@ -4,6 +4,7 @@
 
 import platform
 import os
+import sys
 
 system = platform.system()
 
@@ -28,7 +29,12 @@ if system == "Windows":
     print
     print "Program now runnable through 'mconvert.py'"
     print "To start:"
-    print "> python mconvert.py -h"
+    print "> m2cpp -h"
+    cwdir = os.getcwd()
+    file = open('m2cpp.bat', 'w')
+    run_line = '@echo off\npython ' + cwdir + os.sep + 'mconvert.py' + ' %*'
+    file.write(run_line)
+    file.close()
 
 else:
 
