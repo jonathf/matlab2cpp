@@ -462,7 +462,7 @@ See also:
 
 def modify(node, nargin = False):
     # Modify the abstract syntax tree (AST), also try to overload funtions
-    #node is project node
+    # node is project node
     
     nodes = flatten(node, False, False, False)
 
@@ -472,6 +472,17 @@ def modify(node, nargin = False):
         if n.name in ("clear", "close", "clc"):
             index = n.parent.parent.children.index(n.parent)
             del n.parent.parent.children[index]
+
+    # Change right hand side variable to uvec if assigned with find, b = find(a==3)
+    for n in nodes:
+        if n.cls == "Assign":
+            lhs, rhs = n
+            if rhs.name == "find":
+                declares = n.func[0]
+                print declares.cls
+                for var in declares:
+                    if var.name == lhs.name:
+                        var.type = "uvec"
 
     # move the "using namespace arma ;" node last in the includes list
     for program in node:
@@ -485,13 +496,13 @@ def modify(node, nargin = False):
 
             index += 1
 
-    # remove nargin if args.nargin == True
-    #print args.nargin
-    if nargin == True:
+    # remove nargin if args.nargin == False
+    # print args.nargin
+    if nargin == False:
         # Remove if statements with nargin
         # node is project
         for program in node:
-            #for func in funcs
+            # for func in funcs
             funcs = program[1]
             for func in funcs:
                 block = func[3]
@@ -499,18 +510,18 @@ def modify(node, nargin = False):
                 # find node.name == nargin
                 found_nargin = True
                 while found_nargin:
-                    found_nargin = False;
+                    found_nargin = False
                     nodes = flatten(block, False, False, False)
                     
-                    #remove if node.group is branch
+                    # remove if node.group is branch
                     for n in nodes:
                         if n.name == "nargin":
-                            #remove branch
+                            # remove branch
                             if n.group.cls in ("Branch", "Switch"):
                                 parent = n.group.parent
-                                #print parent.summary()
+                                # print parent.summary()
                                 del parent.children[parent.children.index(n.group)]
-                                #node.group.parent.children.index(node.group)
+                                # node.group.parent.children.index(node.group)
                                 found_nargin = True
                                 break
                             else: # node.group is not a branch

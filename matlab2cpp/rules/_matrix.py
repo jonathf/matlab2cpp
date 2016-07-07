@@ -66,7 +66,7 @@ def Matrix(node):
     if node.parent.name in ("imagesc", "wigb"):
         if all([n.dim == 0 for n in node[0]]):
             return "{{", ", ", "}}"
-        if node.parent.name == "wigb":
+        if node.parent.name in ("imagesc", "wigb", "plot"):
             return "{", ", ", "}"
         return "", ", ", ""
         
