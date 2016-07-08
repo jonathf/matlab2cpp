@@ -140,7 +140,7 @@ def Matrix(node):
 
     try:
         if node.parent.name in ("imagesc", "wigb"):
-            return reduce(lambda a,b: ("arma::join_cols(%s, %s)" % (a,b)), nodes)
+            return "{" + reduce(lambda a,b: ("arma::join_cols(%s, %s)" % (a,b)), nodes) + "}"
         return reduce(lambda a,b: ("arma::join_cols(%s, %s)" % (a,b)), nodes)
     except:
         node.error("No match for handling matrix arg found")
