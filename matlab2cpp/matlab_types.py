@@ -107,7 +107,7 @@ def mtypes(builder):
         funcs_types = {}
         file_path = dst_dir + program.name.split(os.path.sep)[-1] + ".txt"
         #print file_path
-        funcs_types = extract_ftypes(funcs_types, file_path)
+        funcs_types = extract_ftypes(program, funcs_types, file_path)
     
         ##Copy data types to program.ftypes
         funcs = program.ftypes
@@ -129,7 +129,7 @@ def mtypes(builder):
         
 
 
-def extract_ftypes(funcs_types, file_path):
+def extract_ftypes(program, funcs_types, file_path):
     
     #Check if file exists, if not return
     if not os.path.isfile(file_path):
@@ -154,8 +154,9 @@ def extract_ftypes(funcs_types, file_path):
             #funcs_name = cols[1].split(",")[0]
 
             f_names = cols[1].split(",")
-            funcs_name = f_names[0].lstrip() if not len(f_names) == 2 else f_names[1].lstrip()
-            
+
+            #funcs_name = f_names[0].lstrip() if not len(f_names) == 2 else f_names[1].lstrip()
+            funcs_name = f_names[0].lstrip() if program.name != "Main" else f_names[1].lstrip()
             
             #skip next line
             j += 2
