@@ -63,12 +63,12 @@ def Matrix(node):
         return "", " ", ""
 
     #clims in imagesc needs two {{ and }} for the python implementation
-    if node.parent.name in ("imagesc", "wigb"):
+    if node.parent.name in ("imagesc", "wigb") and \
+      len(node) == 1 and len(node[0]) > 1:
         if all([n.dim == 0 for n in node[0]]):
             return "{{", ", ", "}}"
-        if node.parent.name in ("imagesc", "wigb", "plot"):
-            return "{", ", ", "}"
-        return "", ", ", ""
+        #{ } around arma::join_rows()
+        return "{", ", ", "}"
         
     # non-numerical elements in matrix
     if not node.num:
@@ -139,6 +139,8 @@ def Matrix(node):
                 nodes.append(str(node[i]))
 
     try:
+        if node.parent.name in ("imagesc", "wigb"):
+            return reduce(lambda a,b: ("arma::join_cols(%s, %s)" % (a,b)), nodes)
         return reduce(lambda a,b: ("arma::join_cols(%s, %s)" % (a,b)), nodes)
     except:
         node.error("No match for handling matrix arg found")
