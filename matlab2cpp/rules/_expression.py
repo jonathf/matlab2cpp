@@ -178,7 +178,7 @@ Examples:
 
     # unknown input
     if node.type == "TYPE":
-        return "", "*", ""
+        return "", "__percent__", ""
 
     # not numerical
     if not node.num:
