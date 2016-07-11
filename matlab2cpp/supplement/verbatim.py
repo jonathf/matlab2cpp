@@ -12,6 +12,7 @@ def set(D, code):
         keys = set_(re.findall(findterm, code))
 
         value = '___' + value.replace('\n', '___')
+        value = value.replace('\\', '//')
 
         for key_ in keys:
             findterm_ = re.escape(key_)
