@@ -25,19 +25,17 @@ setup(
 )
 
 if system == "Windows":
-
     print
     print "Program now runnable through 'mconvert.py'"
     print "To start:"
     print "> m2cpp -h"
+    system_path = sys.executable
     cwdir = os.getcwd()
     file = open('m2cpp.bat', 'w')
-    run_line = '@echo off\npython ' + cwdir + os.sep + 'mconvert.py' + ' %*'
+    run_line = '@echo off\n' + system_path + ' ' + cwdir + os.sep + 'mconvert.py' + ' %*'
     file.write(run_line)
     file.close()
-
 else:
-
     mconvert = "cp -v mconvert.py /usr/local/bin/mconvert"
     os.system(mconvert)
     chmod = "chmod 755 /usr/local/bin/mconvert"

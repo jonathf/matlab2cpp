@@ -87,21 +87,21 @@ def mtypes(builder):
         f = open(file_path, "w")
         f.write(code)
         f.close()
-
     try:
         import matlab.engine
         cwdir = os.getcwd()
         os.chdir(dst_dir)
         engine = matlab.engine.start_matlab()
-        engine.eval(file_name, nargout=0)
+        engine.evalc(file_name, nargout=0)
         os.chdir(cwdir)
     except:
-        print "matlab did not load correctly, check that you have matlab engine API for python installed"
+        print "matlab did not load correctly"
 
     ##Process .m.txt files to extract data types
     #I could have this under the previous loop,
     #but then the loop becomes so long
     program_number = 0
+
     for program in builder.project:
         #reset funcs_types dictionary for each iteration
         funcs_types = {}
@@ -111,15 +111,10 @@ def mtypes(builder):
     
         ##Copy data types to program.ftypes
         funcs = program.ftypes
+
         for func_key in funcs_types.keys():
             for var_key in funcs_types[func_key].keys():
                 funcs[func_key][var_key] = funcs_types[func_key][var_key]
-        #print file_path
-        #print funcs_types
-        #print funcs
-
-        #print "---------"
-        #print funcs_types
         
         #set ftypes for the current program
         builder[program_number].ftypes = funcs
