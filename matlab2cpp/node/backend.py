@@ -463,8 +463,8 @@ See also:
 def modify(node, nargin = False):
     # Modify the abstract syntax tree (AST), also try to overload funtions
     # node is project node
-    
-    nodes = flatten(node, False, False, False)
+    project = node.project
+    nodes = flatten(project, False, False, False)
 
     # remove the nodes for clear, close and clc so they are not included
     # in the translation
@@ -485,7 +485,7 @@ def modify(node, nargin = False):
                         var.type = "uvec"
 
     # move the "using namespace arma ;" node last in the includes list
-    for program in node:
+    for program in project:
         includes = program[0]
         index = 0
 
@@ -501,7 +501,7 @@ def modify(node, nargin = False):
     if nargin == False:
         # Remove if statements with nargin
         # node is project
-        for program in node:
+        for program in project:
             # for func in funcs
             funcs = program[1]
             for func in funcs:
@@ -527,6 +527,75 @@ def modify(node, nargin = False):
                             else: # node.group is not a branch
                                 found_nargin = False
                                 break
+
+    # add temporary variables for multiple return function
+    nodes = flatten(project, False, False, False)
+    for n in nodes:
+        if n.cls == "Get" and n.backend == "func_returns":
+            func_name = n.name
+
+            func_ret_num = 0
+            if n.parent.cls in ("Assign", "Assigns"):
+
+                for sub_node in n.parent:
+                    if sub_node.cls != "Get":
+                        func_ret_num += 1
+                    else:
+                        break
+            #print n.summary()
+
+            # find the multiple return function
+            # Check if function is in the same program
+
+            # Look first for function in current file
+            funcs = n.program[1]
+            found_func = False
+            func = []
+            for f in funcs:
+                if f.name == n.name:
+                    func_found = True
+                    #programs = n.program
+                    func = f
+
+            # Look for function in external file
+            if found_func == False:
+                for program in n.project:
+                    f = program[1][0]
+                    if f.name == n.name:
+                        func = f
+                        break
+                #programs  = [p[1][0] for p in project if p[1][0]= n.program]
+
+
+            # add needed temporary variables to params
+            if func:
+                return_params = func[1]
+                # dictionary which is used as a counter
+                type_counter = {"int" : 0, "float" : 0, "double" : 0, "uword" : 0, "cx_double" : 0,
+                "ivec" : 0, "fvec" : 0, "uvec" : 0, "vec" : 0, "cx_vec" : 0,
+                "irowvec" : 0, "frowvec" : 0, "urowvec" : 0, "rowvec" : 0, "cx_rowvec" : 0,
+                "imat" : 0, "fmat" : 0, "umat" : 0, "mat" : 0, "cx_mat" : 0,
+                "icube" : 0, "fcube" : 0, "ucube" : 0, "cube" : 0, "cx_cube" : 0}
+
+                # add or reuse variables, also add change
+                while func_ret_num < len(return_params):
+                    if return_params[func_ret_num].type not in ("TYPE", "string"):
+                        type_counter[return_params[func_ret_num].type] += 1
+                        name = "_tmp_" + return_params[func_ret_num].type + \
+                               str(type_counter[return_params[func_ret_num].type])
+
+                        # Allocate Var node. n.parent is the assign node
+                        swap_var = matlab2cpp.collection.Var(n.parent, name)
+                        swap_var.type = return_params[func_ret_num].type
+                        swap_var.backend = return_params[func_ret_num].backend
+                        swap_var.create_declare()
+
+                        # swap Var and Get (function_returns)
+                        n.parent.children[func_ret_num] = swap_var
+                        n.parent.children[-1] = n
+
+                    #index += 1
+                    func_ret_num += 1
 
     
 # small hack to ensure that log isn't cleaned mid translation

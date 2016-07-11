@@ -1024,16 +1024,7 @@ def Get_logspace(node):
     return "logspace<%(type)s>(", ", ", ")"
 
 def Get_find(node):
-    if len(node) == 1:
-        return "find(%(0)s)"
-
-    if len(node) == 2:
-        return "find(%(0)s, %(1)s)"
-
-    if len(node) == 3:
-        return "find(%(0)s, %(1)s, %(2)s)"
-
-    return "find(", ", ", ")"
+    return "find(", ", ", ") + 1"
 
 if __name__ == "__main__":
     import doctest
