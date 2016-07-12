@@ -410,6 +410,12 @@ def Get_logspace(node):
 def Get_find(node):
     node.type = "uvec"
 
+def Get_exp(node):
+    node.type = node[0].type
+
+def Get_log(node):
+    node.type = node[0].type
+
 Get_tic = "string"
 
 Get_toc = "string"
