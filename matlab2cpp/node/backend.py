@@ -479,7 +479,7 @@ def modify(node, nargin = False):
             lhs, rhs = n
             if rhs.name == "find":
                 declares = n.func[0]
-                print declares.cls
+                #print declares.cls
                 for var in declares:
                     if var.name == lhs.name:
                         var.type = "uvec"
