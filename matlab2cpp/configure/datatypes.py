@@ -308,9 +308,7 @@ Elmul = opr
 Paren = opr
 def Exp(node):
     opr(node)
-    if node[0].mem == 1 and node[1].mem == 1:
-        node.mem = 1
-
+    
     if node.num and node.mem < 2:
         node.mem = 3
 
