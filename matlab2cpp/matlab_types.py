@@ -151,7 +151,7 @@ def extract_ftypes(program, funcs_types, file_path):
             f_names = cols[1].split(",")
 
             #funcs_name = f_names[0].lstrip() if not len(f_names) == 2 else f_names[1].lstrip()
-            funcs_name = f_names[0].lstrip() if program.name != "Main" else f_names[1].lstrip()
+            funcs_name = f_names[0].lstrip() if program[1][0].cls != "Main" else f_names[1].lstrip()
             
             #skip next line
             j += 2
