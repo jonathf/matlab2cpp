@@ -23,7 +23,7 @@ reserved = {
 "figure", "clf", "cla", "show", "xlabel", "ylabel", "hold",
 "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
 "xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
-"_splot", "logspace", "find",
+"_splot", "logspace", "find", "exp", "log",
 }
 
 # Common attribute
@@ -1025,6 +1025,12 @@ def Get_logspace(node):
 
 def Get_find(node):
     return "find(", ", ", ") + 1"
+
+def Get_exp(node):
+    return "exp(", ", ", ")"
+
+def Get_log(node):
+    return "log(", ", ", ")"
 
 if __name__ == "__main__":
     import doctest
