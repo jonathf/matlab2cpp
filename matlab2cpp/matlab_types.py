@@ -107,7 +107,6 @@ def mtypes(builder):
         funcs_types = {}
         file_path = dst_dir + program.name.split(os.path.sep)[-1] + ".txt"
         #print file_path
-        funcs_types = extract_ftypes(funcs_types, file_path)
         funcs_types = extract_ftypes(program, funcs_types, file_path)
 
         ##Copy data types to program.ftypes
