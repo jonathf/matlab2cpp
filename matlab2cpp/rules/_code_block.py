@@ -484,8 +484,7 @@ Examples:
     >>> print mc.qscript("[a,b,c] = d")
     [a, b, c] = d ;
     >>> print mc.qscript("[a,b,c] = [1,2,3]")
-    sword __aux_irowvec_1 [] = {1, 2, 3} ;
-    _aux_irowvec_1 = irowvec(__aux_irowvec_1, 3, false) ;
+    _aux_irowvec_1 = {1, 2, 3} ;
     a = _aux_irowvec_1(0) ;
     b = _aux_irowvec_1(1) ;
     c = _aux_irowvec_1(2) ;

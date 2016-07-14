@@ -195,7 +195,8 @@ Args:
 
     #--- work in progress ---
     #Modify the Abstract Syntax Tree (AST)
-    builder.modify(args.nargin)
+    import modify
+    builder.project = modify.transform_AST(builder.project, args.nargin)
     #------------------------
     
     if args.disp:

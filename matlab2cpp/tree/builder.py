@@ -289,19 +289,7 @@ Raises:
         self.configured = True
         mc.configure.configure(self, suggest, **kws)
 
-    def modify(self, nargin = False):
-        """
-Modify the Abstract Syntax Tree (AST). Like a compiler pass to modify/optimize
-the AST before translation.
 
-What I want to do is to do function overloading on functions with multiple return values
-        """
-        if not self.configured:
-            self.configure()
-
-        self.project.modify(nargin)
-
-        
     def translate(self):
         """
 Perform translation on all nodes in all programs in builder.

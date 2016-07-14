@@ -18,28 +18,21 @@ Returns:
 
 Examples:
     >>> print mc.qscript('x=[1,2]; x(:)')
-    sword _x [] = {1, 2} ;
-    x = irowvec(_x, 2, false) ;
+    x = {1, 2} ;
     x(span(0, x.n_rows-1)) ;
     >>> print mc.qscript('x=[1,2]; x(1)')
-    sword _x [] = {1, 2} ;
-    x = irowvec(_x, 2, false) ;
+    x = {1, 2} ;
     x(0) ;
     >>> print mc.qscript('x=[1,2]; x([1,2])')
-    sword _x [] = {1, 2} ;
-    x = irowvec(_x, 2, false) ;
-    uword __aux_urowvec_1 [] = {1, 2} ;
-    _aux_urowvec_1 = urowvec(__aux_urowvec_1, 2, false) ;
+    x = {1, 2} ;
+    _aux_urowvec_1 = {1, 2} ;
     x(arma::strans(_aux_urowvec_1)-1) ;
     >>> print mc.qscript('x=[1,2]; x([1,2;2,1])')
-    sword _x [] = {1, 2} ;
-    x = irowvec(_x, 2, false) ;
-    uword __aux_umat_1 [] = {1, 2, 2, 1} ;
-    _aux_umat_1 = arma::strans(umat(__aux_umat_1, 2, 2, false)) ;
+    x = {1, 2} ;
+    _aux_umat_1 = {{1, 2}, {2, 1}} ;
     x(_aux_umat_1-1) ;
     >>> print mc.qscript("x=[1,2]; x(x')")
-    sword _x [] = {1, 2} ;
-    x = irowvec(_x, 2, false) ;
+    x = {1, 2} ;
     x(arma::trans(x)-1) ;
     """
 

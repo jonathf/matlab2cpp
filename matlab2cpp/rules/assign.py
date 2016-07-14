@@ -15,16 +15,12 @@ Examples:
     >>> print mc.qscript("a = b")
     a = b ;
     >>> print mc.qscript("a=[1,2]; b=[1;2]; a=b")
-    sword _a [] = {1, 2} ;
-    a = irowvec(_a, 2, false) ;
-    sword _b [] = {1, 2} ;
-    b = ivec(_b, 2, false) ;
+    a = {1, 2} ;
+    b = {1, 2} ;
     a = arma::strans(b) ;
     >>> print mc.qscript("a=[1,2,2,1]; b=[2,1;1,2]; a=b")
-    sword _a [] = {1, 2, 2, 1} ;
-    a = irowvec(_a, 4, false) ;
-    sword _b [] = {2, 1, 1, 2} ;
-    b = arma::strans(imat(_b, 2, 2, false)) ;
+    a = {1, 2, 2, 1} ;
+    b = {{2, 1}, {1, 2}} ;
     a = b ;
     """
 
