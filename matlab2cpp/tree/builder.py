@@ -740,9 +740,12 @@ See also:
         return misc.cell(self, parent, cur)
 
     def create_pragma_parfor(self, parent, cur):
-        
         assert isinstance(parent, mc.collection.Block)
         return misc.pragma_for(self, parent, cur)
+
+    def create_tbb_parfor(self, parent, cur):
+        assert isinstance(parent, mc.collection.Block)
+        return misc.tbb_for(self, parent, cur)
 
     def create_comment(self, parent, cur):
         """

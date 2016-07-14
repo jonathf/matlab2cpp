@@ -6,6 +6,7 @@ and have the backend fixd to `code_block`.
 """
 
 import matlab2cpp as mc
+import matlab2cpp.node.backend as bc
 
 def Statement(node):
     """
@@ -543,6 +544,7 @@ Examples:
       b ;
     }
     """
+    node.include("omp")
     var, range = node[:2]
 
     if range.cls == "Colon":
@@ -558,7 +560,7 @@ Examples:
         start, step, stop = map(str, [start, step, stop])
 
         # return
-        out = "#pragma omp parallel for\nfor (%(0)s=" + start + \
+        out = "\n#pragma omp parallel for\nfor (%(0)s=" + start + \
             "; %(0)s<=" + stop + "; %(0)s"
 
         # special case for '+= 1'
@@ -620,12 +622,11 @@ Examples:
     var, range = node[:2]
 
     if range.cls == "Colon":
-
         # <start>:<stop>
         if len(range) == 2:
             start, stop = range
             step = "1"
-        
+
         # <start>:<step>:<stop>
         elif len(range) == 3:
             start, step, stop = range
@@ -661,7 +662,37 @@ Examples:
 }"""
 
 def Pragma_for(node):
-    return "#pragma omp parallel for %(value)s"
+    node.include("omp")
+    return "\n#pragma omp parallel for %(value)s"
+
+def Tbb_for(node):
+    node.include("tbb")
+    return "\n Hello World!"
+"""
+    project = node.project
+    nodes = bc.flatten(project, False, False, False)
+    #var, rande = node[:2]
+    for n in nodes:
+        if n.cls == "For":
+            var, range = n[:2]
+
+    if range.cls == "Colon":
+        for r in range:
+            if len(range) == 2:
+                start, stop = range
+                step = "1"
+                print r
+
+            elif len(range) == 3:
+                start, step, stop = range
+
+            start, step, stop = map(str, [start, step, stop])
+
+            #out = "for (%(0)s=" + start + \
+                  #"; %(0)s<=" + stop + "; %(0)s"
+            #return out
+"""
+
 
 def Bcomment(node):
     """

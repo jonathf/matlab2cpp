@@ -63,9 +63,13 @@ Example:
             if len(self.code)-cur < 3:
                 break
 
-        #%%PARFOR token
-        elif self.code[cur:cur+8] == "%%PARFOR":
+        #%%PARFOR_OMP token
+        elif self.code[cur:cur+12] == "%%PARFOR_OMP":
             cur = self.create_pragma_parfor(block, cur)
+
+        #%%PARFOR_TBB token
+        elif self.code[cur:cur+12] == "%%PARFOR_TBB":
+            cur = self.create_tbb_parfor(block, cur)
             
         elif self.code[cur] == "%":
             cur = self.create_comment(block, cur)
