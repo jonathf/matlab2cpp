@@ -242,20 +242,39 @@ def pragma_for(self, parent, cur):
 
     assert parent.cls == "Block"
 
-    if  self.code[cur:cur+8] != "%%PARFOR":
+    if self.code[cur:cur+12] != "%%PARFOR_OMP":
         self.syntaxerror(cur, "pragma_parfor")
 
-    k = cur+8
+    k = cur+12
 
     end = findend.pragma_for(self, k)
     
     if self.disp:
         print "%4d   Pragma_for     " % cur,
         print "%-20s" % "misc.pragma_for",
-        print repr(self.code[cur+9:end])
+        print repr(self.code[cur+13:end])
         
-    mc.collection.Pragma_for(parent, self.code[cur+9:end], cur=cur)
-        
+    mc.collection.Pragma_for(parent, self.code[cur+13:end], cur=cur)
+
+    return end
+
+def tbb_for(self, parent, cur):
+    assert parent.cls == "Block"
+
+    if self.code[cur:cur+12] != "%%PARFOR_TBB":
+        self.syntaxerror(cur, "tbb_parfor")
+
+    k = cur+12
+
+    end = findend.tbb_for(self, k)
+
+    if self.disp:
+        print "%4d   Tbb_for     " % cur,
+        print "%-20s" % "misc.tbb_for",
+        print repr(self.code[cur + 13:end])
+
+    mc.collection.Tbb_for(parent, self.code[cur + 13:end], cur=cur)
+
     return end
 
 def comment(self, parent, cur):
