@@ -670,7 +670,7 @@ See also:
         elif name == "omp":
             include_code = "#include <omp.h>"
         elif name == "tbb":
-            include_code = "#include <tbb/parallel_for.h>"
+            include_code = "#include <tbb/tbb.h>"
         else:
             include_code = ""
 

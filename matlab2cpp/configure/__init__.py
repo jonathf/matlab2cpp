@@ -67,7 +67,7 @@ def loop(root, suggest):
                 suggests = program.suggest
                 program.stypes = suggests
                 program.ftypes = suggests
-                complete = complete and not any([any(v) for v in suggests.values()])
+                complete = complete #and not any([any(v) for v in suggests.values()])
 
             if complete:
                 break

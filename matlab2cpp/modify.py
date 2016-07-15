@@ -34,7 +34,6 @@ def remove_close_clear_clc(nodes):
             del n.parent.parent.children[index]
     return nodes
 
-
 # Change right hand side variable to uvec if assigned with find, b = find(a==3)
 def modify_find(nodes):
     for n in nodes:

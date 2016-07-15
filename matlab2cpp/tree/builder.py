@@ -70,6 +70,7 @@ Args:
         self.project = mc.collection.Project()
         self.project.kws = kws
         self.project.builder = self
+        self.tbb =
 
         self.configured = False
 
@@ -922,7 +923,6 @@ See also:
     :py:func:`matlab2cpp.tree.variables.variable`
     """
         return variables.variable(self, parent, cur)
-
 
     def create_assign_variable(self, parent, cur, end=None):
         """

@@ -74,7 +74,8 @@ Args:
     args (ArgumentParser): arguments parsed through mconvert
     """
 
-    builder = tree.builder.Builder(disp=args.disp, comments=args.comments, original=args.original)
+    builder = tree.builder.Builder(disp=args.disp, comments=args.comments,
+                                   original=args.original, enable_omp=args.enable_omp, enable_tbb=args.enable_tbb)
 
     if os.path.isfile(args.filename):
 
@@ -190,6 +191,9 @@ Args:
 
     if args.disp:
         print "configure tree"
+
+    #if args.enable_omp:
+        #print "Hello world!"
 
     builder.configure(suggest=2*args.suggest)
 
