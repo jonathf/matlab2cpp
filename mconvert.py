@@ -43,6 +43,14 @@ parser.add_argument("-S", '--matlab-suggest', action="store_true",
 
 1)mconvert "file.m" -S, 2)run the code m2cpp_temp code with matlab to create the data-type files, 3)mconvert "file.m" -S will create matlab file in m2cpp_temp again. Now that the data-type files are found, the extracted information will be used to set the data-types.""")
 
+parser.add_argument("-omp", '--enable-omp', action="store_true",
+                    help="""\
+enables omp when parfor is used in matlab.""")
+
+parser.add_argument("-tbb", '--enable-tbb', action="store_true",
+                    help="""\
+enables tbb when parfor is used in matlab.""")
+
 parser.add_argument("-r", '--reset', action="store_true",
         help="""\
 Ignore the content of `<filename>.py` and make a fresh translation.""")

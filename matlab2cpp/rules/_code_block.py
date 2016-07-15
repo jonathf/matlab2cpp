@@ -6,7 +6,7 @@ and have the backend fixd to `code_block`.
 """
 
 import matlab2cpp as mc
-import matlab2cpp.node.backend as bc
+import argparse
 
 def Statement(node):
     """
@@ -544,8 +544,9 @@ Examples:
       b ;
     }
     """
-    node.include("omp")
     var, range = node[:2]
+    omp = node.project.builder.enable_omp
+    tbb = node.project.builder.enable_tbb
 
     if range.cls == "Colon":
 
@@ -560,8 +561,22 @@ Examples:
         start, step, stop = map(str, [start, step, stop])
 
         # return
-        out = "\n#pragma omp parallel for\nfor (%(0)s=" + start + \
-            "; %(0)s<=" + stop + "; %(0)s"
+        if omp:
+            node.include("omp")
+            out = "\n#pragma omp parallel for\nfor (%(0)s=" + start + \
+                "; %(0)s<=" + stop + "; %(0)s"
+
+        elif tbb:
+            node.include("tbb")
+            out = "\ntbb::parallel_for(tbb::blocked_range<size_t>(" + start + ", " + stop + \
+                  "), [&](const tbb::blocked_range<size_t>& range) {" + \
+                  "\nfor (" + node[0].type + " %(0)s = range.begin();" + \
+                  " %(0)s != range.end(); %(0)s"
+
+        else:
+            node.include("omp")
+            out = "\n#pragma omp parallel for\nfor (%(0)s=" + start + \
+                  "; %(0)s<=" + stop + "; %(0)s"
 
         # special case for '+= 1'
         if step == "1":
@@ -570,6 +585,9 @@ Examples:
             out += "+=" + step
 
         out += ")\n{\n%(2)s\n}"
+
+        if tbb:
+            out += "\n});"
 
         return out
 
@@ -666,8 +684,8 @@ def Pragma_for(node):
     return "\n#pragma omp parallel for %(value)s"
 
 def Tbb_for(node):
-    node.include("tbb")
-    return "\n Hello World!"
+    #node.include("tbb")
+    return ""
 """
     project = node.project
     nodes = bc.flatten(project, False, False, False)
