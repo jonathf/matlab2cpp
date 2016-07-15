@@ -53,7 +53,7 @@ code through the front end functions in :py:mod:`matlab2cpp.qfunctions`::
     }
     """
 
-    def __init__(self, disp=False, comments=True, original=False, **kws):
+    def __init__(self, disp=False, comments=True, original=False,enable_omp=False, enable_tbb=False, **kws):
         """
 Args:
     disp (bool):
@@ -70,7 +70,8 @@ Args:
         self.project = mc.collection.Project()
         self.project.kws = kws
         self.project.builder = self
-        self.tbb =
+        self.enable_omp = enable_omp
+        self.enable_tbb = enable_tbb
 
         self.configured = False
 
