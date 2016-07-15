@@ -115,7 +115,11 @@ Examples:
     dim = node[0].dim
     #mem = max(node[0].mem, 2)
 
+    out = "%(0)s"
+    index = 1
     for child in node[1:]:
+        sVal = str(index)
+        index += 1
 
         # not numerical
         if not child.num:
@@ -126,13 +130,13 @@ Examples:
 
         if dim == 1:
             if child.dim == 0:
-                pass
-                #dim = 1
+                #pass
+                dim = 1
             elif child.dim == 1:
                 child.error("multiplication shape mismatch, colvec*colvec")
             elif child.dim == 2:
-                pass
-                #dim = 3
+                #pass
+                dim = 3
             elif child.dim == 3:
                 child.error("multiplication shape mismatch, colvec*matrix")
             elif child.dim == 4:
@@ -140,35 +144,41 @@ Examples:
 
         elif dim == 2:
             if child.dim == 0:
-                pass
-                #dim = 2
+                #pass
+                dim = 2
             elif child.dim == 1:
-                pass
-                #dim = 0
+
+                out =  "arma::as_scalar(" + out + "*" + "%(" + sVal + ")s" + ")"
+                #pass
+                dim = 0
+                continue
             elif child.dim == 2:
                 child.error("multiplication shape mismatch, rowvec*rowvec")
             elif child.dim == 3:
-                pass
-                #dim = 3
+                #pass
+                dim = 3
 
         elif dim == 3:
             if child.dim == 0:
-                pass
-                #dim = 3
+                #pass
+                dim = 3
             elif child.dim == 1:
-                pass
-                #dim = 1
+                #pass
+                dim = 1
             elif child.dim == 2:
                 child.error("multiplication shape mismatch, matrix*rowvec")
             elif child.dim == 3:
-                pass
-                #dim = 3
+                #pass
+                dim = 3
 
+
+        out = out + "*" + "%(" + sVal + ")s"
         #mem = max(mem, child.mem)
 
     #node.type = (dim, mem)
 
-    return "", "*", ""
+    #return "", "*", ""
+    return out
 
 def Elmul(node):
     """Element multiplication

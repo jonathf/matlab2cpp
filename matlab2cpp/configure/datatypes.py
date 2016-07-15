@@ -297,12 +297,12 @@ def Minus(node):
         node.mem = 1
 
 def Mul(node):
+    opr(node)
+    mem = max([n.mem for n in node])
     if node[0].dim == 2 and node[1].dim == 1:
-        node.type = "double"
-    elif node[0].dim == 1 and node[1].dim == 2:
-        node.type = "int"
-    else:
-        opr(node)
+        node.type = (0, mem)
+    elif node.dim == 1 and node[1].dim == 2:
+        node.type = (3, mem)
 
 Elmul = opr
 Paren = opr
@@ -311,6 +311,9 @@ def Exp(node):
 
     if node.num and node.mem < 2:
         node.mem = 3
+
+def Elexp(node):
+    node.type = [n.type for n in node]
 
 End = "int"
 Int = "int"
