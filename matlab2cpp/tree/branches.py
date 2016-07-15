@@ -327,7 +327,13 @@ def parforloop(self, parent, cur):
         cur += 1
 
     cur = self.create_variable(parfor_loop, cur)
-    #parfor_loop[0].create_declare()
+
+    if parfor_loop.project.builder.enable_tbb:
+        parfor_loop[0].type = "int"
+
+    else:
+        parfor_loop[0].create_declare()
+        parfor_loop[0].suggest = "int"
 
     cur += 1
     while self.code[cur] in " \t":

@@ -281,9 +281,6 @@ Ctranspose = Transpose
 def For(node):
     node[0].suggest = "int"
 
-def Parfor(node):
-    node[0].type = "int"
-
 def Neg(node):
     node.type = node[0].type
     if node[0].mem == 0:
