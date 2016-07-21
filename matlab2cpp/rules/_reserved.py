@@ -1009,6 +1009,14 @@ def Get_subplot(node):
 
 def Get_colormap(node):
     node.plotting()
+
+    if len(node) == 1:
+        arg = node[0]
+
+        if len(arg) == 0:
+            name = str(arg)[:-2] + "(1)"
+            return "_plot.colormap(" + name + ")"
+
     return "_plot.colormap(", ", ", ")"
 
 def Get__splot(node):
