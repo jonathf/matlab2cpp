@@ -49,6 +49,7 @@ import collection
 import configure
 import rules
 import manual
+import re
 
 
 __all__ = ["main"]
@@ -102,6 +103,8 @@ Args:
             f = open(filename, "rU")
             code = f.read()
             f.close()
+
+            code = re.sub('%#', '##', code)
 
             if os.path.isfile(filename + ".py") and not args.reset:
 
