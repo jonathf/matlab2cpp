@@ -638,6 +638,8 @@ Examples:
     }
     """
     var, range = node[:2]
+    index = node.parent.children.index(node)
+    tbb = node.parent.children[index - 1].cls
 
     if range.cls == "Colon":
         # <start>:<stop>
@@ -650,9 +652,15 @@ Examples:
             start, step, stop = range
         start, step, stop = map(str, [start, step, stop])
 
-        # return
-        out = "for (%(0)s=" + start + \
-            "; %(0)s<=" + stop + "; %(0)s"
+        if tbb == "Tbb_for":
+            node.include("tbb")
+            out = "tbb::parallel_for(tbb::blocked_range<size_t>(" + start + ", " + stop + \
+                  "), [&](const tbb::blocked_range<size_t>& range) {" + \
+                  "\nfor (" + node[0].type + " %(0)s = range.begin();" + \
+                  " %(0)s != range.end(); %(0)s"
+        else:
+            out = "for (%(0)s=" + start + \
+                  "; %(0)s<=" + stop + "; %(0)s"
 
         # special case for '+= 1'
         if step == "1":
@@ -661,6 +669,9 @@ Examples:
             out += "+=" + step
 
         out += ")\n{\n%(2)s\n}"
+
+        if tbb == "Tbb_for":
+            out += "\n});\n"
 
         return out
 
@@ -671,7 +682,7 @@ Examples:
 {
 %(2)s
 }
-""" 
+"""
     # default
     return """for (int _%(0)s=0; _%(0)s<length(%(1)s); _%(0)s++)
 {
@@ -684,33 +695,7 @@ def Pragma_for(node):
     return "\n#pragma omp parallel for %(value)s"
 
 def Tbb_for(node):
-    #node.include("tbb")
-    return ""
-"""
-    project = node.project
-    nodes = bc.flatten(project, False, False, False)
-    #var, rande = node[:2]
-    for n in nodes:
-        if n.cls == "For":
-            var, range = n[:2]
-
-    if range.cls == "Colon":
-        for r in range:
-            if len(range) == 2:
-                start, stop = range
-                step = "1"
-                print r
-
-            elif len(range) == 3:
-                start, step, stop = range
-
-            start, step, stop = map(str, [start, step, stop])
-
-            #out = "for (%(0)s=" + start + \
-                  #"; %(0)s<=" + stop + "; %(0)s"
-            #return out
-"""
-
+    return node
 
 def Bcomment(node):
     """
