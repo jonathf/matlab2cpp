@@ -53,7 +53,7 @@ code through the front end functions in :py:mod:`matlab2cpp.qfunctions`::
     }
     """
 
-    def __init__(self, disp=False, comments=True, original=False,enable_omp=False, enable_tbb=False, **kws):
+    def __init__(self, disp=False, comments=True, original=False, enable_omp=False, enable_tbb=False, **kws):
         """
 Args:
     disp (bool):
@@ -72,7 +72,6 @@ Args:
         self.project.builder = self
         self.enable_omp = enable_omp
         self.enable_tbb = enable_tbb
-
         self.configured = False
 
 
@@ -509,7 +508,6 @@ See also:
             raise AssertionError(
                     "parent of Block: %s not valid group parent\n%s" %\
                     (parent.cls, str(pnames)))
-            
         return codeblock.codeblock(self, parent, cur)
 
 

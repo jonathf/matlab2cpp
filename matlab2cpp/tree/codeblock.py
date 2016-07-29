@@ -46,7 +46,6 @@ Example:
     1  9| Statement  code_block   TYPE
     1  9| | Int        int          int
     '''
-
     cur = start
     block = mc.collection.Block(parent, cur=cur)
 
@@ -55,7 +54,7 @@ Example:
         print "%-20s" % "codeblock.codeblock"
 
     while True:
-
+        #print self.code[cur:cur+5]
         if self.code[cur] in " \t;":
             pass
 
@@ -63,12 +62,12 @@ Example:
             if len(self.code)-cur < 3:
                 break
 
-        #%%PARFOR_OMP token
-        elif self.code[cur:cur+12] == "%%PARFOR_OMP":
+        #%#OMP token, special case handled in __init__.py
+        elif self.code[cur:cur+5] == "##OMP":
             cur = self.create_pragma_parfor(block, cur)
 
-        #%%PARFOR_TBB token
-        elif self.code[cur:cur+12] == "%%PARFOR_TBB":
+        #%#TBB token, special case handled in __init__.py
+        elif self.code[cur:cur+5] == "##TBB":
             cur = self.create_tbb_parfor(block, cur)
             
         elif self.code[cur] == "%":
@@ -78,7 +77,6 @@ Example:
             cur = self.create_verbatim(block, cur)
 
         elif self.code[cur] == "[":
-
             # Divide between statement and assignment
             eq_loc = findend.matrix(self, cur)+1
 
@@ -86,11 +84,9 @@ Example:
                 eq_loc += 1
 
             if self.code[eq_loc] == "=" and self.code[eq_loc+1] != "=":
-
                 cur = self.create_assigns(block, cur, eq_loc)
 
             else:
-
                 statement = mc.collection.Statement(block, cur=cur)
 
                 end = findend.expression(self, cur)
@@ -106,7 +102,6 @@ Example:
 
 
         elif self.code[cur] == "'":
-
             end = findend.string(self, cur)
             if self.disp:
                 print "%4d   Statement    " % cur,

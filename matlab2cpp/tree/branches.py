@@ -421,13 +421,22 @@ Example:
         cur += 1
 
     cur = self.create_variable(for_loop, cur)
-    for_loop[0].create_declare()
+
+    index = for_loop.parent.children.index(for_loop)
+    tbb = for_loop.parent.children[index - 1].cls
+    if tbb == "Tbb_for":
+        for_loop[0].type = "size_t"
+
+    else:
+        for_loop[0].create_declare()
+        for_loop[0].suggest = "int"
+
 
     cur += 1
     while self.code[cur] in " \t":
         cur += 1
 
-    if  self.code[cur] != "=":
+    if self.code[cur] != "=":
         self.syntaxerror(cur, "for-loop assignment (=)")
     cur += 1
 
