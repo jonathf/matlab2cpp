@@ -87,39 +87,34 @@ def mtypes(builder):
         f = open(file_path, "w")
         f.write(code)
         f.close()
-
     try:
         import matlab.engine
         cwdir = os.getcwd()
         os.chdir(dst_dir)
         engine = matlab.engine.start_matlab()
-        engine.eval(file_name, nargout=0)
+        engine.evalc(file_name, nargout=0)
         os.chdir(cwdir)
     except:
-        print "matlab did not load correctly, check that you have matlab engine API for python installed"
+        print "matlab did not load correctly"
 
     ##Process .m.txt files to extract data types
     #I could have this under the previous loop,
     #but then the loop becomes so long
     program_number = 0
+
     for program in builder.project:
         #reset funcs_types dictionary for each iteration
         funcs_types = {}
         file_path = dst_dir + program.name.split(os.path.sep)[-1] + ".txt"
         #print file_path
-        funcs_types = extract_ftypes(funcs_types, file_path)
+        funcs_types = extract_ftypes(program, funcs_types, file_path)
     
         ##Copy data types to program.ftypes
         funcs = program.ftypes
+
         for func_key in funcs_types.keys():
             for var_key in funcs_types[func_key].keys():
                 funcs[func_key][var_key] = funcs_types[func_key][var_key]
-        #print file_path
-        #print funcs_types
-        #print funcs
-
-        #print "---------"
-        #print funcs_types
         
         #set ftypes for the current program
         builder[program_number].ftypes = funcs
@@ -129,7 +124,7 @@ def mtypes(builder):
         
 
 
-def extract_ftypes(funcs_types, file_path):
+def extract_ftypes(program, funcs_types, file_path):
     
     #Check if file exists, if not return
     if not os.path.isfile(file_path):
@@ -154,8 +149,9 @@ def extract_ftypes(funcs_types, file_path):
             #funcs_name = cols[1].split(",")[0]
 
             f_names = cols[1].split(",")
-            funcs_name = f_names[0].lstrip() if not len(f_names) == 2 else f_names[1].lstrip()
-            
+
+            #funcs_name = f_names[0].lstrip() if not len(f_names) == 2 else f_names[1].lstrip()
+            funcs_name = f_names[0].lstrip() if program[1][0].cls != "Main" else f_names[1].lstrip()
             
             #skip next line
             j += 2

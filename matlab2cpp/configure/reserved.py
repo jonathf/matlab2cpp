@@ -349,6 +349,8 @@ def Get_fft(node):
     node.type = node[0].type
     if node.mem == 4:
         node.mem = 3
+    elif node.mem == 3:
+        node.mem = 4
 
 def Get_ifft(node):
 
@@ -407,6 +409,12 @@ def Get_logspace(node):
 
 def Get_find(node):
     node.type = "uvec"
+
+def Get_exp(node):
+    node.type = node[0].type
+
+def Get_log(node):
+    node.type = node[0].type
 
 Get_tic = "string"
 

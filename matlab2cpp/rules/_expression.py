@@ -96,11 +96,9 @@ def Mul(node):
 
 Examples:
     >>> print mc.qscript("a = [1,2,3]; b = [4;5;6]; c = a*b")
-    sword _a [] = {1, 2, 3} ;
-    a = irowvec(_a, 3, false) ;
-    sword _b [] = {4, 5, 6} ;
-    b = ivec(_b, 3, false) ;
-    c = a*b ;
+    a = {1, 2, 3} ;
+    b = {4, 5, 6} ;
+    c = arma::as_scalar(a*b) ;
     """
 
     if not node[0].num:
@@ -115,9 +113,13 @@ Examples:
             return "cx_double(0, %(0)s)"
 
     dim = node[0].dim
-    mem = max(node[0].mem, 2)
+    #mem = max(node[0].mem, 2)
 
+    out = "%(0)s"
+    index = 1
     for child in node[1:]:
+        sVal = str(index)
+        index += 1
 
         # not numerical
         if not child.num:
@@ -128,10 +130,12 @@ Examples:
 
         if dim == 1:
             if child.dim == 0:
+                #pass
                 dim = 1
             elif child.dim == 1:
                 child.error("multiplication shape mismatch, colvec*colvec")
             elif child.dim == 2:
+                #pass
                 dim = 3
             elif child.dim == 3:
                 child.error("multiplication shape mismatch, colvec*matrix")
@@ -140,39 +144,49 @@ Examples:
 
         elif dim == 2:
             if child.dim == 0:
+                #pass
                 dim = 2
             elif child.dim == 1:
+
+                out =  "arma::as_scalar(" + out + "*" + "%(" + sVal + ")s" + ")"
+                #pass
                 dim = 0
+                continue
             elif child.dim == 2:
                 child.error("multiplication shape mismatch, rowvec*rowvec")
             elif child.dim == 3:
+                #pass
                 dim = 3
 
         elif dim == 3:
             if child.dim == 0:
+                #pass
                 dim = 3
             elif child.dim == 1:
+                #pass
                 dim = 1
             elif child.dim == 2:
                 child.error("multiplication shape mismatch, matrix*rowvec")
             elif child.dim == 3:
+                #pass
                 dim = 3
 
-        mem = max(mem, child.mem)
 
-    node.type = (dim, mem)
+        out = out + "*" + "%(" + sVal + ")s"
+        #mem = max(mem, child.mem)
 
-    return "", "*", ""
+    #node.type = (dim, mem)
+
+    #return "", "*", ""
+    return out
 
 def Elmul(node):
     """Element multiplication
 
 Examples:
     >>> print mc.qscript("a = [1,2,3]; b = [4,5,6]; c = a.*b")
-    sword _a [] = {1, 2, 3} ;
-    a = irowvec(_a, 3, false) ;
-    sword _b [] = {4, 5, 6} ;
-    b = irowvec(_b, 3, false) ;
+    a = {1, 2, 3} ;
+    b = {4, 5, 6} ;
     c = a%b ;
     """
 
@@ -198,10 +212,8 @@ def Plus(node):
 
 Examples:
     >>> print mc.qscript("a = [1,2,3]; b = [4,5,6]; c = a+b")
-    sword _a [] = {1, 2, 3} ;
-    a = irowvec(_a, 3, false) ;
-    sword _b [] = {4, 5, 6} ;
-    b = irowvec(_b, 3, false) ;
+    a = {1, 2, 3} ;
+    b = {4, 5, 6} ;
     c = a+b ;
     """
 
@@ -225,10 +237,8 @@ def Minus(node):
 
 Examples:
     >>> print mc.qscript("a = [1,2,3]; b = [4,5,6]; c = a-b")
-    sword _a [] = {1, 2, 3} ;
-    a = irowvec(_a, 3, false) ;
-    sword _b [] = {4, 5, 6} ;
-    b = irowvec(_b, 3, false) ;
+    a = {1, 2, 3} ;
+    b = {4, 5, 6} ;
     c = a-b ;
     """
     return "", "-", ""
@@ -237,7 +247,7 @@ Gt      = "", ">", ""
 Ge      = "", ">=", ""
 Lt      = "", "<", ""
 Le      = "", "<=", ""
-Ne      = "", "~=", ""
+Ne      = "", "!=", ""
 Eq      = "", "==", ""
 Band    = "", "&&", ""
 Land    = "", "&", ""
@@ -267,9 +277,9 @@ def Elementdivision(node):
     
     # I commented out the the code below
     # force float output
-    #mem = node[0].mem
-    #if mem<2:
-    #    mem = 2
+    mem = node[0].mem
+    if mem<2:
+        mem = 2
     mem = max(node[0].mem, node[1].mem)
     
     # I think node will always have length 2,
@@ -324,9 +334,9 @@ def Leftelementdivision(node):
         else:
             out = str(child) + "/" + out
 
-        mem = max(mem, child.mem)
+        #mem = max(mem, child.mem)
 
-    node.mem = mem
+    #node.mem = mem
     
     return out
 
@@ -365,19 +375,22 @@ def Matrixdivision(node):
                 out = out + "/" + str(child)
 
             # track memory output
-            mem = max(mem, child.mem)
+            #mem = max(mem, child.mem)
 
             # assert if division legal in matlab
             if dim == 0:
-                dim = child.dim
+                pass
+                #dim = child.dim
 
             elif dim == 1:
                 if child.dim == 0:
-                    dim = 1
+                    pass
+                    #dim = 1
                 elif child.dim == 1:
                     node.error("Matrix division error 'colvec\\colvec'")
                 elif child.dim == 2:
-                    dim = 3
+                    pass
+                    #dim = 3
                 elif child.dim == 3:
                     node.error("Matrix division error 'colvec\\matrix'")
                 elif child.dim == 3:
@@ -385,30 +398,38 @@ def Matrixdivision(node):
 
             elif dim == 2:
                 if child.dim == 0:
-                    dim = 2
+                    pass
+                    #dim = 2
                 elif child.dim == 1:
-                    dim = 0
+                    pass
+                    #dim = 0
                 elif child.dim == 2:
                     node.error("Matrix division error 'rowvec\\rowvec'")
                 elif child.dim == 3:
-                    dim = 2
+                    pass
+                    #dim = 2
                 elif child.dim == 4:
-                    dim = 3
+                    pass
+                    #dim = 3
 
             elif dim == 3:
                 if child.dim == 0:
-                    dim = 3
+                    pass
+                    #dim = 3
                 elif child.dim == 1:
-                    dim = 1
+                    pass
+                    #dim = 1
                 elif child.dim == 2:
                     node.error("Matrix division error 'matrix\\rowvec'")
                 elif child.dim == 3:
-                    dim = 3
+                    pass
+                    #dim = 3
                 elif child.dim == 4:
-                    dim = 4
+                    pass
+                    #dim = 4
 
-    if not (dim is None) and not (mem is None):
-        node.type = (dim, mem)
+    #if not (dim is None) and not (mem is None):
+    #    node.type = (dim, mem)
 
     return out
 
@@ -444,14 +465,14 @@ def Leftmatrixdivision(node):
             # backwords since left division is reverse
             elif child.mem < 2 and mem < 2:
                 out = "(" + out + ")*1.0/" + str(child)
-                mem = 2
+                #mem = 2
 
             # backwords since left division is reverse
             else:
                 out = "(" + out + ")/" + str(child)
                 # out = str(child) + "/" + out
 
-            mem = max(mem, child.mem)
+            #mem = max(mem, child.mem)
 
             # assert division as legal
             if dim == 0:
@@ -459,11 +480,13 @@ def Leftmatrixdivision(node):
 
             elif dim == 1:
                 if node.dim == 0:
-                    dim = 1
+                    pass
+                    #dim = 1
                 elif node.dim == 1:
                     node.error("Matrix division error 'colvec\\colvec'")
                 elif node.dim == 2:
-                    dim = 3
+                    pass
+                    #dim = 3
                 elif node.dim == 3:
                     node.error("Matrix division error 'colvec\\matrix'")
                 elif node.dim == 3:
@@ -471,29 +494,37 @@ def Leftmatrixdivision(node):
 
             elif dim == 2:
                 if node.dim == 0:
-                    dim = 2
+                    pass
+                    #dim = 2
                 elif node.dim == 1:
-                    dim = 0
+                    pass
+                    #dim = 0
                 elif node.dim == 2:
                     node.error("Matrix division error 'rowvec\\rowvec'")
                 elif node.dim == 3:
-                    dim = 2
+                    pass
+                    #dim = 2
                 elif node.dim == 4:
-                    dim = 3
+                    pass
+                    #dim = 3
 
             elif dim == 3:
                 if node.dim == 0:
-                    dim = 3
+                    pass
+                    #dim = 3
                 elif node.dim == 1:
-                    dim = 1
+                    pass
+                    #dim = 1
                 elif node.dim == 2:
                     node.error("Matrix division error 'matrix\\rowvec'")
                 elif node.dim == 3:
-                    dim = 3
+                    pass
+                    #dim = 3
                 elif node.dim == 4:
-                    dim = 4
+                    pass
+                    #dim = 4
 
-    node.type = (dim, mem)
+    #node.type = (dim, mem)
 
     return out
 
@@ -548,8 +579,7 @@ def Transpose(node):
     """(Simple) transpose
 
     >>> print mc.qscript("a = [1,2,3]; b = a.'")
-    sword _a [] = {1, 2, 3} ;
-    a = irowvec(_a, 3, false) ;
+    a = {1, 2, 3} ;
     b = arma::strans(a) ;
     """
 
@@ -557,6 +587,7 @@ def Transpose(node):
     if not node.num:
         return "arma::strans(%(0)s)"
 
+    """
     # colvec -> rowvec
     if node[0].dim == 1:
         node.dim = 2
@@ -564,6 +595,7 @@ def Transpose(node):
     # rowvec -> colvec
     elif node[0].dim == 2:
         node.dim = 1
+    """
 
     # not complex type
     if node.mem < 4:
@@ -574,8 +606,7 @@ def Transpose(node):
 def Ctranspose(node):
     """Complex transpose
     >>> print mc.qscript("a = [1,2,3]; b = a'")
-    sword _a [] = {1, 2, 3} ;
-    a = irowvec(_a, 3, false) ;
+    a = {1, 2, 3} ;
     b = arma::trans(a) ;
     """
 
@@ -583,6 +614,7 @@ def Ctranspose(node):
     if not node.num:
         return "arma::trans(", "", ")"
 
+    """
     # colvec -> rowvec
     if node[0].dim == 1:
         node.dim = 2
@@ -590,6 +622,7 @@ def Ctranspose(node):
     # rowvec -> colvec
     elif node[0].dim == 2:
         node.dim = 1
+    """
 
     return "arma::trans(", "", ")"
 
@@ -601,8 +634,7 @@ Examples:
     a = m2cpp::span<rowvec>(1, 10) ;
     b = m2cpp::fspan(1, 10, 2) ;
     >>> print mc.qscript("a = [1,2,3]; a(1:2:2)")
-    sword _a [] = {1, 2, 3} ;
-    a = irowvec(_a, 3, false) ;
+    a = {1, 2, 3} ;
     arma::strans(a(m2cpp::span<uvec>(0, 2, 1))) ;
     """
 

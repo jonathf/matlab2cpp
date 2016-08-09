@@ -218,7 +218,6 @@ def Vector(node):
     elif dims in ({3}, {1,3}):
         node.dim = 3
 
-
 def Matrix(node):
 
     node.type = [n.type for n in node]
@@ -296,13 +295,25 @@ def Minus(node):
     opr(node)
     if node.mem == 0:
         node.mem = 1
-Mul = opr
+
+def Mul(node):
+    opr(node)
+    mem = max([n.mem for n in node])
+    if node[0].dim == 2 and node[1].dim == 1:
+        node.type = (0, mem)
+    elif node.dim == 1 and node[1].dim == 2:
+        node.type = (3, mem)
+
 Elmul = opr
 Paren = opr
 def Exp(node):
     opr(node)
+
     if node.num and node.mem < 2:
         node.mem = 3
+
+def Elexp(node):
+    node.type = [n.type for n in node]
 
 End = "int"
 Int = "int"

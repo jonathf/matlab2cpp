@@ -23,7 +23,7 @@ reserved = {
 "figure", "clf", "cla", "show", "xlabel", "ylabel", "hold",
 "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
 "xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
-"_splot", "logspace", "find",
+"_splot", "logspace", "find", "exp", "log",
 }
 
 # Common attribute
@@ -710,6 +710,8 @@ def Get_sum(node):
     # second argument should be dim, matlab uses dim 1/2, and armadillo 0/1
     if len(node) == 2:
         return "arma::sum(", ", ", "-1)"
+    elif len(node) == 1 and node[0].dim == 1:
+        return "arma::as_scalar(arma::sum(%(0)s)"
     return "arma::sum(", ", ", ")"
 
 def Get_conj(node):
@@ -1025,6 +1027,12 @@ def Get_logspace(node):
 
 def Get_find(node):
     return "find(", ", ", ") + 1"
+
+def Get_exp(node):
+    return "exp(", ", ", ")"
+
+def Get_log(node):
+    return "log(", ", ", ")"
 
 if __name__ == "__main__":
     import doctest

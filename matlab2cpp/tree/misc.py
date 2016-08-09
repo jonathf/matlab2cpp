@@ -254,7 +254,7 @@ def pragma_for(self, parent, cur):
         print "%-20s" % "misc.pragma_for",
         print repr(self.code[cur+9:end])
         
-        mc.collection.Pragma_for(parent, self.code[cur+9:end], cur=cur)
+    mc.collection.Pragma_for(parent, self.code[cur+9:end], cur=cur)
         
     return end
 
