@@ -184,35 +184,35 @@ def Assign(node):
             # save number of rows as 'rows'
             node["rows"] = len(node[1][0])*len(node[1])
 
-            #return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
-            #    "%(0)s = %(ctype)s(_" + node[0].name + ", %(rows)s, false) ;"
+            return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
+                "%(0)s = %(ctype)s(_" + node[0].name + ", %(rows)s, false) ;"
 
             # use uniform initialization
-            return "%(0)s = %(1)s ;"
+            #return "%(0)s = %(1)s ;"
 
         # rowvec
         elif rhs.dim == 2:
 
             # save number of cols as 'cols'
             node["cols"] = len(node[1][0])*len(node[1])
-            #return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
-            #    "%(0)s = %(ctype)s(_" + node[0].name + ", %(cols)s, false) ;"
+            return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
+                "%(0)s = %(ctype)s(_" + node[0].name + ", %(cols)s, false) ;"
 
             # use uniform initialization
-            return "%(0)s = %(1)s ;"
+            #return "%(0)s = %(1)s ;"
 
         # matrix
         elif rhs.dim == 3:
             # save number of rows and columns
             node["rows"] = len(node[1][0])
             node["cols"] = len(node[1])
-            #return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
-            #"%(0)s = arma::strans(%(ctype)s(_" + node[0].name + ", %(rows)s, %(cols)s, false)) ;"
+            return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
+            "%(0)s = arma::strans(%(ctype)s(_" + node[0].name + ", %(rows)s, %(cols)s, false)) ;"
 
             # use uniform initialization
-            my_list = node[1].children
-            my_list = ["{" + str(elem) + "}" for elem in my_list]
-            return "%(0)s = {" + ", ".join(my_list) + "} ;"
+            #my_list = node[1].children
+            #my_list = ["{" + str(elem) + "}" for elem in my_list]
+            #return "%(0)s = {" + ", ".join(my_list) + "} ;"
 
         assert False
 

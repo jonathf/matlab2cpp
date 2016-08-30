@@ -327,13 +327,19 @@ def parforloop(self, parent, cur):
         cur += 1
 
     cur = self.create_variable(parfor_loop, cur)
-    parfor_loop[0].create_declare()
+
+    if parfor_loop.project.builder.enable_tbb:
+        parfor_loop[0].type = "size_t"
+
+    else:
+        parfor_loop[0].create_declare()
+        parfor_loop[0].suggest = "int"
 
     cur += 1
     while self.code[cur] in " \t":
         cur += 1
 
-    if  self.code[cur] != "=":
+    if self.code[cur] != "=":
         self.syntaxerror(cur, "for-loop assignment (=)")
     cur += 1
 
@@ -351,7 +357,6 @@ def parforloop(self, parent, cur):
 
     while self.code[cur] in " \t\n;":
         cur += 1
-
     end = self.create_codeblock(parfor_loop, cur)
 
     parfor_loop.code = self.code[start:end]
@@ -416,13 +421,22 @@ Example:
         cur += 1
 
     cur = self.create_variable(for_loop, cur)
-    for_loop[0].create_declare()
+
+    index = for_loop.parent.children.index(for_loop)
+    tbb = for_loop.parent.children[index - 1].cls
+    if tbb == "Tbb_for":
+        for_loop[0].type = "size_t"
+
+    else:
+        for_loop[0].create_declare()
+        for_loop[0].suggest = "int"
+
 
     cur += 1
     while self.code[cur] in " \t":
         cur += 1
 
-    if  self.code[cur] != "=":
+    if self.code[cur] != "=":
         self.syntaxerror(cur, "for-loop assignment (=)")
     cur += 1
 

@@ -13,6 +13,10 @@ def transform_AST(node, nargin = False):
     # Change right hand side variable to uvec if assigned with find, b = find(a==3)
     nodes = modify_find(nodes)
 
+    #a multiplication with a complex double results in complex double
+    #works with fx_decon_demo.m needs more testing and maybe a refactoring
+    nodes = complex_mul(nodes)
+
     # move the "using namespace arma ;" node last in the includes list
     project = modify_arma_last(project)
 
@@ -25,6 +29,19 @@ def transform_AST(node, nargin = False):
 
     return project
 
+def complex_mul(nodes):
+    for node in nodes:
+        if node.cls == "Assign":
+            lhs, rhs = node
+
+            if rhs.cls == "Mul":
+                if rhs[0].type == "cx_double":
+                    declares = node.func[0]
+
+                    for var in declares:
+                        if var.name == lhs.name:
+                            var.type = "cx_double"
+    return nodes
 
 # remove the nodes for clear, close and clc so they are not included in the translation
 def remove_close_clear_clc(nodes):
@@ -33,7 +50,6 @@ def remove_close_clear_clc(nodes):
             index = n.parent.parent.children.index(n.parent)
             del n.parent.parent.children[index]
     return nodes
-
 
 # Change right hand side variable to uvec if assigned with find, b = find(a==3)
 def modify_find(nodes):

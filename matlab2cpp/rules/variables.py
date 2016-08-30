@@ -1,4 +1,4 @@
-
+#import matlab2cpp as mc
 def Var(node):
     if node.type == "TYPE":
         node.error("unknown data type")
@@ -91,3 +91,44 @@ def Sget(node):
 
 def Nget(node):
     return "%(name)s.(", ", ", ")"
+
+"""
+def Assign(node):
+    lhs, rhs = node
+    # assign a my_var = [a.val], a is a structs, my_var should be a vec
+    if node[1].cls == "Matrix" and (node[1].backend == "struct" or node[1].backend == "unknown"):
+        element = rhs[0][0]
+
+        if element.backend == "struct" or element.backend == "unknown":
+            var = lhs.name
+            name = element.name
+            value = element.value
+            declares = node.func[0]
+
+            if "_i" not in declares:
+                declare = mc.collection.Var(declares, "_i")
+                declare.type = "int"
+                declare.backend = "int"
+                declares.translate()
+
+                for var in declares:
+                    index = var.parent.children.index(var)
+
+                    if var.name == name:
+                        del var.parent.children[index]
+                        for program in node.project:
+                            structs = program[3]
+
+                            for struct in structs:
+                                index = struct.parent.children.index(struct)
+                                if struct.name == name:
+                                    del struct.parent.children[index]
+
+            string = var + ".set_size(" + name + ".size()" + ") ;\n" +\
+                "for (_i=0; _i<" + var + ".n_elem" + "; ++_i)\n  " +\
+                var + "(_i) = " + name + "[_i]." + value + " ;"
+
+            return string
+
+    return "%(0)s = %(1)s;"
+"""

@@ -256,6 +256,14 @@ def pragma_for(self,start):
         self.syntaxerror(start, "comment end")
     return end
 
+def tbb_for(self, start):
+    end = self.code.find("\n", start)
+
+    if end <= -1:
+        self.syntaxerror(start, "command end")
+
+    return end
+
 def comment(self, start):
     """
 Find end of comment

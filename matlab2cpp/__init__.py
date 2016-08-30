@@ -49,6 +49,7 @@ import collection
 import configure
 import rules
 import manual
+import re
 
 
 __all__ = ["main"]
@@ -74,7 +75,8 @@ Args:
     args (ArgumentParser): arguments parsed through mconvert
     """
 
-    builder = tree.builder.Builder(disp=args.disp, comments=args.comments, original=args.original)
+    builder = tree.builder.Builder(disp=args.disp, comments=args.comments,
+                                   original=args.original, enable_omp=args.enable_omp, enable_tbb=args.enable_tbb)
 
     if os.path.isfile(args.filename):
 
@@ -101,6 +103,8 @@ Args:
             f = open(filename, "rU")
             code = f.read()
             f.close()
+
+            code = re.sub('%#', '##', code)
 
             if os.path.isfile(filename + ".py") and not args.reset:
 
@@ -191,7 +195,10 @@ Args:
     if args.disp:
         print "configure tree"
 
-    builder.configure(suggest=2*args.suggest)
+    #if args.enable_omp:
+        #print "Hello world!"
+
+    builder.configure(suggest=(2*args.suggest or args.matlab_suggest))
 
     #--- work in progress ---
     #Modify the Abstract Syntax Tree (AST)

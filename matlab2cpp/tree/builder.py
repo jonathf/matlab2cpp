@@ -53,7 +53,7 @@ code through the front end functions in :py:mod:`matlab2cpp.qfunctions`::
     }
     """
 
-    def __init__(self, disp=False, comments=True, original=False, **kws):
+    def __init__(self, disp=False, comments=True, original=False, enable_omp=False, enable_tbb=False, **kws):
         """
 Args:
     disp (bool):
@@ -70,7 +70,8 @@ Args:
         self.project = mc.collection.Project()
         self.project.kws = kws
         self.project.builder = self
-
+        self.enable_omp = enable_omp
+        self.enable_tbb = enable_tbb
         self.configured = False
 
 
@@ -507,7 +508,6 @@ See also:
             raise AssertionError(
                     "parent of Block: %s not valid group parent\n%s" %\
                     (parent.cls, str(pnames)))
-            
         return codeblock.codeblock(self, parent, cur)
 
 
@@ -740,9 +740,12 @@ See also:
         return misc.cell(self, parent, cur)
 
     def create_pragma_parfor(self, parent, cur):
-        
         assert isinstance(parent, mc.collection.Block)
         return misc.pragma_for(self, parent, cur)
+
+    def create_tbb_parfor(self, parent, cur):
+        assert isinstance(parent, mc.collection.Block)
+        return misc.tbb_for(self, parent, cur)
 
     def create_comment(self, parent, cur):
         """
@@ -919,7 +922,6 @@ See also:
     :py:func:`matlab2cpp.tree.variables.variable`
     """
         return variables.variable(self, parent, cur)
-
 
     def create_assign_variable(self, parent, cur, end=None):
         """

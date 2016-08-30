@@ -21,8 +21,9 @@ def Matrix(node):
                 return "%(0)s"
     return "[", ", ", "]"
 
-def Assign(node):
+"""def Assign(node):
     lhs, rhs = node
+    print 'here'
     # assign a my_var = [a.val], a is a structs, my_var should be a vec
     if node[1].cls == "Matrix" and node[1].backend == "structs":
         element = rhs[0][0]
@@ -45,5 +46,5 @@ def Assign(node):
 
             return string
 
-    return "%(0)s = %(1)s"
+    return "%(0)s = %(1)s"""""
 

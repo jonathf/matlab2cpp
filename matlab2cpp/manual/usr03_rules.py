@@ -149,7 +149,8 @@ translation for `sum(x)` become very different. `sum` is now an array, and the
 translation adapts::
 
     >>> print mc.qscript("sum=[1,2,3]; sum(x)")
-    sum = {1, 2, 3} ;
+    sword _sum [] = {1, 2, 3} ;
+    sum = irowvec(_sum, 3, false) ;
     sum(x-1) ;
 
 To address this in the same node will quickly become very convoluted. So

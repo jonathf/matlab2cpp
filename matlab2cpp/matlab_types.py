@@ -92,10 +92,10 @@ def mtypes(builder):
         cwdir = os.getcwd()
         os.chdir(dst_dir)
         engine = matlab.engine.start_matlab()
-        engine.evalc(file_name, nargout=0)
+        engine.eval(file_name, nargout=0)
         os.chdir(cwdir)
     except:
-        print "matlab did not load correctly"
+        print "matlab did not load correctly, check that you have matlab engine API for python installed"
 
     ##Process .m.txt files to extract data types
     #I could have this under the previous loop,

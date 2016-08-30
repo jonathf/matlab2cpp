@@ -667,6 +667,10 @@ See also:
             include_code = "#include <cmath>"
         elif name == "algorithm":
             include_code = "#include <algorithm>"
+        elif name == "omp":
+            include_code = "#include <omp.h>"
+        elif name == "tbb":
+            include_code = "#include <tbb/tbb.h>"
         else:
             include_code = ""
 

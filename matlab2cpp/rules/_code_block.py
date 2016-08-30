@@ -6,6 +6,7 @@ and have the backend fixd to `code_block`.
 """
 
 import matlab2cpp as mc
+import argparse
 
 def Statement(node):
     """
@@ -483,7 +484,8 @@ Examples:
     >>> print mc.qscript("[a,b,c] = d")
     [a, b, c] = d ;
     >>> print mc.qscript("[a,b,c] = [1,2,3]")
-    _aux_irowvec_1 = {1, 2, 3} ;
+    sword __aux_irowvec_1 [] = {1, 2, 3} ;
+    _aux_irowvec_1 = irowvec(__aux_irowvec_1, 3, false) ;
     a = _aux_irowvec_1(0) ;
     b = _aux_irowvec_1(1) ;
     c = _aux_irowvec_1(2) ;
@@ -544,6 +546,8 @@ Examples:
     }
     """
     var, range = node[:2]
+    omp = node.project.builder.enable_omp
+    tbb = node.project.builder.enable_tbb
 
     if range.cls == "Colon":
 
@@ -558,8 +562,22 @@ Examples:
         start, step, stop = map(str, [start, step, stop])
 
         # return
-        out = "#pragma omp parallel for\nfor (%(0)s=" + start + \
-            "; %(0)s<=" + stop + "; %(0)s"
+        if omp:
+            node.include("omp")
+            out = "\n#pragma omp parallel for\nfor (%(0)s=" + start + \
+                "; %(0)s<=" + stop + "; %(0)s"
+
+        elif tbb:
+            node.include("tbb")
+            out = "\ntbb::parallel_for(tbb::blocked_range<size_t>(" + start + ", " + stop + \
+                  "), [&](const tbb::blocked_range<size_t>& range) {" + \
+                  "\nfor (" + node[0].type + " %(0)s = range.begin();" + \
+                  " %(0)s != range.end(); %(0)s"
+
+        else:
+            node.include("omp")
+            out = "\n#pragma omp parallel for\nfor (%(0)s=" + start + \
+                  "; %(0)s<=" + stop + "; %(0)s"
 
         # special case for '+= 1'
         if step == "1":
@@ -568,6 +586,9 @@ Examples:
             out += "+=" + step
 
         out += ")\n{\n%(2)s\n}"
+
+        if tbb:
+            out += "\n});"
 
         return out
 
@@ -618,22 +639,29 @@ Examples:
     }
     """
     var, range = node[:2]
+    index = node.parent.children.index(node)
+    tbb = node.parent.children[index - 1].cls
 
     if range.cls == "Colon":
-
         # <start>:<stop>
         if len(range) == 2:
             start, stop = range
             step = "1"
-        
+
         # <start>:<step>:<stop>
         elif len(range) == 3:
             start, step, stop = range
         start, step, stop = map(str, [start, step, stop])
 
-        # return
-        out = "for (%(0)s=" + start + \
-            "; %(0)s<=" + stop + "; %(0)s"
+        if tbb == "Tbb_for":
+            node.include("tbb")
+            out = "tbb::parallel_for(tbb::blocked_range<size_t>(" + start + ", " + stop + \
+                  "), [&](const tbb::blocked_range<size_t>& range) {" + \
+                  "\nfor (" + node[0].type + " %(0)s = range.begin();" + \
+                  " %(0)s != range.end(); %(0)s"
+        else:
+            out = "for (%(0)s=" + start + \
+                  "; %(0)s<=" + stop + "; %(0)s"
 
         # special case for '+= 1'
         if step == "1":
@@ -642,6 +670,9 @@ Examples:
             out += "+=" + step
 
         out += ")\n{\n%(2)s\n}"
+
+        if tbb == "Tbb_for":
+            out += "\n});\n"
 
         return out
 
@@ -652,7 +683,7 @@ Examples:
 {
 %(2)s
 }
-""" 
+"""
     # default
     return """for (int _%(0)s=0; _%(0)s<length(%(1)s); _%(0)s++)
 {
@@ -661,7 +692,11 @@ Examples:
 }"""
 
 def Pragma_for(node):
-    return "#pragma omp parallel for %(value)s"
+    node.include("omp")
+    return "\n#pragma omp parallel for %(value)s"
+
+def Tbb_for(node):
+    return node
 
 def Bcomment(node):
     """
