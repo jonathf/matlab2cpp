@@ -247,7 +247,8 @@ Example:
     be used::
 
     >>> print mc.qscript("[1,2]+3")
-    _aux_irowvec_1 = {1, 2} ;
+    sword __aux_irowvec_1 [] = {1, 2} ;
+    _aux_irowvec_1 = irowvec(__aux_irowvec_1, 2, false) ;
     _aux_irowvec_1+3 ;
 
     The difference in tree structure is as follows:

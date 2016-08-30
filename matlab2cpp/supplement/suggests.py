@@ -16,8 +16,8 @@ def get(node):
         for var in declares[:]+params[:]:
 
             type = var.prop["type"]
-            #if type == "TYPE":
-            type = ""
+            if type == "TYPE":
+                type = ""
 
             if not type:
 

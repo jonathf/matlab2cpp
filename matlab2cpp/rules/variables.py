@@ -1,4 +1,4 @@
-import matlab2cpp as mc
+#import matlab2cpp as mc
 def Var(node):
     if node.type == "TYPE":
         node.error("unknown data type")
@@ -92,7 +92,7 @@ def Sget(node):
 def Nget(node):
     return "%(name)s.(", ", ", ")"
 
-
+"""
 def Assign(node):
     lhs, rhs = node
     # assign a my_var = [a.val], a is a structs, my_var should be a vec
@@ -131,3 +131,4 @@ def Assign(node):
             return string
 
     return "%(0)s = %(1)s;"
+"""

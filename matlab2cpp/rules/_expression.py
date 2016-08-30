@@ -96,8 +96,10 @@ def Mul(node):
 
 Examples:
     >>> print mc.qscript("a = [1,2,3]; b = [4;5;6]; c = a*b")
-    a = {1, 2, 3} ;
-    b = {4, 5, 6} ;
+    sword _a [] = {1, 2, 3} ;
+    a = irowvec(_a, 3, false) ;
+    sword _b [] = {4, 5, 6} ;
+    b = ivec(_b, 3, false) ;
     c = arma::as_scalar(a*b) ;
     """
 
@@ -185,8 +187,10 @@ def Elmul(node):
 
 Examples:
     >>> print mc.qscript("a = [1,2,3]; b = [4,5,6]; c = a.*b")
-    a = {1, 2, 3} ;
-    b = {4, 5, 6} ;
+    sword _a [] = {1, 2, 3} ;
+    a = irowvec(_a, 3, false) ;
+    sword _b [] = {4, 5, 6} ;
+    b = irowvec(_b, 3, false) ;
     c = a%b ;
     """
 
@@ -212,8 +216,10 @@ def Plus(node):
 
 Examples:
     >>> print mc.qscript("a = [1,2,3]; b = [4,5,6]; c = a+b")
-    a = {1, 2, 3} ;
-    b = {4, 5, 6} ;
+    sword _a [] = {1, 2, 3} ;
+    a = irowvec(_a, 3, false) ;
+    sword _b [] = {4, 5, 6} ;
+    b = irowvec(_b, 3, false) ;
     c = a+b ;
     """
 
@@ -237,8 +243,10 @@ def Minus(node):
 
 Examples:
     >>> print mc.qscript("a = [1,2,3]; b = [4,5,6]; c = a-b")
-    a = {1, 2, 3} ;
-    b = {4, 5, 6} ;
+    sword _a [] = {1, 2, 3} ;
+    a = irowvec(_a, 3, false) ;
+    sword _b [] = {4, 5, 6} ;
+    b = irowvec(_b, 3, false) ;
     c = a-b ;
     """
     return "", "-", ""
@@ -579,7 +587,8 @@ def Transpose(node):
     """(Simple) transpose
 
     >>> print mc.qscript("a = [1,2,3]; b = a.'")
-    a = {1, 2, 3} ;
+    sword _a [] = {1, 2, 3} ;
+    a = irowvec(_a, 3, false) ;
     b = arma::strans(a) ;
     """
 
@@ -606,7 +615,8 @@ def Transpose(node):
 def Ctranspose(node):
     """Complex transpose
     >>> print mc.qscript("a = [1,2,3]; b = a'")
-    a = {1, 2, 3} ;
+    sword _a [] = {1, 2, 3} ;
+    a = irowvec(_a, 3, false) ;
     b = arma::trans(a) ;
     """
 
@@ -634,7 +644,8 @@ Examples:
     a = m2cpp::span<rowvec>(1, 10) ;
     b = m2cpp::fspan(1, 10, 2) ;
     >>> print mc.qscript("a = [1,2,3]; a(1:2:2)")
-    a = {1, 2, 3} ;
+    sword _a [] = {1, 2, 3} ;
+    a = irowvec(_a, 3, false) ;
     arma::strans(a(m2cpp::span<uvec>(0, 2, 1))) ;
     """
 

@@ -198,7 +198,7 @@ Args:
     #if args.enable_omp:
         #print "Hello world!"
 
-    builder.configure(suggest=2*args.suggest)
+    builder.configure(suggest=(2*args.suggest or args.matlab_suggest))
 
     #--- work in progress ---
     #Modify the Abstract Syntax Tree (AST)

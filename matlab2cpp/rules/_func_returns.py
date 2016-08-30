@@ -173,7 +173,8 @@ Examples:
       int a ;
       a = 1 ;
       b.c = "2" ;
-      d.e[0] = {4, 5} ;
+      sword _d [] = {4, 5} ;
+      d.e[0] = irowvec(_d, 2, false) ;
     }
     """
 
