@@ -20,6 +20,8 @@ parser.add_argument("filename",
         help="File containing valid Matlab code.").completer=\
                 lambda prefix, **kws: glob("*.m")
 
+parser.add_argument("-p", "--paths_file", nargs='?', default='')
+
 parser.add_argument("-t", '--tree', action="store_true",
         help="""\
 Print the underlying node tree. Each line in the output represents a node and

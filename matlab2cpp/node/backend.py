@@ -614,7 +614,8 @@ See also:
 
     if os.path.isfile(name):
 
-        name = os.path.relpath(name, os.path.dirname(node.program.name))
+        #name = os.path.relpath(name, os.path.dirname(node.program.name))
+        name = os.path.basename(name)
         include_code = '#include "%s.hpp"' % name
         library_code = ""
 
