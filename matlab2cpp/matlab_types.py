@@ -14,7 +14,7 @@ def lstripped(s):
 #def stripped(s):
 #    return lstripped(s), rstripped(s)
 
-def mtypes(builder):
+def mtypes(builder, args):
     dir_parts = builder.project[0].name.split(os.path.sep)[:-1]
     src_dir = ""
 
@@ -92,6 +92,8 @@ def mtypes(builder):
         cwdir = os.getcwd()
         os.chdir(dst_dir)
         engine = matlab.engine.start_matlab()
+        if args.paths_file:
+            engine.eval(args.paths_file.rstrip(".m"), nargout=0)
         engine.eval(file_name, nargout=0)
         os.chdir(cwdir)
     except:

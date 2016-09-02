@@ -22,6 +22,7 @@ to the ``mconvert`` script.
 +--------------------------------+-----------------------------------------+
 """
 
+import os
 import supplement
 import tree
 import matlab2cpp as mc
@@ -348,6 +349,12 @@ See also:
     itypes = supplement.includes.get(tree_)
     vtypes = supplement.verbatim.get(tree_)
     suggestions = supplement.suggests.get(tree_)
+
+    #print "ITYPASDASDA"
+    #itypes = ["#include \"" + itype.split(os.path.sep)[-1] if ".hpp" in itype else itype for itype in itypes]
+    #print itypes
+    #print ".........;;;;;;;;-----"
+    #itypes = [itype.split(os.path.sep)[-1] if ".hpp" in itype else itype for itype in itypes]
 
     out = supplement.str_variables(ftypes, stypes, itypes, suggestions, prefix, vtypes)
     out = out.replace("__percent__", "%")
