@@ -93,8 +93,8 @@ def mtypes(builder, args):
         os.chdir(dst_dir)
         engine = matlab.engine.start_matlab()
         if args.paths_file:
-            engine.eval(args.paths_file.rstrip(".m"), nargout=0)
-        engine.eval(file_name, nargout=0)
+            engine.evalc(args.paths_file.rstrip(".m"), nargout=0)
+        engine.evalc(file_name, nargout=0)
         os.chdir(cwdir)
     except:
         print "matlab did not load correctly, check that you have matlab engine API for python installed"
