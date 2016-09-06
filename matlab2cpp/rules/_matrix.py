@@ -184,7 +184,11 @@ def Assign(node):
             # save number of rows as 'rows'
             node["rows"] = len(node[1][0])*len(node[1])
 
-            return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
+            if node.prop["ctype"] == "mat":
+                return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
+                "%(0)s = %(ctype)s(_" + node[0].name + ", %(rows)s, 1, false) ;"
+            else:
+                return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
                 "%(0)s = %(ctype)s(_" + node[0].name + ", %(rows)s, false) ;"
 
             # use uniform initialization
@@ -195,7 +199,12 @@ def Assign(node):
 
             # save number of cols as 'cols'
             node["cols"] = len(node[1][0])*len(node[1])
-            return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
+
+            if node.prop["ctype"] == "mat":
+                return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
+                "%(0)s = %(ctype)s(_" + node[0].name + ", 1, %(cols)s, false) ;"
+            else:
+                return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
                 "%(0)s = %(ctype)s(_" + node[0].name + ", %(cols)s, false) ;"
 
             # use uniform initialization
