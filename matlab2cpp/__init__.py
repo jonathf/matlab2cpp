@@ -78,52 +78,21 @@ Args:
     builder = tree.builder.Builder(disp=args.disp, comments=args.comments,
                                    original=args.original, enable_omp=args.enable_omp, enable_tbb=args.enable_tbb)
 
-
-    #if args.paths_file:
-    #    print "path:"
-    #    print args.paths_file
-    #    if os.path.isfile(args.paths_file):
-    #        print args.paths_file + " is a file"
-
-    #print "------------"
-    #print args.filename
-    #isfile_list = map(os.path.isfile, args.filename)
-    #print isfile_list
-    #print "------------"
-
-    my_paths = []
-    #skal fikse en funksjon som leser setpath.m og finner strengene og lager liste over strengene. Strengene skal addes til paths
+    paths_from_file = []
+    #read setpath.m file and return string list of paths
     if args.paths_file:
         import setpaths
-        my_paths = setpaths.multiple_folder_paths(args.paths_file)
-    #print my_paths
+        paths_from_file = setpaths.multiple_folder_paths(args.paths_file)
 
     pathOne = os.path.dirname(os.path.abspath(args.filename))
 
     if os.path.isfile(args.filename):
-        #if all(isfile_list):                       #skal endre tilbake til en fil, må da endre på argparse til å ta en fil
-        paths = [os.path.abspath(os.path.dirname(args.filename))]
-        paths += my_paths
-        #paths = list(set(paths))
-        #print "*"
-        #print paths
-        #print "*"
-            #dirnames = map(os.path.dirname, args.filename)
-            #print dirnames
-            #paths = map(os.path.abspath, dirnames) #nå er alle filene isfile, skal endre til en setpath.m som leser strenger. Disse skal addes til paths
-            #print paths
-            #basenames = map(os.path.basename, args.filename)
-            #print "---------"
-            #print basenames
-            #print "---------"
-            #pathOne = os.path.abspath(dirnames[0])
-
+        paths = [os.path.abspath(os.path.dirname(args.filename))] + paths_from_file
 
         if args.disp:
             print "building tree..."
 
         filenames = [os.path.abspath(args.filename)]
-        #filenames = map(os.path.abspath, args.filename)
 
         stack = []
         while filenames:
@@ -235,9 +204,6 @@ Args:
 
     if args.disp:
         print "configure tree"
-
-    #if args.enable_omp:
-        #print "Hello world!"
 
     builder.configure(suggest=(2*args.suggest or args.matlab_suggest))
 

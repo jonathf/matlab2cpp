@@ -17,32 +17,16 @@ def multiple_folder_paths(setpath_file):
 
     builder.configure()
 
-
-    #flat ut strukturen på project, se etter string
+    #Get code_block
     code_block = builder.project[0][1][0][3]
-    #print ";;;;;;;;;;;;;;;;"
-    #print code_block.summary()
-    #print ";;;;;;;;;;;;;;;;"
 
-    #nodes = builder.project.flatten(ordered=False, reverse=False, inverse=False)
-    #print ";;;;;;;;;;;;;;;;"
-    #for node in code_block:
-    #    print node.value
-    #print ";;;;;;;;;;;;;;;;"
-
-    """
-    print "*************"
-    print builder.project.summary()
-    print "*************"
-    """
-
-    #spar assignments variabler av type string
+    #save variables that are assigned of type string
     variables = {}
     folder_paths = []
-    rhs_string = ''
 
+    #each node in code_block is basically one line of code
     for node in code_block:
-        rhs_string = ''
+        #Assignments node
         if node.cls == "Assign":
             subnodes = node[1].flatten(ordered=False, reverse=False, inverse=False)
 
@@ -56,7 +40,8 @@ def multiple_folder_paths(setpath_file):
 
             variables[node[0].name] = str_tmp
 
-        if node.cls == "Statement" and node[0].cls == "Get" and node[0].name in {"path", "setpath"}:
+        #Statement node
+        if node.cls == "Statement" and node[0].cls == "Get" and node[0].name in {"path", "addpath"}:
             subnodes = node[0].flatten(ordered=False, reverse=False, inverse=False)
 
             str_tmp = ''
@@ -69,7 +54,7 @@ def multiple_folder_paths(setpath_file):
 
             folder_paths.append(str_tmp)
 
-    #Ta bort separator om den er på slutten
+    #remove separator if it is at the end of the string
     folder_paths = [path.rstrip(os.path.sep) for path in folder_paths]
     return folder_paths
 
