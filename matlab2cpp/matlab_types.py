@@ -207,13 +207,13 @@ def datatype_string(cols):
                     
             #vec
             if M > 1 and N == 1:
-                data_type = "mat"
-                #data_type = "vec"
+                #data_type = "mat"
+                data_type = "vec"
                     
             #rowvec
             if M == 1 and N > 1:
-                data_type = "mat"
-                #data_type = "rowvec"
+                #data_type = "mat"
+                data_type = "rowvec"
                     
             #matrix
             if M > 1 and N > 1:
@@ -227,13 +227,13 @@ def datatype_string(cols):
 
             #vec
             if M > 1 and N == 1:
-                data_type = "cx_mat"
-                #data_type = "cx_vec"
+                #data_type = "cx_mat"
+                data_type = "cx_vec"
                 
             #rowvec
             if M == 1 and N > 1:
-                data_type = "cx_mat"
-                #data_type = "cx_rowvec"
+                #data_type = "cx_mat"
+                data_type = "cx_rowvec"
                 
             #matrix
             if M > 1 and N > 1:
