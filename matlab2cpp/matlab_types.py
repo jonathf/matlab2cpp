@@ -15,14 +15,8 @@ def lstripped(s):
 #    return lstripped(s), rstripped(s)
 
 def mtypes(builder, args):
-    #dir_parts = builder.project[0].name.split(os.path.sep)[:-1]
-    #dir_parts = os.getcwd()
-    #src_dir = ""
 
-    #for part in dir_parts:
-    #    src_dir = src_dir + part + os.path.sep
-    #src_dir = src_dir
-
+    #Current working directory
     src_dir = os.getcwd() + os.path.sep
 
     dst_dir = src_dir + "m2cpp_temp" + os.path.sep
@@ -32,14 +26,14 @@ def mtypes(builder, args):
         os.mkdir(dst_dir)
 
     #copy file in directory to m2cpp_temp
-    #print src_dir
-    #print dst_dir
-    src_files = os.listdir(src_dir)
+    src_file_dir = os.path.dirname(os.path.abspath(args.filename)) + os.path.sep
+    src_files = os.listdir(os.path.dirname(os.path.abspath(args.filename)) + os.path.sep)
+
     for file_name in src_files:
-        full_file_name = os.path.join(src_dir, file_name)
-        if (os.path.isfile(full_file_name)):
-            shutil.copy(full_file_name, dst_dir)
-    
+        file_src = src_file_dir + file_name
+        if os.path.isfile(file_src):
+            shutil.copy(file_src, dst_dir)
+
     #write whos_f.m to folder. Similar to matlab whos function,
     #but writes to file
     f = open(dst_dir + "whos_f.m", "w")
