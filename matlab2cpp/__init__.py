@@ -114,16 +114,19 @@ Args:
 
             code = re.sub('%#', '##', code)
 
-            if os.path.isfile(filename + ".py") and not args.reset:
+            #Here you have to change filename to current folder for .py files
+            local_name = pathOne + sep + os.path.basename(filename)
+            
+            if os.path.isfile(local_name + ".py") and not args.reset:
 
                 try:
-                    cfg = imp.load_source("cfg", filename + ".py")
+                    cfg = imp.load_source("cfg", local_name + ".py")
 
                 except:
                     raise ImportError("""Supplement file:
     %s.py
     is formated incorrectly. Change the format or convert with '-r' option to create
-    a new file.""" % filename)
+    a new file.""" % local_name)
 
                 if "verbatims" in cfg.__dict__ and cfg.verbatims:
                     verbatims = cfg.verbatims
