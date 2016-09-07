@@ -34,6 +34,13 @@ if system == "Windows":
     new_file.write(command_run)
     new_file.close()
 
+    #copy m2cpp.bat to sys.executable
+    bat_dst = sys.executable
+    bat_dst = os.path.dirname(bat_dst)
+
+    from shutil import copy
+    copy("m2cpp.bat", bat_dst)
+
     print 
     print "Program now runnable through 'mconvert.py'"
     print "> m2cpp -h"
