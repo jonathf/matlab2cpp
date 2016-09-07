@@ -15,12 +15,16 @@ def lstripped(s):
 #    return lstripped(s), rstripped(s)
 
 def mtypes(builder, args):
-    dir_parts = builder.project[0].name.split(os.path.sep)[:-1]
-    src_dir = ""
+    #dir_parts = builder.project[0].name.split(os.path.sep)[:-1]
+    #dir_parts = os.getcwd()
+    #src_dir = ""
 
-    for part in dir_parts:
-        src_dir = src_dir + part + os.path.sep
+    #for part in dir_parts:
+    #    src_dir = src_dir + part + os.path.sep
     #src_dir = src_dir
+
+    src_dir = os.getcwd() + os.path.sep
+
     dst_dir = src_dir + "m2cpp_temp" + os.path.sep
 
     #if directory m2cpp_temp does not exist, create it
