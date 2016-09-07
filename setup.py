@@ -30,7 +30,7 @@ if system == "Windows":
     cwdir = os.getcwd()
 
     new_file = open('m2cpp.bat', 'w')
-    command_run = '@echo off\n' + system_path + ' ' + cwdir + os.sep + 'mconvert.py' + ' %*'
+    command_run = '@echo off\n' + system_path + ' ' + cwdir + os.sep + 'm2cpp.py' + ' %*'
     new_file.write(command_run)
     new_file.close()
 
@@ -42,13 +42,18 @@ if system == "Windows":
     copy("m2cpp.bat", bat_dst)
 
     print 
-    print "Program now runnable through 'mconvert.py'"
+    print "Program now runnable through 'm2cpp'"
     print "> m2cpp -h"
     
 else:
-    mconvert = "cp -v mconvert.py /usr/local/bin/mconvert"
+    mconvert = "cp -v m2cpp.py /usr/local/bin/m2cpp"
     os.system(mconvert)
-    chmod = "chmod 755 /usr/local/bin/mconvert"
+    chmod = "chmod 755 /usr/local/bin/m2cpp"
     print chmod
     os.system(chmod)
+
+    print
+    print "Program now runnable through 'm2cpp'"
+    print "> m2cpp -h"
+
 
