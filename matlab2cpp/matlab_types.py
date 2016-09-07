@@ -89,12 +89,18 @@ def mtypes(builder, args):
         f.close()
     try:
         import matlab.engine
+
+        #Set path to -p "setpath.m" before changing current working directory
+        matlab_cmd = "run(\'" + os.path.abspath(args.paths_file).rstrip(".m") + "\')"
+
         cwdir = os.getcwd()
         os.chdir(dst_dir)
         engine = matlab.engine.start_matlab()
+
         if args.paths_file:
-            engine.evalc(args.paths_file.rstrip(".m"), nargout=0)
+            engine.evalc(matlab_cmd, nargout=0)
         engine.evalc(file_name, nargout=0)
+
         os.chdir(cwdir)
     except:
         print "matlab did not load correctly, check that you have matlab engine API for python installed"
