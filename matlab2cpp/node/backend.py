@@ -630,9 +630,10 @@ See also:
 
             #check if file in directory
             try:
-                file_path = node.program[1].name
-                index = file_path.rindex(sep)
-                output_file_path = file_path[:index] + sep + "SPlot.h"
+                #file_path = node.program[1].name
+                #index = file_path.rindex(sep)
+                #output_file_path = file_path[:index] + sep + "SPlot.h"
+                output_file_path = os.getcwd() + sep + "SPlot.h"
 
                 #if mconvert.h not found in directory, create the file
                 if not os.path.isfile(output_file_path):
@@ -648,9 +649,10 @@ See also:
 
             #check if file in directory
             try:
-                file_path = node.program[1].name
-                index = file_path.rindex(sep)
-                output_file_path = file_path[:index] + sep + "mconvert.h"
+                #file_path = node.program[1].name
+                #index = file_path.rindex(sep)
+                #output_file_path = file_path[:index] + sep + "mconvert.h"
+                output_file_path = os.getcwd() + sep + "mconvert.h"
 
                 #if mconvert.h not found in directory, create the file
                 if not os.path.isfile(output_file_path):

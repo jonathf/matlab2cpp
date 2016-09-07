@@ -115,7 +115,8 @@ Args:
             code = re.sub('%#', '##', code)
 
             #Here you have to change filename to current folder for .py files
-            local_name = pathOne + sep + os.path.basename(filename)
+            #local_name = pathOne + sep + os.path.basename(filename)
+            local_name = os.getcwd() + sep + os.path.basename(filename)
             
             if os.path.isfile(local_name + ".py") and not args.reset:
 
@@ -227,10 +228,12 @@ Args:
 
     for program in builder.project:
 
-        name = program.name
-        if os.path.isfile(args.filename):
-            name = pathOne + sep + os.path.basename(name)
+        #name = program.name
+        #if os.path.isfile(args.filename):
+        #    name = pathOne + sep + os.path.basename(name)
             #print name
+        name = os.getcwd() + sep + os.path.basename(program.name)
+        #print name
 
         cpp = qfunctions.qcpp(program)
         hpp = qfunctions.qhpp(program)
