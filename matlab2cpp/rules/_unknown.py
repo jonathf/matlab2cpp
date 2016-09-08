@@ -15,28 +15,29 @@ def Matrix(node):
 
 def Get(node):
 
-    arg0, dim0 = arma.configure_arg(node[0], 0)
-    arg1, dim1 = arma.configure_arg(node[1], 1)
+    if len(node) == 2:
+        arg0, dim0 = arma.configure_arg(node[0], 0)
+        arg1, dim1 = arma.configure_arg(node[1], 1)
 
-    # All + All
-    if node[0].cls == node[1].cls == "All":
-        return "%(name)s"
+        # All + All
+        if node[0].cls == node[1].cls == "All":
+            return "%(name)s"
 
-    # All + ...
-    if node[0].cls == "All":
-        # All + uvec
-        if dim1:
-            return "%(name)s.cols(" + arg1 + ")"
-        # All + scalar
-        return "%(name)s.col(" + arg1 + ")"
+        # All + ...
+        if node[0].cls == "All":
+            # All + uvec
+            if dim1:
+                return "%(name)s.cols(" + arg1 + ")"
+            # All + scalar
+            return "%(name)s.col(" + arg1 + ")"
 
-    # ... + All
-    elif node[1].cls == "All":
-        # uvec + All
-        if dim0:
-            return "%(name)s.rows(" + arg0 + ")"
-        # scalar + All
-        return "%(name)s.row(" + arg0 + ")"
+        # ... + All
+        elif node[1].cls == "All":
+            # uvec + All
+            if dim0:
+                return "%(name)s.rows(" + arg0 + ")"
+            # scalar + All
+            return "%(name)s.row(" + arg0 + ")"
 
     return "%(name)s(", ", ", ")"
 
