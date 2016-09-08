@@ -838,10 +838,10 @@ def Get_plot(node):
 
         out = ""
         while state:
-            if cur_child > 0 and cur_child < num_children:
-                out += "\n"
-            elif cur_child >= num_children:
-                break
+            #if cur_child > 0 and cur_child < num_children:
+            #    out += "\n"
+            #elif cur_child >= num_children:
+            #    break
 
             out += "_plot.plot("
 
@@ -851,17 +851,38 @@ def Get_plot(node):
                 cur_child += 1
                 out += "%(" + str(cur_child) + ")s"
                 cur_child += 1
-            else:
-                break
 
             #test if linespec
             if cur_child < num_children and node[cur_child].type == "string":
-                out += ", %(" + str(cur_child) + ")s) ;"
+                out += ", %(" + str(cur_child) + ")s"
                 cur_child += 1
             elif cur_child < num_children and node[cur_child].type != "string":
-                out += ") ;"
+                out += ""
             elif cur_child >= num_children:
+                out += ""
+
+            #add next two children
+            if (cur_child+2) <= num_children:
+                out += ", %(" + str(cur_child) + ")s, "
+                cur_child += 1
+                out += "%(" + str(cur_child) + ")s"
+                cur_child += 1
+
+            #test if linespec
+            if cur_child < num_children and node[cur_child].type == "string":
+                out += ", %(" + str(cur_child) + ")s"
+                cur_child += 1
+            elif cur_child < num_children and node[cur_child].type != "string":
+                out += ""
+            elif cur_child >= num_children:
+                out += ""
+
+
+            if (cur_child+1) <= num_children:
+                out += ") ;\n"
+            else:
                 out += ")"
+                state = False
 
         return out
 

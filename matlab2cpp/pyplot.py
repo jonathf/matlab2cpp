@@ -60,6 +60,8 @@ class PyEngine
 		const arma::Mat<T> &m;
 		arma_mat(const arma::Mat<T> &mat) : m(mat) {}
 		arma_mat(const arma::subview<T> &view) : _m(view), m(_m) {}
+		template <class U>
+			arma_mat(const arma::eOp<arma::Mat<T>, U> &op) : _m(op), m(_m) {}
 	};
 
 	class py_obj
@@ -516,9 +518,26 @@ except ImportError:
 		return py_call("title", {title});
 	}
 
-	py_obj plot(const arma_vec<double> &x, const arma_vec<double> &y, const kwargs_t &kwargs={})
+	py_obj plot(const arma_vec<double> &x, const arma_vec<double> &y, const kwargs_t &kwargs)
 	{
 		return py_call("plot", {x, y}, kwargs);
+	}
+
+	py_obj plot(const arma_vec<double> &x, const arma_vec<double> &y, const std::string& spec={})
+	{
+		return py_call("plot", {x, y, spec});
+	}
+
+	py_obj plot(const arma_vec<double> &x1, const arma_vec<double> &y1,
+				const arma_vec<double> &x2, const arma_vec<double> &y2, const std::string& spec2={})
+	{
+		return py_call("plot", {x1, y1, std::string(), x2, y2, spec2});
+	}
+
+	py_obj plot(const arma_vec<double> &x1, const arma_vec<double> &y1, const std::string& spec1,
+				const arma_vec<double> &x2, const arma_vec<double> &y2, const std::string& spec2={})
+	{
+		return py_call("plot", {x1, y1, spec1, x2, y2, spec2});
 	}
 
 	py_obj imshow(const arma_mat<double> &A, const kwargs_t &kwargs={})
@@ -675,6 +694,5 @@ template <> int PyEngine::py_obj::npy_typenum<arma::cx_float>() { return NPY_COM
 template <> int PyEngine::py_obj::npy_typenum<arma::cx_double>() { return NPY_COMPLEX128; }
 
 #endif /* SPLOT_H_ */
-
 
 """
