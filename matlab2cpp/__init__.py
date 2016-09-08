@@ -271,9 +271,13 @@ Args:
             f.write(log)
             f.close()
 
-        f = open(name+".py", "w")
-        f.write(py)
-        f.close()
+        if py:
+            py = """# Automatically translated using Matlab2cpp %g on %s
+#
+%s""" % (__version__, stamp, py)
+            f = open(name+".py", "w")
+            f.write(py)
+            f.close()
 
         if os.path.isfile(name+".pyc"):
             os.remove(name+".pyc")
