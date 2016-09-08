@@ -10,12 +10,20 @@ code = r"""/*
 
 #include <iostream>
 //DGRIM #include "matlib.hpp"
+#ifdef _DEBUG
+#undef _DEBUG
 #include <Python.h>
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <numpy/arrayobject.h>
+#define _DEBUG
+#else
+#include <Python.h>
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#include <numpy/arrayobject.h>
+#endif
+
 #include <map>
 //DGRIM #include "armadillo/armadillo"
-#include <armadillo>
 
 class PyEngine
 {
@@ -694,5 +702,4 @@ template <> int PyEngine::py_obj::npy_typenum<arma::cx_float>() { return NPY_COM
 template <> int PyEngine::py_obj::npy_typenum<arma::cx_double>() { return NPY_COMPLEX128; }
 
 #endif /* SPLOT_H_ */
-
 """
