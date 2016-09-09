@@ -24,6 +24,7 @@ code = r"""/*
 
 #include <map>
 //DGRIM #include "armadillo/armadillo"
+#include <armadillo>
 
 class PyEngine
 {
