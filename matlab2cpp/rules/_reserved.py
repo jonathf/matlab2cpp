@@ -16,7 +16,7 @@ reserved = {
 "abs", "sqrt", "nextpow2", "fft", "ifft", "hankel",
 "zeros", "ones", "round", "return", "rand", "floor",
 "clear", "close", "clc", "clf", 
-"_conv_to", "_reshape",
+"_conv_to", "_reshape", "reshape",
 "interp1", "linspace", "varargins",
 "sum", "conj", "real", "imag",
 "tic", "toc", "diag", "disp", "error", "convmtx", "conv2",
@@ -612,6 +612,9 @@ def Get__conv_to(node):
 
 def Get__reshape(node):
     return "%(value)s(", ", ", ")"
+
+def Get_reshape(node):
+    return "reshape(", ", ", ")"
 
 def Get_nextpow2(node):
     node.include("m2cpp")
