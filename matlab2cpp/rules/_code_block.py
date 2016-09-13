@@ -569,10 +569,10 @@ Examples:
 
         elif tbb:
             node.include("tbb")
-            out = "\ntbb::parallel_for(tbb::blocked_range<size_t>(" + start + ", " + stop + \
-                  "), [&](const tbb::blocked_range<size_t>& range) {" + \
-                  "\nfor (" + node[0].type + " %(0)s = range.begin();" + \
-                  " %(0)s != range.end(); %(0)s"
+            import parallel
+            out = parallel.tbb(node, start, stop)
+
+            return out
 
         else:
             node.include("omp")
@@ -587,8 +587,8 @@ Examples:
 
         out += ")\n{\n%(2)s\n}"
 
-        if tbb:
-            out += "\n});"
+        #if tbb:
+        #    out += "\n});"
 
         return out
 
@@ -654,11 +654,25 @@ Examples:
         start, step, stop = map(str, [start, step, stop])
 
         if tbb == "Tbb_for":
+            import parallel
+
             node.include("tbb")
-            out = "tbb::parallel_for(tbb::blocked_range<size_t>(" + start + ", " + stop + \
-                  "), [&](const tbb::blocked_range<size_t>& range) {" + \
-                  "\nfor (" + node[0].type + " %(0)s = range.begin();" + \
-                  " %(0)s != range.end(); %(0)s"
+
+            out = parallel.tbb(node, start, stop, step)
+
+
+            #out = "tbb::parallel_for(tbb::blocked_range<" + node[0].type + ">(" + start + ", " + stop + "+1" + \
+            #      "),\n[&](const tbb::blocked_range<" + node[0].type + ">& range)\n{" + \
+            #      "\nfor (%(0)s = range.begin();" + \
+            #      " %(0)s != range.end(); %(0)s"
+
+            #out += ")\n{\n%(2)s\n}"
+
+            #if tbb == "Tbb_for":
+            #    out += "\n}\n);\n"
+
+            return out
+
         else:
             out = "for (%(0)s=" + start + \
                   "; %(0)s<=" + stop + "; %(0)s"
@@ -671,8 +685,8 @@ Examples:
 
         out += ")\n{\n%(2)s\n}"
 
-        if tbb == "Tbb_for":
-            out += "\n});\n"
+        #if tbb == "Tbb_for":
+        #    out += "\n});\n"
 
         return out
 

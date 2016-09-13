@@ -329,7 +329,7 @@ def parforloop(self, parent, cur):
     cur = self.create_variable(parfor_loop, cur)
 
     if parfor_loop.project.builder.enable_tbb:
-        parfor_loop[0].type = "size_t"
+        parfor_loop[0].type = "uword"
 
     else:
         parfor_loop[0].create_declare()
@@ -425,7 +425,8 @@ Example:
     index = for_loop.parent.children.index(for_loop)
     tbb = for_loop.parent.children[index - 1].cls
     if tbb == "Tbb_for":
-        for_loop[0].type = "size_t"
+        for_loop[0].create_declare()
+        for_loop[0].suggest = "uword"
 
     else:
         for_loop[0].create_declare()

@@ -279,7 +279,13 @@ def Transpose(node):
 Ctranspose = Transpose
 
 def For(node):
-    node[0].suggest = "int"
+    node[0].type = "int"
+
+    index = node.parent.children.index(node)
+    tbb = node.parent.children[index - 1].cls
+
+    if tbb == "Tbb_for":
+        node[0].type = "uword"
 
 def Neg(node):
     node.type = node[0].type

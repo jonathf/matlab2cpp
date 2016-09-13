@@ -26,13 +26,15 @@ def mtypes(builder, args):
         os.mkdir(dst_dir)
 
     #copy file in directory to m2cpp_temp
+    #If there are data files in directory, then they have to be copied, or abspath to datafiles in program
     src_file_dir = os.path.dirname(os.path.abspath(args.filename)) + os.path.sep
     src_files = os.listdir(os.path.dirname(os.path.abspath(args.filename)) + os.path.sep)
 
     for file_name in src_files:
         file_src = src_file_dir + file_name
         if os.path.isfile(file_src):
-            shutil.copy(file_src, dst_dir)
+            if file_src[-2:] != ".m":
+                shutil.copy(file_src, dst_dir)
 
     #write whos_f.m to folder. Similar to matlab whos function,
     #but writes to file
