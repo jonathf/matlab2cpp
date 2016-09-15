@@ -653,7 +653,7 @@ Examples:
             start, step, stop = range
         start, step, stop = map(str, [start, step, stop])
 
-        if tbb == "Tbb_for":
+        if tbb == "Tbb_for" and node.project.builder.enable_tbb:
             import parallel
 
             node.include("tbb")
