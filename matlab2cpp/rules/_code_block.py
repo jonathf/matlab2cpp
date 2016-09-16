@@ -570,7 +570,7 @@ Examples:
         elif tbb:
             node.include("tbb")
             import parallel
-            out = parallel.tbb(node, start, stop)
+            out = parallel.tbb(node, start, stop, step)
 
             return out
 

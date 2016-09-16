@@ -1,6 +1,6 @@
 
 def variable_lists(node):
-    nodes = node.flatten(ordered=False, reverse=False, inverse=False)
+    nodes = node[2].flatten(ordered=False, reverse=False, inverse=False)
 
     #store some variable names, in private or shared
     private_variable = []
@@ -35,26 +35,28 @@ def variable_lists(node):
     #print shared_variable
 
     for n in nodes:
-        if (n.cls == "Var" or n.cls == "Get") and n.backend != "reserved" and n.name not in shared_variable:
+        if (n.cls == "Var" or n.cls == "Get") and n.backend != "reserved" and n.name \
+                not in [shared_variable, node[0].name]:
             private_variable.append(n.name)
 
     private_variable = list(set(private_variable))
     #print private_variable
 
     #combine shared and private variable to tbb [ , , , , ] with & before shared
-    my_string = ''
+    #my_string = ''
 
-    for var in private_variable:
-        my_string += var + ", "
+    #for var in private_variable:
+    #    my_string += var + ", "
 
-    for var in shared_variable:
-        my_string += "&" + var + ", "
+    #for var in shared_variable:
+    #    my_string += "&" + var + ", "
 
-    my_string = my_string.rstrip(", ")
-    my_string = "[" + my_string + "]"
+    #my_string = my_string.rstrip(", ")
+    #my_string = "[" + my_string + "]"
     #print my_string
     #print "assigned var:\n"
     #print assigned_var
+
 
     return private_variable, shared_variable, assigned_var, type_info
 
@@ -64,7 +66,7 @@ def tbb(node, start, stop, step):
     #print "----type_info------"
     #print type_info
 
-    out = "{\n"
+    out = "{"
 
     temp_list = []
     temp_assigned_var = set(assigned_var)
@@ -82,7 +84,7 @@ def tbb(node, start, stop, step):
     temp_str = "[" + temp_str + "]"
 
     for var, type in zip(assigned_var, type_info):
-        out += "tbb::enumerable_thread_specific<" + type + "> " + "_" + var + " = " + var + " ;\n"
+        out += "\ntbb::enumerable_thread_specific<" + type + "> " + "_" + var + " = " + var + " ;\n"
 
     out += "\ntbb::parallel_for(tbb::blocked_range<size_t>(" + start + ", " + stop + "+1" + \
                   "),\n" + temp_str + "(const tbb::blocked_range<size_t>& _range) \n{\n"

@@ -1,3 +1,5 @@
+Var_false = "int"
+Var_true = "int"
 Var_pi = "double"
 Get_linspace = "rowvec"
 
@@ -414,6 +416,12 @@ def Get_exp(node):
     node.type = node[0].type
 
 def Get_log(node):
+    node.type = node[0].type
+
+def Get_cos(node):
+    node.type = node[0].type
+
+def Get_sin(node):
     node.type = node[0].type
 
 Get_tic = "string"

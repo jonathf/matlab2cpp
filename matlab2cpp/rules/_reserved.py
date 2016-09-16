@@ -11,6 +11,7 @@ import matlab2cpp as mc
 reserved = {
 "and", "or", "not", "all", "any", "isequal",
 "false", "true", "pi", "inf", "Inf", "nan", "NaN",
+"eps",
 "eye", "flipud", "length", "max", "min", "size", "chol",
 "transpose", "ctranspose",
 "abs", "sqrt", "nextpow2", "fft", "ifft", "hankel",
@@ -24,6 +25,7 @@ reserved = {
 "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
 "xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
 "_splot", "logspace", "find", "exp", "log",
+"cos", "sin",
 }
 
 # Common attribute
@@ -41,6 +43,7 @@ Var_inf = "datum::inf"
 Var_Inf = "datum::inf"
 Var_nan = "datum::nan"
 Var_NaN = "datum::nan"
+Var_eps = "datum::eps"
 
 # Special handle of 'i'-variable
 """ removed from reserved: "i",
@@ -1101,6 +1104,12 @@ def Get_exp(node):
 
 def Get_log(node):
     return "log(", ", ", ")"
+
+def Get_cos(node):
+    return "cos(", ", ", ")"
+
+def Get_sin(node):
+    return "sin(", ", ", ")"
 
 if __name__ == "__main__":
     import doctest
