@@ -11,11 +11,13 @@ import matlab2cpp as mc
 reserved = {
 "and", "or", "not", "all", "any", "isequal",
 "false", "true", "pi", "inf", "Inf", "nan", "NaN",
-"eps",
+"eps", "exp", "log", "log2", "log10", "power", "floor", "ceil",
+"cos", "acos", "cosh", "acosh",
+"sin",
 "eye", "flipud", "length", "max", "min", "size", "chol",
 "transpose", "ctranspose",
 "abs", "sqrt", "nextpow2", "fft", "ifft", "hankel",
-"zeros", "ones", "round", "return", "rand", "floor",
+"zeros", "ones", "round", "return", "rand",
 "clear", "close", "clc", "clf", 
 "_conv_to", "_reshape", "reshape",
 "interp1", "linspace", "varargins",
@@ -24,8 +26,7 @@ reserved = {
 "figure", "clf", "cla", "show", "xlabel", "ylabel", "hold",
 "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
 "xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
-"_splot", "logspace", "find", "exp", "log",
-"cos", "sin",
+"_splot", "logspace", "find",
 }
 
 # Common attribute
@@ -44,6 +45,115 @@ Var_Inf = "datum::inf"
 Var_nan = "datum::nan"
 Var_NaN = "datum::nan"
 Var_eps = "datum::eps"
+
+def Get_exp(node):
+    # scalar done through std
+    if node[0].dim == 0 and node[0].mem != 4:
+        node.include("cmath")
+        return "std::exp(", ", ", ")"
+
+    return "arma::exp(", ", ", ")"
+
+def Get_log(node):
+    # scalar done through std
+    if node[0].dim == 0 and node[0].mem != 4:
+        node.include("cmath")
+        return "std::log(", ", ", ")"
+    return "arma::log(", ", ", ")"
+
+def Get_log2(node):
+    if node[0].dim == 0 and node[0].mem != 4:
+        node.include("cmath")
+        return "std::log(%(0)s)/std::log(2)"
+        #seems like it is a C++11 feature
+        #return "std::log2(", ", ", ")"
+    return "arma::log2(", ", ", ")"
+
+def Get_log10(node) :
+    if node[0].dim == 0 and node[0].mem != 4:
+        node.include("cmath")
+        return "std::log10(", ", ", ")"
+    return "arma::log10(", ", ", ")"
+
+def Get_power(node):
+    if node[0].dim == 0 and node[0].mem != 4:
+        node.include("cmath")
+        return "std::pow(", ", ", ")"
+    return "arma::pow(", ", ", ")"
+
+def Get_floor(node):
+    # unknown input
+    #if node[0].type == "TYPE":
+    #    return "floor(", ", ", ")"
+
+    # scalar done through std
+    if node[0].dim == 0 and node[0].mem != 4:
+        node.include("cmath")
+        return "std::floor(", ", ", ")"
+
+    return "arma::floor(", ", ", ")"
+
+def Get_ceil(node):
+    # scalar done through std
+    if node[0].dim == 0 and node[0].mem != 4:
+        node.include("cmath")
+        return "std::ceil(%(0)s)"
+
+    return "arma::ceil(%(0)s)"
+
+def Get_round(node):
+
+    assert len(node)<3
+
+    # number of decimals to retain
+    if len(node) == 2:
+        decimals = str(node[1])
+    else:
+        decimals = "0"
+
+    # int and uword do not have decimals
+    if node[0].mem < 2:
+        return "%(0)s"
+
+    # hack to cut-off for scalars
+    if node[0].dim == 0:
+        node.include("cmath")
+        if decimals == "0":
+            return "std::round(%(0)s)"
+        return "std::round(%(0)s*std::pow(10, %(1)s))*std::pow(10, -%(1)s)"
+
+    # hack for cut-off for array-type
+    if decimals == "0":
+        return "arma::round(%(0)s)"
+    return "arma::round(%(0)s*std::pow(10, %(1)s))*std::pow(10, -%(1)s)"
+
+def Get_cos(node):
+    if node[0].dim == 0 and node[0].mem != 4:
+        node.include("cmath")
+        return "std::cos(", ", ", ")"
+    return "arma::cos(", ", ", ")"
+
+def Get_acos(node):
+    if node[0].dim == 0 and node[0].mem != 4:
+        node.include("cmath")
+        return "std::acos(", ", ", ")"
+    return "arma::acos(", ", ", ")"
+
+def Get_cosh(node):
+    if node[0].dim == 0 and node[0].mem != 4:
+        node.include("cmath")
+        return "std::cosh(", ", ", ")"
+    return "arma::cosh(", ", ", ")"
+
+def Get_acosh(node):
+    if node[0].dim == 0 and node[0].mem != 4:
+        node.include("cmath")
+        #is a C++11 feature
+        return "std::acosh(", ", ", ")"
+    return "arma::acosh(", ", ", ")"
+
+def Get_sin(node):
+    return "sin(", ", ", ")"
 
 # Special handle of 'i'-variable
 """ removed from reserved: "i",
@@ -509,34 +619,6 @@ def Get_zeros(node):
 
     return "arma::zeros<%(type)s>(", ", ", ")"
 
-
-def Get_round(node):
-
-    assert len(node)<3
-
-    # number of decimals to retain
-    if len(node) == 2:
-        decimals = str(node[1])
-    else:
-        decimals = "0"
-
-    # int and uword do not have decimals
-    if node[0].mem < 2:
-        return "%(0)s"
-
-    # hack to cut-off for scalars
-    if node[0].dim == 0:
-        node.include("cmath")
-        if decimals == "0":
-            return "std::round(%(0)s)"
-        return "std::round(%(0)s*std::pow(10, %(1)s))*std::pow(10, -%(1)s)"
-
-    # hack for cut-off for array-type
-    if decimals == "0":
-        return "arma::round(%(0)s)"
-    return "arma::round(%(0)s*std::pow(10, %(1)s))*std::pow(10, -%(1)s)"
-
-
 def Var_rand(node):
     return "arma::randu<arma::vec>(1)"
 
@@ -563,20 +645,6 @@ def Get_rand(node):
 
     else:
         raise NotImplementedError
-
-
-def Get_floor(node):
-
-    # unknown input
-    if node[0].type == "TYPE":
-        return "floor(", ", ", ")"
-
-    # scalar done through std
-    if node[0].dim == 0:
-        return "std::floor(%(0)s)"
-
-    return "arma::floor(%(0)s)"
-
 
 def Var_clear(node):
     #index = node.parent.children.index(node)
@@ -1098,18 +1166,6 @@ def Get_logspace(node):
 
 def Get_find(node):
     return "find(", ", ", ") + 1"
-
-def Get_exp(node):
-    return "exp(", ", ", ")"
-
-def Get_log(node):
-    return "log(", ", ", ")"
-
-def Get_cos(node):
-    return "cos(", ", ", ")"
-
-def Get_sin(node):
-    return "sin(", ", ", ")"
 
 if __name__ == "__main__":
     import doctest

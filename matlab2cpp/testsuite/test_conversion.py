@@ -298,6 +298,7 @@ includes = [
 #include <armadillo>
 using namespace arma ;
 #include "mconvert.h"
+#include <cmath>
 
 mat fx_decon(mat DATA, double dt, int lf, double mu, double flow, int fhigh) ;
 void ar_modeling(cx_vec x, int lf, double mu, cx_vec& yf, cx_vec& yb) ;

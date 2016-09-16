@@ -3,6 +3,51 @@ Var_true = "int"
 Var_pi = "double"
 Get_linspace = "rowvec"
 
+def Get_exp(node):
+    node.type = node[0].type
+
+def Get_log(node):
+    node.type = node[0].type
+
+def Get_log2(node):
+    node.type = node[0].type
+
+def Get_log10(node):
+    node.type = node[0].type
+
+def Get_power(node):
+    node.type = node[0].type
+
+def Get_floor(node):
+    node.type = node[0].type
+
+def Get_ceil(node):
+    node.type = node[0].type
+
+def Get_round(node):
+    if len(node) == 1:
+        #int, float, double, uword
+        if node[0].dim == 0 and node[0].mem != 4:
+            node.type = "double"
+        #arma types
+        elif node[0].dim != 0:
+            node.type = node[0].type
+
+def Get_cos(node):
+    node.type = node[0].type
+
+def Get_acos(node):
+    node.type = node[0].type
+
+def Get_cosh(node):
+    node.type = node[0].type
+
+def Get_acosh(node):
+    node.type = node[0].type
+
+def Get_sin(node):
+    node.type = node[0].type
+
 def Get_sqrt(node):
     #if len(node) > 0 ...
     if len(node) and node[0].cls == "Neg":
@@ -303,14 +348,6 @@ def Get_zeros(node):
 
 Get_ones = Get_zeros
 
-def Get_round(node):
-    if len(node) == 1:
-        #int, float, double, uword
-        if node[0].dim == 0 and node[0].mem != 4:
-            node.type = "double"
-        #arma types
-        elif node[0].dim != 0:
-            node.type = node[0].type
 Var_rand = "vec"
 
 def Get_rand(node):
@@ -332,16 +369,6 @@ def Get_rand(node):
     # three args -> cube
     elif len(node) == 3:
         node.type = "cube"
-
-def Get_floor(node):
-
-    # unknown input
-    if node[0].type == "TYPE":
-        pass
-
-    # returns int
-    elif node[0].mem > 1:
-        node.type = (node[0].dim, 1)
 
 def Get_nextpow2(node):
     node.type = "int"
@@ -411,18 +438,6 @@ def Get_logspace(node):
 
 def Get_find(node):
     node.type = "uvec"
-
-def Get_exp(node):
-    node.type = node[0].type
-
-def Get_log(node):
-    node.type = node[0].type
-
-def Get_cos(node):
-    node.type = node[0].type
-
-def Get_sin(node):
-    node.type = node[0].type
 
 Get_tic = "string"
 
