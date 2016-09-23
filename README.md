@@ -1,4 +1,4 @@
-Matlab2cpp is a semi-automatic tool for converting code from Matlab to C++.
+m2cpp is a semi-automatic tool for converting code from Matlab to C++.
 
 Note that it is not meant as a complete tool for creating runnable C++ code.
 For example, the `eval`-function can not be supported because there is no
@@ -35,13 +35,13 @@ As root, run the following command::
 
     $ python setup.py install
 
-The executable ´mconvert´ is now available from path.
+The executable ´m2cpp´ is now available from path.
 
 Windows::
 
     > Python setup.py install
 
-The executable mconvert.py can freely be copied or be added to
+The executable m2cpp.py can freely be copied or be added to
 environmental variables manually (with or without the `.py` extension).
 
 Sphinx::
@@ -62,7 +62,7 @@ This only works for Bash and would require a restart of terminal emulator.
 An illustrating Example
 -----------------------
 
-Assuming Linux installation and `mconvert` available in path.
+Assuming Linux installation and `m2cpp` available in path.
 Code works analogous in Mac and Windows.
 
 Consider a file `example.m` with the following content::
@@ -77,7 +77,7 @@ Consider a file `example.m` with the following content::
 
 Run conversion on the file: ::
 
-    $ mconvert example.m
+    $ m2cpp example.m
 
 This will create two files: `example.m.hpp` and `example.m.py`.
 
@@ -101,7 +101,7 @@ follows::
       f(x) ;
     }
 
-Matlab doesn't declare variables explicitly, so Matlab2cpp is unable to complete
+Matlab doesn't declare variables explicitly, so m2cpp is unable to complete
 the translation.  To create a full conversion, the variables must be declared.
 Declarations can be done in the file `example.m.py`. After the first run, it
 will look as follows::
@@ -138,7 +138,7 @@ However, some times it is possible to guess some of the variable types from
 context.  To let the software try to guess variable types, run conversion with
 the `-s` flag::
 
-    $ mconvert example.m -s
+    $ m2cpp example.m -s
 
 The file `example.m.py` will then automatically be populated with data types
 from context::
