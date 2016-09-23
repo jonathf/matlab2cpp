@@ -153,7 +153,10 @@ def Get_acosh(node):
     return "arma::acosh(", ", ", ")"
 
 def Get_sin(node):
-    return "sin(", ", ", ")"
+    if node[0].dim == 0 and node[0].mem != 4:
+        node.include("cmath")
+        return "std::sin(", ", ", ")"
+    return "arma::sin(", ", ", ")"
 
 # Special handle of 'i'-variable
 """ removed from reserved: "i",
