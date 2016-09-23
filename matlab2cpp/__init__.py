@@ -29,7 +29,7 @@ The toolbox is sorted into the following modules:
 
 The simplest way to use the library is to use the quick translation functions.
 They are available through the `mc.qfunctions` module and mirrors the
-functionality offered by the `mconvert` function.
+functionality offered by the `m2cpp` function.
 """
 
 __version__ = 0.5
@@ -72,7 +72,7 @@ def main(args):
 Initiate the interpretation and conversion process.
 
 Args:
-    args (ArgumentParser): arguments parsed through mconvert
+    args (ArgumentParser): arguments parsed through m2cpp
     """
 
     builder = tree.builder.Builder(disp=args.disp, comments=args.comments,

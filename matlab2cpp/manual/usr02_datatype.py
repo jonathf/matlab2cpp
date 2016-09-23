@@ -265,7 +265,7 @@ filled in. Consider the following program where this is not the case::
 
 Since all variables are unknown, the program decides to fill in the dummy
 variable ``TYPE`` for each unknown variable. Any time variables are unknown,
-``TYPE`` is used. The supplement file created by `mconvert` or
+``TYPE`` is used. The supplement file created by `m2cpp` or
 :py:func:`~matlab2cpp.qpy` reflects all these unknown variables as follows::
 
     >>> print mc.qpy("function c=f(); a = 4; b = 4.; c = a+b", suggest=False)

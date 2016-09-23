@@ -46,8 +46,8 @@ if system == "Windows":
     print "> m2cpp -h"
     
 else:
-    mconvert = "cp -v m2cpp.py /usr/local/bin/m2cpp"
-    os.system(mconvert)
+    m2cpp = "cp -v m2cpp.py /usr/local/bin/m2cpp"
+    os.system(m2cpp)
     chmod = "chmod 755 /usr/local/bin/m2cpp"
     print chmod
     os.system(chmod)
