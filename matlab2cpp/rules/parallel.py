@@ -60,34 +60,49 @@ def variable_lists(node):
 
     return private_variable, shared_variable, assigned_var, type_info
 
+def omp(node, start, stop, step):
+    private_variable, shared_variable, assigned_var, type_info = variable_lists(node)
+
+    #out = "#pragma omp parallel for\nfor (%(0)s=" + start + \
+            #    "; %(0)s<=" + stop + "; %(0)s"
+
+    temp_str = ", ".join(assigned_var)
+    if temp_str:
+        temp_str = "firstprivate(" + temp_str + ")"
+
+    out = "#pragma omp parallel for " + temp_str + "\nfor (%(0)s=" + start + \
+                "; %(0)s<=" + stop + "; %(0)s"
+
+    return out
+
 def tbb(node, start, stop, step):
     private_variable, shared_variable, assigned_var, type_info = variable_lists(node)
 
     #print "----type_info------"
     #print type_info
 
-    out = "{"
+    out = "{\n"
 
-    temp_list = []
-    temp_assigned_var = set(assigned_var)
+    #temp_list = []
+    #temp_assigned_var = set(assigned_var)
 
-    for var in private_variable:
-        if var in temp_assigned_var:
-            temp_list.append("&_" + var)
-        else:
-            temp_list.append("&" + var)
+    #for var in private_variable:
+    #    if var in temp_assigned_var:
+    #        temp_list.append("&_" + var)
+    #    else:
+    #        temp_list.append("&" + var)
 
-    for var in shared_variable:
-        temp_list.append("&" + var)
+    #for var in shared_variable:
+    #    temp_list.append("&" + var)
 
-    temp_str = ", ".join(temp_list)
-    temp_str = "[" + temp_str + "]"
+    #temp_str = ", ".join(temp_list)
+    #temp_str = "[" + temp_str + "]"
 
     for var, type in zip(assigned_var, type_info):
-        out += "\ntbb::enumerable_thread_specific<" + type + "> " + "_" + var + " = " + var + " ;\n"
+        out += "tbb::enumerable_thread_specific<" + type + "> " + "_" + var + " = " + var + " ;\n"
 
-    out += "\ntbb::parallel_for(tbb::blocked_range<size_t>(" + start + ", " + stop + "+1" + \
-                  "),\n" + temp_str + "(const tbb::blocked_range<size_t>& _range) \n{\n"
+    out += "tbb::parallel_for(tbb::blocked_range<size_t>(" + start + ", " + stop + "+1" + \
+                  "),\n" + "[&]" + "(const tbb::blocked_range<size_t>& _range) \n{\n"
 
     #assign to local L, x, y
     for var, type in zip(assigned_var, type_info):
@@ -103,5 +118,5 @@ def tbb(node, start, stop, step):
 
     out += ")\n{\n%(2)s\n}"
     out += "\n}\n);\n"
-    out += "}\n"
+    out += "}"
     return out

@@ -112,7 +112,7 @@ Args:
             code = f.read()
             f.close()
 
-            code = re.sub('%#', '##', code)
+            #code = re.sub('%#', '##', code)
 
             #Here you have to change filename to current folder for .py files
             #local_name = pathOne + sep + os.path.basename(filename)

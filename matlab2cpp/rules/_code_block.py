@@ -8,6 +8,8 @@ and have the backend fixd to `code_block`.
 import matlab2cpp as mc
 import argparse
 
+import parallel
+
 def Statement(node):
     """
 Stand-alone codeline without assignment etc.
@@ -564,20 +566,26 @@ Examples:
         # return
         if omp:
             node.include("omp")
-            out = "\n#pragma omp parallel for\nfor (%(0)s=" + start + \
-                "; %(0)s<=" + stop + "; %(0)s"
+
+            out = parallel.omp(node, start, stop, step)
+
+            #out = "#pragma omp parallel for\nfor (%(0)s=" + start + \
+            #    "; %(0)s<=" + stop + "; %(0)s"
 
         elif tbb:
             node.include("tbb")
-            import parallel
+
             out = parallel.tbb(node, start, stop, step)
 
             return out
 
         else:
-            node.include("omp")
-            out = "\n#pragma omp parallel for\nfor (%(0)s=" + start + \
+            out = "for (%(0)s=" + start + \
                   "; %(0)s<=" + stop + "; %(0)s"
+            #node.include("omp")
+            #out = "\n#pragma omp parallel for\nfor (%(0)s=" + start + \
+            #      "; %(0)s<=" + stop + "; %(0)s"
+
 
         # special case for '+= 1'
         if step == "1":
@@ -593,8 +601,7 @@ Examples:
         return out
 
     # default
-    return """#pragma omp parallel for
-for (int _%(0)s=0; _%(0)s<length(%(1)s); _%(0)s++)
+    return """for (int _%(0)s=0; _%(0)s<length(%(1)s); _%(0)s++)
 {
 %(0)s = %(1)s[_%(0)s] ;
 %(2)s
@@ -639,8 +646,11 @@ Examples:
     }
     """
     var, range = node[:2]
+    omp = node.project.builder.enable_omp
+    tbb = node.project.builder.enable_tbb
+
     index = node.parent.children.index(node)
-    tbb = node.parent.children[index - 1].cls
+    parallel_loop = node.parent.children[index - 1].cls in ["Pragma_for", "Tbb_for"]
 
     if range.cls == "Colon":
         # <start>:<stop>
@@ -653,8 +663,14 @@ Examples:
             start, step, stop = range
         start, step, stop = map(str, [start, step, stop])
 
-        if tbb == "Tbb_for" and node.project.builder.enable_tbb:
-            import parallel
+        if omp and parallel_loop:
+            node.include("omp")
+
+            out = parallel.omp(node, start, stop, step)
+            #out = "#pragma omp parallel for\nfor (%(0)s=" + start + \
+            #    "; %(0)s<=" + stop + "; %(0)s"
+
+        elif tbb and parallel_loop:
 
             node.include("tbb")
 
@@ -706,11 +722,13 @@ Examples:
 }"""
 
 def Pragma_for(node):
-    node.include("omp")
-    return "\n#pragma omp parallel for %(value)s"
+    #node.include("omp")
+    #return node
+    #return "//__percent__%(value)s"
+    return ""
 
-def Tbb_for(node):
-    return node
+#def Tbb_for(node):
+#    return node
 
 def Bcomment(node):
     """
