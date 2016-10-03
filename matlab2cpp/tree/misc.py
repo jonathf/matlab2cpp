@@ -258,46 +258,6 @@ def pragma_for(self, parent, cur):
 
     return end
 
-"""
-def pragma_for(self, parent, cur):
-
-    assert parent.cls == "Block"
-
-    if self.code[cur:cur+5] != "##OMP":
-        self.syntaxerror(cur, "pragma_for")
-
-    k = cur+5
-
-    end = findend.pragma_for(self, k)
-    
-    if self.disp:
-        print "%4d   Pragma_for     " % cur,
-        print "%-20s" % "misc.pragma_for",
-        print repr(self.code[cur+6:end])
-        
-    mc.collection.Pragma_for(parent, self.code[cur+6:end], cur=cur)
-
-    return end
-"""
-"""
-def tbb_for(self, parent, cur):
-    assert parent.cls == "Block"
-
-    if self.code[cur:cur+5] != "##TBB":
-        self.syntaxerror(cur, "tbb_parfor")
-
-    k = cur+5
-    end = findend.tbb_for(self, k)
-
-    if self.disp:
-        print "%4d   Tbb_for     " % cur,
-        print "%-20s" % "misc.tbb_for",
-        print repr(self.code[cur + 6:end])
-
-    mc.collection.Tbb_for(parent, self.code[cur + 6:end], cur=cur)
-
-    return end
-"""
 def comment(self, parent, cur):
     """
 Comments on any form

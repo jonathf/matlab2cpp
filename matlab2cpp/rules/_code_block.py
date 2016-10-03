@@ -528,19 +528,16 @@ Children:
 
 Examples:
     >>> print mc.qscript("parfor i=1:10; a")
-    #pragma omp parallel for
     for (i=1; i<=10; i++)
     {
       a ;
     }
     >>> print mc.qscript("parfor i=1:2:10; a")
-    #pragma omp parallel for
     for (i=1; i<=10; i+=2)
     {
       a ;
     }
     >>> print mc.qscript("parfor i=a; b")
-    #pragma omp parallel for
     for (int _i=0; _i<length(a); _i++)
     {
       i = a[_i] ;
@@ -569,9 +566,6 @@ Examples:
 
             out = parallel.omp(node, start, stop, step)
 
-            #out = "#pragma omp parallel for\nfor (%(0)s=" + start + \
-            #    "; %(0)s<=" + stop + "; %(0)s"
-
         elif tbb:
             node.include("tbb")
 
@@ -582,10 +576,6 @@ Examples:
         else:
             out = "for (%(0)s=" + start + \
                   "; %(0)s<=" + stop + "; %(0)s"
-            #node.include("omp")
-            #out = "\n#pragma omp parallel for\nfor (%(0)s=" + start + \
-            #      "; %(0)s<=" + stop + "; %(0)s"
-
 
         # special case for '+= 1'
         if step == "1":
@@ -667,25 +657,10 @@ Examples:
             node.include("omp")
 
             out = parallel.omp(node, start, stop, step)
-            #out = "#pragma omp parallel for\nfor (%(0)s=" + start + \
-            #    "; %(0)s<=" + stop + "; %(0)s"
 
         elif tbb and parallel_loop:
-
             node.include("tbb")
-
             out = parallel.tbb(node, start, stop, step)
-
-
-            #out = "tbb::parallel_for(tbb::blocked_range<" + node[0].type + ">(" + start + ", " + stop + "+1" + \
-            #      "),\n[&](const tbb::blocked_range<" + node[0].type + ">& range)\n{" + \
-            #      "\nfor (%(0)s = range.begin();" + \
-            #      " %(0)s != range.end(); %(0)s"
-
-            #out += ")\n{\n%(2)s\n}"
-
-            #if tbb == "Tbb_for":
-            #    out += "\n}\n);\n"
 
             return out
 
@@ -700,9 +675,6 @@ Examples:
             out += "+=" + step
 
         out += ")\n{\n%(2)s\n}"
-
-        #if tbb == "Tbb_for":
-        #    out += "\n});\n"
 
         return out
 
@@ -726,9 +698,6 @@ def Pragma_for(node):
     #return node
     #return "//__percent__%(value)s"
     return ""
-
-#def Tbb_for(node):
-#    return node
 
 def Bcomment(node):
     """
