@@ -599,6 +599,8 @@ See also:
     node.str = value
 
 
+#wanted a static variable in function include below
+created_file = []
 def include(node, name, **kws):
     """
 Backend for the :py:func:`~matlab2cpp.Node.include` function.
@@ -636,10 +638,11 @@ See also:
                 output_file_path = os.getcwd() + sep + "SPlot.h"
 
                 #if mconvert.h not found in directory, create the file
-                if not os.path.isfile(output_file_path):
+                if not os.path.isfile(output_file_path) or "SPlot.h" not in created_file:
                     f = open(output_file_path, "w")
                     f.write(matlab2cpp.pyplot.code)
                     f.close()
+                    created_file.append("SPlot.h")
             except:
                 pass
                 
@@ -655,10 +658,11 @@ See also:
                 output_file_path = os.getcwd() + sep + "mconvert.h"
 
                 #if mconvert.h not found in directory, create the file
-                if not os.path.isfile(output_file_path):
+                if not os.path.isfile(output_file_path) or "mconvert.h" not in created_file:
                     f = open(output_file_path, "w")
                     f.write(matlab2cpp.m2cpp.code)
                     f.close()
+                    created_file.append("mconvert.h")
             except:
                 pass
                 
@@ -683,6 +687,8 @@ See also:
                 value=includes.value)
         include.backend="program"
 
+    #node.program[2] is inlines. I don't think inlines are used anymore
+    #if you look at variable library_code above, it is set to ""
     inlines_ = node.program[2]
     if library_code and library_code not in inlines_.names:
         inline = matlab2cpp.collection.Inline(inlines_, library_code)
