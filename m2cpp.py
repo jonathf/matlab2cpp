@@ -58,7 +58,7 @@ parser.add_argument("-d", '--disp', action="store_true",
         help="""\
 Print out the progress of the translation process.""")
 
-parser.add_argument("-p", "--paths_file", nargs='?', default='',
+parser.add_argument("-p", "--paths_file", nargs=1,
         help="""\
 Flag and paths_file (-p path_to_pathsfile). m2cpp will look for matlab files in the location specified in the paths_file""")
 
