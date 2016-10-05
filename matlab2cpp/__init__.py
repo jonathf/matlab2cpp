@@ -82,7 +82,7 @@ Args:
     #read setpath.m file and return string list of paths
     if args.paths_file:
         import setpaths
-        paths_from_file = setpaths.multiple_folder_paths(args.paths_file)
+        paths_from_file = setpaths.multiple_folder_paths(args.paths_file[0])
 
     pathOne = os.path.dirname(os.path.abspath(args.filename))
 
