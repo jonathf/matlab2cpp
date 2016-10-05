@@ -12,7 +12,7 @@ from distutils.core import setup
 
 setup(
     name='matlab2cpp',
-    version='0.3',
+    version='0.5',
     packages=['matlab2cpp', 'matlab2cpp/node', 'matlab2cpp/tree',
         'matlab2cpp/rules', 'matlab2cpp/testsuite', 'matlab2cpp/supplement',
         'matlab2cpp/manual', 'matlab2cpp/configure'],
