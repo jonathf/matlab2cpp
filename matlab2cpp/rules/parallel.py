@@ -15,8 +15,9 @@ def variable_lists(node):
             #index = n.parent.children.index(n)
 
             if n[0].cls == "Var":
-                assigned_var.append(n[0].name)
-                type_info.append(n[0].type)
+                if n[0].name not in assigned_var:
+                    assigned_var.append(n[0].name)
+                    type_info.append(n[0].type)
             """
             if n[0].cls == "Set":
                 var_name = n[0].name
@@ -33,8 +34,9 @@ def variable_lists(node):
             """
 
         if n.cls == "Var" and n.parent.cls == "For":
-            assigned_var.append(n.name)
-            type_info.append(n.type)
+            if n.name not in assigned_var:
+                assigned_var.append(n.name)
+                type_info.append(n.type)
 
     #shared_variable = list(set(shared_variable))
     #print shared_variable
