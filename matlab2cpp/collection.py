@@ -198,7 +198,7 @@ __all__ = [
 "Counter", "Cset", "Ctranspose", "Cvar", 
 "Declares", "Ecomment",
 "Elementdivision", "Elexp", "Elif", "Elmul", "Else", "End", "Eq", "Error",
-"Exp", "Expr", "Fget", "Float", "Parfor", "Pragma_for", "Tbb_for", "For", "Fset", "Func", "Funcs", "Fvar", "Ge",
+"Exp", "Expr", "Fget", "Float", "Parfor", "Pragma_for", "For", "Fset", "Func", "Funcs", "Fvar", "Ge",
 "Get", "Gt", "Header", "Headers", "If", "Imag", "Include", "Includes", "Inline",
 "Inlines", "Int", "Lambda", "Land", "Lcomment", "Le", "Leftelementdivision",
 "Leftmatrixdivision", "Log", "Lor", "Lt", "Main", "Matrix", "Matrixdivision",
@@ -392,10 +392,6 @@ class Lambda(Node):
         Node.__init__(self, parent, name=name, **kws)
 
 class Pragma_for(Node):
-    def __init__(self, parent, value, **kws):
-        Node.__init__(self, parent, value=value, **kws)
-
-class Tbb_for(Node):
     def __init__(self, parent, value, **kws):
         Node.__init__(self, parent, value=value, **kws)
 

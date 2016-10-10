@@ -241,6 +241,7 @@ file specifies the number of elements in the integer ``_size``:
       'using namespace arma ;',
     ]
 
+.. _usr02_suggestion_engine:
 
 Suggestion engine
 -----------------
@@ -265,7 +266,7 @@ filled in. Consider the following program where this is not the case::
 
 Since all variables are unknown, the program decides to fill in the dummy
 variable ``TYPE`` for each unknown variable. Any time variables are unknown,
-``TYPE`` is used. The supplement file created by `mconvert` or
+``TYPE`` is used. The supplement file created by `m2cpp` or
 :py:func:`~matlab2cpp.qpy` reflects all these unknown variables as follows::
 
     >>> print mc.qpy("function c=f(); a = 4; b = 4.; c = a+b", suggest=False)
@@ -410,6 +411,46 @@ multiple lines. For example::
     two line
     three line
     c = 3 ;
+
+Verbatims can also be utilized by modifying the .py file. Consider the Matlab script::
+
+    a = 1 ;
+    b = 2 ;
+    c = 3 ;
+
+Using the m2cpp script to translate the Matlab script produces a C++ file and a .py file. By adding code to the .py file, verbatim translation can be added. This is done by using the keyword verbatims and setting it to a python dictionary. Similar to vtype, keys are strings found in the original code, and the values are string of the replacement::
+
+    functions = {
+    "main" : {
+    "a" : "int",
+    "b" : "int",
+    "c" : "int",
+    },
+    }
+    includes = [
+    '#include <armadillo>',
+    'using namespace arma ;',
+    ]
+    verbatims = {"b = 2 ;" : '''one line
+    two line
+    tree line'''
+    }
+
+In the generated C++ file the second assignment is replaced with the verbatim translation::
+
+    int main(int argc, char** argv)
+    {
+      int a, c ;
+      a = 1 ;
+      // b = 2 ;
+      one line
+      two line
+      tree line
+      c = 3 ;
+      return 0 ;
+    }
+
+   
 """
 import matlab2cpp as mc
 

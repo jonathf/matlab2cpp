@@ -39,7 +39,7 @@ e = [6; 7]
     f.write(m_code)
     f.close()
 
-    os.system("mconvert test.m -rs > /dev/null")
+    os.system("m2cpp test.m -rs > /dev/null")
 
     f = open("test.m.cpp", "r")
     converted_code = f.read()
@@ -93,7 +93,7 @@ end
     f.write(m_code)
     f.close()
 
-    os.system("mconvert test.m -rs > /dev/null")
+    os.system("m2cpp test.m -rs > /dev/null")
 
     f = open("test.m.hpp", "r")
     converted_code = f.read()
@@ -150,7 +150,7 @@ end
     f.write(m_code)
     f.close()
 
-    os.system("mconvert test.m -rs > /dev/null")
+    os.system("m2cpp test.m -rs > /dev/null")
 
     f = open("test.m.hpp", "r")
     converted_code = f.read()
@@ -385,7 +385,7 @@ void ar_modeling(cx_vec x, int lf, double mu, cx_vec& yf, cx_vec& yb)
     f.write(py_file)
     f.close()
 
-    os.system("mconvert fx_decon.m -s > /dev/null")
+    os.system("m2cpp fx_decon.m -s > /dev/null")
 
     f = open("fx_decon.m.hpp", "r")
     converted_code = "\n".join(f.read().split("\n")[2:]).strip()

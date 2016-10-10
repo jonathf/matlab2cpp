@@ -233,7 +233,7 @@ Example:
     while self.code[end] in " \t":
         end += 1
 
-    if  self.code[end] not in ")}":
+    if self.code[end] not in ")}":
         self.syntaxerror(cur, "end of list character")
 
     return end
@@ -242,37 +242,19 @@ def pragma_for(self, parent, cur):
 
     assert parent.cls == "Block"
 
-    if self.code[cur:cur+5] != "##OMP":
+    if self.code[cur:cur+8] != "%#PARFOR":
         self.syntaxerror(cur, "pragma_for")
 
-    k = cur+5
+    k = cur+8
 
     end = findend.pragma_for(self, k)
-    
+
     if self.disp:
-        print "%4d   Pragma_for     " % cur,
+        print "%4d   Pragma_for   " % cur,
         print "%-20s" % "misc.pragma_for",
-        print repr(self.code[cur+6:end])
-        
-    mc.collection.Pragma_for(parent, self.code[cur+6:end], cur=cur)
+        print repr(self.code[cur:end])
 
-    return end
-
-def tbb_for(self, parent, cur):
-    assert parent.cls == "Block"
-
-    if self.code[cur:cur+5] != "##TBB":
-        self.syntaxerror(cur, "tbb_parfor")
-
-    k = cur+5
-    end = findend.tbb_for(self, k)
-
-    if self.disp:
-        print "%4d   Tbb_for     " % cur,
-        print "%-20s" % "misc.tbb_for",
-        print repr(self.code[cur + 6:end])
-
-    mc.collection.Tbb_for(parent, self.code[cur + 6:end], cur=cur)
+    mc.collection.Pragma_for(parent, self.code[cur+1:end], cur=cur)
 
     return end
 
