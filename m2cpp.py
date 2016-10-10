@@ -32,9 +32,7 @@ parser.add_argument("-s", '--suggest', action="store_true",
 Automatically populate the `<filename>.py` file with datatype with suggestions
 if possible.""")
 parser.add_argument("-S", '--matlab-suggest', action="store_true",
-        help="""Creates a folder m2cpp_temp. In the folder the matlab file(s) to be translated are also put. These matlab file(s) are slightly modified so that they output data-type information of the variables to file(s). This output can then be used to set the datatypes for the translation.
-
-1)m2cpp "file.m" -S, 2)run the code m2cpp_temp code with matlab to create the data-type files, 3)m2cpp "file.m" -S will create matlab file in m2cpp_temp again. Now that the data-type files are found, the extracted information will be used to set the data-types.""")
+        help="""Creates a folder m2cpp_temp. In the folder the matlab file(s) to be translated are also put. These matlab file(s) are slightly modified so that they output data-type information of the variables to file(s). This output can then be used to set the datatypes for the translation.""")
 
 parser.add_argument("-r", '--reset', action="store_true",
         help="""\
@@ -58,7 +56,7 @@ parser.add_argument("-d", '--disp', action="store_true",
         help="""\
 Print out the progress of the translation process.""")
 
-parser.add_argument("-p", "--paths_file", nargs=1,
+parser.add_argument("-p", "--paths_file", type=str, dest="paths_file",
         help="""\
 Flag and paths_file (-p path_to_pathsfile). m2cpp will look for matlab files in the location specified in the paths_file""")
 

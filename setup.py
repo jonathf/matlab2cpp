@@ -24,7 +24,8 @@ setup(
     description='Matlab to C++ converter'
 )
 
-"""OPTIONAL this will not add path to environment variable, only make m2cpp script"""
+"""OPTIONAL the code below will copy the executable m2cpp to a folder which is in path."""
+#Windows
 if system == "Windows":
     system_path = sys.executable
     cwdir = os.getcwd()
@@ -45,7 +46,7 @@ if system == "Windows":
     print "Program now runnable through 'm2cpp'"
     print "> m2cpp -h"
     
-else:
+else: #Linux/Mac
     m2cpp = "cp -v m2cpp.py /usr/local/bin/m2cpp"
     os.system(m2cpp)
     chmod = "chmod 755 /usr/local/bin/m2cpp"

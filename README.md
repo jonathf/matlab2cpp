@@ -1,4 +1,4 @@
-m2cpp is a semi-automatic tool for converting code from Matlab to C++.
+matlab2cpp is a semi-automatic tool for converting code from Matlab to C++. At the moment, matlab2cpp is the name of the python module while m2cpp is the name of the python script. m2cpp is found in the root folder. When installing the matlab2cpp module, the python script is copied to a system folder so that the script is available in path. Then the m2cpp script can be executed by typing "m2cpp" in the command line interface (cmd in Windows, terminal in Linux).
 
 Note that it is not meant as a complete tool for creating runnable C++ code.
 For example, the `eval`-function can not be supported because there is no
@@ -23,9 +23,11 @@ Requirements:
 * Python 2.7.3
 * Armadillo (Not required for running, but generator
   creates armadillo code.)
+* C++11 (Plotting and TBB require C++11)
 
 Optional:
 
+* TBB
 * Sphinx (for compiling documentation)
 * Argcomplete (for tab-completion support)
 
@@ -35,14 +37,33 @@ As root, run the following command::
 
     $ python setup.py install
 
+In addition to installing the matlab2cpp module, the executable ´m2cpp´ is copied to "/usr/local/bin/"
 The executable ´m2cpp´ is now available from path.
 
-Windows::
+Windows:
 
     > Python setup.py install
 
-The executable m2cpp.py can freely be copied or be added to
-environmental variables manually (with or without the `.py` extension).
+A bat script is created so that m2cpp.py can be executed by typing m2cpp.
+The bat script and m2cpp.py is copied to "sys.executable". "sys.executable" is the location where Python is installed.
+The executable ´m2cpp´ is now available from path.
+
+Linux, Mac, Windows:
+
+If you want to put the executable m2cpp in another place, modify the setup.py file. From line 27 starts the code which
+makes the m2cpp.py file available from path. Alternatively, remove the code from line 27. The executable m2cpp.py can freely be copied or be added to path or environmental variables manually (with or without the `.py` extension).
+
+Armadillo:
+
+Armadillo is a linear algebra library for the C++ language. The Armadillo library can be found at http://arma.sourceforge.net. 
+Some functionality in Armadillo rely on a math library like LAPACK, BLAS, OpenBLAS or MKL. When installing Armadillo, it will look for installed math libraries. 
+If Armadillo is installed, the library can be linked with the link flag `-larmadillo`. Armadillo can also be linked directly, see the `FAQ` at the Armadillo webpage for more information. 
+
+I believe MKL is the fastest math library and it can be downloaded for free at https://software.intel.com/en-us/articles/free-mkl.
+
+TBB:
+
+By inserting pragmas in the Matlab code, for loops can be marked by the user. The program can then either insert OpenMP or TBB code to parallelize the for loop. To compile TBB code, the TBB library has to be installed. See :ref:`parallel_flags` for more details.
 
 Sphinx::
 
@@ -62,7 +83,7 @@ This only works for Bash and would require a restart of terminal emulator.
 An illustrating Example
 -----------------------
 
-Assuming Linux installation and `m2cpp` available in path.
+Assuming Linux installation and `m2cpp` is available in path.
 Code works analogous in Mac and Windows.
 
 Consider a file `example.m` with the following content::
