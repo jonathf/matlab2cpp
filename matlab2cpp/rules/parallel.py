@@ -3,8 +3,6 @@ def variable_lists(node):
     nodes = node.flatten(ordered=False, reverse=False, inverse=False)
 
     #store some variable names, in private or shared
-    #private_variable = []
-    #shared_variable = []
     assigned_var = []
     type_info = []
 
@@ -13,11 +11,13 @@ def variable_lists(node):
     for n in nodes:
         if n.cls == "Assign":
             #index = n.parent.children.index(n)
-
+            #lhs var of the assignment
             if n[0].cls == "Var":
                 if n[0].name not in assigned_var:
                     assigned_var.append(n[0].name)
                     type_info.append(n[0].type)
+
+
             """
             if n[0].cls == "Set":
                 var_name = n[0].name
@@ -33,6 +33,16 @@ def variable_lists(node):
                         #print subnode.name
             """
 
+        #multiple return from function are assigned to vars
+        if n.cls == "Assigns" and n.backend == "func_returns":
+            for sub_node in n:
+                if sub_node.cls == "Var":
+                    if sub_node.name not in assigned_var:
+                        assigned_var.append(sub_node.name)
+                        type_info.append(sub_node.type)
+
+
+        #get the iteration variable in the for loop
         if n.cls == "Var" and n.parent.cls == "For":
             if n.name not in assigned_var:
                 assigned_var.append(n.name)

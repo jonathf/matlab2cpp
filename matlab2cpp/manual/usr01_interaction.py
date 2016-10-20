@@ -35,10 +35,24 @@ these have to be available for this option to work. The Matlab suggest option is
 but still quite good at suggesting datatypes. A downside with the using Matlab to suggest
 datatypes, is that Matlab takes some time to start up and then run the (Matlab) code.
 
+Multiple directories, -p paths_file
+-----------------------------------
+
+In Matlab the script and function files have to be in the same folder for the function files to be found. To call a function script located in a different folder, the folder has to be added to path. This can be done with `addpath` or `path`. In a separate file from the Matlab main and function scripts, a separate script can be written to set the path to different folders::
+
+    Dir='/path_to_folder/SeismicLab/codes/';
+    path(path, strcat(Dir,'bp_filter/'));
+    path(path, strcat(Dir,'decon'));
+    path(path, strcat(Dir,'dephasing'));
+    path(path, strcat(Dir,'fx'));
+    ...
+
+The flag option `-p paths_file` can be set to parse such a file. Then Matlab as well as m2cpp can find function scripts that are located in other directories.
+    
 .. _parallel_flags:
 
-Parallel flags -omp, -tbb
--------------------------
+Parallel flags, -omp, -tbb
+--------------------------
 
 The program m2cpp can do parallelization of simple for loops (so called embarrasingly parallel).
 To let the program know which loops the user wants to parallelize, use the pragma `%#PARFOR`
