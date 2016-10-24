@@ -5,15 +5,16 @@ Variable interpretor
 import matlab2cpp as mc
 import constants as c
 import findend
+import iterate
 
 
-def assign(self, node, cur, end=None):
+def assign(self, parent, cur, end=None):
     """
 Variable left side of an assignment
 
 Args:
     self (Builder): Code constructor
-    node (Node): Parent node
+    parent (Node): Parent node
     cur (int): Current position in code
 
 Kwargs:
@@ -65,7 +66,7 @@ Example:
         if self.code[end] == "(":
 
             end = findend.paren(self, end)
-            node = mc.collection.Cset(node, name, cur=cur,
+            node = mc.collection.Cset(parent, name, cur=cur,
                     code=self.code[cur:end+1])
 
             if self.disp:
@@ -76,7 +77,10 @@ Example:
             n_fields = 0
             while self.code[k] == "{":
 
-                cur = self.iterate_cell(node, k)
+                #cur = self.iterate_cell(node, k)
+                cur = findend.cell(self, k)
+                #cur = iterate.comma_list(node, k)
+
                 k = cur+1
                 while self.code[k] in " \t":
                     k += 1
@@ -95,7 +99,7 @@ Example:
 
         else:
             end = findend.cell(self, k)
-            node = mc.collection.Cvar(node, name, cur=cur,
+            node = mc.collection.Cvar(parent, name, cur=cur,
                     code=self.code[cur:end+1])
 
             if self.disp:
@@ -106,7 +110,24 @@ Example:
             num = 0
             while self.code[k] == "{":
 
-                cur = self.iterate_cell(node, k)
+                cur = findend.cell(self, k)
+                #cur = self.iterate_cell(node, k)
+
+                #print node.code
+                #print k
+                #print "\n\n"
+
+                #l = 0
+                #while node.code[l] in c.letters+c.digits+"_":
+                #    l += 1
+
+                #list = iterate.comma_list(node, l)
+                #for tup in list:
+                #    mc.collection.Var(node, node.code[tup[0]:tup[1]+1])
+
+                #print list
+                #print "LISTAT\n\n"
+
                 k = cur+1
                 while self.code[k] in " \t":
                     k += 1
@@ -131,7 +152,7 @@ Example:
                 print "%-20s" % "variables.assign",
                 print repr(self.code[cur:end])
 
-            node = mc.collection.Sset(node, name, value, cur=cur,
+            node = mc.collection.Sset(parent, name, value, cur=cur,
                     code=self.code[cur:end], pointer=1)
 
             last = self.create_list(node, k)
@@ -145,7 +166,7 @@ Example:
                 print "%-20s" % "variables.assign",
                 print repr(self.code[cur:end+1])
 
-            node = mc.collection.Set(node, name, cur=cur,
+            node = mc.collection.Set(parent, name, cur=cur,
                     code=self.code[cur:end+1])
 
             last = self.create_list(node, k)
@@ -171,7 +192,7 @@ Example:
                 print repr(self.code[cur:end+1])
 
 
-            node = mc.collection.Nset(node, name)
+            node = mc.collection.Nset(parent, name)
             node.cur = cur
             node.code = self.code[cur:end+1]
 
@@ -199,7 +220,7 @@ Example:
                     print "%-20s" % "variables.assign",
                     print repr(self.code[cur:end+1])
 
-                node = mc.collection.Fset(node, name, value=value, cur=cur,
+                node = mc.collection.Fset(parent, name, value=value, cur=cur,
                         code=self.code[cur:end+1])
 
                 cur = self.create_list(node, j)
@@ -212,7 +233,7 @@ Example:
                     print "%-20s" % "variables.assign",
                     print repr(self.code[cur:last+1])
 
-                node = mc.collection.Fvar(node, name, value=value, cur=cur,
+                node = mc.collection.Fvar(parent, name, value=value, cur=cur,
                         code=self.code[cur:last+1])
 
                 cur = last
@@ -225,7 +246,7 @@ Example:
             print repr(self.code[cur:last])
 
 
-        node = mc.collection.Var(node, name, cur=cur,
+        node = mc.collection.Var(parent, name, cur=cur,
                 code=self.code[cur:last])
 
         cur = last-1
@@ -305,7 +326,10 @@ Example:
             n_fields = 0
             while self.code[k] == "{":
 
-                cur = self.iterate_cell(node, k)
+                cur = findend.cell(self, k)
+                #cur = self.iterate_cell(node, k)
+                #cur = iterate.comma_list(node, k)
+
                 k = cur+1
                 while self.code[k] in " \t":
                     k += 1
