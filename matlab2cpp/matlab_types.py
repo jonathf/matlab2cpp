@@ -91,7 +91,8 @@ def mtypes(builder, args):
         import matlab.engine
 
         #Set path to -p "setpath.m" before changing current working directory
-        matlab_cmd = "run(\'" + os.path.abspath(args.paths_file).rstrip(".m") + "\')"
+        if args.paths_file:
+            matlab_cmd = "run(\'"+ os.path.abspath(args.paths_file).rstrip(".m") + "\')"
 
         cwdir = os.getcwd()
         os.chdir(dst_dir)
