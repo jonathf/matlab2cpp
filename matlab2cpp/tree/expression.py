@@ -226,7 +226,7 @@ Examples::
         return create(self, node, start, end)
 
     # Reserved keywords
-    elif self.code[start:start+3] == "end": # and self.code[start+3] in " \t" + c.e_end:
+    elif self.code[start:start+3] == "end" and self.code[start+3] in " :\t" + c.e_end:
         node = mc.collection.End(node, cur=start, code=self.code[start:start+3])
 
     elif self.code[start:start+6] == "return" and self.code[start+6] in " ,;\n":
