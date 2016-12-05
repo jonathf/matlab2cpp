@@ -678,9 +678,6 @@ def Var_clf(node):
 def Get_clf(node):
     return "// clf"
 
-def Get_close(node):
-    return "// clc(", ", ", ")"
-
 def Get__conv_to(node):
     return "conv_to<%(type)s>::from(%(0)s)"
 

@@ -547,6 +547,8 @@ See also:
 
     # let rule create a translation
     if not isinstance(value, (unicode, str, list, tuple)):
+        #print node.code
+        #print "\n\n"
         value = value(node)
 
     # not quite right format
@@ -554,6 +556,12 @@ See also:
         value = str(value)
 
     elif value is None:
+        #print "\n\nerror:"
+        #print node.code
+        #print node.parent.code
+
+        #print node.parent.parent.code
+        #print "\n"
         raise ValueError(
 "missing return in function %s in file %s" % (node.cls, node.backend))
 
@@ -588,6 +596,11 @@ See also:
     try:
         value = value % node.properties()
     except:
+
+        #print ".........."
+        #print node.code
+        #print "----------"
+        #print "\n\n"
         raise SyntaxError("interpolation in " + node.backend + "." +\
                 node.cls + " is misbehaving\n'" + value + "'\n" +\
                 str(node.prop)  + "\nCrash on line " + str(node.line) +\

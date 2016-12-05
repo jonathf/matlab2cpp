@@ -46,7 +46,7 @@ def complex_mul(nodes):
 # remove the nodes for clear, close and clc so they are not included in the translation
 def remove_close_clear_clc(nodes):
     for n in nodes:
-        if n.name in ("clear", "close", "clc"):
+        if n.backend == "reserved" and n.name in ("clear", "close", "clc"):
             index = n.parent.parent.children.index(n.parent)
             del n.parent.parent.children[index]
     return nodes
@@ -87,6 +87,7 @@ def remove_nargin(project):
         # for func in funcs
         funcs = program[1]
         for func in funcs:
+            #print func.summary()
             block = func[3]
 
             # find node.name == nargin
