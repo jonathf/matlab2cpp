@@ -18,6 +18,7 @@ reserved = {
 "transpose", "ctranspose",
 "abs", "sqrt", "nextpow2", "fft", "ifft", "hankel",
 "zeros", "ones", "round", "return", "rand",
+"qr",
 "clear", "close", "clc", "clf", 
 "_conv_to", "_reshape", "reshape",
 "interp1", "linspace", "varargins",
@@ -621,6 +622,15 @@ def Get_zeros(node):
                 return "arma::zeros<%(type)s>(%(0)s)"
 
     return "arma::zeros<%(type)s>(", ", ", ")"
+
+def Get_qr(node):
+    return "", ", ", ""
+
+def Assign_qr(node):
+    return "arma::qr(", ", ", ")"
+
+def Assigns_qr(node):
+    return "arma::qr(", ", ", ")"
 
 def Var_rand(node):
     return "arma::randu<arma::vec>(1)"
