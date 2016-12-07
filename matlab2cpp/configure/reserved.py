@@ -129,7 +129,10 @@ def Get_size(node):
           node.parent.name in ("min", "max"):
             node.type = "uword"
             return
-        
+        if len(node) == 1:
+            node.type = "urowvec"
+            return
+
         if node.parent.cls == "Get":
             return
 
