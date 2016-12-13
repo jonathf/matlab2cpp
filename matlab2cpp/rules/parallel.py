@@ -67,8 +67,9 @@ def omp(node, start, stop, step):
     #out = "#pragma omp parallel for\nfor (%(0)s=" + start + \
             #    "; %(0)s<=" + stop + "; %(0)s"
 
-    temp_str = ", ".join(assigned_var)
-    if temp_str:
+	temp_str = ""
+	if len(assigned_var) > 1:
+    	temp_str = ", ".join(assigned_var[1:])
         temp_str = "firstprivate(" + temp_str + ")"
 
     out = "#pragma omp parallel for " + temp_str + "\nfor (%(0)s=" + start + \
