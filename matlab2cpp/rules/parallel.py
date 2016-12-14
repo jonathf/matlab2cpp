@@ -80,17 +80,41 @@ def omp(node, start, stop, step):
 def tbb(node, start, stop, step):
     assigned_var, type_info = variable_lists(node)
 
+    #tbb.counter += 1
     out = "{\n"
 
+    #str_val = str(tbb.counter)
+    declare_struct = "struct tbb_var_struct" + "\n{"
+
     for var, type in zip(assigned_var, type_info):
-        out += "tbb::enumerable_thread_specific<" + type + "> " + "_" + var + " = " + var + " ;\n"
+        if type not in ["uword", "int", "float", "double"]:
+            declare_struct += "\n" + type + " " + var + ";"
+
+    declare_struct += "\n} " + ";\n"
+
+    declare_struct += "tbb::combinable<struct tbb_var_struct" + "> tbb_per_thread_data" + " ;\n"
+
+
+    out += declare_struct
+
+    #for var, type in zip(assigned_var, type_info):
+    #    out += "tbb::enumerable_thread_specific<" + type + "> " + "_" + var + " = " + var + " ;\n"
 
     out += "tbb::parallel_for(tbb::blocked_range<size_t>(" + start + ", " + stop + "+1" + \
                   "),\n" + "[&]" + "(const tbb::blocked_range<size_t>& _range) \n{\n"
 
     #assign to local L, x, y
     for var, type in zip(assigned_var, type_info):
-        out += type + "& " + var + " = _" + var + ".local() ;\n"
+        if type in ["uword", "int", "float", "double"]:
+            out += type + " " + var + ";\n"
+    out += "struct tbb_var_struct" + " tbb_struct_vars = tbb_per_thread_data" + ".local() ;\n"
+
+    for var, type in zip(assigned_var, type_info):
+        if type not in ["uword", "int", "float", "double"]:
+            out += type + "& " + var + " = " + "tbb_struct_vars." + var + ";\n"
+
+    #for var, type in zip(assigned_var, type_info):
+    #    out += type + "& " + var + " = _" + var + ".local() ;\n"
 
     out += "\nfor (" + "%(0)s = _range.begin(); %(0)s != _range.end(); %(0)s"
 
@@ -104,3 +128,5 @@ def tbb(node, start, stop, step):
     out += "\n}\n);\n"
     out += "}"
     return out
+
+#tbb.counter = 0
