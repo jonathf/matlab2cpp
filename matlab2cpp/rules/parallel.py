@@ -80,22 +80,26 @@ def omp(node, start, stop, step):
 def tbb(node, start, stop, step):
     assigned_var, type_info = variable_lists(node)
 
+    any_vec_or_mat = False
+    for var, type in zip(assigned_var, type_info):
+        if type not in ["uword", "int", "float", "double"]:
+            any_vec_or_mat = True
+
     #tbb.counter += 1
     out = "{\n"
 
     #str_val = str(tbb.counter)
-    declare_struct = "struct tbb_var_struct" + "\n{"
+    if any_vec_or_mat:
+        declare_struct = "struct tbb_var_struct" + "\n{"
 
-    for var, type in zip(assigned_var, type_info):
-        if type not in ["uword", "int", "float", "double"]:
-            declare_struct += "\n" + type + " " + var + ";"
+        for var, type in zip(assigned_var, type_info):
+            if type not in ["uword", "int", "float", "double"]:
+                declare_struct += "\n" + type + " " + var + ";"
 
-    declare_struct += "\n} " + ";\n"
+        declare_struct += "\n} " + ";\n"
+        declare_struct += "tbb::combinable<struct tbb_var_struct" + "> tbb_per_thread_data" + " ;\n"
 
-    declare_struct += "tbb::combinable<struct tbb_var_struct" + "> tbb_per_thread_data" + " ;\n"
-
-
-    out += declare_struct
+        out += declare_struct
 
     #for var, type in zip(assigned_var, type_info):
     #    out += "tbb::enumerable_thread_specific<" + type + "> " + "_" + var + " = " + var + " ;\n"
@@ -107,16 +111,18 @@ def tbb(node, start, stop, step):
     for var, type in zip(assigned_var, type_info):
         if type in ["uword", "int", "float", "double"]:
             out += type + " " + var + ";\n"
-    out += "struct tbb_var_struct" + " tbb_struct_vars = tbb_per_thread_data" + ".local() ;\n"
 
-    for var, type in zip(assigned_var, type_info):
-        if type not in ["uword", "int", "float", "double"]:
-            out += type + "& " + var + " = " + "tbb_struct_vars." + var + ";\n"
+    if any_vec_or_mat:
+        out += "struct tbb_var_struct" + " tbb_struct_vars = tbb_per_thread_data" + ".local() ;\n"
+
+        for var, type in zip(assigned_var, type_info):
+            if type not in ["uword", "int", "float", "double"]:
+                out += type + "& " + var + " = " + "tbb_struct_vars." + var + ";\n"
 
     #for var, type in zip(assigned_var, type_info):
     #    out += type + "& " + var + " = _" + var + ".local() ;\n"
 
-    out += "\nfor (" + "%(0)s = _range.begin(); %(0)s != _range.end(); %(0)s"
+    out += "for (" + "%(0)s = _range.begin(); %(0)s != _range.end(); %(0)s"
 
     # special case for '+= 1'
     if step == "1":
