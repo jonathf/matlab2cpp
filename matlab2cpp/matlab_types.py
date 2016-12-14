@@ -87,9 +87,7 @@ def mtypes(builder, args):
         f = open(file_path, "w")
         f.write(code)
         f.close()
-
     try:
-        print "starting Matlab..."
         import matlab.engine
 
         #Set path to -p "setpath.m" before changing current working directory
@@ -101,23 +99,10 @@ def mtypes(builder, args):
         engine = matlab.engine.start_matlab()
 
         if args.paths_file:
-            dir_paths_file = os.path.dirname(os.path.abspath(args.paths_file))
-            dir_paths_cmd = "cd(\'" + dir_paths_file + "\')"
-
-            dir_dst_cmd = "cd(\'" + dst_dir + "\')"
-
-            #change directory to paths_file directory (to get correct path if paths_file contains relative path)
-            engine.evalc(dir_paths_cmd, nargout=0)
-            #run the paths file (adds directories to path
             engine.evalc(matlab_cmd, nargout=0)
-            #change back to folder dst_dir (m2cpp_temp)
-            engine.evalc(dir_dst_cmd, nargout=0)
-
-        #run the modified files in m2cpp_temp m2cpp with matlab
         engine.evalc(file_name, nargout=0)
 
         os.chdir(cwdir)
-        print "Matlab task completed"
     except:
         print "matlab did not load correctly, check that you have matlab engine API for python installed"
 
