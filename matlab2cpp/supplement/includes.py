@@ -9,9 +9,11 @@ def set(node, types):
 
     # Includes
     for key in types:
+        #print includes.names
 
         if key not in includes.names:
-            matlab2cpp.collection.Include(includes, key)
+            if write_to_includes(key):
+                matlab2cpp.collection.Include(includes, key)
 
 
 def get(node):
@@ -20,9 +22,19 @@ def get(node):
 
     types_i = []
     for include in includes:
-        types_i.append(include.name)
+        if write_to_includes(include.name):
+            types_i.append(include.name)
 
     return types_i
+
+
+def write_to_includes(include_string):
+    write = True
+    not_to_include = ['#include <armadillo>', '#include "SPlot.h"', '#include <tbb/tbb.h>', 'include "mconvert.h"']
+
+    if include_string in not_to_include:
+        write = False
+    return write
 
 
 class Itypes(object):

@@ -691,6 +691,8 @@ See also:
             include_code = "#include <omp.h>"
         elif name == "tbb":
             include_code = "#include <tbb/tbb.h>"
+        elif name == "no_min_max":
+            include_code = "#define NOMINMAX"
         else:
             include_code = ""
 
