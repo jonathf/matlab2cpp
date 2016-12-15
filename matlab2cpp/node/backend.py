@@ -527,7 +527,12 @@ See also:
         if backend == "TYPE":
             backend = "unknown"
 
-        target = matlab2cpp.rules.__dict__["_"+backend]
+        try:
+            target = matlab2cpp.rules.__dict__["_"+backend]
+        except KeyError:
+            print "Crash with file: %s. Data type set in .py file could be wrong. " % (str(node.file))
+            raise
+
         spesific_name = node.cls + "_" + node.name
 
         # e.g. Get_a (reserved typically)
@@ -541,8 +546,8 @@ See also:
         else:
             print node.program.summary()
             raise KeyError(
-                    "Expected to find rule for '%s' in the file '_%s.py'" %\
-                            (node.cls, node.backend))
+                    "Expected to find rule for '%s' in the file '_%s.py. Crash with file: %s, on line: %s'" %\
+                            (node.cls, node.backend, node.file, node.line))
 
 
     # let rule create a translation
@@ -563,7 +568,8 @@ See also:
         #print node.parent.parent.code
         #print "\n"
         raise ValueError(
-"missing return in function %s in file %s" % (node.cls, node.backend))
+"missing return in function %s in file %s, Matlab: Crash with file: %s, on line: %s" %\
+(node.cls, node.backend, node.file, node.line))
 
     node.ret = repr(value)
 
@@ -603,7 +609,7 @@ See also:
         #print "\n\n"
         raise SyntaxError("interpolation in " + node.backend + "." +\
                 node.cls + " is misbehaving\n'" + value + "'\n" +\
-                str(node.prop)  + "\nCrash on line " + str(node.line) +\
+                str(node.prop)  + "\nCrash with file: " + str(node.file) + " , on line: " + str(node.line) +\
                 ":\n" + node.code)
 
     if node.cls in ("Assign", "Assigns", "Statement") and node.project.builder.original:
