@@ -1,7 +1,7 @@
 import matlab2cpp
 import matlab2cpp.node as nmodule
 
-def transform_AST(node, nargin = False):
+def preorder_transform_AST(node, nargin = False):
     # Modify the abstract syntax tree (AST), also try to overload funtions
     # node is project node
     project = node.project
@@ -17,9 +17,6 @@ def transform_AST(node, nargin = False):
     #works with fx_decon_demo.m needs more testing and maybe a refactoring
     nodes = complex_mul(nodes)
 
-    # move the "using namespace arma ;" node last in the includes list
-    project = modify_arma_last(project)
-
     # remove nargin if args.nargin == False, Thus by default. Use -n flag to keep nargin
     if nargin == False:
         project = remove_nargin(project)
@@ -28,6 +25,19 @@ def transform_AST(node, nargin = False):
     project = add_parameters(project)
 
     return project
+
+
+def postorder_transform_AST(node):
+    project = node.project
+
+    # move the "using namespace arma ;" node last in the includes list
+    project = modify_arma_last(project)
+
+    #move #define NOMINMAX to first position
+    project = modify_define_first(project)
+
+    return project
+
 
 def complex_mul(nodes):
     for node in nodes:
@@ -43,6 +53,7 @@ def complex_mul(nodes):
                             var.type = "cx_double"
     return nodes
 
+
 # remove the nodes for clear, close and clc so they are not included in the translation
 def remove_close_clear_clc(nodes):
     for n in nodes:
@@ -50,6 +61,7 @@ def remove_close_clear_clc(nodes):
             index = n.parent.parent.children.index(n.parent)
             del n.parent.parent.children[index]
     return nodes
+
 
 # Change right hand side variable to uvec if assigned with find, b = find(a==3)
 def modify_find(nodes):
@@ -66,15 +78,33 @@ def modify_find(nodes):
 
 
 # move the "using namespace arma ;" node last in the includes list
+def modify_define_first(project):
+    for program in project:
+        includes = program[0]
+        index = 0
+
+        for include in includes:
+            if include != includes[0] and include.name[:7] == "#define":
+                #print "hello " + include.name
+                define_include = includes.children.pop(index)
+                includes.children.insert(0, define_include)
+
+            index += 1
+
+    return project
+
+
+# move the "using namespace arma ;" node last in the includes list
 def modify_arma_last(project):
     for program in project:
         includes = program[0]
         index = 0
 
         for include in includes:
-            if include != includes[-1] and \
-              include.name == "using namespace arma ;":
-                includes += [includes.pop(index)] # remove and append arma include node
+            if include != includes[-1] and include.name == "using namespace arma ;":
+                #includes += [includes.pop(index)] # remove and append arma include node
+                using_arma = includes.children.pop(index)
+                includes.children.append(using_arma)
 
             index += 1
     return project

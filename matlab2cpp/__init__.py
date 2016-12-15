@@ -50,7 +50,7 @@ import configure
 import rules
 import manual
 import re
-
+import modify
 
 __all__ = ["main"]
 
@@ -166,6 +166,8 @@ Args:
                         if key not in includes:
                             includes.append(key)
 
+                    includes = [i for i in includes if supplement.includes.write_to_includes(i)]
+
                     program.itypes = includes
 
             else:
@@ -213,8 +215,7 @@ Args:
 
     #--- work in progress ---
     #Modify the Abstract Syntax Tree (AST)
-    import modify
-    builder.project = modify.transform_AST(builder.project, args.nargin)
+    builder.project = modify.preorder_transform_AST(builder.project, args.nargin)
     #------------------------
     
     if args.disp:
@@ -222,6 +223,9 @@ Args:
         print "generate translation"
 
     builder.project.translate(args)
+
+    #post order modify project
+    builder.project = modify.postorder_transform_AST(builder.project)
 
     t = time.time()
     stamp = date.fromtimestamp(t).strftime('%Y-%m-%d %H:%M:%S')
