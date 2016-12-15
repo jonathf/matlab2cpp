@@ -347,6 +347,8 @@ See also:
     ftypes = supplement.functions.get(tree_)
     stypes = supplement.structs.get(tree_)
     itypes = supplement.includes.get(tree_)
+    itypes = [i for i in itypes if supplement.includes.write_to_includes(i)]
+
     vtypes = supplement.verbatim.get(tree_)
     suggestions = supplement.suggests.get(tree_)
 

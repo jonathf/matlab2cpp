@@ -9,6 +9,7 @@ import matlab2cpp as mc
 import argparse
 
 import parallel
+import os
 
 def Statement(node):
     """
@@ -569,6 +570,10 @@ Examples:
         elif tbb:
             node.include("tbb")
 
+            #windows
+            if os.name == 'nt':
+                node.include("no_min_max")
+
             out = parallel.tbb(node, start, stop, step)
 
             return out
@@ -660,6 +665,11 @@ Examples:
 
         elif tbb and parallel_loop:
             node.include("tbb")
+
+            #windows
+            if os.name == 'nt':
+                node.include("no_min_max")
+
             out = parallel.tbb(node, start, stop, step)
 
             return out

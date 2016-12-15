@@ -12,8 +12,7 @@ def set(node, types):
         #print includes.names
 
         if key not in includes.names:
-            if write_to_includes(key):
-                matlab2cpp.collection.Include(includes, key)
+            matlab2cpp.collection.Include(includes, key)
 
 
 def get(node):
@@ -22,15 +21,14 @@ def get(node):
 
     types_i = []
     for include in includes:
-        if write_to_includes(include.name):
-            types_i.append(include.name)
+        types_i.append(include.name)
 
     return types_i
 
 
 def write_to_includes(include_string):
     write = True
-    not_to_include = ['#include <armadillo>', '#include "SPlot.h"', '#include <tbb/tbb.h>', 'include "mconvert.h"']
+    not_to_include = ['#include "SPlot.h"', '#include <tbb/tbb.h>', '#define NOMINMAX', 'include "mconvert.h"'] 
 
     if include_string in not_to_include:
         write = False
