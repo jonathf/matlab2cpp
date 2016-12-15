@@ -85,7 +85,8 @@ Attributes:
     cur = ref.Recursive_property_reference("cur")
 
     dim = dt.Dim()
-    file = ref.Recursive_property_reference("file")
+    #file = ref.Recursive_property_reference("file")
+    file = ref.File_reference()
     line = ref.Line_reference()
     mem = dt.Mem()
     name = ref.Property_reference("name")

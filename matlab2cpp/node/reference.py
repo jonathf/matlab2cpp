@@ -52,6 +52,20 @@ class Recursive_property_reference(object):
     def __set__(self, instance, value):
         instance.prop[self.name] = value
 
+class File_reference(object):
+    def __get__(self, instance, owner):
+        if hasattr(instance, "_file"):
+            return instance._file
+
+        if instance.cls == "Program":
+            file_name = instance.name
+        else:
+            file_name = instance.program.name
+
+        instance._file = file_name
+        return file_name
+
+
 class Line_reference(object):
 
     def __get__(self, instance, owner):

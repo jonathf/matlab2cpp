@@ -50,7 +50,9 @@ import configure
 import rules
 import manual
 import re
+
 import modify
+import setpaths
 
 __all__ = ["main"]
 
@@ -81,10 +83,12 @@ Args:
     paths_from_file = []
     #read setpath.m file and return string list of paths
     if args.paths_file:
-        import setpaths
-        paths_from_file = setpaths.multiple_folder_paths(args.paths_file)
+        if os.path.isfile(args.paths_file):
+            paths_from_file = setpaths.multiple_folder_paths(args.paths_file)
+        else:
+            raise IOError("File '" + args.paths_file + "' not found")
 
-    pathOne = os.path.dirname(os.path.abspath(args.filename))
+    #pathOne = os.path.dirname(os.path.abspath(args.filename))
 
     if os.path.isfile(args.filename):
         paths = [os.path.abspath(os.path.dirname(args.filename))] + paths_from_file
