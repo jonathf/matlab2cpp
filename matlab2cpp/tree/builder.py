@@ -339,7 +339,7 @@ Example::
         while end < len(self.code) and self.code[end] != "\n":
             end += 1
 
-        out = "line %d in Matlab code:\n" % (self.code.count("\n", 0, cur)+1)
+        out = "File: %s, line %d in Matlab code:\n" % (self.project[-1].name, self.code.count("\n", 0, cur)+1)
         out += self.code[start:end] + "\n" + " "*(cur-start) + "^\n"
         out += "Expected: " + text
         raise SyntaxError(out)

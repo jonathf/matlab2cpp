@@ -529,9 +529,9 @@ See also:
 
         try:
             target = matlab2cpp.rules.__dict__["_"+backend]
-        except KeyError:
-            print "Crash with file: %s. Data type set in .py file could be wrong. " % (str(node.file))
-            raise
+        except KeyError as err:
+            err_str = "\'" + err.message + "\', File: %s. Data type set in .py file could be wrong." % (str(node.file))
+            raise KeyError(err_str)
 
         spesific_name = node.cls + "_" + node.name
 
