@@ -265,6 +265,12 @@ See also:
     if funcs and funcs[0].name == "main":
         return out
 
+    if funcs and funcs[0].name != "main":
+        name = funcs[0].name + "_M_HPP"
+        name = name.upper()
+        name.replace(".", "_")
+        out = "#ifndef " + name + "\n#define " + name + "\n\n"
+
     if includes.str:
         out += includes.str + "\n\n"
 
@@ -277,7 +283,10 @@ See also:
     if funcs.str:
         out += funcs.str + "\n\n"
 
-    out =  out[:-2]
+    out = out[:-2]
+
+    if funcs and funcs[0].name != "main":
+        out += "\n#endif"
 
     out = out.replace("__percent__", "%")
     out = strip(out)
