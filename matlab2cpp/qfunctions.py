@@ -61,7 +61,7 @@ Example use::
     >>> print mc.build("a**b")
     Traceback (most recent call last):
         ...
-    SyntaxError: line 1 in Matlab code:
+    SyntaxError: File: unamed, line 1 in Matlab code:
     a**b
       ^
     Expected: expression start
@@ -204,6 +204,9 @@ Returns:
 Example::
     >>> code = "function y=f(x); y=x+1; end; function g(); f(4)"
     >>> print mc.qhpp(code)
+    #ifndef F_M_HPP
+    #define F_M_HPP
+    <BLANKLINE>
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
@@ -221,7 +224,11 @@ Example::
     {
       f(4) ;
     }
+    #endif
     >>> print mc.qhpp(code, suggest=True)
+    #ifndef F_M_HPP
+    #define F_M_HPP
+    <BLANKLINE>
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
@@ -239,6 +246,7 @@ Example::
     {
       f(4) ;
     }
+    #endif
 
 See also:
     :py:func:`~matlab2cpp.qcpp`,

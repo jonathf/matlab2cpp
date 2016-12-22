@@ -138,6 +138,9 @@ direct assignment.  For example will ``a.b=4`` create a ``struct`` with name
 a C++-struct, such that::
 
     >>> print mc.qhpp("function f(); a.b = 4.", suggest=True)
+    #ifndef F_M_HPP
+    #define F_M_HPP
+    <BLANKLINE>
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
@@ -151,6 +154,7 @@ a C++-struct, such that::
       _A a ;
       a.b = 4. ;
     }
+    #endif
 
 In the suppliment file, the local variable `a` will be assigned as a `struct`.
 In addition, since the struct has content, the suppliment file creates a new
@@ -205,6 +209,9 @@ value per element.  There are a couple of differences in the translation.
 First, the struct is declared as an array:
 
     >>> print mc.qhpp("function f(); a(1).b = 4.", suggest=True)
+    #ifndef F_M_HPP
+    #define F_M_HPP
+    <BLANKLINE>
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
@@ -218,6 +225,7 @@ First, the struct is declared as an array:
       _A a[100] ;
       a[0].b = 4. ;
     }
+    #endif
 
 The translation assigned reserves 100 pointers for the content of ``a``.
 Obviously, there are situations where this isn't enough (or too much), and the
@@ -252,6 +260,9 @@ argument ``suggest=True`` have been used, and all variable types have been
 filled in. Consider the following program where this is not the case::
 
     >>> print mc.qhpp("function c=f(); a = 4; b = 4.; c = a+b", suggest=False)
+    #ifndef F_M_HPP
+    #define F_M_HPP
+    <BLANKLINE>
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
@@ -263,6 +274,7 @@ filled in. Consider the following program where this is not the case::
       c = a+b ;
       return c ;
     }
+    #endif
 
 Since all variables are unknown, the program decides to fill in the dummy
 variable ``TYPE`` for each unknown variable. Any time variables are unknown,
@@ -301,6 +313,9 @@ The resulting program will have the following complete form:
 
     >>> print mc.qhpp(
     ...     "function c=f(); a = 4; b = 4.; c = a+b", suggest=True)
+    #ifndef F_M_HPP
+    #define F_M_HPP
+    <BLANKLINE>
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
@@ -313,6 +328,7 @@ The resulting program will have the following complete form:
       c = a+b ;
       return c ;
     }
+    #endif
 
 Note here though that the variable ``c`` didn't have a suggestion. The
 suggestion is an interactive process such that ``a`` and ``b`` both must be
