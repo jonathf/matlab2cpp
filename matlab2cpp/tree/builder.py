@@ -33,6 +33,9 @@ Programs that are loaded, configured and translated, can be converted into C++
 code through the front end functions in :py:mod:`matlab2cpp.qfunctions`::
 
     >>> print mc.qhpp(prg1)
+    #ifndef PRG1_M_HPP
+    #define PRG1_M_HPP
+    <BLANKLINE>
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
@@ -42,6 +45,7 @@ code through the front end functions in :py:mod:`matlab2cpp.qfunctions`::
       y = x ;
       return y ;
     }
+    #endif
     >>> print mc.qcpp(prg2)
     #include <armadillo>
     using namespace arma ;
@@ -325,7 +329,7 @@ Example::
     >>> builder.syntaxerror(7, "example of error")
     Traceback (most recent call last):
         ...
-    SyntaxError: line 1 in Matlab code:
+    SyntaxError: File: unnamed.m, line 1 in Matlab code:
     0123456789
            ^
     Expected: example of error

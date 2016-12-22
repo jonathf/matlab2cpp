@@ -61,7 +61,7 @@ Example use::
     >>> print mc.build("a**b")
     Traceback (most recent call last):
         ...
-    SyntaxError: line 1 in Matlab code:
+    SyntaxError: File: unamed, line 1 in Matlab code:
     a**b
       ^
     Expected: expression start
@@ -204,6 +204,9 @@ Returns:
 Example::
     >>> code = "function y=f(x); y=x+1; end; function g(); f(4)"
     >>> print mc.qhpp(code)
+    #ifndef F_M_HPP
+    #define F_M_HPP
+    <BLANKLINE>
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
@@ -221,7 +224,11 @@ Example::
     {
       f(4) ;
     }
+    #endif
     >>> print mc.qhpp(code, suggest=True)
+    #ifndef F_M_HPP
+    #define F_M_HPP
+    <BLANKLINE>
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
@@ -239,6 +246,7 @@ Example::
     {
       f(4) ;
     }
+    #endif
 
 See also:
     :py:func:`~matlab2cpp.qcpp`,
@@ -265,6 +273,12 @@ See also:
     if funcs and funcs[0].name == "main":
         return out
 
+    if funcs and funcs[0].name != "main":
+        name = funcs[0].name + "_M_HPP"
+        name = name.upper()
+        name.replace(".", "_")
+        out = "#ifndef " + name + "\n#define " + name + "\n\n"
+
     if includes.str:
         out += includes.str + "\n\n"
 
@@ -277,7 +291,10 @@ See also:
     if funcs.str:
         out += funcs.str + "\n\n"
 
-    out =  out[:-2]
+    out = out[:-2]
+
+    if funcs and funcs[0].name != "main":
+        out += "\n#endif"
 
     out = out.replace("__percent__", "%")
     out = strip(out)
