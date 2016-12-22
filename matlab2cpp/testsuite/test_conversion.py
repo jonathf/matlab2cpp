@@ -102,7 +102,10 @@ end
     # strip header
     converted_code = "\n".join(converted_code.split("\n")[2:])
 
-    reference_code = """#include <armadillo>
+    reference_code = """#ifndef F_M_HPP
+#define F_M_HPP
+
+#include <armadillo>
 using namespace arma ;
 
 irowvec f(irowvec x) ;
@@ -121,7 +124,8 @@ void g()
   sword _x [] = {1, 2, 3} ;
   x = irowvec(_x, 3, false) ;
   y = f(x) ;
-}"""
+}
+#endif"""
 
     assert converted_code == reference_code
 
@@ -159,7 +163,10 @@ end
     # strip header
     converted_code = "\n".join(converted_code.split("\n")[2:])
 
-    reference_code = """#include <armadillo>
+    reference_code = """#ifndef F_M_HPP
+#define F_M_HPP
+
+#include <armadillo>
 using namespace arma ;
 
 void f(irowvec a, ivec b, irowvec& y, ivec& z) ;
@@ -180,7 +187,8 @@ void g()
   sword _b [] = {4, 5, 6} ;
   b = ivec(_b, 3, false) ;
   f(a, b, y, z) ;
-}"""
+}
+#endif"""
 
     assert reference_code == converted_code
 
@@ -295,6 +303,9 @@ includes = [
     """
 
     reference_code = """
+#ifndef FX_DECON_M_HPP
+#define FX_DECON_M_HPP
+
 #include <armadillo>
 #include "mconvert.h"
 #include <cmath>
@@ -375,6 +386,7 @@ void ar_modeling(cx_vec x, int lf, double mu, cx_vec& yf, cx_vec& yb)
   yf = temp ;
   return ;
 }
+#endif
     """
 
     f = open("fx_decon.m", "w")
