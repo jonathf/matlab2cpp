@@ -74,7 +74,7 @@ Sphinx::
 
 Argcomplete::
 
-    pip intall argcomplete
+    pip install argcomplete
     activate-global-python-argcomplete
 
 This only works for Bash and would require a restart of terminal emulator.
