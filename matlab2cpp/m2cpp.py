@@ -114,7 +114,7 @@ namespace m2cpp {
    inline rowvec fspan(double a, double step, double b) {
 	   //arma::Col<eT> s;
 	   rowvec s;
-	   int n = (int) round((b - a) / step);
+	   int n = (int) ((b - a) / step);
       if (n < 0) return s;
 
       //s.set_size(n + 1);
