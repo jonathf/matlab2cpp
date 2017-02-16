@@ -553,6 +553,12 @@ def Elexp(node):
     """
 
     out = str(node[0])
+
+    if len(node) == 2:
+        exponent = str(node[1])
+        if exponent == "2":
+            return "square(" + out + ")"
+
     for child in node[1:]:
         out = "pow(" + str(out) + ", " + str(child) + ")"
     return out
