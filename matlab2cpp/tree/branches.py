@@ -289,7 +289,7 @@ Example:
         print "%-20s" % "branches.whileloop",
         print repr(self.code[cur:end+1])
 
-    whileloop = mc.collection.While(parent, cur=cur)
+    whileloop = mc.collection.While(parent, cur=cur, code=self.code[cur:end+1])
 
     if self.code[k] == "(":
         k += 1
@@ -305,7 +305,7 @@ Example:
 
     end = self.create_codeblock(whileloop, cur)
 
-    whileloop.code = self.code[start:end+1]
+    #whileloop.code = self.code[start:end+1]
 
     return end
 
@@ -320,7 +320,7 @@ def parforloop(self, parent, cur):
         print repr(self.code[cur:self.code.find("\n", cur)]),
         print "branches.parforloop"
 
-    parfor_loop = mc.collection.Parfor(parent, cur=cur)
+    parfor_loop = mc.collection.Parfor(parent, cur=cur, code=self.code[cur:self.code.find("\n", cur)])
 
     cur = cur+6
     while self.code[cur] in "( \t":
@@ -359,7 +359,7 @@ def parforloop(self, parent, cur):
         cur += 1
     end = self.create_codeblock(parfor_loop, cur)
 
-    parfor_loop.code = self.code[start:end]
+    #parfor_loop.code = self.code[start:end]
 
     return end
 
@@ -414,7 +414,7 @@ Example:
         print repr(self.code[cur:self.code.find("\n", cur)]),
         print "branches.forloop"
 
-    for_loop = mc.collection.For(parent, cur=cur)
+    for_loop = mc.collection.For(parent, cur=cur, code=self.code[cur:self.code.find("\n", cur)])
 
     cur = cur+3
     while self.code[cur] in "( \t":
@@ -458,7 +458,7 @@ Example:
 
     end = self.create_codeblock(for_loop, cur)
 
-    for_loop.code = self.code[start:end]
+    #for_loop.code = self.code[start:end]
 
     return end
 
@@ -538,7 +538,7 @@ Example:
         print "%-20s" % "branches.ifbranch",
         print repr(self.code[start:end+1])
 
-    node = mc.collection.If(branch, cur=cur)
+    node = mc.collection.If(branch, cur=cur, code=self.code[start:end+1])
 
     if self.code[cur] == "(":
         cur += 1
@@ -549,12 +549,12 @@ Example:
     cur = end+1
 
     end = self.create_codeblock(node, cur)
-    node.code = self.code[cur:end]
+    #node.code = self.code[cur:end]
     cur = end
 
     while self.code[cur:cur+6] == "elseif" and self.code[cur+6] in c.k_end:
 
-        node.code = self.code[start:cur]
+        #node.code = self.code[start:cur]
         start = cur
 
         cur += 6
@@ -568,7 +568,7 @@ Example:
             print "%-20s" % "branches.ifbranch",
             print repr(self.code[start:end+1])
 
-        node = mc.collection.Elif(branch, cur=start)
+        node = mc.collection.Elif(branch, cur=start, code=self.code[start:end+1])
 
         if self.code[cur] == "(":
             cur += 1
@@ -582,7 +582,7 @@ Example:
 
 
     cur = end
-    node.code = self.code[start:cur]
+    #node.code = self.code[start:cur]
 
     if self.code[cur:cur+4] == "else" and self.code[cur+4] in c.k_end:
 
@@ -598,7 +598,7 @@ Example:
         node = mc.collection.Else(branch, cur=start)
 
         end = self.create_codeblock(node, cur)
-        node.code = self.code[start:end+1]
+        #node.code = self.code[start:end+1]
 
     branch.code = self.code[start:end+1]
 
