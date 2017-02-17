@@ -258,9 +258,9 @@ Le      = "", "<=", ""
 Ne      = "", "!=", ""
 Eq      = "", "==", ""
 Band    = "", "&&", ""
-Land    = "", "&", ""
+Land    = "", "&&", ""
 Bor     = "", "||", ""
-Lor     = "", "|", ""
+Lor     = "", "||", ""
 
 def Elementdivision(node):
     """Element wise division
@@ -557,7 +557,10 @@ def Elexp(node):
     if len(node) == 2:
         exponent = str(node[1])
         if exponent == "2":
-            return "square(" + out + ")"
+            if(node[0].dim == 0):
+                return "m2cpp::square(" + out + ")"
+            else:
+                return "square(" + out + ")"
 
     for child in node[1:]:
         out = "pow(" + str(out) + ", " + str(child) + ")"
@@ -586,7 +589,7 @@ def All(node):
 
     return "m2cpp::span<uvec>(0, " + arg + "-1)"
 
-Neg = "-(", "", ")"
+Neg = "-", "", ""
 Not = "not ", "", ""
 
 def Transpose(node):
