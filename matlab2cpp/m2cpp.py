@@ -136,6 +136,10 @@ namespace m2cpp {
     return p;
   }
 
+  template<typename T1>
+  inline T1 square(T1 a) {
+      return a*a;
+  }
 
   template<typename T1, typename T2>
   inline  arma::Mat<typename T1::elem_type> hankel(const T1& c_, const T2& r_) {

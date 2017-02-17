@@ -1093,10 +1093,10 @@ def Get_caxis(node):
 def Get_axis(node):
     """
     >>> print mc.qscript("axis(0, 3, -2, 4)")
-    _plot.axis(0, 3, -(2), 4) ;
+    _plot.axis(0, 3, -2, 4) ;
     _plot.show() ;
     >>> print mc.qscript("axis([0, 3, -2, 4])")
-    _plot.axis(0, 3, -(2), 4) ;
+    _plot.axis(0, 3, -2, 4) ;
     _plot.show() ;
     """
 
