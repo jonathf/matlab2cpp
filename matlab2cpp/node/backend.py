@@ -614,7 +614,8 @@ See also:
 
     if node.cls in ("Assign", "Assigns", "Statement", "If", "Elif",
                     "For", "Parfor", "While") and node.project.builder.original:
-        value = "// " + node.code + "\n" + value
+        code_tmp = ["// " + line for line in node.code.splitlines()]
+        value = "\n".join(code_tmp) + "\n" + value
         value = value.replace("%", "__percent__")
     node.str = value
 

@@ -560,10 +560,10 @@ def Elexp(node):
             if(node[0].dim == 0):
                 return "m2cpp::square(" + out + ")"
             else:
-                return "square(" + out + ")"
+                return "arma::square(" + out + ")"
 
     for child in node[1:]:
-        out = "pow(" + str(out) + ", " + str(child) + ")"
+        out = "arma::pow(" + str(out) + ", " + str(child) + ")"
     return out
 
 
