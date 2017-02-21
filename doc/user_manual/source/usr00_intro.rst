@@ -1,0 +1,8 @@
+.. _usr00:
+
+Introduction
+============
+..
+	.. include:: ../../../README.md
+
+.. automodule:: matlab2cpp.manual.usr00_introduction
