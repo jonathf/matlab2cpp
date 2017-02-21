@@ -61,8 +61,8 @@ Returns:
         elif self.code[k] == "{":
             k = cell(self, k)
 
-        elif self.code[k:k+3] == "...":
-            k = dots(self, k)
+        #elif self.code[k:k+3] == "...":
+        #    k = dots(self, k)
 
         elif self.code[k] == "=":
 
