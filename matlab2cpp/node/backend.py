@@ -612,8 +612,10 @@ See also:
                 str(node.prop)  + "\nCrash with file: " + str(node.file) + " , on line: " + str(node.line) +\
                 ":\n" + node.code)
 
-    if node.cls in ("Assign", "Assigns", "Statement") and node.project.builder.original:
-        value = "// " + node.code + "\n" + value
+    if node.cls in ("Assign", "Assigns", "Statement", "If", "Elif",
+                    "For", "Parfor", "While") and node.project.builder.original:
+        code_tmp = ["// " + line for line in node.code.splitlines()]
+        value = "\n".join(code_tmp) + "\n" + value
         value = value.replace("%", "__percent__")
     node.str = value
 

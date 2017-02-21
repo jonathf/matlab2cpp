@@ -1,4 +1,5 @@
-code = r"""/*
+code = r"""
+/*
  * SPlot.h
  *
  *  Created on: 19. aug. 2010
@@ -10,21 +11,11 @@ code = r"""/*
 
 #include <iostream>
 //DGRIM #include "matlib.hpp"
-#ifdef _DEBUG
-#undef _DEBUG
 #include <Python.h>
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <numpy/arrayobject.h>
-#define _DEBUG
-#else
-#include <Python.h>
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-#include <numpy/arrayobject.h>
-#endif
-
 #include <map>
 //DGRIM #include "armadillo/armadillo"
-#include <armadillo>
 
 class PyEngine
 {
@@ -293,23 +284,34 @@ class SPlot : public PyEngine
 			// May be copied to separate file "splot.py" in current directory
 			splot_py = R"(
 from __future__ import division
+
 import matplotlib as mpl
+qt_backend = None
 try:
-    mpl.use('qt4agg')
-except:
-    pass
+    from PyQt4 import QtCore, QtGui, QtGui as QtWidgets
+    qt_backend = 4
+except ImportError:
+    try:
+        from PyQt5 import QtCore, QtGui, QtWidgets
+        qt_backend = 5
+    except ImportError:
+        pass
+if qt_backend:
+    try:
+        mpl.use('qt%dagg'%qt_backend)
+    except:
+        pass
 
 from pylab import *
 import numpy as np
 
 pylab_show = show
 def show(interactive):
-    try:
-        from PyQt4 import QtGui
+    if qt_backend:
         pylab_show(block=False)
         if interactive:
-            QtGui.QApplication.instance().exec_()
-    except ImportError:
+            QtWidgets.QApplication.instance().exec_()
+    else:
         pylab_show(block=interactive)
 
 def wigb(a, scale=1.0, x=None, z=None, amx=None, xshift=0.0, **kwargs):
@@ -356,9 +358,11 @@ def wigb(a, scale=1.0, x=None, z=None, amx=None, xshift=0.0, **kwargs):
 
     return plots
 
-try:
-    from PyQt4 import QtGui, QtCore
 
+if not qt_backend:
+    def table(*args, **kwargs):
+        print 'Failed to import Qt, no table support. Please install pyqt4 or pyqt5.'
+else:
     class TableModel(QtCore.QAbstractTableModel):
         def __init__(self, mat):
             QtCore.QAbstractTableModel.__init__(self)
@@ -378,22 +382,31 @@ try:
 
         def headerData(self, section, orientation, role):
             if role == QtCore.Qt.DisplayRole:
-                return QtCore.QString.number(section+1)
+                return str(section+1)
             return None
 
-    class TableView(QtGui.QTableView):
+    class TableView(QtWidgets.QTableView):
         _views = {} # references to live windows, to prevent early deletion
 
         def __init__(self):
-            QtGui.QTableView.__init__(self)
-            self.horizontalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
-            self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
+            QtWidgets.QTableView.__init__(self)
+            if qt_backend == 4:
+                self.horizontalHeader().setResizeMode(QtWidgets.QHeaderView.Fixed)
+                self.verticalHeader().setResizeMode(QtWidgets.QHeaderView.Fixed)
+            else:
+                self.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
+                self.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
             self.pt = self.font().pointSize()
             self.chars = 9
 
-            self.connect(QtGui.QShortcut(QtGui.QKeySequence.ZoomIn, self), QtCore.SIGNAL('activated()'), self.zoom_in)
-            self.connect(QtGui.QShortcut(QtGui.QKeySequence.ZoomOut, self), QtCore.SIGNAL('activated()'), self.zoom_out)
-            self.connect(QtGui.QShortcut(QtGui.QKeySequence.Close, self), QtCore.SIGNAL('activated()'), self.close)
+            if qt_backend == 4:
+                self.connect(QtWidgets.QShortcut(QtWidgets.QKeySequence.ZoomIn, self), QtCore.SIGNAL('activated()'), self.zoom_in)
+                self.connect(QtWidgets.QShortcut(QtWidgets.QKeySequence.ZoomOut, self), QtCore.SIGNAL('activated()'), self.zoom_out)
+                self.connect(QtWidgets.QShortcut(QtWidgets.QKeySequence.Close, self), QtCore.SIGNAL('activated()'), self.close)
+            else:
+                QtWidgets.QShortcut(QtGui.QKeySequence.ZoomIn, self).activated.connect(self.zoom_in)
+                QtWidgets.QShortcut(QtGui.QKeySequence.ZoomOut, self).activated.connect(self.zoom_out)
+                QtWidgets.QShortcut(QtGui.QKeySequence.Close, self).activated.connect(self.close)
 
             TableView._views[self] = self
 
@@ -422,6 +435,7 @@ try:
             metrics = QtGui.QFontMetrics(font)
             padding = 1.5
             width = 2*padding + self.chars*metrics.width('X')
+            width = width*1.3
             height = metrics.height() + 4*padding
 
             header = self.verticalHeader()
@@ -443,22 +457,23 @@ try:
 
         def wheelEvent(self, event):
             if event.modifiers() == QtCore.Qt.ControlModifier:
-                if event.delta() > 1:
+                delta = event.delta() if qt_backend==4 else event.angleDelta().y()
+                if delta > 1:
                     self.zoom_in()
                 else:
                     self.zoom_out()
             else:
-                QtGui.QTableView.wheelEvent(self, event)
+                QtWidgets.QTableView.wheelEvent(self, event)
 
         def closeEvent(self, event):
             del TableView._views[self]
-            QtGui.QTableView.closeEvent(self, event)
+            QtWidgets.QTableView.closeEvent(self, event)
 
 
     def table(mat, title=None):
-        if QtGui.QApplication.instance() is None:
+        if QtWidgets.QApplication.instance() is None:
             import sys
-            table.app = QtGui.QApplication(sys.argv)
+            table.app = QtWidgets.QApplication(sys.argv)
         table.seq += 1
         if title is None:
             title = 'Table %d '%table.seq
@@ -476,10 +491,6 @@ try:
         view.setWindowTitle(title)
         view.show()
     table.seq = 0
-
-except ImportError:
-    def table(mat):
-        print 'Failed to import Qt, no table support'
 )";
 		} else {
 			splot_py = static_cast<std::stringstream&>(std::stringstream() << in.rdbuf()).str();

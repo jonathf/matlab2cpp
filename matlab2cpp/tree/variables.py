@@ -406,7 +406,7 @@ Example:
 
 
 
-    elif self.code[k] == "." and self.code[k+1] not in "*/\\^'":
+    elif self.code[k] == "." and self.code[k+1] not in ".*/\\^'":
 
         k += 1
 
