@@ -821,7 +821,7 @@ def Var_toc(node):
 def Get_toc(node):
     node.wall_clock()
     if node.parent.cls != "Statement":
-        return "_time.toc()"
+        return "_timer.toc()"
 
     node.include("iostream")
     return 'std::cout << "Ellapsed time = " << _timer.toc() << std::endl'
