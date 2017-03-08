@@ -8,9 +8,9 @@ User Manual
 .. toctree::
     :maxdepth: 3
 
-    usr00_intro
-    usr05_installation
-    usr01_interaction
+    intro
+    installation
+    interaction
     usr02_datatype
     usr03_rules
     usr04_node
