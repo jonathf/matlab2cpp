@@ -540,10 +540,12 @@ Example:
 
     node = mc.collection.If(branch, cur=cur, code=self.code[start:end+1])
 
-    if self.code[cur] == "(":
-        cur += 1
-        while self.code[cur] in " \t":
-            cur += 1
+    # this code below gives error if the if statement is: if (a > 1) && (a < 6)
+    #because it digs down recursevly in (a > 1) and not the whole statement
+    #if self.code[cur] == "(":
+    #    cur += 1
+    #    while self.code[cur] in " \t":
+    #        cur += 1
     self.create_expression(node, cur)
 
     cur = end+1

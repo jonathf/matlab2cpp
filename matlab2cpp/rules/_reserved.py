@@ -24,7 +24,7 @@ reserved = {
 "interp1", "linspace", "varargins",
 "sum", "conj", "real", "imag",
 "tic", "toc", "diag", "disp", "fprintf", "error", "convmtx", "conv2",
-"figure", "clf", "cla", "show", "xlabel", "ylabel", "hold",
+"figure", "clf", "cla", "show", "xlabel", "ylabel", "hold", "load",
 "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
 "xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
 "_splot", "logspace", "find",
@@ -888,6 +888,12 @@ def Get_hold(node):
 
     node.error("hold toggle not supported")
     return "_plot.hold(", ", ", ")"
+
+def Var_load(node):
+    return Get_load(node)
+
+def Get_load(node):
+    return "%(0)s.load(\"" + node.value + "\")"
 
 def Var_clf(node):
     return Get_clf(node)

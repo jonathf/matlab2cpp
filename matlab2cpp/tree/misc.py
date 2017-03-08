@@ -522,6 +522,34 @@ def reserved(self, node, start):
     k = start
     
     newline = self.code.find("\n", start)
+
+    if self.code[k:k+4] == "load":
+
+        statement = mc.collection.Statement(node, cur=start,
+                                            code=self.code[start:newline])
+
+        l = k+4
+        while self.code[l] in " \t":
+            l += 1
+
+        if self.code[l] == "(":
+            return expression.create(self, statement, k)
+
+        k += 4
+        while self.code[k] in " \t":
+            k += 1
+
+        get = mc.collection.Get(statement, name="load", cur=start, value=self.code[k:newline])
+
+        #mc.collection.String(get, self.code[k:newline])
+
+        name = str(self.code[k:newline]).split(".")[0]
+        node = mc.collection.Var(get, name)
+        node.create_declare()
+
+        k = newline
+
+        return k
     
     if self.code[k:k+4] == "hold":
 
