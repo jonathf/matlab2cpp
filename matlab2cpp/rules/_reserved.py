@@ -23,7 +23,7 @@ reserved = {
 "_conv_to", "_reshape", "reshape",
 "interp1", "linspace", "varargins",
 "sum", "conj", "real", "imag",
-"tic", "toc", "diag", "disp", "error", "convmtx", "conv2",
+"tic", "toc", "diag", "disp", "fprintf", "error", "convmtx", "conv2",
 "figure", "clf", "cla", "show", "xlabel", "ylabel", "hold",
 "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
 "xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
@@ -841,6 +841,14 @@ def Get_disp(node):
     else:
         node.error("disp should take one argument")
     return "std::cout << ", "<< ", " << std::endl"
+
+def Get_fprintf(node):
+    """ Matlab's fprintf can write to file and screen... this is translated to printf (so only printing to screen)
+    will give error if trying to write to file.
+    """
+    node.include("cstdio")
+    return "std::printf(", ", ", ")"
+
 
 def Get_error(node):
     node.include("iostream")
