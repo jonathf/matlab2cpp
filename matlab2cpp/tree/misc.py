@@ -520,8 +520,49 @@ def reserved(self, node, start):
     """
 
     k = start
-    
-    newline = self.code.find("\n", start)
+
+    l = k
+
+    while self.code[l] not in ";\n":
+        l += 1
+    newline = l
+
+    if self.disp:
+        print "%4d     reserved       " % k,
+        print "%-20s" % "misc.reserved",
+        print repr(self.code[k:newline])
+
+    if self.code[k:k+4] == "load":
+
+        statement = mc.collection.Statement(node, cur=start,
+                                            code=self.code[start:newline])
+
+        l = k+4
+        while self.code[l] in " \t":
+            l += 1
+
+        if self.code[l] == "(":
+            return expression.create(self, statement, k)
+
+        k += 4
+        while self.code[k] in " \t\n'":
+            k += 1
+
+        l = k
+        while self.code[l] not in " \t\n":
+            l += 1
+
+        get = mc.collection.Get(statement, name="load", cur=start, value=self.code[k:l])
+
+        name = str(self.code[k:l]).split(".")[0]
+        node = mc.collection.Var(get, name)
+        node.create_declare()
+
+        while self.code[k] not in ";\n":
+            k += 1
+
+
+        return k
     
     if self.code[k:k+4] == "hold":
 
@@ -541,17 +582,20 @@ def reserved(self, node, start):
 
         get = mc.collection.Get(statement, name="hold", cur=start)
 
-        if self.code[k:k+2] == "on":
+        if self.code[k:k+2] == "on"  and (self.code[k+2] in c.k_end):
             mc.collection.String(get, "on")
             return k+2
     
-        if self.code[k:k+3] == "off":
+        if self.code[k:k+3] == "off"  and (self.code[k+3] in c.k_end):
             mc.collection.String(get, "off")
             return k+3
 
-        if self.code[k:k+3] == "all":
+        if self.code[k:k+3] == "all"  and (self.code[k+3] in c.k_end):
             mc.collection.String(get, "all")
             return k+3
+
+        while self.code[k] not in ";\n":
+            k += 1
 
         return k
 
@@ -573,17 +617,20 @@ def reserved(self, node, start):
 
         get = mc.collection.Get(statement, name="grid", cur=start)
 
-        if self.code[k:k+2] == "on":
+        if self.code[k:k+2] == "on"  and (self.code[k+2] in c.k_end):
             mc.collection.String(get, "on", cur=k)
             return k+2
 
-        if self.code[k:k+3] == "off":
+        if self.code[k:k+3] == "off"  and (self.code[k+3] in c.k_end):
             mc.collection.String(get, "off", cur=k)
             return k+3
 
-        if self.code[k:k+5] == "minor":
+        if self.code[k:k+5] == "minor"  and (self.code[k+5] in c.k_end):
             mc.collection.String(get, "minor", cur=k)
             return k+5
+
+        while self.code[k] not in ";\n":
+            k += 1
 
         return k
         

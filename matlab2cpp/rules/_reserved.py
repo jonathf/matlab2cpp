@@ -23,8 +23,8 @@ reserved = {
 "_conv_to", "_reshape", "reshape",
 "interp1", "linspace", "varargins",
 "sum", "conj", "real", "imag",
-"tic", "toc", "diag", "disp", "error", "convmtx", "conv2",
-"figure", "clf", "cla", "show", "xlabel", "ylabel", "hold",
+"tic", "toc", "diag", "disp", "fprintf", "error", "convmtx", "conv2",
+"figure", "clf", "cla", "show", "xlabel", "ylabel", "hold", "load",
 "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
 "xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
 "_splot", "logspace", "find",
@@ -821,7 +821,7 @@ def Var_toc(node):
 def Get_toc(node):
     node.wall_clock()
     if node.parent.cls != "Statement":
-        return "_time.toc()"
+        return "_timer.toc()"
 
     node.include("iostream")
     return 'std::cout << "Ellapsed time = " << _timer.toc() << std::endl'
@@ -841,6 +841,14 @@ def Get_disp(node):
     else:
         node.error("disp should take one argument")
     return "std::cout << ", "<< ", " << std::endl"
+
+def Get_fprintf(node):
+    """ Matlab's fprintf can write to file and screen... this is translated to printf (so only printing to screen)
+    will give error if trying to write to file.
+    """
+    node.include("cstdio")
+    return "std::printf(", ", ", ")"
+
 
 def Get_error(node):
     node.include("iostream")
@@ -880,6 +888,21 @@ def Get_hold(node):
 
     node.error("hold toggle not supported")
     return "_plot.hold(", ", ", ")"
+
+def Var_load(node):
+    return Get_load(node)
+
+def Get_load(node):
+
+    out = "load " + node.code
+    if len(node) == 1:
+        if node[0].cls == "String":
+            name = str(node[0].value).split(".")[0]
+            out = name + ".load(%(0)s)"
+        else:
+            out = "%(0)s.load(\"" + node.value + "\")"
+
+    return out
 
 def Var_clf(node):
     return Get_clf(node)

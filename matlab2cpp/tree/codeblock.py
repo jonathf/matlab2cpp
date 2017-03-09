@@ -155,6 +155,10 @@ Example:
             self.code[cur+4] not in c.letters+c.digits+"_":
             cur = self.create_reserved(block, cur)
 
+        elif self.code[cur:cur+4] == "load" and \
+            self.code[cur+4] not in c.letters+c.digits+"_":
+            cur = self.create_reserved(block, cur)
+
         elif self.code[cur:cur+4] == "grid" and \
             self.code[cur+4] not in c.letters+c.digits+"_":
             cur = self.create_reserved(block, cur)
