@@ -824,7 +824,7 @@ def Get_toc(node):
         return "_timer.toc()"
 
     node.include("iostream")
-    return 'std::cout << "Ellapsed time = " << _timer.toc() << std::endl'
+    return 'std::cout << "Elapsed time = " << _timer.toc() << std::endl'
 
 def Get_diag(node):
     return "diagmat(", ", ", ")"
