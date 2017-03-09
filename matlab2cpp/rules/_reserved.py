@@ -893,7 +893,16 @@ def Var_load(node):
     return Get_load(node)
 
 def Get_load(node):
-    return "%(0)s.load(\"" + node.value + "\")"
+
+    out = "load " + node.code
+    if len(node) == 1:
+        if node[0].cls == "String":
+            name = str(node[0].value).split(".")[0]
+            out = name + ".load(%(0)s)"
+        else:
+            out = "%(0)s.load(\"" + node.value + "\")"
+
+    return out
 
 def Var_clf(node):
     return Get_clf(node)
