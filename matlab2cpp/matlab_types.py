@@ -2,6 +2,7 @@ import os
 import shutil #copy files from current dir to m2cpp_temp
 #import re
 import matlab2cpp.mwhos
+from matlab2cpp.datatype import get_mem
 
 from itertools import takewhile
 
@@ -166,7 +167,8 @@ def extract_ftypes(program, funcs_types, file_path):
             j += 2
 
             #make double indexed dictionary
-            funcs_types[funcs_name] = {}
+            if not funcs_types.get(funcs_name):
+                funcs_types[funcs_name] = {}
             while j < len(lines) and lines[j] != "":
                 cols = lines[j].split(", ")
 
@@ -181,7 +183,21 @@ def extract_ftypes(program, funcs_types, file_path):
                 #print var_name + ": " + data_type
 
                 #insert in dictionary
-                funcs_types[funcs_name][var_name] = data_type
+                #check if entry in dictionary exist
+                data_type_old = funcs_types[funcs_name].get(var_name)
+
+                #complex type should stay complex type
+                if data_type_old:
+                    #get if datatype is comples, then mem_value should be 4
+                    #mem_value_old = get_mem(data_type_old)
+                    mem_value_new = get_mem(data_type)
+                    #print "mem_value_new: "
+                    #print mem_value_new
+                    if mem_value_new == 4:
+                        funcs_types[funcs_name][var_name] = data_type
+                else:
+                    funcs_types[funcs_name][var_name] = data_type
+
                 j += 1
                 
         j += 1

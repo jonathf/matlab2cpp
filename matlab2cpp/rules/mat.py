@@ -83,11 +83,15 @@ def Get(node):
 
         # scalar + uvec
         if dim0 == 0 and dim1 > 0:
-            return "%(name)s.col(" + arg0 + ").rows(" + arg1 + ")"
+            return "%(name)s(m2cpp::span<uvec>(" + arg0 + ", " + arg0 + ")" + ", " + "m2cpp" + node[1].str[4:] + ")"
+            #return "%(name)s.col(" + arg0 + ").rows(" + arg1 + ")"
+
 
         # uvec + scalar
         elif dim0 > 0 and dim1 == 0:
-            return "%(name)s.row(" + arg0 + ").cols(" + arg1 + ")"
+
+            return "%(name)s(" + "m2cpp" + node[0].str[4:] + ", m2cpp::span<uvec>(" + arg1 + ", " + arg1 + "))"
+            #return "%(name)s.row(" + arg0 + ").cols(" + arg1 + ")"
 
         return "%(name)s(" + arg0 + ", " + arg1 + ")"
 

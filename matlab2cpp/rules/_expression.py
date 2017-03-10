@@ -663,6 +663,7 @@ Examples:
                 "Set", "Cset", "Nset", "Fset", "Sset") and node.parent.num:
         #node.type = "uvec"
 
+        node.include("m2cpp")
         # two arguments, use Armadillo span from:to
         if len(node) == 2:
             if node.dim in (1, 2):
@@ -706,8 +707,8 @@ Examples:
         # <start>:<stop>
         if len(node) == 2:
             if node.group.cls == "Assign":
-                return "m2cpp::span<" + node.type + ">" + "(%(0)s, %(1)s)"
-            return "m2cpp::span<" + node.type + ">" + "(%(0)s, %(1)s)"
+                return "m2cpp::fspan" + "(%(0)s, 1, %(1)s)"
+            return "m2cpp::fspan" + "(%(0)s, 1, %(1)s)"
 
         # <start>:<step>:<stop>
         elif len(node) == 3:

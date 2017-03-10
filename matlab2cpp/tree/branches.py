@@ -572,10 +572,10 @@ Example:
 
         node = mc.collection.Elif(branch, cur=start, code=self.code[start:end+1])
 
-        if self.code[cur] == "(":
-            cur += 1
-            while self.code[cur] in " \t":
-                cur += 1
+        #if self.code[cur] == "(":
+        #    cur += 1
+        #    while self.code[cur] in " \t":
+        #        cur += 1
 
         self.create_expression(node, cur)
         cur = end+1
