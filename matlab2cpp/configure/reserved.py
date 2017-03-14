@@ -394,12 +394,17 @@ def Get_fft(node):
 def Get_ifft(node):
 
     node.type = node[0].type
+    if node.mem == 4:
+        node.mem = 3
+    elif node.mem == 3:
+        node.mem = 4
 
     # unknown input
-    if not node.num:
-        pass
-    else:
-        node.mem = 4
+    #if not node.num:
+    #    pass
+    #else:
+    #    node.mem = 4
+
 
 def Get_interp1(node):
     if len(node):
