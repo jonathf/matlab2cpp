@@ -259,7 +259,14 @@ def Get_eye(node):
     else:
         node.type = "mat"
     
-Get_diag = Get_eye
+def Get_diag(node):
+    if len(node) > 0:
+        if node[0].dim == 3:
+            node.type = (1, node[0].mem)
+        elif node[0].dim in (1, 2):
+            node.type = (3, node[0].mem)
+
+
 Var_eye = Get_eye
 
 def Get_transpose(node):

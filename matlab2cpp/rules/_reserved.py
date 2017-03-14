@@ -839,7 +839,9 @@ def Get_toc(node):
     return 'std::cout << "Elapsed time = " << _timer.toc() << std::endl'
 
 def Get_diag(node):
-    return "diagmat(", ", ", ")"
+    if node.dim == 3:
+        return "diagmat(", ", ", ")"
+    return "diagvec(", ", ", ")"
 
 def Get_disp(node):
     node.include("iostream")
