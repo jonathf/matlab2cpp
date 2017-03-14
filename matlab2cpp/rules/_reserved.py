@@ -19,7 +19,7 @@ reserved = {
 "abs", "sqrt", "nextpow2", "fft", "ifft", "hankel",
 "zeros", "ones", "round", "return", "rand",
 "qr",
-"clear", "close", "clc", "clf", 
+"clear", "close", "clc", "clf", "more", "format",
 "_conv_to", "_reshape", "reshape",
 "interp1", "linspace", "varargins",
 "sum", "conj", "real", "imag",
@@ -687,6 +687,18 @@ def Var_clf(node):
 
 def Get_clf(node):
     return "// clf"
+
+def Var_more(node):
+    return "// more"
+
+def Get_more(node):
+    return "// more"
+
+def Var_format(node):
+    return "// format"
+
+def Get_format(node):
+    return "// format"
 
 def Get__conv_to(node):
     return "conv_to<%(type)s>::from(%(0)s)"
