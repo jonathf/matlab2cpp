@@ -650,7 +650,7 @@ def Colon(node):
 
 Examples:
     >>> print mc.qscript("a = 1:10; b = 1:10:2")
-    a = m2cpp::span<rowvec>(1, 10) ;
+    a = m2cpp::fspan(1, 1, 10) ;
     b = m2cpp::fspan(1, 10, 2) ;
     >>> print mc.qscript("a = [1,2,3]; a(1:2:2)")
     sword _a [] = {1, 2, 3} ;
