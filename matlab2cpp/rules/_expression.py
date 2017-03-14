@@ -650,7 +650,7 @@ def Colon(node):
 
 Examples:
     >>> print mc.qscript("a = 1:10; b = 1:10:2")
-    a = m2cpp::span<rowvec>(1, 10) ;
+    a = m2cpp::fspan(1, 1, 10) ;
     b = m2cpp::fspan(1, 10, 2) ;
     >>> print mc.qscript("a = [1,2,3]; a(1:2:2)")
     sword _a [] = {1, 2, 3} ;
@@ -663,6 +663,7 @@ Examples:
                 "Set", "Cset", "Nset", "Fset", "Sset") and node.parent.num:
         #node.type = "uvec"
 
+        node.include("m2cpp")
         # two arguments, use Armadillo span from:to
         if len(node) == 2:
             if node.dim in (1, 2):
@@ -706,8 +707,8 @@ Examples:
         # <start>:<stop>
         if len(node) == 2:
             if node.group.cls == "Assign":
-                return "m2cpp::span<" + node.type + ">" + "(%(0)s, %(1)s)"
-            return "m2cpp::span<" + node.type + ">" + "(%(0)s, %(1)s)"
+                return "m2cpp::fspan" + "(%(0)s, 1, %(1)s)"
+            return "m2cpp::fspan" + "(%(0)s, 1, %(1)s)"
 
         # <start>:<step>:<stop>
         elif len(node) == 3:
