@@ -659,15 +659,19 @@ Examples:
     """
 
     # context: array argument (must always be uvec)
-    if node.parent.cls in ("Get", "Cget", "Nget", "Fget", "Sget",
+    if node.group.cls in ("Get", "Cget", "Nget", "Fget", "Sget",
                 "Set", "Cset", "Nset", "Fset", "Sset") and node.parent.num:
         #node.type = "uvec"
 
         node.include("m2cpp")
         # two arguments, use Armadillo span from:to
         if len(node) == 2:
-            if node.dim in (1, 2):
-                return "arma::span(%(0)s-1, %(1)s-1)"
+
+            if node.parent.cls in ("Get", "Cget", "Nget", "Fget", "Sget",
+                "Set", "Cset", "Nset", "Fset", "Sset") and node.parent.num:
+                if node.dim in (1, 2):
+                    return "arma::span(%(0)s-1, %(1)s-1)"
+
             return "m2cpp::span<%(type)s>(%(0)s-1, %(1)s-1)"
 
         # three arguments, not supported in Armadillo

@@ -398,7 +398,7 @@ def Get_ifft(node):
 
     node.type = node[0].type
     if node.mem == 4:
-        node.mem = 3
+        node.mem = 4
     elif node.mem == 3:
         node.mem = 4
 
