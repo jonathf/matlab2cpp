@@ -440,10 +440,9 @@ Get_conj = "cx_mat"
 
 def Get_real(node):
     arg = node[0]
+
     # output always real
-    if arg.num and arg.mem == 4:
-        node.type = arg.type
-        node.mem = 3
+    node.type = (3, arg.mem)
 
 def Get_convmtx(node):
     node.type = node[0].type
