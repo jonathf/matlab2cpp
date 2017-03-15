@@ -13,7 +13,7 @@ reserved = {
 "false", "true", "pi", "inf", "Inf", "nan", "NaN",
 "eps", "exp", "log", "log2", "log10", "power", "floor", "ceil",
 "cos", "acos", "cosh", "acosh",
-"sin",
+"sin", "mod",
 "eye", "flipud", "length", "max", "min", "size", "chol",
 "transpose", "ctranspose",
 "abs", "sqrt", "nextpow2", "fft", "ifft", "hankel",
@@ -164,6 +164,12 @@ def Get_sin(node):
 def Var_i(node):
     return "cx_double(0, 1)"
 """
+
+def Get_mod(node):
+    if node[0].dim == 0 and node[0].mem != 4:
+        return "", " __percent__ ", ""
+    return "mod(", ", ", ")"
+
 def Get_abs(node):
     if len(node) and node[0].dim == 0:
         if node[0].mem == 4: #cx_double

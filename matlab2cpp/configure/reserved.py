@@ -55,6 +55,9 @@ def Get_sqrt(node):
     elif len(node):
         node.type = node[0].type
 
+def Get_mod(node):
+    node.type = node[0].type
+
 def Get_abs(node):
     if node[0].type in ("cx_double", "cx_mat"):
         node.type = "mat"
