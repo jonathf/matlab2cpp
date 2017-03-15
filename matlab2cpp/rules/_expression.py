@@ -257,10 +257,10 @@ Lt      = "", "<", ""
 Le      = "", "<=", ""
 Ne      = "", "!=", ""
 Eq      = "", "==", ""
-Band    = "", "&&", ""
-Land    = "", "&&", ""
-Bor     = "", "||", ""
-Lor     = "", "||", ""
+Band    = "", " && ", ""
+Land    = "", " && ", ""
+Bor     = "", " || ", ""
+Lor     = "", " || ", ""
 
 def Elementdivision(node):
     """Element wise division
