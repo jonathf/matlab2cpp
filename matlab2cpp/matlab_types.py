@@ -20,9 +20,12 @@ def mtypes(builder, args):
     #Current working directory
     src_dir = os.getcwd() + os.path.sep
 
-    dst_dir = src_dir + "m2cpp_temp" + os.path.sep
+    dst_dir = src_dir + "m2cpp_data_type_temp" + os.path.sep
 
-    #if directory m2cpp_temp does not exist, create it
+    # Delete the temporary folder which the datatype info
+    if os.path.isdir(dst_dir):
+        shutil.rmtree(dst_dir)
+    #if directory m2cpp_data_type_temp does not exist, create it
     if not os.path.isdir(dst_dir):
         os.mkdir(dst_dir)
 
@@ -129,7 +132,7 @@ def mtypes(builder, args):
         #set ftypes for the current program
         builder[program_number].ftypes = funcs
         program_number += 1
-    
+
     return builder
         
 
