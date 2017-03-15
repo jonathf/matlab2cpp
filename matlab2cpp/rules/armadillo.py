@@ -103,7 +103,10 @@ Examples:
 
     else:
         dim = 1
-        if node.cls != "Colon":
+
+        if len(node) > 0 and node[0].cls == "Paren":
+            pass
+        elif node.cls not in ["Colon", "Paren"]:
             out = out + "-1"
 
     return out, dim

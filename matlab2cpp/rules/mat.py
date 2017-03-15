@@ -95,6 +95,13 @@ def Get(node):
             return "%(name)s(" + "m2cpp::span<uvec>" + node[0].str[index:] + ", m2cpp::span<uvec>(" + arg1 + ", " + arg1 + "))"
             #return "%(name)s.row(" + arg0 + ").cols(" + arg1 + ")"
 
+        # uvec + uvec
+        if dim0 > 0 and dim1 > 0:
+            a0 = node[0].str.replace("arma::span", "m2cpp::span<uvec>")
+            a1 = node[1].str.replace("arma::span", "m2cpp::span<uvec>")
+
+            return "%(name)s(" + a0 + ", " + a1 + ")"
+
         return "%(name)s(" + arg0 + ", " + arg1 + ")"
 
 
@@ -187,18 +194,16 @@ def Set(node):
         # uvec + scalar
         elif dim0 > 0 and dim1 == 0:
             index = node[0].str.index('(')
-            return "%(name)s(" + "m2cpp::span<uvec>" + node[0].str[index:] + ", m2cpp::span<uvec>(" + arg1 + ", " + arg1 + "))"
+            return "%(name)s(" + "m2cpp::span<uvec>" + node[0].str[index:] + \
+                   ", m2cpp::span<uvec>(" + arg1 + ", " + arg1 + "))"
             #return "%(name)s.row(" + arg0 + ").cols(" + arg1 + ")"
 
-        ## scalar + uvec
-        #if dim0 == 0 and dim1 > 0:
-        #    #arg0 = "m2cpp::asuvec(" + arg0 + ")"
-        #    return "%(name)s.col(" + arg0 + ").rows(" + arg1 + ")"
+        # uvec + uvec
+        if dim0 > 0 and dim1 > 0:
+            a0 = node[0].str.replace("arma::span", "m2cpp::span<uvec>")
+            a1 = node[1].str.replace("arma::span", "m2cpp::span<uvec>")
 
-        ## uvec + scalar
-        #elif dim0 > 0 and dim1 == 0:
-        #    #arg1 = "m2cpp::asuvec(" + arg1 + ")"
-        #    return "%(name)s.row(" + arg0 + ").cols(" + arg1 + ")"
+            return "%(name)s(" + a0 + ", " + a1 + ")"
 
         return "%(name)s(" + arg0 + ", " + arg1 + ")"
 

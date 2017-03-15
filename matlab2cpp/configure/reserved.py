@@ -55,6 +55,9 @@ def Get_sqrt(node):
     elif len(node):
         node.type = node[0].type
 
+def Get_mod(node):
+    node.type = node[0].type
+
 def Get_abs(node):
     if node[0].type in ("cx_double", "cx_mat"):
         node.type = "mat"
@@ -259,7 +262,14 @@ def Get_eye(node):
     else:
         node.type = "mat"
     
-Get_diag = Get_eye
+def Get_diag(node):
+    if len(node) > 0:
+        if node[0].dim == 3:
+            node.type = (1, node[0].mem)
+        elif node[0].dim in (1, 2):
+            node.type = (3, node[0].mem)
+
+
 Var_eye = Get_eye
 
 def Get_transpose(node):
@@ -387,12 +397,17 @@ def Get_fft(node):
 def Get_ifft(node):
 
     node.type = node[0].type
+    if node.mem == 4:
+        node.mem = 4
+    elif node.mem == 3:
+        node.mem = 4
 
     # unknown input
-    if not node.num:
-        pass
-    else:
-        node.mem = 4
+    #if not node.num:
+    #    pass
+    #else:
+    #    node.mem = 4
+
 
 def Get_interp1(node):
     if len(node):
