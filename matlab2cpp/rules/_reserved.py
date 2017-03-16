@@ -726,25 +726,25 @@ def Get_ifft(node):
 
     # unknown input
     if not node.num:
-        return "ifft(", ", ", ")"
+        return "arma::real(arma::ifft(", ", ", "))"
 
     if len(node) == 1:
-        return "arma::ifft(%(0)s)"
+        return "arma::real(arma::ifft(%(0)s))"
 
     elif len(node) == 2:
-        return "arma::ifft(%(0)s, %(1)s)"
+        return "arma::real(arma::ifft(%(0)s, %(1)s))"
 
     elif len(node) == 3:
 
         if node[0].dim in (1,2):
-            return "arma::ifft(%(0)s, %(1)s)"
+            return "arma::real(arma::ifft(%(0)s, %(1)s))"
 
         if node[1].cls == "Matrix":
             node.include("m2cpp")
-            return "m2cpp::ifft<" + node.type + ">(%(0)s, %(2)s)"
+            return "arma::real(m2cpp::ifft(%(0)s, %(2)s))"
         else:
             node.include("m2cpp")
-            return "m2cpp::ifft<" + node.type + ">(", ", ", ")"
+            return "arma::real(m2cpp::ifft(", ", ", "))"
 
     else:
         node.error("Number of args in 'ifft' should be between 1 and 3")
@@ -752,7 +752,7 @@ def Get_ifft(node):
     if node[0].mem != 4:
         node.warning("Argument datatype of 'ifft' should be complex")
 
-    return "arma::ifft(", ", ", ")"
+    return "arma::real(arma::ifft(", ", ", "))"
 
 
 def Get_hankel(node):
