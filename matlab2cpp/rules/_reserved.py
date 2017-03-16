@@ -803,7 +803,7 @@ def Get_conj(node):
             return "std::conj(", ", ", ")"
         else:
             return "%(0)s"
-
+        
     return "arma::conj(", ", ", ")"
 
 def Get_imag(node):
