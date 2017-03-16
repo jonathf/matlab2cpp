@@ -693,6 +693,8 @@ See also:
             include_code = "#include <iostream>"
         elif name == "cstdio":
             include_code = "#include <cstdio>"
+        elif name == "complex":
+            include_code = "#include <complex>"
         elif name == "cmath":
             include_code = "#include <cmath>"
         elif name == "algorithm":
