@@ -63,6 +63,14 @@ Examples:
         elif lhs.dim in (1,2) and rhs.dim in (3, 4):
             pass
 
+        # Added this elif to handle assignment of: complex type = non_complex type
+        elif  lhs.mem > rhs.mem:
+            if lhs.dim > 0 and rhs.dim > 0:
+                out = "conv_to<" + lhs.type + ">::from(%(1)s)"
+            elif lhs.dim == 0 and rhs.dim == 0:
+                if lhs.mem == 4:
+                    out = "(" + lhs.type + ")" + " %(1)s"
+
         # all the ways things are wrong
         elif lhs.dim > 0 and rhs.dim > 0:
 

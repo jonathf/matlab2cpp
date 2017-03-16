@@ -86,8 +86,7 @@ namespace m2cpp {
    }
 
 
-	template <typename T>
-	inline arma::Mat<typename T::elem_type> ifft(arma::cx_mat X, int dim)
+	inline arma::cx_mat ifft(arma::cx_mat X, int dim)
 	{
 		if (dim == 1)
 			X = arma::ifft(X);

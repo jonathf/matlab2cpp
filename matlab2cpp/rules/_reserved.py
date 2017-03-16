@@ -639,31 +639,11 @@ def Assigns_qr(node):
     return "arma::qr(", ", ", ")"
 
 def Var_rand(node):
-    return "arma::randu<arma::vec>(1)"
+    return "arma::randu<" + node.type + ">(1)"
 
 
 def Get_rand(node):
-
-    type = node[0].type
-
-    # unknown input
-    if type == "TYPE":
-        return "arma::randu<TYPE>(", ", ", ")"
-
-    # one arg -> vec
-    if len(node) == 1:
-        return "arma::randu<vec>(%(0)s)"
-
-    # two args -> mat
-    elif len(node) == 2:
-        return "arma::randu<mat>(%(0)s, %(1)s)"
-
-    # three args -> cube
-    elif len(node) == 3:
-        return "arma::randu<cube>(%(0)s, %(1)s, %(2)s)"
-
-    else:
-        raise NotImplementedError
+    return "arma::randu<" + node.type + ">(", ", ", ")"
 
 def Var_clear(node):
     #index = node.parent.children.index(node)
@@ -746,25 +726,25 @@ def Get_ifft(node):
 
     # unknown input
     if not node.num:
-        return "ifft(", ", ", ")"
+        return "arma::real(arma::ifft(", ", ", "))"
 
     if len(node) == 1:
-        return "arma::ifft(%(0)s)"
+        return "arma::real(arma::ifft(%(0)s))"
 
     elif len(node) == 2:
-        return "arma::ifft(%(0)s, %(1)s)"
+        return "arma::real(arma::ifft(%(0)s, %(1)s))"
 
     elif len(node) == 3:
 
         if node[0].dim in (1,2):
-            return "arma::ifft(%(0)s, %(1)s)"
+            return "arma::real(arma::ifft(%(0)s, %(1)s))"
 
         if node[1].cls == "Matrix":
             node.include("m2cpp")
-            return "m2cpp::ifft<" + node.type + ">(%(0)s, %(2)s)"
+            return "arma::real(m2cpp::ifft(%(0)s, %(2)s))"
         else:
             node.include("m2cpp")
-            return "m2cpp::ifft<" + node.type + ">(", ", ", ")"
+            return "arma::real(m2cpp::ifft(", ", ", "))"
 
     else:
         node.error("Number of args in 'ifft' should be between 1 and 3")
@@ -772,7 +752,7 @@ def Get_ifft(node):
     if node[0].mem != 4:
         node.warning("Argument datatype of 'ifft' should be complex")
 
-    return "arma::ifft(", ", ", ")"
+    return "arma::real(arma::ifft(", ", ", "))"
 
 
 def Get_hankel(node):
@@ -817,6 +797,12 @@ def Get_sum(node):
     return "arma::sum(", ", ", ")"
 
 def Get_conj(node):
+    if node.dim == 0:
+        if node.mem == 4:
+            node.include("complex")
+            return "std::conj(", ", ", ")"
+        else:
+            return "%(0)s"
     return "arma::conj(", ", ", ")"
 
 def Get_imag(node):
