@@ -639,31 +639,11 @@ def Assigns_qr(node):
     return "arma::qr(", ", ", ")"
 
 def Var_rand(node):
-    return "arma::randu<arma::vec>(1)"
+    return "arma::randu<" + node.type + ">(1)"
 
 
 def Get_rand(node):
-
-    type = node[0].type
-
-    # unknown input
-    if type == "TYPE":
-        return "arma::randu<TYPE>(", ", ", ")"
-
-    # one arg -> vec
-    if len(node) == 1:
-        return "arma::randu<vec>(%(0)s)"
-
-    # two args -> mat
-    elif len(node) == 2:
-        return "arma::randu<mat>(%(0)s, %(1)s)"
-
-    # three args -> cube
-    elif len(node) == 3:
-        return "arma::randu<cube>(%(0)s, %(1)s, %(2)s)"
-
-    else:
-        raise NotImplementedError
+    return "arma::randu<" + node.type + ">(", ", ", ")"
 
 def Var_clear(node):
     #index = node.parent.children.index(node)
@@ -817,6 +797,8 @@ def Get_sum(node):
     return "arma::sum(", ", ", ")"
 
 def Get_conj(node):
+    if node.dim == 0:
+        return "std::conj(", ", ", ")"
     return "arma::conj(", ", ", ")"
 
 def Get_imag(node):
