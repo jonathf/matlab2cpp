@@ -365,17 +365,17 @@ Var_rand = "vec"
 
 def Get_rand(node):
 
-    type = node[0].type
+    # Get type from left hand side of assignment
+    if node.group.cls == "Assign":
+        if node.group[0].type != "TYPE":
+            node.type = node.group[0].type
+            return
 
-    # unknown input
-    if type == "TYPE":
-        return
-
-    # one arg -> vec
+    # one arg
     if len(node) == 1:
         node.type = "vec"
 
-    # two args -> mat
+    # two args
     elif len(node) == 2:
         node.type = "mat"
 
@@ -436,7 +436,8 @@ def Get_sum(node):
         dim = arg.dim-1
     node.dim = dim
 
-Get_conj = "cx_mat"
+def Get_conj(node):
+    node.type = node[0].type
 
 def Get_real(node):
     arg = node[0]
