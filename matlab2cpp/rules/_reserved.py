@@ -798,7 +798,11 @@ def Get_sum(node):
 
 def Get_conj(node):
     if node.dim == 0:
-        return "std::conj(", ", ", ")"
+        if node.mem == 4:
+            node.include("complex")
+            return "std::conj(", ", ", ")"
+        else:
+            return "%(0)s"
     return "arma::conj(", ", ", ")"
 
 def Get_imag(node):
