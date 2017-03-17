@@ -668,14 +668,18 @@ Examples:
         if len(node) == 2:
 
             if node.parent.cls in ("Get", "Cget", "Nget", "Fget", "Sget",
-                "Set", "Cset", "Nset", "Fset", "Sset") and node.parent.num:
+                "Set", "Cset", "Nset", "Fset", "Sset") and node.parent.num and node.parent.backend != "reserved":
                 if node.dim in (1, 2):
                     return "arma::span(%(0)s-1, %(1)s-1)"
 
+            if node.group.backend == "reserved":
+                return "m2cpp::fspan(%(0)s, 1, %(1)s)"
             return "m2cpp::span<%(type)s>(%(0)s-1, %(1)s-1)"
 
         # three arguments, not supported in Armadillo
         elif len(node) == 3:
+            if node.group.backend == "reserved":
+                return "m2cpp::fspan(%(0)s, %(1)s, %(2)s)"
             return "m2cpp::span<%(type)s>(%(0)s-1, %(1)s, %(2)s-1)"
 
         else:
