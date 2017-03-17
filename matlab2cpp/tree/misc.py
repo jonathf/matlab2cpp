@@ -547,16 +547,19 @@ def reserved(self, node, start):
         while self.code[k] in " \t":
             k += 1
 
+        name = ""
         if self.code[k] == "\'":
             l = findend.string(self, k)
+            name = str(self.code[k+1:l])
         else:
             l = k
             while self.code[l] not in " \t\n":
                 l += 1
+            name = str(self.code[k:l])
 
         get = mc.collection.Get(statement, name="disp", cur=start, value=self.code[k:l])
 
-        name = str(self.code[k+1:l])
+        #name = str(self.code[k+1:l])
         node = mc.collection.String(get, name)
         #node.create_declare()
 
