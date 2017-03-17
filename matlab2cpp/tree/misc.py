@@ -532,6 +532,41 @@ def reserved(self, node, start):
         print "%-20s" % "misc.reserved",
         print repr(self.code[k:newline])
 
+    if self.code[k:k+4] == "disp":
+        statement = mc.collection.Statement(node, cur=start,
+                                            code=self.code[start:newline])
+
+        l = k+4
+        while self.code[l] in " \t":
+            l += 1
+
+        if self.code[l] == "(":
+            return expression.create(self, statement, k)
+
+        k += 4
+        while self.code[k] in " \t":
+            k += 1
+
+        if self.code[k] == "\'":
+            l = findend.string(self, k)
+        else:
+            l = k
+            while self.code[l] not in " \t\n":
+                l += 1
+
+        get = mc.collection.Get(statement, name="disp", cur=start, value=self.code[k:l])
+
+        name = str(self.code[k+1:l])
+        node = mc.collection.String(get, name)
+        #node.create_declare()
+
+        while self.code[k] not in ";\n":
+            k += 1
+
+
+        return k
+
+
     if self.code[k:k+4] == "load":
 
         statement = mc.collection.Statement(node, cur=start,
