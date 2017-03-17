@@ -16,7 +16,7 @@ reserved = {
 "sin", "mod",
 "eye", "flipud", "length", "max", "min", "size", "chol",
 "transpose", "ctranspose",
-"abs", "sqrt", "nextpow2", "fft", "ifft", "hankel",
+"abs", "sqrt", "nextpow2", "fft", "ifft", "fft2", "ifft2", "hankel",
 "zeros", "ones", "round", "return", "rand",
 "qr",
 "clear", "close", "clc", "clf", "more", "format",
@@ -754,6 +754,11 @@ def Get_ifft(node):
 
     return "arma::real(arma::ifft(", ", ", "))"
 
+def Get_fft2(node):
+    return "arma::fft2(", ", ", ")"
+
+def Get_ifft2(node):
+    return "arma::real(arma::ifft2(", ", ", "))"
 
 def Get_hankel(node):
     node.include("m2cpp")
@@ -803,6 +808,7 @@ def Get_conj(node):
             return "std::conj(", ", ", ")"
         else:
             return "%(0)s"
+        
     return "arma::conj(", ", ", ")"
 
 def Get_imag(node):
@@ -834,6 +840,9 @@ def Get_diag(node):
     if node.dim == 3:
         return "diagmat(", ", ", ")"
     return "diagvec(", ", ", ")"
+
+def Var_disp(node):
+    return "// disp"
 
 def Get_disp(node):
     node.include("iostream")
