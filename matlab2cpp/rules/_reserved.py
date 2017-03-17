@@ -836,6 +836,9 @@ def Get_diag(node):
         return "diagmat(", ", ", ")"
     return "diagvec(", ", ", ")"
 
+def Var_disp(node):
+    return "// disp"
+
 def Get_disp(node):
     node.include("iostream")
     
