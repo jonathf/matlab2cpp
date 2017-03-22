@@ -383,6 +383,10 @@ def Get_rand(node):
     elif len(node) == 3:
         node.type = "cube"
 
+def Get_reshape(node):
+    if node[0].mem:
+        node.type = (3, node[0].mem)
+
 def Get_nextpow2(node):
     node.type = "int"
     
