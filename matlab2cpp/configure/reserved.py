@@ -409,9 +409,9 @@ def Get_ifft(node):
 
     node.type = node[0].type
     if node.mem == 4:
-        node.mem = 4
+        node.mem = 3
     elif node.mem == 3:
-        node.mem = 4
+        node.mem = 3
 
     # unknown input
     #if not node.num:
@@ -454,10 +454,13 @@ def Get_conj(node):
     node.type = node[0].type
 
 def Get_real(node):
-    arg = node[0]
-
+    if node[0].dim:
+        node.type = (node[0].dim, 3)
+    #arg = node[0]
+    #
     # output always real
-    node.type = (3, arg.mem)
+    #if arg.mem:
+    #    node.type = (3, arg.mem)
 
 def Get_convmtx(node):
     node.type = node[0].type

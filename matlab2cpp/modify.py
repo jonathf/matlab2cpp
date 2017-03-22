@@ -24,6 +24,9 @@ def preorder_transform_AST(node, nargin = False):
     # add temporary variables for multiple return function
     project = add_parameters(project)
 
+    # change data type from real to complex, if left hand side is real and right hand side is complex in assignment
+    change_to_complex(project)
+
     return project
 
 
@@ -37,6 +40,61 @@ def postorder_transform_AST(node):
     project = modify_define_first(project)
 
     return project
+
+
+# node is project node
+def change_to_complex(project):
+
+    # for each program in project
+    for idx, program in enumerate(project):
+        dictionary = program.ftypes
+        new_complex_types = {}
+        new_complex_dim = {}
+
+        # for each function (in Funcs) in program
+        for func in program[1]:
+            func_name = func.name
+
+            # flatten nodes in the function
+            nodes = func.flatten(False, False, False)
+
+            #look for assignment
+            for n in nodes:
+                if n.cls in "Assign" and len(n) == 2:
+                    lhs, rhs = n
+                    if lhs.mem and lhs.mem != 4 and rhs.mem == 4:
+                        lhs.mem = 4
+
+                        # add variable name as key and complex type as type
+                        if (lhs.name in new_complex_dim) and (new_complex_dim[lhs.name] < lhs.dim):
+
+                            new_complex_dim[lhs.name] = lhs.dim
+
+                            lhs.type = (lhs.dim, lhs.mem)
+                            new_complex_types[lhs.name] = lhs.type
+
+                        else:
+                            new_complex_dim[lhs.name] = lhs.dim
+                            lhs.type = (lhs.dim, lhs.mem)
+                            new_complex_types[lhs.name] = lhs.type
+
+                        dictionary[func_name][lhs.name] = new_complex_types[lhs.name]
+
+        # clear the types in the program
+        nodes = program.flatten(False, False, False)
+        for idy, node in enumerate(nodes):
+            node.type = "TYPE"
+
+        # use dictionary to set ftypes
+        program.ftypes = dictionary
+
+    # unset the configured flag
+    project.builder.configured = False
+
+    # configure again
+    project.builder.configure(True)
+
+    #print dictionary
 
 
 def complex_mul(nodes):
