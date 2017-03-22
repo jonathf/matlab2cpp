@@ -48,6 +48,15 @@ def Get_acosh(node):
 def Get_sin(node):
     node.type = node[0].type
 
+def Get_asin(node):
+    node.type = node[0].type
+
+def Get_sinh(node):
+    node.type = node[0].type
+
+def Get_asinh(node):
+    node.type = node[0].type
+
 def Get_sqrt(node):
     #if len(node) > 0 ...
     if len(node) and node[0].cls == "Neg":
