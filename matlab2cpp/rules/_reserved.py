@@ -13,7 +13,7 @@ reserved = {
 "false", "true", "pi", "inf", "Inf", "nan", "NaN",
 "eps", "exp", "log", "log2", "log10", "power", "floor", "ceil",
 "cos", "acos", "cosh", "acosh",
-"sin", "mod",
+"sin", "asin", "sinh", "asinh", "mod",
 "eye", "flipud", "length", "max", "min", "size", "chol",
 "transpose", "ctranspose",
 "abs", "sqrt", "nextpow2", "fft", "ifft", "fft2", "ifft2", "hankel",
@@ -159,6 +159,24 @@ def Get_sin(node):
         node.include("cmath")
         return "std::sin(", ", ", ")"
     return "arma::sin(", ", ", ")"
+
+def Get_asin(node):
+    if node[0].dim == 0 and node[0].mem != 4:
+        node.include("cmath")
+        return "std::asin", ", ", ")"
+    return "arma::asin(", ", ", ")"
+
+def Get_sinh(node):
+    if node[0].dim == 0 and node[0].mem != 4:
+        node.include("cmath")
+        return "std::sinh", ", ", ")"
+    return "arma::sinh(", ", ", ")"
+
+def Get_asinh(node):
+    if node[0].dim == 0 and node[0].mem != 4:
+        node.include("cmath")
+        return "std::asinh", ", ", ")"
+    return "arma::asinh(", ", ", ")"
 
 # Special handle of 'i'-variable
 """ removed from reserved: "i",
