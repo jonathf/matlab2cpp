@@ -22,8 +22,9 @@ reserved = {
 "clear", "close", "clc", "clf", "more", "format",
 "_conv_to", "_reshape", "reshape",
 "interp1", "linspace", "varargins",
-"sum", "conj", "real", "imag",
-"tic", "toc", "diag", "disp", "fprintf", "error", "convmtx", "conv2",
+"sum", "cumsum", "conj", "real", "imag",
+"tic", "toc", "diag", "tril", "triu",
+"disp", "fprintf", "error", "convmtx", "conv2",
 "figure", "clf", "cla", "show", "xlabel", "ylabel", "hold", "load",
 "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
 "xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
@@ -801,6 +802,14 @@ def Get_sum(node):
         return "arma::as_scalar(arma::sum(%(0)s))"
     return "arma::sum(", ", ", ")"
 
+def Get_cumsum(node):
+    if len(node) < 2:
+        return "cumsum(", ", ", ")"
+    elif len(node) == 2:
+        return "cumsum(%(0)s, %(1)s-1)"
+    else:
+        return "cumsum(", ", ", ")"
+
 def Get_conj(node):
     if node.dim == 0:
         if node.mem == 4:
@@ -839,6 +848,12 @@ def Get_diag(node):
     if node.dim == 3:
         return "diagmat(", ", ", ")"
     return "diagvec(", ", ", ")"
+
+def Get_tril(node):
+    return "trimatl(", ", ", ")"
+
+def Get_triu(node):
+    return "trimatu(", ", ", ")"
 
 def Var_disp(node):
     return "// disp"

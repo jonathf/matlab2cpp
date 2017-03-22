@@ -269,7 +269,14 @@ def Get_diag(node):
         elif node[0].dim in (1, 2):
             node.type = (3, node[0].mem)
 
+def Get_tril(node):
+    if node[0].mem:
+        node.type = (3, node[0].mem)
 
+def Get_triu(node):
+    if node[0].mem:
+        node.type = (3, node[0].mem)
+        
 Var_eye = Get_eye
 
 def Get_transpose(node):
@@ -439,6 +446,9 @@ def Get_sum(node):
     else:
         dim = arg.dim-1
     node.dim = dim
+
+def Get_cumsum(node):
+    node.type = node[0].type
 
 def Get_conj(node):
     node.type = node[0].type
