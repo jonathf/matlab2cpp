@@ -269,7 +269,14 @@ def Get_diag(node):
         elif node[0].dim in (1, 2):
             node.type = (3, node[0].mem)
 
+def Get_tril(node):
+    if node[0].mem:
+        node.type = (3, node[0].mem)
 
+def Get_triu(node):
+    if node[0].mem:
+        node.type = (3, node[0].mem)
+        
 Var_eye = Get_eye
 
 def Get_transpose(node):
@@ -383,6 +390,10 @@ def Get_rand(node):
     elif len(node) == 3:
         node.type = "cube"
 
+def Get_reshape(node):
+    if node[0].mem:
+        node.type = (3, node[0].mem)
+
 def Get_nextpow2(node):
     node.type = "int"
     
@@ -398,9 +409,9 @@ def Get_ifft(node):
 
     node.type = node[0].type
     if node.mem == 4:
-        node.mem = 4
+        node.mem = 3
     elif node.mem == 3:
-        node.mem = 4
+        node.mem = 3
 
     # unknown input
     #if not node.num:
@@ -436,14 +447,20 @@ def Get_sum(node):
         dim = arg.dim-1
     node.dim = dim
 
+def Get_cumsum(node):
+    node.type = node[0].type
+
 def Get_conj(node):
     node.type = node[0].type
 
 def Get_real(node):
-    arg = node[0]
-
+    if node[0].dim:
+        node.type = (node[0].dim, 3)
+    #arg = node[0]
+    #
     # output always real
-    node.type = (3, arg.mem)
+    #if arg.mem:
+    #    node.type = (3, arg.mem)
 
 def Get_convmtx(node):
     node.type = node[0].type
