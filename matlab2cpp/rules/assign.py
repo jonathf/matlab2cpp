@@ -60,8 +60,8 @@ Examples:
             return arma.scalar_assign(node)
 
         # dimensions that works just fine
-        elif lhs.dim in (1,2) and rhs.dim in (3, 4):
-            pass
+        #elif lhs.dim in (1,2) and rhs.dim in (3, 4):
+        #    pass
 
         # Added this elif to handle assignment of: complex type = non_complex type
         elif  lhs.mem > rhs.mem:
