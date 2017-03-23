@@ -329,6 +329,10 @@ def Get_zeros(node):
     else:
         node.mem = 3
 
+    #if node.group.cls == "Matrix" and node.group.group.cls == "Assign" and len(node.group.group) == 2:
+    #    if node.group.group[0].mem == 4:
+    #        node.mem = 4
+
     # reset to uword if arg of array-node
     if node.group.cls in ("Get", "Cget", "Fget", "Nget", "Sget", "Set", "Cset",
             "Fset", "Nset", "Sset") and node.group.num:
