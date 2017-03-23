@@ -51,9 +51,9 @@ namespace m2cpp {
         {
             return s;
         }
-        s.set_size(n + 1);
+        s.set_size(n);
 
-        for (int ii = 0; ii <= n; ii++)
+        for (int ii = 0; ii < n; ii++)
         {
             s(ii) = step * ii + a;
         }
@@ -70,9 +70,9 @@ namespace m2cpp {
         {
             return s;
         }
-        s.set_size(n + 1);
+        s.set_size(n);
 
-        for (int ii = 0; ii <= n; ii++)
+        for (int ii = 0; ii < n; ii++)
         {
             s(ii) = step * ii + a;
         }
