@@ -13,7 +13,7 @@ reserved = {
 "false", "true", "pi", "inf", "Inf", "nan", "NaN",
 "eps", "exp", "log", "log2", "log10", "power", "floor", "ceil",
 "cos", "acos", "cosh", "acosh",
-"sin", "mod",
+"sin", "asin", "sinh", "asinh", "mod",
 "eye", "flipud", "length", "max", "min", "size", "chol",
 "transpose", "ctranspose",
 "abs", "sqrt", "nextpow2", "fft", "ifft", "fft2", "ifft2", "hankel",
@@ -22,8 +22,9 @@ reserved = {
 "clear", "close", "clc", "clf", "more", "format",
 "_conv_to", "_reshape", "reshape",
 "interp1", "linspace", "varargins",
-"sum", "conj", "real", "imag",
-"tic", "toc", "diag", "disp", "fprintf", "error", "convmtx", "conv2",
+"sum", "cumsum", "conj", "real", "imag",
+"tic", "toc", "diag", "tril", "triu",
+"disp", "fprintf", "error", "convmtx", "conv2",
 "figure", "clf", "cla", "show", "xlabel", "ylabel", "hold", "load",
 "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
 "xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
@@ -158,6 +159,24 @@ def Get_sin(node):
         node.include("cmath")
         return "std::sin(", ", ", ")"
     return "arma::sin(", ", ", ")"
+
+def Get_asin(node):
+    if node[0].dim == 0 and node[0].mem != 4:
+        node.include("cmath")
+        return "std::asin", ", ", ")"
+    return "arma::asin(", ", ", ")"
+
+def Get_sinh(node):
+    if node[0].dim == 0 and node[0].mem != 4:
+        node.include("cmath")
+        return "std::sinh", ", ", ")"
+    return "arma::sinh(", ", ", ")"
+
+def Get_asinh(node):
+    if node[0].dim == 0 and node[0].mem != 4:
+        node.include("cmath")
+        return "std::asinh", ", ", ")"
+    return "arma::asinh(", ", ", ")"
 
 # Special handle of 'i'-variable
 """ removed from reserved: "i",
@@ -801,6 +820,14 @@ def Get_sum(node):
         return "arma::as_scalar(arma::sum(%(0)s))"
     return "arma::sum(", ", ", ")"
 
+def Get_cumsum(node):
+    if len(node) < 2:
+        return "cumsum(", ", ", ")"
+    elif len(node) == 2:
+        return "cumsum(%(0)s, %(1)s-1)"
+    else:
+        return "cumsum(", ", ", ")"
+
 def Get_conj(node):
     if node.dim == 0:
         if node.mem == 4:
@@ -840,6 +867,12 @@ def Get_diag(node):
     if node.dim == 3:
         return "diagmat(", ", ", ")"
     return "diagvec(", ", ", ")"
+
+def Get_tril(node):
+    return "trimatl(", ", ", ")"
+
+def Get_triu(node):
+    return "trimatu(", ", ", ")"
 
 def Var_disp(node):
     return "// disp"
