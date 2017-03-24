@@ -103,6 +103,8 @@ Examples:
     c = arma::as_scalar(a*b) ;
     """
 
+    c_flag = False
+
     if not node[0].num:
         return "", "*", ""
 
@@ -117,7 +119,10 @@ Examples:
     dim = node[0].dim
     #mem = max(node[0].mem, 2)
 
-    out = "%(0)s"
+    if node.mem == 4 and node[0].dim == 0 and node[0].mem != 4:
+        out = "(cx_double) %(0)s"
+    else:
+        out = "%(0)s"
     index = 1
     for child in node[1:]:
         sVal = str(index)
@@ -129,6 +134,8 @@ Examples:
 
         if dim == 0:
             dim = child.dim
+            if node.mem == 4 and child.dim == 0 and child.mem != 4:
+                c_flag = True
 
         if dim == 1:
             if child.dim == 0:
@@ -173,8 +180,10 @@ Examples:
                 #pass
                 dim = 3
 
-
-        out = out + "*" + "%(" + sVal + ")s"
+        if c_flag:
+            out = out + "*" + "(cx_double) %(" + sVal + ")s"
+        else:
+            out = out + "*" + "%(" + sVal + ")s"
         #mem = max(mem, child.mem)
 
     #node.type = (dim, mem)
