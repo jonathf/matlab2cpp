@@ -816,8 +816,10 @@ def Get_sum(node):
     # second argument should be dim, matlab uses dim 1/2, and armadillo 0/1
     if len(node) == 2:
         return "arma::sum(", ", ", "-1)"
+    elif len(node) == 1 and node[0].dim == 2:
+        return "arma::as_scalar(arma::sum(arma::strans(%(0)s)))"
     elif len(node) == 1 and node[0].dim == 1:
-        return "arma::as_scalar(arma::sum(%(0)s))"
+        return "arma::as_scalar(arma::sum(", ", ", "))"
     return "arma::sum(", ", ", ")"
 
 def Get_cumsum(node):
