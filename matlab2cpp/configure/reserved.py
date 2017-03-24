@@ -457,7 +457,12 @@ def Get_sum(node):
         else:
             dim = 2
     else:
-        dim = arg.dim-1
+        if arg.dim == 3:
+            dim = 2
+        elif arg.dim == 2:
+            arg.dim == 0
+        else:
+            dim = arg.dim-1
     node.dim = dim
 
 def Get_cumsum(node):
