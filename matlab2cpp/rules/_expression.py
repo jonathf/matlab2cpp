@@ -625,10 +625,10 @@ def Transpose(node):
     """
 
     # not complex type
-    if node.mem < 4:
-        return "arma::strans(", "", ")"
+    #if node.mem < 4:
+    #    return "arma::strans(", "", ")"
 
-    return "arma::trans(", "", ")"
+    return "arma::strans(", "", ")"
 
 def Ctranspose(node):
     """Complex transpose
