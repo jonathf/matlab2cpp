@@ -296,6 +296,9 @@ def Get_triu(node):
         
 Var_eye = Get_eye
 
+def Get_trace(node):
+    node.type = node[0].type
+
 def Get_transpose(node):
     """Simple transpose
     """

@@ -15,7 +15,7 @@ reserved = {
 "cos", "acos", "cosh", "acosh",
 "sin", "asin", "sinh", "asinh", "mod",
 "eye", "fliplr", "flipud", "length", "max", "min", "size", "chol",
-"transpose", "ctranspose",
+"trace", "transpose", "ctranspose",
 "abs", "sqrt", "nextpow2", "fft", "ifft", "fft2", "ifft2", "hankel",
 "zeros", "ones", "round", "return", "rand",
 "qr",
@@ -532,6 +532,9 @@ def Get_eye(node):
         return "arma::eye<%(type)s>(%(0)s, %(1)s)"
 
     raise NotImplementedError
+
+def Get_trace(node):
+    return "arma::trace(", ", ", ")"
 
 def Get_transpose(node):
     """Simple transpose
