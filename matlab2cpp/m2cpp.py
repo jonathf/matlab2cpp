@@ -111,19 +111,15 @@ namespace m2cpp {
         return X;
     }
 
-/*
-  template<typename eT>
-  inline typename arma::enable_if2<arma::is_real<eT>::value, arma::Col<eT> >::result fspan(eT a, eT step, eT b) {
-  arma::Col<eT> s;
-  int n = int((b - a) / step);
-  if (n < 0) return s;
-
-  s.set_size(n + 1);
-  for (int ii = 0; ii <= n; ii++)
-  s(ii) = step * ii + a;
-  return s;
-  }
-*/
+    inline arma::cx_mat ifft(arma::cx_mat X, int n, int dim)
+    {
+        if (dim == 1)
+            X = arma::ifft(X, n);
+        else
+            X = arma::strans(arma::ifft(arma::strans(X), n));
+        return X;
+    }
+    
 
     //template<typename eT>
     inline rowvec fspan(double a, double step, double b) {
@@ -194,6 +190,7 @@ namespace m2cpp {
         return A.n_elem;
     }
 
+    /*
     template<typename T>
     inline arma::Mat <typename T::elem_type> convmtx(const T& v, int m) {
 
@@ -202,6 +199,31 @@ namespace m2cpp {
 
         for (int ii = 0; ii < m; ii++) {
             out.submat(ii, ii, ii + v.n_elem - 1, ii) = v;
+        }
+
+        if (v.n_rows == 1)
+            out = out.t();
+        return out;
+    }
+    */
+
+    template<typename T>
+    inline arma::Mat <typename T::elem_type> convmtx(const T& v, int m) {
+
+        arma::Mat<typename T::elem_type> out = zeros<arma::Mat<typename T::elem_type> >(v.n_elem + m - 1, m);
+        arma::Col<typename T::elem_type> aux((typename T::elem_type*)v.memptr(), v.n_elem);
+
+        if (v.n_rows == 1)
+        {
+            for (int ii = 0; ii < m; ii++) {
+                out.submat(ii, ii, ii + v.n_elem - 1, ii) = aux;
+            }
+        }
+        else
+        {
+            for (int ii = 0; ii < m; ii++) {
+                out.submat(ii, ii, ii + v.n_elem - 1, ii) = v;
+            }
         }
 
         if (v.n_rows == 1)
