@@ -14,7 +14,7 @@ reserved = {
 "eps", "exp", "log", "log2", "log10", "power", "floor", "ceil",
 "cos", "acos", "cosh", "acosh",
 "sin", "asin", "sinh", "asinh", "mod",
-"eye", "flipud", "length", "max", "min", "size", "chol",
+"eye", "fliplr", "flipud", "length", "max", "min", "size", "chol",
 "transpose", "ctranspose",
 "abs", "sqrt", "nextpow2", "fft", "ifft", "fft2", "ifft2", "hankel",
 "zeros", "ones", "round", "return", "rand",
@@ -544,6 +544,9 @@ def Get_ctranspose(node):
     """
 
     return "arma::trans(%(0)s)"
+
+def Get_fliplr(node):
+    return "arma::fliplr(%(0)s)"
 
 def Get_flipud(node):
     return "arma::flipud(%(0)s)"

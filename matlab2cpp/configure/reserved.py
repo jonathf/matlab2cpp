@@ -264,6 +264,14 @@ def Assigns_max(node):
         node[0].suggest = (0, var.mem)
         node[1].suggest = "int"
 
+def Get_fliplr(node):
+    if len(node) > 0:
+        node.type = node[0].type
+
+def Get_flipud(node):
+    if len(node) > 0:
+        node.type = node[0].type
+
 def Get_eye(node):
     #set eye type to cx_mat if LHS is complex type
     if node.group.cls == "Assign" and node.group[0].mem == 4:
