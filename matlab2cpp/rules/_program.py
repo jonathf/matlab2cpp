@@ -1,6 +1,7 @@
 import re
 import matlab2cpp as mc
 import armadillo as arma
+from function import type_string
 
 def add_indenting(text):
     """Add identing to text
@@ -91,17 +92,50 @@ def Headers(node):
 def Header(node):
     func = node.program[1][node.program[1].names.index(node.name)]
     if func.backend == "func_return":
-        code = func[1][0].type + " " + func.name + "(" +\
-            ", ".join([p.type + " " + p.name for p in func[2]]) + ") ;"
+        code = func[1][0].type + " " + func.name + "("
+
+        params = ""
+        for p in func[2]:
+            if p.dim > 0:
+                params += ", " + "const " + type_string(p) + "& " + str(p)
+            else:
+                params += ", " + type_string(p) + " " + str(p)
+
+        code += params[2:] + ") ;"
 
     elif func.backend == "func_returns" and not func[1]:
-        code = "void " + func.name + "(" +\
-            ", ".join([p.type + " " + p.name for p in func[2]]) + ") ;"
+        code = "void " + func.name + "("
+
+        params = ""
+        for p in func[2]:
+            if p.dim > 0:
+                params += ", " + "const " + type_string(p) + "& " + str(p)
+            else:
+                params += ", " + type_string(p) + " " + str(p)
+
+        code += params[2:] + ") ;"
 
     elif func.backend == "func_returns" and func[1]:
-        code = "void " + func.name + "(" +\
-            ", ".join([p.type + " " + p.name for p in func[2]]) + ", " +\
-            ", ".join([p.type + "& " + p.name for p in func[1]]) + ") ;"
+        code = "void " + func.name + "("
+
+        params = ""
+        for p in func[2]:
+            if p.dim > 0:
+                params += ", " + "const " + type_string(p) + "& " + str(p)
+            else:
+                params += ", " + type_string(p) + " " + str(p)
+
+        #return_params = ""
+        return_params = ", ".join([p.type + "& " + p.name for p in func[1]])
+
+        if return_params and params:
+            params += ", " + return_params
+        else:
+            params += return_params
+
+        params += ") ;"
+
+        code += params[2:]
     return code
 
 Include = "%(name)s"
