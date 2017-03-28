@@ -50,7 +50,7 @@ Examples:
         if lhs.dim == 0 and rhs.dim == 0:
 
             if lhs.mem >= rhs.mem:
-                out = "(" + lhs.type + ") " + out
+                out = "" + lhs.type + "(" + out + ")"
             else:
                 node.warning("Type reduction from %s to %s" %\
                         (rhs.type, lhs.type))
@@ -69,7 +69,7 @@ Examples:
                 out = "conv_to<" + lhs.type + ">::from(%(1)s)"
             elif lhs.dim == 0 and rhs.dim == 0:
                 if lhs.mem == 4:
-                    out = "(" + lhs.type + ")" + " %(1)s"
+                    out = "" + lhs.type + "" + "(%(1)s)"
 
         # all the ways things are wrong
         elif lhs.dim > 0 and rhs.dim > 0:

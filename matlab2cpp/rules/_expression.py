@@ -120,7 +120,7 @@ Examples:
     #mem = max(node[0].mem, 2)
 
     if node.mem == 4 and node[0].dim == 0 and node[0].mem != 4:
-        out = "(cx_double) %(0)s"
+        out = "cx_double(%(0)s)"
     else:
         out = "%(0)s"
     index = 1
