@@ -120,7 +120,7 @@ Examples:
     #mem = max(node[0].mem, 2)
 
     if node.mem == 4 and node[0].dim == 0 and node[0].mem != 4:
-        out = "(cx_double) %(0)s"
+        out = "cx_double(%(0)s)"
     else:
         out = "%(0)s"
     index = 1
@@ -388,6 +388,9 @@ def Matrixdivision(node):
             elif child.mem < 2 and mem < 2:
                 out = out + "*1.0/" + str(child)
 
+            elif child.type == "int" and mem == 4:
+                out = out + "/" + "double(" + str(child) + ")"
+
             else:
                 out = out + "/" + str(child)
 
@@ -625,10 +628,10 @@ def Transpose(node):
     """
 
     # not complex type
-    if node.mem < 4:
-        return "arma::strans(", "", ")"
+    #if node.mem < 4:
+    #    return "arma::strans(", "", ")"
 
-    return "arma::trans(", "", ")"
+    return "arma::strans(", "", ")"
 
 def Ctranspose(node):
     """Complex transpose

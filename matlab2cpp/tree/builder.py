@@ -57,7 +57,8 @@ code through the front end functions in :py:mod:`matlab2cpp.qfunctions`::
     }
     """
 
-    def __init__(self, disp=False, comments=True, original=False, enable_omp=False, enable_tbb=False, **kws):
+    def __init__(self, disp=False, comments=True, original=False, enable_omp=False, enable_tbb=False,
+                 reference=False, **kws):
         """
 Args:
     disp (bool):
@@ -76,6 +77,7 @@ Args:
         self.project.builder = self
         self.enable_omp = enable_omp
         self.enable_tbb = enable_tbb
+        self.reference = reference
         self.configured = False
 
 

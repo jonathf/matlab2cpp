@@ -91,17 +91,47 @@ def Headers(node):
 def Header(node):
     func = node.program[1][node.program[1].names.index(node.name)]
     if func.backend == "func_return":
-        code = func[1][0].type + " " + func.name + "(" +\
+
+        # if -ref, -reference flag option
+        if node.project.builder.reference:
+
+            code = func[1][0].type + " " + func.name + "(" +\
+                   ", ".join(["const " + p.type + "& " + p.name if p.dim > 0 else
+                           p.type + " " + p.name for p in func[2]]) + ") ;"
+
+        else:
+            code = func[1][0].type + " " + func.name + "(" +\
             ", ".join([p.type + " " + p.name for p in func[2]]) + ") ;"
 
+
     elif func.backend == "func_returns" and not func[1]:
-        code = "void " + func.name + "(" +\
+
+        # if -ref, -reference flag option
+        if node.project.builder.reference:
+            code = "void " + func.name + "(" +\
+                ", ".join(["const " + p.type + "& " + p.name if p.dim > 0 else
+                           p.type + " " + p.name for p in func[2]]) + ") ;"
+
+        else:
+            code = "void " + func.name + "(" +\
             ", ".join([p.type + " " + p.name for p in func[2]]) + ") ;"
 
     elif func.backend == "func_returns" and func[1]:
-        code = "void " + func.name + "(" +\
+
+        # if -ref, -reference flag option
+        if node.project.builder.reference:
+            code = "void " + func.name + "(" +\
+                ", ".join(["const " + p.type + "& " + p.name if p.dim > 0 else
+                           p.type + " " + p.name for p in func[2]]) + ", " +\
+                ", ".join([p.type + "& " + p.name for p in func[1]]) + ") ;"
+
+        else:
+            code = "void " + func.name + "(" +\
             ", ".join([p.type + " " + p.name for p in func[2]]) + ", " +\
             ", ".join([p.type + "& " + p.name for p in func[1]]) + ") ;"
+
+
+
     return code
 
 Include = "%(name)s"
