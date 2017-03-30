@@ -80,12 +80,16 @@ Examples:
     """
 
     out = ""
-    for child in node:
-        if child.dim > 0:
-            out += ", " + "const " + type_string(child) + "& " + str(child)
-        else:
-            out += ", " + type_string(child) + " " + str(child)
-    return out[2:]
+
+    # if -ref, -reference flag option
+    if node.project.builder.reference:
+        out += ", ".join(["const " + child.type + "& " + child.name if child.dim > 0 else
+                           child.type + " " + child.name for child in node])
+
+    else:
+        out = ", ".join([child.type + " " + child.name for child in node])
+
+    return out
 
 
 def Declares(node):

@@ -78,7 +78,8 @@ Args:
     """
 
     builder = tree.builder.Builder(disp=args.disp, comments=args.comments,
-                                   original=args.original, enable_omp=args.enable_omp, enable_tbb=args.enable_tbb)
+                                   original=args.original, enable_omp=args.enable_omp, enable_tbb=args.enable_tbb,
+                                   reference=args.reference)
 
     paths_from_file = []
     #read setpath.m file and return string list of paths

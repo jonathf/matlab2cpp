@@ -32,7 +32,9 @@ parser.add_argument("-s", '--suggest', action="store_true",
 Automatically populate the `<filename>.py` file with datatype with suggestions
 if possible.""")
 parser.add_argument("-S", '--matlab-suggest', action="store_true",
-        help="""Creates a folder m2cpp_temp. In the folder the matlab file(s) to be translated are also put. These matlab file(s) are slightly modified so that they output data-type information of the variables to file(s). This output can then be used to set the datatypes for the translation.""")
+        help="""Creates a folder m2cpp_temp. In the folder the matlab file(s) to be translated are also put. \
+        These matlab file(s) are slightly modified so that they output data-type information of the variables \
+        to file(s). This output can then be used to set the datatypes for the translation.""")
 
 parser.add_argument("-r", '--reset', action="store_true",
         help="""\
@@ -58,16 +60,25 @@ Print out the progress of the translation process.""")
 
 parser.add_argument("-p", "--paths_file", type=str, dest="paths_file",
         help="""\
-Flag and paths_file (-p path_to_pathsfile). m2cpp will look for matlab files in the location specified in the paths_file""")
+Flag and paths_file (-p path_to_pathsfile). m2cpp will look for matlab files in the location specified \
+in the paths_file""")
 
 parser.add_argument("-omp", '--enable-omp', action="store_true",
                     help="""\
-OpenMP code is inserted for Parfor and loops marked with the pragma %%#PARFOR (in Matlab code) when this flag is set.""")
+OpenMP code is inserted for Parfor and loops marked with the pragma %%#PARFOR (in Matlab code) when this \
+flag is set.""")
 
 parser.add_argument("-tbb", '--enable-tbb', action="store_true",
                     help="""\
 TBB code is inserted for Parfor and loops marked with the pragma %%#PARFOR (in Matlab code) when this flag is set.""")
 
+parser.add_argument("-ref", '--reference', action="store_true",
+                    help="""\
+For the generated C++ code, function input parameters are "copied by value" as default. With this flag some \
+input parameters in the generated code can be const references. There can be some performance advantage of using
+const references instead of "copied by value". Note that Matlab "copies by value". \
+The Matlab code you try to translate to C++ code could try read as well as write to this input variable. \
+The code generator doesn't perform an analysis to detect this and then "copy by value" for this variable.""")
 parser.add_argument("-l", '--line', type=int, dest="line",
         help="Only display code related to code line number `<line>`.")
 
