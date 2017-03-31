@@ -1,6 +1,7 @@
 import re
 import matlab2cpp as mc
 import armadillo as arma
+from function import type_string
 
 def add_indenting(text):
     """Add identing to text
@@ -96,12 +97,12 @@ def Header(node):
         if node.project.builder.reference:
 
             code = func[1][0].type + " " + func.name + "(" +\
-                   ", ".join(["const " + p.type + "& " + p.name if p.dim > 0 else
-                           p.type + " " + p.name for p in func[2]]) + ") ;"
+                   ", ".join(["const " + type_string(p) + "& " + p.name if p.dim > 0 else
+                           type_string(p) + " " + p.name for p in func[2]]) + ") ;"
 
         else:
             code = func[1][0].type + " " + func.name + "(" +\
-            ", ".join([p.type + " " + p.name for p in func[2]]) + ") ;"
+            ", ".join([type_string(p) + " " + p.name for p in func[2]]) + ") ;"
 
 
     elif func.backend == "func_returns" and not func[1]:
@@ -109,26 +110,26 @@ def Header(node):
         # if -ref, -reference flag option
         if node.project.builder.reference:
             code = "void " + func.name + "(" +\
-                ", ".join(["const " + p.type + "& " + p.name if p.dim > 0 else
-                           p.type + " " + p.name for p in func[2]]) + ") ;"
+                ", ".join(["const " + type_string(p) + "& " + p.name if p.dim > 0 else
+                           type_string(p) + " " + p.name for p in func[2]]) + ") ;"
 
         else:
             code = "void " + func.name + "(" +\
-            ", ".join([p.type + " " + p.name for p in func[2]]) + ") ;"
+            ", ".join([type_string(p) + " " + p.name for p in func[2]]) + ") ;"
 
     elif func.backend == "func_returns" and func[1]:
 
         # if -ref, -reference flag option
         if node.project.builder.reference:
             code = "void " + func.name + "(" +\
-                ", ".join(["const " + p.type + "& " + p.name if p.dim > 0 else
-                           p.type + " " + p.name for p in func[2]]) + ", " +\
-                ", ".join([p.type + "& " + p.name for p in func[1]]) + ") ;"
+                ", ".join(["const " + type_string(p) + "& " + p.name if p.dim > 0 else
+                           type_string(p) + " " + p.name for p in func[2]]) + ", " +\
+                ", ".join([type_string(p) + "& " + p.name for p in func[1]]) + ") ;"
 
         else:
             code = "void " + func.name + "(" +\
-            ", ".join([p.type + " " + p.name for p in func[2]]) + ", " +\
-            ", ".join([p.type + "& " + p.name for p in func[1]]) + ") ;"
+            ", ".join([type_string(p) + " " + p.name for p in func[2]]) + ", " +\
+            ", ".join([type_string(p) + "& " + p.name for p in func[1]]) + ") ;"
 
 
 
