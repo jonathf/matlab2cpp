@@ -83,11 +83,11 @@ Examples:
 
     # if -ref, -reference flag option
     if node.project.builder.reference:
-        out += ", ".join(["const " + child.type + "& " + child.name if child.dim > 0 else
-                           child.type + " " + child.name for child in node])
+        out += ", ".join(["const " + type_string(child) + "& " + child.name if child.dim > 0 else
+                           type_string(child) + " " + child.name for child in node])
 
     else:
-        out = ", ".join([child.type + " " + child.name for child in node])
+        out = ", ".join([type_string(child) + " " + child.name for child in node])
 
     return out
 
