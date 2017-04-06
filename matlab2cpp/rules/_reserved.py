@@ -11,7 +11,7 @@ import matlab2cpp as mc
 reserved = {
 "and", "or", "not", "all", "any", "isequal",
 "false", "true", "pi", "inf", "Inf", "nan", "NaN",
-"eps", "exp", "log", "log2", "log10", "power", "floor", "ceil",
+"eps", "exp", "log", "log2", "log10", "power", "floor", "ceil", "fix",
 "cos", "acos", "cosh", "acosh",
 "sin", "asin", "sinh", "asinh", "mod",
 "eye", "fliplr", "flipud", "length", "max", "min", "size", "chol",
@@ -48,7 +48,28 @@ Var_nan = "datum::nan"
 Var_NaN = "datum::nan"
 Var_eps = "datum::eps"
 
+def conv_to(str, type):
+    return "arma::conv_to<" + type +  ">::from(" + str + ")"
+
+def Assign_elemwise_(node):
+    
+    if node[0].type != node[1].type:
+        
+        if node[0].dim == 0 and node[1].dim == 0:
+            return "%(0)s = " + node[0].type + "(%(1)s) ;"
+
+        if node[0].dim == 0 and node[1].dim > 0:
+            if node[0].mem != node[1].mem:
+                return "%(0)s = " + node[0].type + "(arma::as_scalar(%(1)s)) ;"
+            return "%(0)s = arma::as_scalar(%(1)s) ;"
+
+        if node[0].mem != node[1].mem:
+            return "%(0)s = arma::conv_to<" + node[0].type + ">::from(%(1)s) ;"
+
+    return "%(0)s = %(1)s ;"
+
 def Get_exp(node):
+    node.type = node[0].type
     # scalar done through std
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
@@ -57,6 +78,7 @@ def Get_exp(node):
     return "arma::exp(", ", ", ")"
 
 def Get_log(node):
+    node.type = node[0].type
     # scalar done through std
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
@@ -64,6 +86,7 @@ def Get_log(node):
     return "arma::log(", ", ", ")"
 
 def Get_log2(node):
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
         return "std::log(%(0)s)/std::log(2)"
@@ -72,12 +95,14 @@ def Get_log2(node):
     return "arma::log2(", ", ", ")"
 
 def Get_log10(node) :
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
         return "std::log10(", ", ", ")"
     return "arma::log10(", ", ", ")"
 
 def Get_power(node):
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
         return "std::pow(", ", ", ")"
@@ -87,6 +112,7 @@ def Get_floor(node):
     # unknown input
     #if node[0].type == "TYPE":
     #    return "floor(", ", ", ")"
+    node.type = node[0].type
 
     # scalar done through std
     if node[0].dim == 0 and node[0].mem != 4:
@@ -96,6 +122,7 @@ def Get_floor(node):
     return "arma::floor(", ", ", ")"
 
 def Get_ceil(node):
+    node.type = node[0].type
     # scalar done through std
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
@@ -104,7 +131,7 @@ def Get_ceil(node):
     return "arma::ceil(%(0)s)"
 
 def Get_round(node):
-
+    node.type = node[0].type
     assert len(node)<3
 
     # number of decimals to retain
@@ -129,25 +156,44 @@ def Get_round(node):
         return "arma::round(%(0)s)"
     return "arma::round(%(0)s*std::pow(10, %(1)s))*std::pow(10, -%(1)s)"
 
+def Get_fix(node):
+    node.type = node[0].type
+
+    if node[0].mem < 2:
+        return "%(0)s"
+
+    if node[0].dim == 0 and node[0].mem != 4:
+        node.include("mconvert")
+        return "m2cpp::fix(%(0)s)"
+
+    return "arma::trunc(%(0)s)"
+
+def Assign_fix(node):
+    return Assign_elemwise_(node)
+
 def Get_cos(node):
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
         return "std::cos(", ", ", ")"
     return "arma::cos(", ", ", ")"
 
 def Get_acos(node):
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
         return "std::acos(", ", ", ")"
     return "arma::acos(", ", ", ")"
 
 def Get_cosh(node):
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
         return "std::cosh(", ", ", ")"
     return "arma::cosh(", ", ", ")"
 
 def Get_acosh(node):
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
         #is a C++11 feature
@@ -155,24 +201,28 @@ def Get_acosh(node):
     return "arma::acosh(", ", ", ")"
 
 def Get_sin(node):
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
         return "std::sin(", ", ", ")"
     return "arma::sin(", ", ", ")"
 
 def Get_asin(node):
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
         return "std::asin", ", ", ")"
     return "arma::asin(", ", ", ")"
 
 def Get_sinh(node):
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
         return "std::sinh", ", ", ")"
     return "arma::sinh(", ", ", ")"
 
 def Get_asinh(node):
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
         return "std::asinh", ", ", ")"
@@ -185,11 +235,13 @@ def Var_i(node):
 """
 
 def Get_mod(node):
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         return "", " __percent__ ", ""
     return "mod(", ", ", ")"
 
 def Get_abs(node):
+    node.type = node[0].type
     if len(node) and node[0].dim == 0:
         if node[0].mem == 4: #cx_double
             node.include("m2cpp")
@@ -199,6 +251,7 @@ def Get_abs(node):
     return "abs(", ", ", ")"
 
 def Get_sqrt(node):
+    node.type = node[0].type
     #if len(node) > 0 ...
     if len(node) and node[0].cls == "Neg" and len(node[0]) == 1:
         return "cx_double(0, " + node[0][0].str + ")"
@@ -724,7 +777,28 @@ def Get_nextpow2(node):
     node.include("m2cpp")
     return "m2cpp::nextpow2(", ", ", ")"
 
+
+def Assign_fft(node):
+
+    #conv = node[0].type == "mat"
+    #conv = conv or node[0].type == "fmat"
+    #conv = conv or node[0].type == "vec"
+    #conv = conv or node[0].type == "fvec"
+    #conv = conv or node[0].type == "rowvec"
+    #conv = conv or node[0].type == "frowvec"
+
+    if node[0].mem == 3:
+        return "%(0)s = arma::conv_to<" + node[0].type + ">::from(%(1)s) ;"
+    
+    return "%(0)s = %(1)s ;"
+
+def Assign_ifft(node):
+    return Assign_fft(node)
+
 def Get_fft(node):
+
+    if node[0].mem != None:
+        node.type = node[0].type
 
     # arma & matlab fft same for n_args in (1,2)
     if len(node) in (1,2):
@@ -745,31 +819,38 @@ def Get_fft(node):
     else:
         node.error("Number of args in 'fft' should be between 1 and 3")
 
+    
+
     return "arma::fft(", ", ", ")"
 
 def Get_ifft(node):
 
+    if node[0].mem != None:
+        node.type = node[0].type
+
     # unknown input
     if not node.num:
-        return "arma::real(arma::ifft(", ", ", "))"
+        return "arma::ifft(", ", ", ")"
 
     if len(node) == 1:
-        return "arma::real(arma::ifft(%(0)s))"
+        return "arma::ifft(%(0)s)"
+        
 
     elif len(node) == 2:
-        return "arma::real(arma::ifft(%(0)s, %(1)s))"
+        return "arma::ifft(%(0)s, %(1)s)"
+        
 
     elif len(node) == 3:
 
         if node[0].dim in (1,2):
-            return "arma::real(arma::ifft(%(0)s, %(1)s))"
+            return "arma::ifft(%(0)s, %(1)s)"
 
         if node[1].cls == "Matrix":
             node.include("m2cpp")
-            return "arma::real(m2cpp::ifft(%(0)s, %(2)s))"
+            return "m2cpp::ifft(%(0)s, %(2)s)"
         else:
             node.include("m2cpp")
-            return "arma::real(m2cpp::ifft(", ", ", "))"
+            return "m2cpp::ifft(", ", ", ")"
 
     else:
         node.error("Number of args in 'ifft' should be between 1 and 3")
@@ -777,13 +858,28 @@ def Get_ifft(node):
     if node[0].mem != 4:
         node.warning("Argument datatype of 'ifft' should be complex")
 
-    return "arma::real(arma::ifft(", ", ", "))"
+    return "arma::ifft(", ", ", ")"
 
 def Get_fft2(node):
+
+    if node[0].mem != None:
+        node.type = node[0].type
+
     return "arma::fft2(", ", ", ")"
 
 def Get_ifft2(node):
-    return "arma::real(arma::ifft2(", ", ", "))"
+
+    if node[0].mem != None:
+        node.type = node[0].type
+
+    return "arma::ifft2(", ", ", ")"
+
+def Assign_fft2(node):
+    return Assign_fft(node)
+
+def Assign_ifft2(node):
+    return Assign_fft(node)
+
 
 def Get_hankel(node):
     node.include("m2cpp")

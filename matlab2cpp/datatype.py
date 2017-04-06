@@ -19,7 +19,7 @@ The follwing constructor classes exists here:
 import supplement
 import matlab2cpp as mc
 
-dim0 = {"int", "float", "double", "uword", "cx_double", "size_t"}
+dim0 = {"int", "float", "uword", "double", "cx_double", "size_t"}
 dim1 = {"ivec", "fvec", "uvec", "vec", "cx_vec"}
 dim2 = {"irowvec", "frowvec", "urowvec", "rowvec", "cx_rowvec"}
 dim3 = {"imat", "fmat", "umat", "mat", "cx_mat"}

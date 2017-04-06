@@ -533,11 +533,11 @@ See also:
             err_str = "\'" + err.message + "\', File: %s. Data type set in .py file could be wrong." % (str(node.file))
             raise KeyError(err_str)
 
-        spesific_name = node.cls + "_" + node.name
+        specific_name = node.cls + "_" + node.name
 
         # e.g. Get_a (reserved typically)
-        if spesific_name in target.__dict__:
-            value = target.__dict__[spesific_name]
+        if specific_name in target.__dict__:
+            value = target.__dict__[specific_name]
 
         # e.g. Get (normal behavior)
         elif node.cls in target.__dict__:

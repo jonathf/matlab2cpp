@@ -220,7 +220,7 @@ Args:
 
     #--- work in progress ---
     #Modify the Abstract Syntax Tree (AST)
-    builder.project = modify.preorder_transform_AST(builder.project, args.nargin)
+    builder.project = modify.preorder_transform_AST(builder.project, args.nargin, suggest=(2*args.suggest or args.matlab_suggest))
     #------------------------
     
     if args.disp:

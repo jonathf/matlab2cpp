@@ -424,18 +424,24 @@ def Get_nextpow2(node):
 def Get_fft(node):
 
     node.type = node[0].type
-    if node.mem == 4:
+    if node.type != 'TYPE':
         node.mem = 4
-    elif node.mem == 3:
-        node.mem = 4
+    #if node.mem == 4:
+    #    node.mem = 4
+    #elif node.mem == 3:
+    #    node.mem = 4
 
 def Get_ifft(node):
 
+    #assert(node[0].mem == 4)
     node.type = node[0].type
-    if node.mem == 4:
-        node.mem = 3
-    elif node.mem == 3:
-        node.mem = 3
+    if node.type != 'TYPE':
+        node.mem = 4
+
+    #if node.mem == 4:
+    #    node.mem = 3
+    #elif node.mem == 3:
+    #    node.mem = 3
 
     # unknown input
     #if not node.num:

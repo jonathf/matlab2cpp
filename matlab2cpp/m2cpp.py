@@ -252,6 +252,11 @@ namespace m2cpp {
         return out;
     }
 
+    template <typename eT>
+    inline eT fix(const eT a) {
+       return a > eT(0) ? floor(a) : ceil(a);
+    }
+
 
 }
 

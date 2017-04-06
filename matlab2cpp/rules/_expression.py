@@ -8,6 +8,7 @@ Examples:
     >>> print mc.qscript("(1+2)*(3-4)")
     (1+2)*(3-4) ;
     """
+    node.type = node[0].type
     return "(%(0)s)"
 
 def End(node):
