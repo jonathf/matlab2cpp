@@ -282,7 +282,7 @@ def function_code(program, code):
     num_end = 0
     lines = code.splitlines()
     for line in lines:
-        if line == "end":
+        if line.strip() == "end":
             num_end += 1
         #print line
 
@@ -300,35 +300,40 @@ def function_code(program, code):
     num_funcs = len(program[1])
 
     #insert whos_f before end of function or before new function
-    func_name = "whos_f\n"
+    func_name = "whos_f"
     
     #functions end with end keyword
-    index = len(code)
+    #index = len(code)
+    index = len(lines)
     #print code
     if function_end:
         #should stop when num_funcs becomes zero
         while num_funcs:
             #search for keyword end
-            index = code.rfind("end", 0, index)
+            #index = code.rfind("end", 0, index)
+            index = next(i for i in range(index - 1,-1,-1) if lines[i].strip() == 'end')
 
             #add function name to code
-            code = code[:index] + func_name + code[index:]
-            index += len(func_name)
+            lines = lines[:index] + [func_name] + lines[index:]
+            #index += len(func_name)
 
             #Search for previous function
             if num_funcs != 1:
-                index = code.rfind("\nfunction", 0, index)
+                #index = code.rfind("\nfunction", 0, index)
+                index = next(i for i in range(index - 1,-1,-1) if len(lines[i].split()) > 0 and [i].split()[0] == 'function')
             num_funcs -= 1
     else:
         #function does not end with end keyword
         while num_funcs:
-            code = code[:index] + func_name + code[index:]
+            #code = code[:index] + func_name + code[index:]
+            lines = lines[:index] + [func_name] + lines[index:]
 
             if num_funcs != 1:
-                index = code.rfind("\nfunction", 0, index)
+                #index = code.rfind("\nfunction", 0, index)
+                index = next(i for i in range(index - 1,-1,-1) if len(lines[i].split()) > 0 and lines[i].split()[0] == 'function')
             num_funcs -= 1
         
 
     #print code
-    
+    code = '\n'.join(lines)
     return code
