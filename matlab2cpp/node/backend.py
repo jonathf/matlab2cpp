@@ -598,7 +598,7 @@ See also:
                 out += children[i] + value[i+1]
             value = out
 
-    # interperlate string
+    # interpolate string
     try:
         value = value % node.properties()
     except:

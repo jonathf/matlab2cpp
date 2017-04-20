@@ -21,7 +21,7 @@ reserved = {
 "qr",
 "clear", "close", "clc", "clf", "more", "format",
 "_conv_to", "_reshape", "reshape",
-"interp1", "linspace", "varargins",
+"interp1", "linspace", "varargin",
 "sum", "cumsum", "conj", "real", "imag",
 "tic", "toc", "diag", "tril", "triu",
 "disp", "fprintf", "error", "convmtx", "conv2",

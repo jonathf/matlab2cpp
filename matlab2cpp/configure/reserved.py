@@ -24,6 +24,9 @@ def Get_floor(node):
 def Get_ceil(node):
     node.type = node[0].type
 
+def Get_fix(node):
+    node.type = node[0].type
+
 def Get_round(node):
     if len(node) == 1:
         #int, float, double, uword

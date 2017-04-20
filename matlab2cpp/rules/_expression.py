@@ -119,6 +119,9 @@ Examples:
 
     dim = node[0].dim
     #mem = max(node[0].mem, 2)
+    mem = 0
+    for n in node:
+        mem = max(mem, n.mem)
 
     if node.mem == 4 and node[0].dim == 0 and node[0].mem != 4:
         out = "cx_double(%(0)s)"
@@ -187,7 +190,7 @@ Examples:
             out = out + "*" + "%(" + sVal + ")s"
         #mem = max(mem, child.mem)
 
-    #node.type = (dim, mem)
+    node.type = (dim, mem)
 
     #return "", "*", ""
     return out
@@ -565,6 +568,7 @@ def Elexp(node):
     """Elementwise exponent
     """
 
+    node.type = node[0].type
     out = str(node[0])
 
     if len(node) == 2:
@@ -686,12 +690,14 @@ Examples:
                     return "arma::span(%(0)s-1, %(1)s-1)"
 
             if node.group.backend == "reserved":
+                node.type = 'rowvec'
                 return "m2cpp::fspan(%(0)s, 1, %(1)s)"
             return "m2cpp::span<%(type)s>(%(0)s-1, %(1)s-1)"
 
         # three arguments, not supported in Armadillo
         elif len(node) == 3:
             if node.group.backend == "reserved":
+                node.type = 'rowvec'
                 return "m2cpp::fspan(%(0)s, %(1)s, %(2)s)"
             return "m2cpp::span<%(type)s>(%(0)s-1, %(1)s, %(2)s-1)"
 
@@ -728,11 +734,13 @@ Examples:
         # <start>:<stop>
         if len(node) == 2:
             if node.group.cls == "Assign":
+                node.type = 'rowvec'
                 return "m2cpp::fspan" + "(%(0)s, 1, %(1)s)"
             return "m2cpp::fspan" + "(%(0)s, 1, %(1)s)"
 
         # <start>:<step>:<stop>
         elif len(node) == 3:
+            node.type = 'rowvec'
             args = "(%(0)s, %(1)s, %(2)s)"
             #return "m2cpp::span<" + node.type + ">" + args
             #return "arma::strans(arma::linspace(%(0)s, %(2)s, (%(2)s%(1)s))"
