@@ -76,6 +76,20 @@ def Get_abs(node):
     else:
         node.type = node[0].type
 
+def Get_tic(node):
+    node.type = "double"
+
+def Assign_tic(node):
+    node[0].declare.type = "double"
+    node[0].type = "double"
+
+def Get_toc(node):
+    node.type = "double"
+
+def Assign_toc(node):
+    node[0].declare.type = "double"
+    node[0].type = "double"
+
 def Get_any(node):
     if not node[0].num:
         return

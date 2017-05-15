@@ -17,10 +17,10 @@ def Fvar(node):
 def Cvar(node):
     "a{b}"
 
-    if node.type == "TYPE":
-        node.declare.type = "cell"
+    #if node.type == "TYPE":
+    #    node.declare.type = "cell"
 
-    elif node.type != "cell":
+    if not node.type == "cell" or node.type == "varargin":
         node.error("Behaves like cell, not %s" % node.type)
 
     return "%(name)s{", "}{", "}"

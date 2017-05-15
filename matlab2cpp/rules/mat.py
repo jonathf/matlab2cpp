@@ -83,6 +83,7 @@ def Get(node):
 
         # scalar + uvec
         if dim0 == 0 and dim1 > 0:
+
             index = node[1].str.index('(')
             return "%(name)s(m2cpp::span<uvec>(" + arg0 + ", " + arg0 + ")" + ", " \
                    + "m2cpp::span<uvec>" + node[1].str[index:] + ")"
@@ -91,8 +92,9 @@ def Get(node):
 
         # uvec + scalar
         elif dim0 > 0 and dim1 == 0:
-            index = node[0].str.index('(')
-            return "%(name)s(" + "m2cpp::span<uvec>" + node[0].str[index:] + ", m2cpp::span<uvec>(" + arg1 + ", " + arg1 + "))"
+            return "%(name)s(" + arg0 + ", m2cpp::span<uvec>(" + arg1 + ", " + arg1 + "))"
+            #index = node[0].str.index('(')
+            #return "%(name)s(" + "m2cpp::span<uvec>" + node[0].str[index:] + ", m2cpp::span<uvec>(" + arg1 + ", " + arg1 + "))"
             #return "%(name)s.row(" + arg0 + ").cols(" + arg1 + ")"
 
         # uvec + uvec

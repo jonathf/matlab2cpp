@@ -28,7 +28,7 @@ reserved = {
 "figure", "clf", "cla", "show", "xlabel", "ylabel", "hold", "load",
 "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
 "xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
-"_splot", "logspace", "find",
+"_splot", "logspace", "find", "unique", "intersect", "isempty", "sortrows",
 }
 
 # Common attribute
@@ -395,18 +395,33 @@ def Assigns_size(node):
     val = str(val)
 
     # suggest some types for matrix
-    if len(node)==3:
-        return "%(0)s = " +val+ ".n_rows ;\n%(1)s = " +val+ ".n_cols ;"
 
+    out = ""
+    
+    if node[0].str != '~':
+        out += "%(0)s = " + val + ".n_rows;\n"
+    if node[1].str != '~':
+        out += "%(1)s = " + val + ".n_cols;\n"
+    if len(node) == 4 and node[2] != '~':
+        out += "%(2)s = " + val + ".n_slices;\n"
+    #if len(node)==3:
+    #    return 
+    #    return "%(0)s = " +val+ ".n_rows ;\n%(1)s = " +val+ ".n_cols ;"
+    
+    if not (len(node) == 3 or len(node) == 4):
+        raise NotImplementedError
+    
+    return out
+        
 
     # suggest some types for cube
-    if len(node)==4:
+    #if len(node)==4:
 
-        return  "%(0)s = "+val+".n_rows ;\n"+\
-                "%(1)s = "+val+".n_cols ;\n"+\
-                "%(2)s = "+val+".n_slices ;"
+    #    return  "%(0)s = "+val+".n_rows ;\n"+\
+    #            "%(1)s = "+val+".n_cols ;\n"+\
+    #            "%(2)s = "+val+".n_slices ;"
 
-    raise NotImplementedError
+    
 
 def Get_chol(node):
     return "", ", ", ""
@@ -437,7 +452,47 @@ def Assigns_chol(node):
     lhs_string = ", ".join(lhs_list)
     rhs_string = ", ".join(rhs_list)
     return "[" + lhs_string + "]" + " = chol(" + rhs_string + ") ;"
+
+
+def Get_unique(node):
+    node.include("m2cpp")
+    return "", ", ", ""
+
+def Assign_unique(node):
+    node.include("m2cpp")
+    args = ", ".join([n.str for n in node])
+    return "m2cpp::unique(" + args + ");"
+
+def Assigns_unique(node):
+    node.include("m2cpp")
+    args = ", ".join([n.str for n in node])
+    return "m2cpp::unique(" + args + ");"
+
+def Get_sortrows(node):
+    node.include("m2cpp")
+    args = ", ".join([n.str for n in node])
+    return "m2cpp::sortrows(" + args + ");"
     
+def Get_intersect(node):
+    node.include("m2cpp")
+    return "", ", ", ""
+
+
+def Assign_intersect(node):
+    node.include("m2cpp")
+    lhs, rhs = node
+    my_list = []
+    for n in rhs:
+        my_list.append(n.str)
+    my_string = ", ".join(my_list)
+
+    return "%(0)s = m2cpp::intersect(" + my_string + ") ;"
+
+def Assigns_intersect(node):
+    node.include("m2cpp")
+    rhs = ", ".join([n.str for n in node])
+    return "m2cpp::intersect(" + rhs + ");"
+
 def Get_length(node):
     # array-type uses n_elem
     if node.cls == "Var":
@@ -446,6 +501,9 @@ def Get_length(node):
     node.include("m2cpp")
     return "m2cpp::length(%(0)s)"
 
+def Get_isempty(node):
+    node.include("m2cpp")
+    return "m2cpp::isempty(%(0)s)"
 
 def Get_min(node):
 
@@ -472,7 +530,15 @@ def Get_min(node):
 
     # two args
     if len(node) == 2:
-        return "arma::min(%(0)s, %(1)s)"
+        if node[0].dim and node[1].dim:
+            return "arma::min(%(0)s, %(1)s)"
+        
+        if node[0].dim==0:
+            return "arma::clamp(%(1)s, %(1)s.min(), %(0)s)"
+
+        if node[1].dim==0:
+            return "arma::clamp(%(0)s, %(0)s.min(), %(1)s)"
+
 
     # three args
     if len(node) == 3:
@@ -502,8 +568,10 @@ def Assigns_min(node):
     if var.cls != "Var":
         var = var.auxiliary()
     var = str(var)
-
-    return "%(0)s = " + var + ".min(%(1)s) ;"
+    if node[0].str != '~':
+        return "%(0)s = " + var + ".min(%(1)s) ;"
+    else:
+        return var + ".min(%(1)s);"
 
 def Get_max(node):
 
@@ -533,7 +601,14 @@ def Get_max(node):
         return "arma::max(%(0)s)"
 
     if len(node) == 2:
-        return "arma::max(%(0)s, %(1)s)"
+        if node[0].dim and node[1].dim:
+            return "arma::max(%(0)s, %(1)s)"
+        
+        if node[0].dim==0:
+            return "arma::clamp(%(1)s, %(0)s, %(1)s.max())"
+
+        if node[1].dim==0:
+            return "arma::clamp(%(0)s, %(1)s, %(0)s.max())"
 
     if len(node) == 3:
         if node[2].dim == 0:
@@ -563,8 +638,11 @@ def Assigns_max(node):
     if var.cls != "Var":
         var = var.auxiliary()
     var = str(var)
-
-    return "%(0)s = " + var + ".max(%(1)s) ;"
+    
+    if node[0].str != '~':
+        return "%(0)s = " + var + ".max(%(1)s);"
+    else:
+        var + ".max(%(1)s);"
 
 Var_eye = "1"
 
@@ -954,18 +1032,27 @@ def Var_tic(node):
 
 def Get_tic(node):
     node.wall_clock()
-    return "_timer.tic()"
+    node.type = 'double'
+    return "m2cpp::tic()"
+
+def Assign_tic(node):
+    node.wall_clock()
+    node[0].type = 'double'
+    return "%(0)s = m2cpp::tic();"
 
 def Var_toc(node):
     return Get_toc(node)
 
 def Get_toc(node):
     node.wall_clock()
-    if node.parent.cls != "Statement":
-        return "_timer.toc()"
 
+    arg = ", ".join([n.str for n in node])
+    
+    if node.parent.cls != "Statement":
+        return "m2cpp::toc(" + arg + ")"
+    
     node.include("iostream")
-    return 'std::cout << "Elapsed time = " << _timer.toc() << std::endl'
+    return 'std::cout << "Elapsed time = " << m2cpp::toc(' + arg + ') << std::endl'
 
 def Get_diag(node):
     if node.dim == 3:

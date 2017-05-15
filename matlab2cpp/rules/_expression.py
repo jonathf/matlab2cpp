@@ -607,7 +607,8 @@ def All(node):
     return "m2cpp::span<uvec>(0, " + arg + "-1)"
 
 Neg = "-", "", ""
-Not = "not ", "", ""
+#Not = "not ", "", ""
+Not = "!", "", ""
 
 def Transpose(node):
     """(Simple) transpose
