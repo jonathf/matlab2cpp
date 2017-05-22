@@ -32,7 +32,7 @@ They are available through the `mc.qfunctions` module and mirrors the
 functionality offered by the `m2cpp` function.
 """
 
-__version__ = 1.0
+__version__ = "1.0"
 
 import time
 from datetime import datetime as date
@@ -258,7 +258,7 @@ Args:
                     os.remove(name+ext)
 
         if cpp:
-            cpp = """// Automatically translated using m2cpp %g on %s
+            cpp = """// Automatically translated using m2cpp %s on %s
 
 %s""" % (__version__, stamp, cpp)
             f = open(name+".cpp", "w")
@@ -266,7 +266,7 @@ Args:
             f.close()
 
         if hpp:
-            hpp = """// Automatically translated using m2cpp %g on %s
+            hpp = """// Automatically translated using m2cpp %s on %s
             
 %s""" % (__version__, stamp, hpp)
             f = open(name+".hpp", "w")
@@ -274,14 +274,14 @@ Args:
             f.close()
 
         if log:
-            log = "Automatically translated using m2cpp %g on %s\n\n%s"\
+            log = "Automatically translated using m2cpp %s on %s\n\n%s"\
                     % (__version__, stamp, log)
             f = open(name+".log", "w")
             f.write(log)
             f.close()
 
         if py:
-            py = """# Automatically translated using m2cpp %g on %s
+            py = """# Automatically translated using m2cpp %s on %s
 #
 %s""" % (__version__, stamp, py)
             f = open(name+".py", "w")
