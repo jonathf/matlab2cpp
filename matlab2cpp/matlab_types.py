@@ -236,7 +236,7 @@ def datatype_string(cols):
                 data_type = "rowvec"
                     
             #matrix
-            if M > 1 and N > 1:
+            if (M > 1 and N > 1) or M == 0 or N == 0: #if empty matrix, set to mat
                 data_type = "mat"
                     
         #complex value
@@ -256,7 +256,7 @@ def datatype_string(cols):
                 data_type = "cx_rowvec"
                 
             #matrix
-            if M > 1 and N > 1:
+            if M > 1 and N > 1 or M == 0 or N == 0: #if empty matrix, set to mat:
                 data_type = "cx_mat"
                 
     return data_type
