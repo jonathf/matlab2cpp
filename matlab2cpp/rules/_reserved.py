@@ -997,7 +997,7 @@ def Get_sum(node):
     if len(node) == 2:
         return "arma::sum(", ", ", "-1)"
     elif len(node) == 1 and node[0].dim == 2:
-        return "arma::as_scalar(arma::sum(arma::strans(%(0)s)))"
+        return "arma::as_scalar(arma::sum(%(0)s))"
     elif len(node) == 1 and node[0].dim == 1:
         return "arma::as_scalar(arma::sum(", ", ", "))"
     return "arma::sum(", ", ", ")"
