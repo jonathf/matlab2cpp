@@ -48,6 +48,9 @@ Var_nan = "datum::nan"
 Var_NaN = "datum::nan"
 Var_eps = "datum::eps"
 
+def Get_NaN(node):
+    return "arma::zeros(", ", ", ") * datum::nan"
+
 def Get_exp(node):
     # scalar done through std
     if node[0].dim == 0 and node[0].mem != 4:
