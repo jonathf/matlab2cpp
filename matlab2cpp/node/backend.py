@@ -231,7 +231,7 @@ See also:
     :py:func:`~matlab2cpp.Node.resize`
     """
 
-    if node["_resize"]:
+    if "_resize" in node.prop:
         return
     node["_resize"] = True
 
