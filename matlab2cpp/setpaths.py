@@ -1,5 +1,5 @@
 import os
-import tree
+from . import tree
 
 def multiple_folder_paths(setpath_file):
     builder = tree.builder.Builder()

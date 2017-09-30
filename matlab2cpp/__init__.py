@@ -39,33 +39,34 @@ from datetime import datetime as date
 import os
 from os.path import sep
 import imp
-
-import supplement
-import node
-import tree
-
-import qfunctions
-import collection
-import configure
-import rules
-import manual
 import re
 
-import modify
-import setpaths
+from . import (
+    supplement,
+    node,
+    tree,
+    qfunctions,
+    collection,
+    configure,
+    rules,
+    manual,
+    modify,
+    setpaths,
+)
+
 
 __all__ = ["main"]
 
-from qfunctions import *
+from .qfunctions import *
 __all__ += qfunctions.__all__
 
-from tree import *
+from .tree import *
 __all__ += tree.__all__
 
-from node import *
+from .node import *
 __all__ += node.__all__
 
-from collection import *
+from .collection import *
 __all__ += collection.__all__
 
 
@@ -95,7 +96,7 @@ Args:
         paths = [os.path.abspath(os.path.dirname(args.filename))] + paths_from_file
 
         if args.disp:
-            print "building tree..."
+            print("building tree...")
 
         filenames = [os.path.abspath(args.filename)]
 
@@ -109,7 +110,7 @@ Args:
                 continue
 
             if args.disp:
-                print "loading", filename
+                print("loading", filename)
 
             stack.append(filename)
 
@@ -183,9 +184,9 @@ Args:
             unknowns = builder.get_unknowns(filename)
 
             for i in xrange(len(unknowns)-1, -1, -1):
-                #print i
+                #print(i)
                 for path in paths:
-                    #print path
+                    #print(path)
                     if os.path.isfile(path + sep + unknowns[i] + ".m"):
                         unknowns[i] = unknowns[i] + ".m"
                     if os.path.isfile(path + sep + unknowns[i]):
@@ -214,7 +215,7 @@ Args:
     #------------------------
 
     if args.disp:
-        print "configure tree"
+        print("configure tree")
 
     builder.configure(suggest=(2*args.suggest or args.matlab_suggest))
 
@@ -224,8 +225,8 @@ Args:
     #------------------------
     
     if args.disp:
-        print builder.project.summary()
-        print "generate translation"
+        print(builder.project.summary())
+        print("generate translation")
 
     builder.project.translate(args)
 
@@ -240,9 +241,9 @@ Args:
         #name = program.name
         #if os.path.isfile(args.filename):
         #    name = pathOne + sep + os.path.basename(name)
-            #print name
+            #print(name)
         name = os.getcwd() + sep + os.path.basename(program.name)
-        #print name
+        #print(name)
 
         cpp = qfunctions.qcpp(program)
         hpp = qfunctions.qhpp(program)
@@ -250,7 +251,7 @@ Args:
         log = qfunctions.qlog(program)
 
         if args.disp:
-            print "Writing files..."
+            print("Writing files...")
 
         if args.reset:
             for ext in [".cpp", ".hpp", ".log", ".py"]:
@@ -295,21 +296,19 @@ Args:
     program = builder[0]
 
     if args.tree_full:
-        print program.summary(args)
+        print(program.summary(args))
 
     elif args.tree:
         if program[1][0].cls == "Main":
-            print program[1][0][3].summary(args)
+            print(program[1][0][3].summary(args))
         else:
-            print program[1].summary(args)
+            print(program[1].summary(args))
 
     elif args.line:
         nodes = program[1].flatten(False, False, False)
         for node_ in nodes:
             if node_.line == args.line and node_.cls != "Block":
-                print node_.str.replace("__percent__", "%")
+                print(node_.str.replace("__percent__", "%"))
                 break
     else:
-        print program[1].str.replace("__percent__", "%")
-
-
+        print(program[1].str.replace("__percent__", "%"))

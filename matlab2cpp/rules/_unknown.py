@@ -1,6 +1,6 @@
-from assign import Assign
-from variables import *
-import armadillo as arma
+from .assign import Assign
+from .variables import *
+from . import armadillo as arma
 
 Declare = "TYPE %(name)s ;"
 

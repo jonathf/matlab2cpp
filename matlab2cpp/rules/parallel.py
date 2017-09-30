@@ -30,7 +30,7 @@ def variable_lists(node):
                 for subnode in subnodes[1:]:
                     if subnode.name and subnode.name == iterator_name:
                         shared_variable.append(var_name)
-                        #print subnode.name
+                        #print(subnode.name)
             """
 
         #multiple return from function are assigned to vars
@@ -49,7 +49,7 @@ def variable_lists(node):
                 type_info.append(n.type)
 
     #shared_variable = list(set(shared_variable))
-    #print shared_variable
+    #print(shared_variable)
 
     #for n in nodes:
     #    if (n.cls == "Var" or n.cls == "Get") and n.backend != "reserved" and n.name \

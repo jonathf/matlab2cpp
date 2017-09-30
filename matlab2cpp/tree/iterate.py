@@ -12,9 +12,7 @@ Rutines for iterating lists
 +------------------------------------------------+----------------------+
 """
 
-import constants as c
-import findend
-import identify
+from . import constants as c, findend, identify
 
 
 def comma_list(self, start):

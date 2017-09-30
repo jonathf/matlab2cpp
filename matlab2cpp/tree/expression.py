@@ -3,9 +3,11 @@ Expression interpretor
 """
 
 import matlab2cpp as mc
-import findend
-import identify
-import constants as c
+from . import (
+    findend,
+    identify,
+    constants as c,
+)
 
 
 def create(self, node, start, end=None, start_opr=None):
@@ -47,7 +49,7 @@ Examples::
        6     Expression  expression.create    'd'
        6     Var         variables.variable   'd'
     >>> builder.configure(suggest=False)
-    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Statement  code_block   TYPE
     1 1| | Plus       expression   TYPE
@@ -69,13 +71,13 @@ Examples::
 
         if self.disp:
 
-            print "%4d     Expression " % (start),
-            print "%-20s" % "expression.create",
-            print repr(self.code[start:start+1])
+            print("%4d     Expression " % (start),)
+            print("%-20s" % "expression.create",)
+            print(repr(self.code[start:start+1]))
 
-            print "%4d     All        " % (start),
-            print "%-20s" % "expression.create",
-            print repr(self.code[start:start+1])
+            print("%4d     All        " % (start),)
+            print("%-20s" % "expression.create",)
+            print(repr(self.code[start:start+1]))
 
         mc.collection.All(node, cur=start, code=self.code[start])
         return start
@@ -84,9 +86,9 @@ Examples::
         end = findend.expression(self, start)
 
     if self.disp:
-        print "%4d     Expression " % (start),
-        print "%-20s" % "expression.create",
-        print repr(self.code[start:end+1])
+        print("%4d     Expression " % (start),)
+        print("%-20s" % "expression.create",)
+        print(repr(self.code[start:end+1]))
 
     if  self.code[start] not in c.e_start:
         self.syntaxerror(start, "expression start")

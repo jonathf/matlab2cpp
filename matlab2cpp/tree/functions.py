@@ -19,10 +19,8 @@ Functions, programs and meta-nodes
 """
 
 import matlab2cpp as mc
-import constants as c
-import findend
-import iterate
-import identify
+
+from . import constants as c, findend, iterate, identify
 
 
 def program(self, name):
@@ -47,7 +45,7 @@ Example:
        0     Expression  expression.create    'a'
        0     Var         variables.variable   'a'
     >>> builder.configure(suggest=False)
-    >>> print mc.qtree(builder) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree(builder)) # doctest: +NORMALIZE_WHITESPACE
        Program    program      TYPE    unamed
        | Includes   program      TYPE
     1 1| Funcs      program      TYPE    unamed
@@ -65,8 +63,8 @@ Example:
     """
 
     if self.disp:
-        print "     Program    ",
-        print "functions.program"
+        print("     Program    ",)
+        print("functions.program")
 
     # Create intial nodes
     program = mc.collection.Program(self.project, name=name, cur=0, code=self.code)
@@ -128,7 +126,7 @@ Example:
        0 Function        functions.function   'function f()'
       12 Codeblock   codeblock.codeblock 
     >>> builder.configure(suggest=False)
-    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1  1Funcs      program      TYPE    unnamed
     1  1| Func       func_returns TYPE    f
     1  1| | Declares   func_returns TYPE
@@ -187,9 +185,9 @@ Example:
             m = l
 
         if self.disp:
-            print "%4d Function       " % cur,
-            print "%-20s" % "functions.function",
-            print repr(self.code[START:m+1])
+            print("%4d Function       " % cur,)
+            print("%-20s" % "functions.function",)
+            print(repr(self.code[START:m+1]))
 
         name = self.code[k:l+1]
         func = mc.collection.Func(parent, name, cur=cur)
@@ -208,9 +206,9 @@ Example:
                     end = s
 
                     if self.disp:
-                        print "%4d   Return       " % cur,
-                        print "%-20s" % "functions.function",
-                        print repr(self.code[s:e+1])
+                        print("%4d   Return       " % cur,)
+                        print("%-20s" % "functions.function",)
+                        print(repr(self.code[s:e+1]))
 
                     if not any([a in c.letters+c.digits+"_@" \
                             for a in self.code[s:e+1]]):
@@ -224,8 +222,8 @@ Example:
             end = findend.expression(self, start)
 
             if self.disp:
-                print "%4d   Return       " % cur,
-                print repr(self.code[start:end+1])
+                print("%4d   Return       " % cur,)
+                print(repr(self.code[start:end+1]))
 
             mc.collection.Var(returns, self.code[start:end+1], cur=start,
                     code=self.code[start:end+1])
@@ -245,9 +243,9 @@ Example:
 
 
         if self.disp:
-            print "%4d Function       " % cur,
-            print "%-20s" % "functions.function",
-            print repr(self.code[START:m+1])
+            print("%4d Function       " % cur,)
+            print("%-20s" % "functions.function",)
+            print(repr(self.code[START:m+1]))
 
         end = start+1
         while self.code[end] in c.letters+"_":
@@ -273,9 +271,9 @@ Example:
             for s,e in array:
 
                 if self.disp:
-                    print "%4d   Param        " % cur,
-                    print "%-20s" % "functions.function",
-                    print repr(self.code[s:e+1])
+                    print("%4d   Param        " % cur,)
+                    print("%-20s" % "functions.function",)
+                    print(repr(self.code[s:e+1]))
 
                 var = mc.collection.Var(params, self.code[s:e+1], cur=s,
                         code=self.code[s:e+1])
@@ -321,7 +319,7 @@ Example:
        0     Expression  expression.create    'a'
        0     Var         variables.variable   'a'
     >>> builder.configure(suggest=False)
-    >>> print mc.qtree(builder) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree(builder)) # doctest: +NORMALIZE_WHITESPACE
        Program    program      TYPE    unnamed
        | Includes   program      TYPE
     1 1| Funcs      program      TYPE    unnamed
@@ -339,8 +337,8 @@ Example:
     """
 
     if self.disp:
-        print "%4d Main       " % cur,
-        print "functions.main"
+        print("%4d Main       " % cur,)
+        print("functions.main")
 
     func = mc.collection.Main(parent)
 
@@ -382,7 +380,7 @@ Example:
       11     Expression  expression.create    'x'
       11     Var         variables.variable   'x'
     >>> builder.configure(suggest=False)
-    >>> print mc.qtree(builder) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree(builder)) # doctest: +NORMALIZE_WHITESPACE
          Program    program      TYPE    unnamed
          | Includes   program      TYPE
      1  1| Funcs      program      TYPE    unnamed
@@ -421,10 +419,9 @@ Example:
         self.syntaxerror(cur, "anonymous function assignment (=)")
 
     if self.disp:
-        print "%4d   Assign       " %\
-                cur,
-        print repr(self.code[cur:self.code.find("\n", cur)]),
-        print "functions.lambda_assign"
+        print("%4d   Assign       " % cur)
+        print(repr(self.code[cur:self.code.find("\n", cur)]),)
+        print("functions.lambda_assign")
 
     assign = mc.collection.Assign(node, cur=cur)#, backend="func_lambda")
 
@@ -471,9 +468,9 @@ Returns:
     end = findend.expression(self, end)
 
     if self.disp:
-        print "%4d   Lambda       " % cur,
-        print "%-20s" % "functions.lambda_func",
-        print repr(self.code[cur:end+1])
+        print("%4d   Lambda       " % cur,)
+        print("%-20s" % "functions.lambda_func",)
+        print(repr(self.code[cur:end+1]))
 
     if node.cls == "Assign":
         name = node[0].name

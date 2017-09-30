@@ -1,13 +1,13 @@
-from funcs import funcs
 import matlab2cpp as mc
-import armadillo
+from .funcs import funcs
+from . import armadillo
 
 Counter = "structs"
 
 def Var(node):
     """
 Example:
-    >>> print mc.qcpp("a.b = 4; c = a")
+    >>> print(mc.qcpp("a.b = 4; c = a"))
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>

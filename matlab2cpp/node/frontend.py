@@ -1,5 +1,7 @@
-import reference as ref
-import backend
+from . import (
+    reference as ref,
+    backend,
+)
 
 import matlab2cpp.datatype as dt
 import matlab2cpp.supplement as sup
@@ -211,7 +213,7 @@ Returns:
 
 Example:
     >>> var = mc.collection.Var(None, name="A", value="B", line=1, cur=0, code="C")
-    >>> print var.properties() # doctest: +NORMALIZE_WHITESPACE
+    >>> print(var.properties()) # doctest: +NORMALIZE_WHITESPACE
     {'code': 'C', 'cur': 0, 'suggest': 'TYPE', 'value': 'B', 'ret': '', 'str':
     '', 'type': 'TYPE', 'line': 1, 'backend': 'unknown', 'pointer': 0, 'class':
     'Var', 'name': 'A'}
@@ -247,21 +249,21 @@ Example:
     must first be initialized and converted into ``rowvec`` before arithmetics can
     be used::
 
-    >>> print mc.qscript("[1,2]+3")
+    >>> print(mc.qscript("[1,2]+3"))
     sword __aux_irowvec_1 [] = {1, 2} ;
     _aux_irowvec_1 = irowvec(__aux_irowvec_1, 2, false) ;
     _aux_irowvec_1+3 ;
 
     The difference in tree structure is as follows:
 
-    >>> print mc.qtree("[1,2]", core=True) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree("[1,2]", core=True)) # doctest: +NORMALIZE_WHITESPACE
      1  1Block      code_block   TYPE
      1  1| Statement  code_block   TYPE
      1  1| | Matrix     matrix       irowvec
      1  2| | | Vector     matrix       irowvec
      1  2| | | | Int        int          int
      1  4| | | | Int        int          int
-    >>> print mc.qtree("[1,2]+3", core=True) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree("[1,2]+3", core=True)) # doctest: +NORMALIZE_WHITESPACE
      1  1Block      code_block   TYPE
      1  1| Assign     matrix       int
      1  1| | Var        irowvec      irowvec _aux_irowvec_1
@@ -332,7 +334,7 @@ Args:
     msg (str): Content of the error
 
 Example:
-    >>> print mc.qlog("  a")
+    >>> print(mc.qlog("  a"))
     Error in class Var on line 1:
       a
       ^

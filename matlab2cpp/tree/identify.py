@@ -15,8 +15,7 @@ Rutines for identifying code structure.
 +------------------------------------------------------+-----------------------+
 """
 
-import constants as c
-import findend
+from . import constants as c, findend
 
 def space_delimiter(self, start):
     """

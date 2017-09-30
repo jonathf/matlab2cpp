@@ -3,9 +3,8 @@ Variable interpretor
 """
 
 import matlab2cpp as mc
-import constants as c
-import findend
-import iterate
+
+from . import constants as c, findend, iterate
 
 
 def assign(self, parent, cur, end=None):
@@ -35,7 +34,7 @@ Example:
        4     Expression  expression.create    '4'
        4     Int         misc.number          '4'
     >>> builder.configure(suggest=False)
-    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Assign     int          int 
     1 1| | Var        unknown      (int)   a
@@ -71,9 +70,9 @@ Example:
                     code=self.code[cur:end+1])
 
             if self.disp:
-                print "%4d     Cset       " % cur,
-                print "%-20s" % "variables.assign",
-                print repr(self.code[cur:end+1])
+                print("%4d     Cset       " % cur,)
+                print("%-20s" % "variables.assign",)
+                print(repr(self.code[cur:end+1]))
 
             n_fields = 0
             while self.code[k] == "{":
@@ -104,9 +103,9 @@ Example:
                     code=self.code[cur:end+1])
 
             if self.disp:
-                print "%4d     Cvar       " % cur,
-                print "%-20s" % "variables.assign",
-                print repr(self.code[cur:end+1])
+                print("%4d     Cvar       " % cur,)
+                print("%-20s" % "variables.assign",)
+                print(repr(self.code[cur:end+1]))
 
             num = 0
             while self.code[k] == "{":
@@ -114,9 +113,9 @@ Example:
                 cur = findend.cell(self, k)
                 #cur = self.iterate_cell(node, k)
 
-                #print node.code
-                #print k
-                #print "\n\n"
+                #print(node.code)
+                #print(k)
+                #print("\n\n")
 
                 #l = 0
                 #while node.code[l] in c.letters+c.digits+"_":
@@ -126,8 +125,8 @@ Example:
                 #for tup in list:
                 #    mc.collection.Var(node, node.code[tup[0]:tup[1]+1])
 
-                #print list
-                #print "LISTAT\n\n"
+                #print(list)
+                #print("LISTAT\n\n")
 
                 k = cur+1
                 while self.code[k] in " \t":
@@ -148,10 +147,9 @@ Example:
             value = self.code[start:end]
 
             if self.disp:
-                print "%4d     Sset        " %\
-                        cur,
-                print "%-20s" % "variables.assign",
-                print repr(self.code[cur:end])
+                print("%4d     Sset        " % cur)
+                print("%-20s" % "variables.assign",)
+                print(repr(self.code[cur:end]))
 
             node = mc.collection.Sset(parent, name, value, cur=cur,
                     code=self.code[cur:end], pointer=1)
@@ -162,10 +160,9 @@ Example:
         else:
 
             if self.disp:
-                print "%4d     Set        " %\
-                        cur,
-                print "%-20s" % "variables.assign",
-                print repr(self.code[cur:end+1])
+                print("%4d     Set        " % cur)
+                print("%-20s" % "variables.assign",)
+                print(repr(self.code[cur:end+1]))
 
             node = mc.collection.Set(parent, name, cur=cur,
                     code=self.code[cur:end+1])
@@ -188,9 +185,9 @@ Example:
                 k += 1
 
             if self.disp:
-                print "%4d     Nset       " % cur,
-                print "%-20s" % "variables.assign",
-                print repr(self.code[cur:end+1])
+                print("%4d     Nset       " % cur,)
+                print("%-20s" % "variables.assign",)
+                print(repr(self.code[cur:end+1]))
 
 
             node = mc.collection.Nset(parent, name)
@@ -217,9 +214,9 @@ Example:
 
                 end = findend.paren(self, j)
                 if self.disp:
-                    print "%4d     Fset       " % cur,
-                    print "%-20s" % "variables.assign",
-                    print repr(self.code[cur:end+1])
+                    print("%4d     Fset       " % cur,)
+                    print("%-20s" % "variables.assign",)
+                    print(repr(self.code[cur:end+1]))
 
                 node = mc.collection.Fset(parent, name, value=value, cur=cur,
                         code=self.code[cur:end+1])
@@ -230,9 +227,9 @@ Example:
             else:
 
                 if self.disp:
-                    print "%4d     Fvar       " % cur,
-                    print "%-20s" % "variables.assign",
-                    print repr(self.code[cur:last+1])
+                    print("%4d     Fvar       " % cur,)
+                    print("%-20s" % "variables.assign",)
+                    print(repr(self.code[cur:last+1]))
 
                 node = mc.collection.Fvar(parent, name, value=value, cur=cur,
                         code=self.code[cur:last+1])
@@ -242,9 +239,9 @@ Example:
     # Simple variable assignment
     else:
         if self.disp:
-            print "%4d     Var        " % cur,
-            print "%-20s" % "variables.assign",
-            print repr(self.code[cur:last])
+            print("%4d     Var        " % cur,)
+            print("%-20s" % "variables.assign",)
+            print(repr(self.code[cur:last]))
 
 
         node = mc.collection.Var(parent, name, cur=cur,
@@ -284,7 +281,7 @@ Example:
        0     Expression  expression.create    'a'
        0     Var         variables.variable   'a'
     >>> builder.configure()
-    >>> print mc.qtree(builder, core=True) #doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree(builder, core=True)) #doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Statement  code_block   TYPE
     1 1| | Var        unknown      TYPE    a
@@ -322,9 +319,9 @@ Example:
                     code=self.code[cur:end+1])
 
             if self.disp:
-                print "%4d     Cget       " % cur,
-                print "%-20s" % "variables.variable",
-                print repr(self.code[cur:end+1])
+                print("%4d     Cget       " % cur,)
+                print("%-20s" % "variables.variable",)
+                print(repr(self.code[cur:end+1]))
 
             n_fields = 0
             while self.code[k] == "{":
@@ -355,9 +352,9 @@ Example:
                     code=self.code[cur:end+1])
 
             if self.disp:
-                print "%4d     Cvar       " % cur,
-                print "%-20s" % "variables.variable",
-                print repr(self.code[cur:end+1])
+                print("%4d     Cvar       " % cur,)
+                print("%-20s" % "variables.variable",)
+                print(repr(self.code[cur:end+1]))
 
             num = 0
             while self.code[k] == "{":
@@ -382,10 +379,9 @@ Example:
             value = self.code[start:end]
 
             if self.disp:
-                print "%4d     Sget        " %\
-                        cur,
-                print "%-20s" % "variables.variable",
-                print repr(self.code[cur:end])
+                print("%4d     Sget        " % cur,)
+                print("%-20s" % "variables.variable",)
+                print(repr(self.code[cur:end]))
 
             node = mc.collection.Sget(parent, name, value, cur=cur,
                     code=self.code[cur:end], pointer=1)
@@ -396,10 +392,9 @@ Example:
         else:
 
             if self.disp:
-                print "%4d     Get        " %\
-                        cur,
-                print "%-20s" % "variables.variable",
-                print repr(self.code[cur:end+1])
+                print("%4d     Get        " % cur,)
+                print("%-20s" % "variables.variable",)
+                print(repr(self.code[cur:end+1]))
 
             node = mc.collection.Get(parent, name, cur=cur,
                     code=self.code[cur:end+1])
@@ -419,9 +414,9 @@ Example:
             end = findend.paren(self, k)
 
             if self.disp:
-                print "%4d     Nget       " % cur,
-                print "%-20s" % "variables.variable",
-                print repr(self.code[cur:end+1])
+                print("%4d     Nget       " % cur,)
+                print("%-20s" % "variables.variable",)
+                print(repr(self.code[cur:end+1]))
 
             k += 1
 
@@ -451,9 +446,9 @@ Example:
 
                 end = findend.paren(self, j)
                 if self.disp:
-                    print "%4d     Fget       " % cur,
-                    print "%-20s" % "variables.variable",
-                    print repr(self.code[cur:end+1])
+                    print("%4d     Fget       " % cur,)
+                    print("%-20s" % "variables.variable",)
+                    print(repr(self.code[cur:end+1]))
 
 
                 node = mc.collection.Fget(parent, name, cur=cur,
@@ -471,9 +466,9 @@ Example:
             else:
 
                 if self.disp:
-                    print "%4d     Fvar       " % cur,
-                    print "%-20s" % "variables.variable",
-                    print repr(self.code[cur:last])
+                    print("%4d     Fvar       " % cur,)
+                    print("%-20s" % "variables.variable",)
+                    print(repr(self.code[cur:last]))
 
                 node = mc.collection.Fvar(parent, name, value=value,
                         cur=cur, code=self.code[cur:last])
@@ -487,9 +482,9 @@ Example:
     else:
 
         if self.disp:
-            print "%4d     Var        " % cur,
-            print "%-20s" % "variables.variable",
-            print repr(self.code[cur:last])
+            print("%4d     Var        " % cur,)
+            print("%-20s" % "variables.variable",)
+            print(repr(self.code[cur:last]))
 
         node = mc.collection.Var(parent, name, cur=cur,
                 code=self.code[cur:last])
@@ -527,7 +522,7 @@ Example:
        2     Expression  expression.create    'b'
        2     Var         variables.variable   'b'
     >>> builder.configure()
-    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Statement  code_block   TYPE
     1 1| | Cvar       cell         TYPE    a

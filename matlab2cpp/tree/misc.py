@@ -5,11 +5,8 @@ Interpretors that didn't fit other places
 """
 
 import matlab2cpp as mc
-import constants as c
-import findend
-import expression
-import iterate
-import identify
+
+from . import constants as c, findend, expression, iterate, identify
 
 
 def number(self, node, start):
@@ -35,7 +32,7 @@ Example:
        0     Expression  expression.create    '42.'
        0     Float       misc.number          '42.'
     >>> builder.configure()
-    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Statement  code_block   TYPE
     1 1| | Float      double       double
@@ -82,17 +79,17 @@ Example:
             node = mc.collection.Imag(node, number, cur=start,
                     code=self.code[start:last+1])
             if self.disp:
-                print "%4d     Imag       " % (start),
-                print "%-20s" % "misc.number",
-                print repr(self.code[start:last+1])
+                print("%4d     Imag       " % (start),)
+                print("%-20s" % "misc.number",)
+                print(repr(self.code[start:last+1]))
 
         else:
             node = mc.collection.Float(node, number, cur=start,
                     code=self.code[start:last+1])
             if self.disp:
-                print "%4d     Float      " % (start),
-                print "%-20s" % "misc.number",
-                print repr(self.code[start:last+1])
+                print("%4d     Float      " % (start),)
+                print("%-20s" % "misc.number",)
+                print(repr(self.code[start:last+1]))
 
     elif integer:
 
@@ -104,17 +101,17 @@ Example:
                     code=self.code[start:last+1])
             k += 1
             if self.disp:
-                print "%4d     Imag       " % (start),
-                print "%-20s" % "misc.number",
-                print repr(self.code[start:last+1])
+                print("%4d     Imag       " % (start),)
+                print("%-20s" % "misc.number",)
+                print(repr(self.code[start:last+1]))
 
         else:
             node = mc.collection.Int(node, self.code[start:k], cur=start,
                     code=self.code[start:last+1])
             if self.disp:
-                print "%4d     Int        " % (start),
-                print "%-20s" % "misc.number",
-                print repr(self.code[start:last+1])
+                print("%4d     Int        " % (start),)
+                print("%-20s" % "misc.number",)
+                print(repr(self.code[start:last+1]))
 
     else:
 
@@ -124,17 +121,17 @@ Example:
                     code=self.code[start:last+1])
             k += 1
             if self.disp:
-                print "%4d     Imag       " % (start),
-                print "%-20s" % "misc.number",
-                print repr(self.code[start:last+1])
+                print("%4d     Imag       " % (start),)
+                print("%-20s" % "misc.number",)
+                print(repr(self.code[start:last+1]))
 
         else:
             node = mc.collection.Float(node, self.code[start:k], cur=start,
                     code=self.code[start:k])
             if self.disp:
-                print "%4d     Float      " % (start),
-                print "%-20s" % "misc.number",
-                print repr(self.code[start:last+1])
+                print("%4d     Float      " % (start),)
+                print("%-20s" % "misc.number",)
+                print(repr(self.code[start:last+1]))
 
     return k-1
 
@@ -161,7 +158,7 @@ Example:
        0   Statement     codeblock.codeblock  "'abc'"
        0     String  misc.string          "'abc'"
     >>> builder.configure()
-    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Statement  code_block   TYPE
     1 1| | String     string       string
@@ -176,9 +173,9 @@ Example:
             code=self.code[cur:end+1])
 
     if self.disp:
-        print "%4d     String " % cur,
-        print "%-20s" % "misc.string",
-        print repr(self.code[cur:end+1])
+        print("%4d     String " % cur,)
+        print("%-20s" % "misc.string",)
+        print(repr(self.code[cur:end+1]))
 
     return end
 
@@ -211,7 +208,7 @@ Example:
        3     Expression  expression.create    '-3'
        4     Int         misc.number          '3'
     >>> builder.configure(suggest=False)
-    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
      1  1Block      code_block   TYPE
      1  1| Statement  code_block   TYPE
      1  1| | Matrix     matrix       irowvec
@@ -250,9 +247,9 @@ def pragma_for(self, parent, cur):
     end = findend.pragma_for(self, k)
 
     if self.disp:
-        print "%4d   Pragma_for   " % cur,
-        print "%-20s" % "misc.pragma_for",
-        print repr(self.code[cur:end])
+        print("%4d   Pragma_for   " % cur,)
+        print("%-20s" % "misc.pragma_for",)
+        print(repr(self.code[cur:end]))
 
     mc.collection.Pragma_for(parent, self.code[cur+1:end], cur=cur)
 
@@ -282,7 +279,7 @@ Example:
        0     Int         misc.number          '4'
        2   Comment       misc.comment         '% comment'
     >>> builder.configure(suggest=False)
-    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1  1Block      code_block   TYPE
     1  1| Statement  code_block   TYPE
     1  1| | Int        int          int
@@ -300,9 +297,9 @@ Example:
         return end
 
     if self.disp:
-        print "%4d   Comment      " % cur,
-        print "%-20s" % "misc.comment",
-        print repr(self.code[cur:end])
+        print("%4d   Comment      " % cur,)
+        print("%-20s" % "misc.comment",)
+        print(repr(self.code[cur:end]))
 
     if self.code[cur+1] == "{":
         comment = mc.collection.Bcomment(parent, self.code[cur+2:end-1], cur=cur)
@@ -337,9 +334,9 @@ Returns:
     end = findend.verbatim(self, cur)
 
     if self.disp:
-        print "%4d   Verbatim     " % cur,
-        print "%-20s" % "misc.verbatim",
-        print repr(self.code[cur:end+1])
+        print("%4d   Verbatim     " % cur,)
+        print("%-20s" % "misc.verbatim",)
+        print(repr(self.code[cur:end+1]))
 
     keys = self.code[cur:end+1].split("___")
     name = keys[1]
@@ -387,7 +384,7 @@ Example:
       10     Expression  expression.create    '4'
       10     Int         misc.number          '4'
     >>> builder.configure(suggest=False)
-    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
      1   1Block      code_block   TYPE
      1   1| Statement  code_block   TYPE
      1   1| | Matrix     matrix       irowvec
@@ -407,9 +404,9 @@ Example:
 
     end = findend.matrix(self, cur)
     if self.disp:
-        print "%4d     Matrix     " % cur,
-        print "%-20s" % "misc.matrix",
-        print repr(self.code[cur:end+1])
+        print("%4d     Matrix     " % cur,)
+        print("%-20s" % "misc.matrix",)
+        print(repr(self.code[cur:end+1]))
 
     if identify.space_delimited(self, cur):
         L = iterate.space_list(self, cur)
@@ -429,9 +426,9 @@ Example:
                 code=self.code[start:end+1])
 
         if self.disp:
-            print "%4d     Vector     " % (start),
-            print "%-20s" % "misc.matrix",
-            print repr(self.code[start:end+1])
+            print("%4d     Vector     " % (start),)
+            print("%-20s" % "misc.matrix",)
+            print(repr(self.code[start:end+1]))
 
         for start,end in array:
 
@@ -440,9 +437,9 @@ Example:
     if not L:
 
         if self.disp:
-            print "%4d     Vector     " % cur,
-            print "%-20s" % "misc.matrix",
-            print repr("")
+            print("%4d     Vector     " % cur,)
+            print("%-20s" % "misc.matrix",)
+            print(repr(""))
         vector = mc.collection.Vector(matrix, cur=cur, code="")
 
 
@@ -476,7 +473,7 @@ Example:
        4     Expression  expression.create    '2'
        4     Int         misc.number          '2'
     >>> builder.configure(suggest=False)
-    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Statement  code_block   TYPE
     1 1| | Cell       cell         TYPE
@@ -489,9 +486,9 @@ Example:
 
     end = findend.cell(self, cur)
     if self.disp:
-        print "%4d     Cell       " % cur,
-        print "%-20s" % "misc.cell",
-        print repr(self.code[cur:end+1])
+        print("%4d     Cell       " % cur,)
+        print("%-20s" % "misc.cell",)
+        print(repr(self.code[cur:end+1]))
 
     if identify.space_delimited(self, cur):
         L = iterate.space_list(self, cur)
@@ -528,9 +525,9 @@ def reserved(self, node, start):
     newline = l
 
     if self.disp:
-        print "%4d     reserved       " % k,
-        print "%-20s" % "misc.reserved",
-        print repr(self.code[k:newline])
+        print("%4d     reserved       " % k,)
+        print("%-20s" % "misc.reserved",)
+        print(repr(self.code[k:newline]))
 
     if self.code[k:k+4] == "disp":
         statement = mc.collection.Statement(node, cur=start,

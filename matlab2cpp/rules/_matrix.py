@@ -10,9 +10,8 @@ Matrix : Matrix container
 Vector : (Column)-Vector container
     Contains: Expr, ...
 """
-from _code_block import Statement
-import assign
-import armadillo as arma
+from ._code_block import Statement
+from . import assign, armadillo as arma
 
 
 def Vector(node):

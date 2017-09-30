@@ -28,8 +28,7 @@ Look-ahead routines to find end character.
 +------------------------------------------------------+------------------------+
 """
 
-import constants as c
-import identify
+from . import constants as c, identify
 
 def expression(self, start):
     """

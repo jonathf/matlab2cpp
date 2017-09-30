@@ -74,10 +74,10 @@ types. It can be used to quickly retrievieng and inserting datatypes.
 For example::
 
     >>> tree = mc.build("function f(a)")
-    >>> print tree.ftypes
+    >>> print(tree.ftypes)
     {'f': {'a': ''}}
     >>> tree.ftypes = {"f": {"a": "int"}}
-    >>> print mc.qscript(tree)
+    >>> print(mc.qscript(tree))
     void f(int a)
     {
       // Empty block
@@ -91,7 +91,7 @@ Anonymous functions
 In addition to normal function, Matlab have support for anonymous function
 through the name prefix ``@``.  For example::
 
-    >>> print mc.qscript("function f(); g = @(x) x^2; g(4)")
+    >>> print(mc.qscript("function f(); g = @(x) x^2; g(4)"))
     void f()
     {
       std::function<double(int)> g ;
@@ -106,7 +106,7 @@ a ``_``-prefix (and a number postfix, if name is taken).  The information about
 this function dictate the behaviour of the output The supplement file have the
 following form::
 
-    >>> print mc.qpy("function f(); g = @(x) x^2; g(4)")
+    >>> print(mc.qpy("function f(); g = @(x) x^2; g(4)"))
     functions = {
       "_g" : {
               "x" : "int",
@@ -137,7 +137,7 @@ direct assignment.  For example will ``a.b=4`` create a ``struct`` with name
 ``a`` that has one field ``b``.  When translating such a snippet, it creates
 a C++-struct, such that::
 
-    >>> print mc.qhpp("function f(); a.b = 4.", suggest=True)
+    >>> print(mc.qhpp("function f(); a.b = 4.", suggest=True))
     #ifndef F_M_HPP
     #define F_M_HPP
     <BLANKLINE>
@@ -160,7 +160,7 @@ In the suppliment file, the local variable `a` will be assigned as a `struct`.
 In addition, since the struct has content, the suppliment file creates a new
 section for structs.  It will have the following form::
 
-    >>> print mc.qpy("function f(); a.b = 4.", suggest=True)
+    >>> print(mc.qpy("function f(); a.b = 4.", suggest=True))
     functions = {
       "f" : {
         "a" : "struct",
@@ -182,7 +182,7 @@ Quick retrieving and inserting struct variables can be done through the
     >>> tree = mc.build("a.b = 4")
     >>> tree.ftypes = {"f": {"a": "struct"}}
     >>> tree.stypes = {"a": {"b": "double"}}
-    >>> print mc.qcpp(tree)
+    >>> print(mc.qcpp(tree))
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
@@ -208,7 +208,7 @@ table.  Very similar to regular :ref:`structs <struct>`, which only has one
 value per element.  There are a couple of differences in the translation.
 First, the struct is declared as an array:
 
-    >>> print mc.qhpp("function f(); a(1).b = 4.", suggest=True)
+    >>> print(mc.qhpp("function f(); a(1).b = 4.", suggest=True))
     #ifndef F_M_HPP
     #define F_M_HPP
     <BLANKLINE>
@@ -232,7 +232,7 @@ Obviously, there are situations where this isn't enough (or too much), and the
 number should be increased. So second, to adjust this number, the suppliment
 file specifies the number of elements in the integer ``_size``:
 
-    >>> print mc.qpy("function f(); a(1).b = 4.", suggest=True)
+    >>> print(mc.qpy("function f(); a(1).b = 4.", suggest=True))
     functions = {
       "f" : {
         "a" : "structs",
@@ -259,7 +259,7 @@ The examples so far, when the functions :py:func:`~matlab2cpp.qcpp`,
 argument ``suggest=True`` have been used, and all variable types have been
 filled in. Consider the following program where this is not the case::
 
-    >>> print mc.qhpp("function c=f(); a = 4; b = 4.; c = a+b", suggest=False)
+    >>> print(mc.qhpp("function c=f(); a = 4; b = 4.; c = a+b", suggest=False))
     #ifndef F_M_HPP
     #define F_M_HPP
     <BLANKLINE>
@@ -281,7 +281,7 @@ variable ``TYPE`` for each unknown variable. Any time variables are unknown,
 ``TYPE`` is used. The supplement file created by `m2cpp` or
 :py:func:`~matlab2cpp.qpy` reflects all these unknown variables as follows::
 
-    >>> print mc.qpy("function c=f(); a = 4; b = 4.; c = a+b", suggest=False)
+    >>> print(mc.qpy("function c=f(); a = 4; b = 4.; c = a+b", suggest=False))
     functions = {
       "f" : {
         "a" : "", # int
@@ -296,7 +296,7 @@ variable ``TYPE`` for each unknown variable. Any time variables are unknown,
 
 By flipping the boolean to ``True``, all the variables get assigned datatypes::
 
-    >>> print mc.qpy("function c=f(); a = 4; b = 4.; c = a+b", suggest=True)
+    >>> print(mc.qpy("function c=f(); a = 4; b = 4.; c = a+b", suggest=True))
     functions = {
       "f" : {
         "a" : "int",
@@ -311,7 +311,7 @@ By flipping the boolean to ``True``, all the variables get assigned datatypes::
 
 The resulting program will have the following complete form:
 
-    >>> print mc.qhpp(
+    >>> print(mc.qhpp()
     ...     "function c=f(); a = 4; b = 4.; c = a+b", suggest=True)
     #ifndef F_M_HPP
     #define F_M_HPP
@@ -342,7 +342,7 @@ variable.  In practice the suggestions can potentially fill in all datatypes
 automatically in large programs, and often quite intelligently. For example,
 variables get suggested across function call scope::
 
-    >>> print mc.qscript('function y=f(x); y=x; function g(); z=f(4)')
+    >>> print(mc.qscript('function y=f(x); y=x; function g(); z=f(4)'))
     int f(int x)
     {
       int y ;
@@ -363,14 +363,14 @@ And accross multiple files::
     >>> builder.load("g.m", "function g(); z=f(4)")
     >>> builder.configure(suggest=True)
     >>> tree_f, tree_g = builder[:]
-    >>> print mc.qscript(tree_f)
+    >>> print(mc.qscript(tree_f))
     int f(int x)
     {
       int y ;
       y = x ;
       return y ;
     }
-    >>> print mc.qscript(tree_g)
+    >>> print(mc.qscript(tree_g))
     void g()
     {
       int z ;
@@ -403,7 +403,7 @@ well. Instead the replacement dictionary can be bassed as argument to
     >>> tree = mc.build('''a=1
     ... b=2
     ... c=3''', vtypes = {"b": "_replaced_text_"})
-    >>> print mc.qscript(tree)
+    >>> print(mc.qscript(tree))
     a = 1 ;
     // b=2
     _replaced_text_
@@ -420,7 +420,7 @@ multiple lines. For example::
     >>> tree = mc.build('''a=1
     ... b=2
     ... c=3''', vtypes={"b": replace_code})
-    >>> print mc.qscript(tree)
+    >>> print(mc.qscript(tree))
     a = 1 ;
     // b=2
     one line

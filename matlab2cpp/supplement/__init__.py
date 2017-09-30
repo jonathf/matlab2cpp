@@ -16,17 +16,11 @@ PREFIX = """# encoding: utf-8
 # char    string  struct  structs func_lambda
 """
 
-import functions
-import suggests
-import structs
-import includes
-import verbatim
-
-from functions import Ftypes
-from suggests import  Sstypes
-from structs import Stypes
-from includes import Itypes
-from verbatim import Vtypes
+from .functions import Ftypes
+from .suggests import  Sstypes
+from .structs import Stypes
+from .includes import Itypes
+from .verbatim import Vtypes
 
 import matlab2cpp as mc
 
@@ -53,7 +47,7 @@ Example:
     >>> types_s = {"c" : {"d":""}}
     >>> types_i = ["#include <armadillo>"]
     >>> suggest = {"g" : {"b":"float"}, "c" : {"d":"vec"}}
-    >>> print str_variables(types_f, types_s, types_i, suggest, prefix=False)
+    >>> print(str_variables(types_f, types_s, types_i, suggest, prefix=False))
     functions = {
       "f" : {
         "a" : "int",

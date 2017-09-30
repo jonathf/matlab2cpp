@@ -42,19 +42,19 @@ if system == "Windows":
     from shutil import copy
     copy("m2cpp.bat", bat_dst)
 
-    print 
-    print "Program now runnable through 'm2cpp'"
-    print "> m2cpp -h"
-    
+    print()
+    print("Program now runnable through 'm2cpp'")
+    print("> m2cpp -h")
+
 else: #Linux/Mac
     m2cpp = "cp -v m2cpp.py /usr/local/bin/m2cpp"
     os.system(m2cpp)
     chmod = "chmod 755 /usr/local/bin/m2cpp"
-    print chmod
+    print(chmod)
     os.system(chmod)
 
-    print
-    print "Program now runnable through 'm2cpp'"
-    print "> m2cpp -h"
+    print()
+    print("Program now runnable through 'm2cpp'")
+    print("> m2cpp -h")
 
 

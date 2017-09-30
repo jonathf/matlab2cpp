@@ -3,8 +3,8 @@ Functions with multiple returns
 """
 
 import matlab2cpp as mc
-from function import type_string
-from variables import Get
+from .function import type_string
+from .variables import Get
 
 
 def Func(node):
@@ -14,7 +14,7 @@ Contains: Declares Returns Params Block
 Property: name (of function)
 
 Examples:
-    >>> print mc.qscript("function f()")
+    >>> print(mc.qscript("function f()"))
     void f()
     {
       // Empty block
@@ -56,7 +56,7 @@ without arguments.
 Property: name (of variable)
 
 Examples:
-    >>> print mc.qscript("function f(); end; function g(); f")
+    >>> print(mc.qscript("function f(); end; function g(); f"))
     void f()
     {
       // Empty block
@@ -85,7 +85,7 @@ Property: name (of function)
 Contains: Expression Expression+ Get
 
 Examples:
-    >>> print mc.qscript('''function [a,b]=f(c,d); a=c; b=d
+    >>> print(mc.qscript('''function [a,b]=f(c,d); a=c; b=d)
     ...     function g(); [a,b] = f(1,2.)''')
     void f(int c, double d, int& a, double& b)
     {
@@ -122,7 +122,7 @@ Adds type prefix and '&' (since they are to be placed in parameters)
 Contains: Return*
 
 Examples:
-    >>> print mc.qscript("function [a,b]=f(); a=1, b=2.")
+    >>> print(mc.qscript("function [a,b]=f(); a=1, b=2."))
     void f(int& a, double& b)
     {
       a = 1 ;
@@ -145,7 +145,7 @@ Contains: Var*
 
 Examples:
     >>> ftypes = {"f": {"a":"int", "b":"double"}}
-    >>> print mc.qscript("function f(a,b)", ftypes=ftypes)
+    >>> print(mc.qscript("function f(a,b)", ftypes=ftypes))
     void f(int a, double b)
     {
       // Empty block
@@ -175,7 +175,7 @@ def Declares(node):
 Contains: Declare*
 
 Examples:
-    >>> print mc.qscript("function f(); a=1; b.c='2'; d.e(1)=[4,5]")
+    >>> print(mc.qscript("function f(); a=1; b.c='2'; d.e(1)=[4,5]"))
     void f()
     {
       _B b ;

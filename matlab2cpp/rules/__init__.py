@@ -95,18 +95,19 @@ These basic types are then glued together through the following:
 +-------------------------------------------+---------------------------------------+
 """
 
-import matlab2cpp as mc
 import glob
 import os
+
+import matlab2cpp as mc
 sep = os.path.sep
 
-for name in glob.glob(os.path.dirname(__file__)+sep+"*.py"):
+for name in glob.glob(os.path.dirname(__file__)+os.path.sep+"*.py"):
 
     name = name.split(sep)[-1]
     if name != "__init__":
-        exec("import %s" % name[:-3])
+        exec("from . import %s" % name[:-3])
 
-from _reserved import reserved
+from ._reserved import reserved
 
 if __name__ == "__main__":
     import doctest

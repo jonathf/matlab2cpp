@@ -1,4 +1,4 @@
-from assign import Assign
-from variables import *
+from .assign import Assign
+from .variables import *
 
 Declare = "uword %(name)s ;"

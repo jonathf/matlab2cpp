@@ -48,7 +48,7 @@ def mtypes(builder, args):
 
     ##Create new matlab file in m2cpp_temp
     #Loop for each script and function .m file
-    #print "- Program loop start\n\n"
+    #print("- Program loop start\n\n")
     for program in builder.project:
         #get program code from matlab file
         f = open(program.name, "r")
@@ -57,7 +57,7 @@ def mtypes(builder, args):
 
         #Get name of file after splitting path, set file path "m2cpp_temp/file"
         file_path = dst_dir + program.name.split(os.path.sep)[-1]
-        #print file_path
+        #print(file_path)
 
         #Program is main script file, add whos_f at end of file
         #program[1][0].cls is Main if script file
@@ -86,7 +86,7 @@ def mtypes(builder, args):
         code = "\n".join(code_temp)
         
         #write file to m2cpp_temp/
-        #print "writing file: " + file_path
+        #print("writing file: " + file_path)
 
         f = open(file_path, "w")
         f.write(code)
@@ -108,7 +108,7 @@ def mtypes(builder, args):
 
         os.chdir(cwdir)
     except:
-        print "matlab did not load correctly, check that you have matlab engine API for python installed"
+        print("matlab did not load correctly, check that you have matlab engine API for python installed")
 
     ##Process .m.txt files to extract data types
     #I could have this under the previous loop,
@@ -119,7 +119,7 @@ def mtypes(builder, args):
         #reset funcs_types dictionary for each iteration
         funcs_types = {}
         file_path = dst_dir + program.name.split(os.path.sep)[-1] + ".txt"
-        #print file_path
+        #print(file_path)
         funcs_types = extract_ftypes(program, funcs_types, file_path)
     
         ##Copy data types to program.ftypes
@@ -153,12 +153,12 @@ def extract_ftypes(program, funcs_types, file_path):
     while j < len(lines):
         line = lines[j]
 
-        #print str(j) + ":" + line
+        #print(str(j) + ":" + line)
         #When function is found, loop over variables and
         cols = line.split(":")
         #add them to dict funcs_types
         if cols[0] == "#function_name":
-            #print line
+            #print(line)
             #funcs_name = cols[1].split(",")[0]
 
             f_names = cols[1].split(",")
@@ -179,11 +179,11 @@ def extract_ftypes(program, funcs_types, file_path):
                 #extract variables to be more readable
                 var_name = cols[0]
                 
-                #print lines[j]
+                #print(lines[j])
                 #extract the type in string format
                 data_type = datatype_string(cols)
 
-                #print var_name + ": " + data_type
+                #print(var_name + ": " + data_type)
 
                 #insert in dictionary
                 #check if entry in dictionary exist
@@ -194,8 +194,8 @@ def extract_ftypes(program, funcs_types, file_path):
                     #get if datatype is comples, then mem_value should be 4
                     #mem_value_old = get_mem(data_type_old)
                     mem_value_new = get_mem(data_type)
-                    #print "mem_value_new: "
-                    #print mem_value_new
+                    #print("mem_value_new: ")
+                    #print(mem_value_new)
                     if mem_value_new == 4:
                         funcs_types[funcs_name][var_name] = data_type
                 else:
@@ -287,7 +287,7 @@ def detect_string(code, k):
 
 
 def function_code(program, code):
-    #print program.summary()
+    #print(program.summary())
 
     #count number of if, while, for, switch and number of end
 
@@ -302,7 +302,7 @@ def function_code(program, code):
         if node.cls in ["If", "While", "For", "Switch"]:
             iwfs_ends += 1
 
-    #print "iwfs_ends: " + str(iwfs_ends)
+    #print("iwfs_ends: " + str(iwfs_ends))
     
     #Get number of 'end' on separate lines
     
@@ -341,13 +341,13 @@ def function_code(program, code):
     #for line in elines:
     #    if line.strip() == "end":
     #        num_end += 1
-        #print line
+        #print(line)
 
     
    
     
 
-    #print "num_end: " + str(num_end)
+    #print("num_end: " + str(num_end))
 
 
     #insert whos_f before return and before function ..... (here)end (next fun)
@@ -387,7 +387,7 @@ def function_code(program, code):
     #index = len(code)
     
     #index = len(lines)
-    ##print code
+    ##print(code)
     #if function_end:
     #    #should stop when num_funcs becomes zero
     #    while num_funcs:
@@ -416,6 +416,6 @@ def function_code(program, code):
     #        num_funcs -= 1
         
 
-    #print code
+    #print(code)
     #code = '\n'.join(lines)
     return code

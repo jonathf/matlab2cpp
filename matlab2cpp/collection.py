@@ -190,22 +190,22 @@ A full summary of all nodes.
 +---------------------+--------------------+----------------+------------------------------+
 """
 
-from node import Node
+from .node import Node
 
 __all__ = [
-"All", "Assign", "Assigns", "Band", "Bcomment", "Block", "Bor", "Branch",
-"Break", "Case", "Catch", "Cell", "Cget", "Colon",
-"Counter", "Cset", "Ctranspose", "Cvar", 
-"Declares", "Ecomment",
-"Elementdivision", "Elexp", "Elif", "Elmul", "Else", "End", "Eq", "Error",
-"Exp", "Expr", "Fget", "Float", "Parfor", "Pragma_for", "For", "Fset", "Func", "Funcs", "Fvar", "Ge",
-"Get", "Gt", "Header", "Headers", "If", "Imag", "Include", "Includes", "Inline",
-"Inlines", "Int", "Lambda", "Land", "Lcomment", "Le", "Leftelementdivision",
-"Leftmatrixdivision", "Log", "Lor", "Lt", "Main", "Matrix", "Matrixdivision",
-"Minus", "Mul", "Ne", "Neg", "Nget", "Not", "Nset", "Opr", "Otherwise",
-"Params", "Paren", "Plus", "Program", "Project", "Resize", "Return", "Returns",
-"Set", "Sget", "Sset", "Statement", "String", "Struct", "Structs", "Switch",
-"Transpose", "Try", "Tryblock", "Var", "Vector", "Warning", "While"
+    "All", "Assign", "Assigns", "Band", "Bcomment", "Block", "Bor", "Branch",
+    "Break", "Case", "Catch", "Cell", "Cget", "Colon",
+    "Counter", "Cset", "Ctranspose", "Cvar", 
+    "Declares", "Ecomment",
+    "Elementdivision", "Elexp", "Elif", "Elmul", "Else", "End", "Eq", "Error",
+    "Exp", "Expr", "Fget", "Float", "Parfor", "Pragma_for", "For", "Fset", "Func", "Funcs", "Fvar", "Ge",
+    "Get", "Gt", "Header", "Headers", "If", "Imag", "Include", "Includes", "Inline",
+    "Inlines", "Int", "Lambda", "Land", "Lcomment", "Le", "Leftelementdivision",
+    "Leftmatrixdivision", "Log", "Lor", "Lt", "Main", "Matrix", "Matrixdivision",
+    "Minus", "Mul", "Ne", "Neg", "Nget", "Not", "Nset", "Opr", "Otherwise",
+    "Params", "Paren", "Plus", "Program", "Project", "Resize", "Return", "Returns",
+    "Set", "Sget", "Sset", "Statement", "String", "Struct", "Structs", "Switch",
+    "Transpose", "Try", "Tryblock", "Var", "Vector", "Warning", "While"
 ]
 
 class Project(Node):

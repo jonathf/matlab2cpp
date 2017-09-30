@@ -1,7 +1,8 @@
 import re
+
 import matlab2cpp as mc
-import armadillo as arma
-from function import type_string
+from . import armadillo as arma
+from .function import type_string
 
 def add_indenting(text):
     """Add identing to text
@@ -35,7 +36,7 @@ def number_fix(text):
 explicit number subtractions with the single index equivalent.
 
 Examples:
-    >>> print number_fix("a(8-1, 5-1)")
+    >>> print(number_fix("a(8-1, 5-1)"))
     a(7, 4)
     """
     # Cosmetic fix

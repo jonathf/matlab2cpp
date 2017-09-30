@@ -6,8 +6,7 @@ The main codeblock loop
 
 import matlab2cpp as mc
 
-import findend
-import constants as c
+from . import findend, constants as c
 
 def codeblock(self, parent, start):
     '''
@@ -37,7 +36,7 @@ Example:
        8     Expression  expression.create    '3'
        8     Int         misc.number          '3'
     >>> builder.configure()
-    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1  1Block      code_block   TYPE
     1  1| Statement  code_block   TYPE
     1  1| | Var        unknown      TYPE    a
@@ -50,13 +49,13 @@ Example:
     block = mc.collection.Block(parent, cur=cur)
 
     if self.disp:
-        print "%4d Codeblock  " % cur,
-        print "%-20s" % "codeblock.codeblock"
+        print("%4d Codeblock  " % cur,)
+        print("%-20s" % "codeblock.codeblock")
 
     is_end_terminated = False
 
     while True:
-        #print self.code[cur:cur+5]
+        #print(self.code[cur:cur+5])
         if self.code[cur] in " \t;":
             pass
 
@@ -89,9 +88,9 @@ Example:
 
                 end = findend.expression(self, cur)
                 if self.disp:
-                    print "%4d   Statement    " % cur,
-                    print "%-20s" % "codeblock.codeblock",
-                    print repr(self.code[cur:end+1])
+                    print("%4d   Statement    " % cur,)
+                    print("%-20s" % "codeblock.codeblock",)
+                    print(repr(self.code[cur:end+1]))
 
                 statement.code = self.code[cur:end+1]
 
@@ -102,9 +101,9 @@ Example:
         elif self.code[cur] == "'":
             end = findend.string(self, cur)
             if self.disp:
-                print "%4d   Statement    " % cur,
-                print "%-20s" % "codeblock.codeblock",
-                print repr(self.code[cur:end+1])
+                print("%4d   Statement    " % cur,)
+                print("%-20s" % "codeblock.codeblock",)
+                print(repr(self.code[cur:end+1]))
 
             statement = mc.collection.Statement(block, cur=cur,
                     code=self.code[cur:end+1])
@@ -191,9 +190,9 @@ Example:
             else:
                 end = findend.expression(self, cur)
                 if self.disp:
-                    print "%4d   Statement    " % cur,
-                    print "%-20s" % "codeblock.codeblock",
-                    print repr(self.code[cur:end+1])
+                    print("%4d   Statement    " % cur,)
+                    print("%-20s" % "codeblock.codeblock",)
+                    print(repr(self.code[cur:end+1]))
 
                 statement = mc.collection.Statement(block, cur=cur,
                         code=self.code[cur:end+1])

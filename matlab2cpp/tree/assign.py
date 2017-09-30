@@ -11,10 +11,7 @@ Support functions for identifying assignments.
 """
 import matlab2cpp as mc
 
-import findend
-import constants as c
-import identify
-import iterate
+from . import findend, constants as c, identify, iterate
 
 def multi(self, parent, cur, eq_loc):
     """
@@ -42,7 +39,7 @@ Example:
        8     Expression  expression.create    'c'
        8     Var         variables.variable   'c'
     >>> builder.configure()
-    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
      1  1Block      code_block   TYPE
      1  1| Assigns    unknown      TYPE    c
      1  2| | Var        unknown      TYPE    a
@@ -64,10 +61,9 @@ Example:
     end = findend.expression(self, j)
 
     if self.disp:
-        print "%4d   Assigns    " %\
-                cur,
-        print "%-20s" % "assign.multi",
-        print repr(self.code[cur:end+1])
+        print("%4d   Assigns    " % cur)
+        print("%-20s" % "assign.multi",)
+        print(repr(self.code[cur:end+1]))
 
     if identify.space_delimited(self, cur):
         l = iterate.space_list(self, cur)
@@ -119,7 +115,7 @@ Example:
        2     Expression  expression.create    'b'
        2     Var         variables.variable   'b'
     >>> builder.configure()
-    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Assign     unknown      TYPE    b
     1 1| | Var        unknown      TYPE    a
@@ -137,10 +133,9 @@ Example:
     end = findend.expression(self, j)
 
     if self.disp:
-        print "%4d   Assign     " %\
-                cur,
-        print "%-20s" % "assign.single",
-        print repr(self.code[cur:end+1])
+        print("%4d   Assign     " % cur)
+        print("%-20s" % "assign.single",)
+        print(repr(self.code[cur:end+1]))
 
     assign = mc.collection.Assign(parent, cur=cur, code=self.code[cur:end+1])
 

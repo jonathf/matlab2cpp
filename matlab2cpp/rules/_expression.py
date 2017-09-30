@@ -1,11 +1,11 @@
 import matlab2cpp as mc
-from assign import Assign
+from .assign import Assign
 
 def Paren(node):
     """Parenthesis surounding expression.
 
 Examples:
-    >>> print mc.qscript("(1+2)*(3-4)")
+    >>> print(mc.qscript("(1+2)*(3-4)"))
     (1+2)*(3-4) ;
     """
     node.type = node[0].type
@@ -15,7 +15,7 @@ def End(node):
     """The 'end' statement indicating not end of block, but end-of-range.
     
 Examples:
-    >>> print mc.qscript("x = zeros(2,2,2); x(end, end, end)")
+    >>> print(mc.qscript("x = zeros(2,2,2); x(end, end, end)"))
     x = arma::zeros<cube>(2, 2, 2) ;
     x(x.n_rows-1, x.n_cols-1, x.n_slices-1) ;
     """
@@ -58,12 +58,12 @@ def Return(node):
     """Return statement
 
 Examples:
-    >>> print mc.qscript("function f(); return")
+    >>> print(mc.qscript("function f(); return"))
     void f()
     {
       return ;
     }
-    >>> print mc.qscript("function y=f(); return; y=1")
+    >>> print(mc.qscript("function y=f(); return; y=1"))
     int f()
     {
       int y ;
@@ -71,7 +71,7 @@ Examples:
       y = 1 ;
       return y ;
     }
-    >>> print mc.qscript("function [y,z]=f(); return; y=1; z=2")
+    >>> print(mc.qscript("function [y,z]=f(); return; y=1; z=2"))
     void f(int& y, int& z)
     {
       return ;
@@ -96,7 +96,7 @@ def Mul(node):
     """(Matrix-)multiplication
 
 Examples:
-    >>> print mc.qscript("a = [1,2,3]; b = [4;5;6]; c = a*b")
+    >>> print(mc.qscript("a = [1,2,3]; b = [4;5;6]; c = a*b"))
     sword _a [] = {1, 2, 3} ;
     a = irowvec(_a, 3, false) ;
     sword _b [] = {4, 5, 6} ;
@@ -199,7 +199,7 @@ def Elmul(node):
     """Element multiplication
 
 Examples:
-    >>> print mc.qscript("a = [1,2,3]; b = [4,5,6]; c = a.*b")
+    >>> print(mc.qscript("a = [1,2,3]; b = [4,5,6]; c = a.*b"))
     sword _a [] = {1, 2, 3} ;
     a = irowvec(_a, 3, false) ;
     sword _b [] = {4, 5, 6} ;
@@ -228,7 +228,7 @@ def Plus(node):
     """Addition
 
 Examples:
-    >>> print mc.qscript("a = [1,2,3]; b = [4,5,6]; c = a+b")
+    >>> print(mc.qscript("a = [1,2,3]; b = [4,5,6]; c = a+b"))
     sword _a [] = {1, 2, 3} ;
     a = irowvec(_a, 3, false) ;
     sword _b [] = {4, 5, 6} ;
@@ -255,7 +255,7 @@ def Minus(node):
     """Subtraction
 
 Examples:
-    >>> print mc.qscript("a = [1,2,3]; b = [4,5,6]; c = a-b")
+    >>> print(mc.qscript("a = [1,2,3]; b = [4,5,6]; c = a-b"))
     sword _a [] = {1, 2, 3} ;
     a = irowvec(_a, 3, false) ;
     sword _b [] = {4, 5, 6} ;
@@ -613,7 +613,7 @@ Not = "!", "", ""
 def Transpose(node):
     """(Simple) transpose
 
-    >>> print mc.qscript("a = [1,2,3]; b = a.'")
+    >>> print(mc.qscript("a = [1,2,3]; b = a.'"))
     sword _a [] = {1, 2, 3} ;
     a = irowvec(_a, 3, false) ;
     b = arma::strans(a) ;
@@ -641,7 +641,7 @@ def Transpose(node):
 
 def Ctranspose(node):
     """Complex transpose
-    >>> print mc.qscript("a = [1,2,3]; b = a'")
+    >>> print(mc.qscript("a = [1,2,3]; b = a'"))
     sword _a [] = {1, 2, 3} ;
     a = irowvec(_a, 3, false) ;
     b = arma::trans(a) ;
@@ -667,10 +667,10 @@ def Colon(node):
     """Colon (as operator)
 
 Examples:
-    >>> print mc.qscript("a = 1:10; b = 1:10:2")
+    >>> print(mc.qscript("a = 1:10; b = 1:10:2"))
     a = m2cpp::fspan(1, 1, 10) ;
     b = m2cpp::fspan(1, 10, 2) ;
-    >>> print mc.qscript("a = [1,2,3]; a(1:2:2)")
+    >>> print(mc.qscript("a = [1,2,3]; a(1:2:2)"))
     sword _a [] = {1, 2, 3} ;
     a = irowvec(_a, 3, false) ;
     arma::strans(a(m2cpp::span<uvec>(0, 2, 1))) ;
@@ -723,7 +723,7 @@ Examples:
             #LHS have  rowvec, while node.type (RHS) have vec dim
             #node.type = node.group[0].type
         #    node.type = "rowvec"
-            #print node.group[0].mem
+            #print(node.group[0].mem)
             #node.mem = node.group[0].mem
 
         #else:
@@ -751,10 +751,10 @@ Examples:
         # ex, ti is type vec: ti = (m2cpp::span<vec>(0, 1, nt-1))*dt ;
         #should probably change the if statement above, context: assignment
         #if node.group.cls == "Assign":
-            #print node.group
-            #print node.group.cls
-            #print node.group[0].type
-            #print "\n\n\n"
+            #print(node.group)
+            #print(node.group.cls)
+            #print(node.group[0].type)
+            #print("\n\n\n")
         #    return "m2cpp::span<" + node.group[0].type + ">" +args
         return "m2cpp::span<" + node.type + ">(", ", ", ")"
 

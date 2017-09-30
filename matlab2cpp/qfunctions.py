@@ -23,10 +23,10 @@ to the ``mconvert`` script.
 """
 
 import os
-import supplement
-import tree
 import matlab2cpp as mc
-from rules._program import add_indenting, number_fix, strip
+
+from . import supplement, tree
+from .rules._program import add_indenting, number_fix, strip
 
 __all__ = ["build", "qcpp", "qhpp", "qpy", "qlog", "qtree", "qscript"]
 
@@ -53,12 +53,12 @@ Returns:
 
 Example use::
     >>> builder = mc.build("a=4", retall=True)
-    >>> print isinstance(builder, mc.Builder)
+    >>> print(isinstance(builder, mc.Builder))
     True
     >>> node = mc.build("a=4", retall=False)
-    >>> print isinstance(node, mc.Node)
+    >>> print(isinstance(node, mc.Node))
     True
-    >>> print mc.build("a**b")
+    >>> print(mc.build("a**b"))
     Traceback (most recent call last):
         ...
     SyntaxError: File: unamed, line 1 in Matlab code:
@@ -109,7 +109,7 @@ Returns:
 
 Example::
     >>> code = "a = 4; b = 5.; c = 'abc'"
-    >>> print mc.qcpp(code, suggest=False)
+    >>> print(mc.qcpp(code, suggest=False))
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
@@ -121,7 +121,7 @@ Example::
       c = "abc" ;
       return 0 ;
     }
-    >>> print mc.qcpp(code, suggest=True)
+    >>> print(mc.qcpp(code, suggest=True))
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
@@ -136,7 +136,7 @@ Example::
       return 0 ;
     }
     >>> build = mc.build(code, retall=True)
-    >>> print mc.qcpp(build) == mc.qcpp(code)
+    >>> print(mc.qcpp(build) == mc.qcpp(code))
     True
 
 See also:
@@ -203,7 +203,7 @@ Returns:
 
 Example::
     >>> code = "function y=f(x); y=x+1; end; function g(); f(4)"
-    >>> print mc.qhpp(code)
+    >>> print(mc.qhpp(code))
     #ifndef F_M_HPP
     #define F_M_HPP
     <BLANKLINE>
@@ -225,7 +225,7 @@ Example::
       f(4) ;
     }
     #endif
-    >>> print mc.qhpp(code, suggest=True)
+    >>> print(mc.qhpp(code, suggest=True))
     #ifndef F_M_HPP
     #define F_M_HPP
     <BLANKLINE>
@@ -319,7 +319,7 @@ Returns:
 
 Example::
     >>> code = "a = 4; b = 5.; c = 'abc'"
-    >>> print mc.qpy(code, suggest=False)
+    >>> print(mc.qpy(code, suggest=False))
     functions = {
       "main" : {
         "a" : "", # int
@@ -331,7 +331,7 @@ Example::
       '#include <armadillo>',
       'using namespace arma ;',
     ]
-    >>> print mc.qpy(code, suggest=True)
+    >>> print(mc.qpy(code, suggest=True))
     functions = {
       "main" : {
         "a" : "int",
@@ -369,10 +369,10 @@ See also:
     vtypes = supplement.verbatim.get(tree_)
     suggestions = supplement.suggests.get(tree_)
 
-    #print "ITYPASDASDA"
+    #print("ITYPASDASDA")
     #itypes = ["#include \"" + itype.split(os.path.sep)[-1] if ".hpp" in itype else itype for itype in itypes]
-    #print itypes
-    #print ".........;;;;;;;;-----"
+    #print(itypes)
+    #print(".........;;;;;;;;-----")
     #itypes = [itype.split(os.path.sep)[-1] if ".hpp" in itype else itype for itype in itypes]
 
     out = supplement.str_variables(ftypes, stypes, itypes, suggestions, prefix, vtypes)
@@ -404,7 +404,7 @@ Returns:
 	str: A string representation of the log
 
 Example::
-    >>> print mc.qlog("function f(x); x=4")
+    >>> print(mc.qlog("function f(x); x=4"))
     Error in class Var on line 1:
     function f(x); x=4
                ^
@@ -475,7 +475,7 @@ Returns:
     str: A summary of the node tree.
 
 Example::
-    >>> print mc.qtree("function y=f(x); y=x+4") #doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree("function y=f(x); y=x+4") #doctest: +NORMALIZE_WHITESPACE)
           Program    program      TYPE    unamed
           | Includes   program      TYPE
           | | Include    program      TYPE    #include <armadillo>
@@ -547,7 +547,7 @@ Returns:
 	str: A code translation in C++.
 
 Example:
-    >>> print mc.qscript("a = 4")
+    >>> print(mc.qscript("a = 4"))
     a = 4 ;
     """
 

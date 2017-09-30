@@ -1,5 +1,5 @@
 #from assign import Assign
-from variables import *
+from .variables import *
 import matlab2cpp as mc
 
 Declare = "struct %(name)s"
@@ -25,7 +25,7 @@ def Matrix(node):
 
 """def Assign(node):
     lhs, rhs = node
-    print 'here'
+    print('here')
     # assign a my_var = [a.val], a is a structs, my_var should be a vec
     if node[1].cls == "Matrix" and node[1].backend == "structs":
         element = rhs[0][0]

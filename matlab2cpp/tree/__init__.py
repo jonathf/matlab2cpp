@@ -54,7 +54,7 @@ In addition a collectio of genereal purpose modules are available:
 """
 
 import matlab2cpp as mc
-from builder import Builder
+from .builder import Builder
 __all__ = ["Builder"]
 
 if __name__ == "__main__":

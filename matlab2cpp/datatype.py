@@ -16,8 +16,8 @@ The follwing constructor classes exists here:
 +------------------------------------------+---------------------------------------+
 """
 
-import supplement
 import matlab2cpp as mc
+from . import supplement
 
 dim0 = {"int", "float", "uword", "double", "cx_double", "size_t"}
 dim1 = {"ivec", "fvec", "uvec", "vec", "cx_vec"}
@@ -208,10 +208,10 @@ The variable can be both read and set in real time:
 
     >>> node = mc.Var(None, "name")
     >>> node.type="float"
-    >>> print node.dim
+    >>> print(node.dim)
     0
     >>> node.dim = 3
-    >>> print node.type
+    >>> print(node.type)
     fmat
     """
 
@@ -250,10 +250,10 @@ The variable can be both read and set in real time:
 
     >>> node = mc.Var(None, "name")
     >>> node.type="float"
-    >>> print node.mem
+    >>> print(node.mem)
     2
     >>> node.mem = 3
-    >>> print node.type
+    >>> print(node.type)
     double
     """
 

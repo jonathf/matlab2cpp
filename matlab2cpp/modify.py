@@ -97,7 +97,7 @@ def change_to_complex(project):
     # configure again
     project.builder.configure(True)
 
-    #print dictionary
+    #print(dictionary)
 
 
 def complex_mul(nodes):
@@ -131,7 +131,7 @@ def modify_find(nodes):
             lhs, rhs = n
             if rhs.name == "find":
                 declares = n.func[0]
-                #print declares.cls
+                #print(declares.cls)
                 for var in declares:
                     if var.name == lhs.name:
                         var.type = "uvec"
@@ -146,7 +146,7 @@ def modify_define_first(project):
 
         for include in includes:
             if include != includes[0] and include.name[:7] == "#define":
-                #print "hello " + include.name
+                #print("hello " + include.name)
                 define_include = includes.children.pop(index)
                 includes.children.insert(0, define_include)
 
@@ -178,7 +178,7 @@ def remove_nargin(project):
         # for func in funcs
         funcs = program[1]
         for func in funcs:
-            #print func.summary()
+            #print(func.summary())
             block = func[3]
 
             # find node.name == nargin
@@ -193,7 +193,7 @@ def remove_nargin(project):
                         # remove branch
                         if n.group.cls in ("Branch", "Switch"):
                             parent = n.group.parent
-                            # print parent.summary()
+                            # print(parent.summary())
                             del parent.children[parent.children.index(n.group)]
                             # node.group.parent.children.index(node.group)
                             found_nargin = True
@@ -219,7 +219,7 @@ def add_parameters(project):
                         func_ret_num += 1
                     else:
                         break
-            #print n.summary()
+            #print(n.summary())
 
             # find the multiple return function
             # Check if function is in the same program

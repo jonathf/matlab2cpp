@@ -17,7 +17,7 @@ Attributes:
 
 import string
 
-letters = string.letters
+letters = string.ascii_letters
 digits = string.digits
 
 # start and end of expression

@@ -1,5 +1,5 @@
-from assign import Assign
-from variables import *
+from .assign import Assign
+from .variables import *
 
 Declare = "string %(name)s ;"
 

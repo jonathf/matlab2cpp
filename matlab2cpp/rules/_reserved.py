@@ -33,7 +33,7 @@ reserved = {
 
 # Common attribute
 
-from assign import Assign
+from .assign import Assign
 #Assign = "%(0)s = %(1)s ;"
 
 def Var(node):
@@ -806,9 +806,9 @@ def Get_rand(node):
 
 def Var_clear(node):
     #index = node.parent.children.index(node)
-    #print node.parent.parent.names
+    #print(node.parent.parent.names)
     #del node.parent.parent.children[0]
-    #print node.parent.summary()
+    #print(node.parent.summary())
     #return ""
     return "// clear"
 
@@ -1259,10 +1259,10 @@ def Get_colorbar(node):
 def Get_xlim(node):
     """
 Examples:
-    >>> print mc.qscript("xlim(0.0, 3.14)")
+    >>> print(mc.qscript("xlim(0.0, 3.14)"))
     _plot.xlim(0.0, 3.14) ;
     _plot.show() ;
-    >>> print mc.qscript("xlim([0.0, 3.14])")
+    >>> print(mc.qscript("xlim([0.0, 3.14])"))
     _plot.xlim(0.0, 3.14) ;
     _plot.show() ;
     """
@@ -1293,10 +1293,10 @@ Examples:
 def Get_ylim(node):
     """
 Examples:
-    >>> print mc.qscript("ylim(0.5,.7)")
+    >>> print(mc.qscript("ylim(0.5,.7)"))
     _plot.ylim(0.5, 0.7) ;
     _plot.show() ;
-    >>> print mc.qscript("ylim([0.5,.7])")
+    >>> print(mc.qscript("ylim([0.5,.7])"))
     _plot.ylim(0.5, 0.7) ;
     _plot.show() ;
     """
@@ -1325,10 +1325,10 @@ Examples:
 
 def Get_caxis(node):
     """
-    >>> print mc.qscript("caxis(0, 3)")
+    >>> print(mc.qscript("caxis(0, 3)"))
     _plot.caxis(0, 3) ;
     _plot.show() ;
-    >>> print mc.qscript("caxis([0, 3])")
+    >>> print(mc.qscript("caxis([0, 3])"))
     _plot.caxis(0, 3) ;
     _plot.show() ;
     """
@@ -1357,10 +1357,10 @@ def Get_caxis(node):
 
 def Get_axis(node):
     """
-    >>> print mc.qscript("axis(0, 3, -2, 4)")
+    >>> print(mc.qscript("axis(0, 3, -2, 4)"))
     _plot.axis(0, 3, -2, 4) ;
     _plot.show() ;
-    >>> print mc.qscript("axis([0, 3, -2, 4])")
+    >>> print(mc.qscript("axis([0, 3, -2, 4])"))
     _plot.axis(0, 3, -2, 4) ;
     _plot.show() ;
     """

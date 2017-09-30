@@ -30,7 +30,7 @@ forward in the code. The various constructors uses the support modules in the
 :py:mod:`~matlab2cpp.mc.qtree` to build a full toke tree.  The result is as
 follows::
 
-    >>> print builder # doctest: +NORMALIZE_WHITESPACE
+    >>> print(builder) # doctest: +NORMALIZE_WHITESPACE
          Project    unknown      TYPE
          | Program    unknown      TYPE    file1.m
          | | Includes   unknown      TYPE
@@ -75,7 +75,7 @@ respectivly.  To configure backends and datatypes, use the
 :py:func:`~matlab2cpp.Builder.configure` method::
 
     >>> builder.configure(suggest=True)
-    >>> print builder # doctest: +NORMALIZE_WHITESPACE
+    >>> print(builder) # doctest: +NORMALIZE_WHITESPACE
          Project    program      TYPE
          | Program    program      TYPE    file1.m
          | | Includes   program      TYPE
@@ -104,14 +104,14 @@ of projects that involves multiple files. For example::
 The two programs refer to each other through their names. This can the
 suggestion engine use::
 
-    >>> print mc.qscript(builder[0])
+    >>> print(mc.qscript(builder[0]))
     int a(int x)
     {
       int y ;
       y = x+1 ;
       return y ;
     }
-    >>> print mc.qscript(builder[1])
+    >>> print(mc.qscript(builder[1]))
     b = a(2) ;
 
 Note that the frontend functions (like :py:func:`~matlab2cpp.qscript`)
@@ -127,7 +127,7 @@ sub-nodes together. Consider the following example::
     >>> def Plus(node):
     ...     return "", " +", ""
     ...
-    >>> print mc.qscript("2+3", Plus=Plus)
+    >>> print(mc.qscript("2+3", Plus=Plus))
     2 +3 ;
 
 Though not used, the argument `node` represents the current node in the tree as
@@ -140,10 +140,10 @@ and its node children. It works the same way as the function
 :py:func:`~matlab2cpp.qtree`, but can be used mid translation. For example::
 
     >>> def Plus(node):
-    ...     print node.summary()
+    ...     print(node.summary())
     ...     return "", " +", ""
     ...
-    >>> print mc.qscript("2+3", Plus=Plus) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qscript("2+3", Plus=Plus)) # doctest: +NORMALIZE_WHITESPACE
      1  1Plus       expression   int
      1  1| Int        int          int
      1  3| Int        int          int
@@ -161,7 +161,7 @@ a good startingpoint. This can either be done through the function
     >>> builder.load("unnamed", "function y=f(x); y=x+4")
     >>> builder[0].ftypes = {"f" : {"x": "int", "y": "double"}}
     >>> builder.translate()
-    >>> print builder # doctest: +NORMALIZE_WHITESPACE
+    >>> print(builder) # doctest: +NORMALIZE_WHITESPACE
          Project    program      TYPE
          | Program    program      TYPE    unnamed
          | | Includes   program      TYPE
@@ -201,14 +201,14 @@ Moving upwards towards the root of the tree is done using the
 :py:attr:`~matlab2cpp.Node.parent` reference::
 
     >>> block = assign.parent
-    >>> print assign is var_y.parent
+    >>> print(assign is var_y.parent)
     True
 
 The node provided in the node function is the current node for which the parser
 is trying to translate. This gives each node full control over context of which
 is is placed. For example, consider the following::
 
-    >>> print mc.qtree("x(end, end)", core=True) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree("x(end, end)", core=True)) # doctest: +NORMALIZE_WHITESPACE
      1  1Block      code_block   TYPE
      1  1| Statement  code_block   TYPE
      1  1| | Get        unknown      TYPE    x
@@ -220,7 +220,7 @@ is is placed. For example, consider the following::
     ...     if node is node.parent[1]:
     ...         return node.parent.name + ".n_cols"
     ...
-    >>> print mc.qscript("x(end, end)", End=End)
+    >>> print(mc.qscript("x(end, end)", End=End))
     x(x.n_rows, x.n_cols) ;
 
 Here the rule `End` was called twice, where the if-test produces two different

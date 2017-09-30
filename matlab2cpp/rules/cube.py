@@ -1,5 +1,5 @@
-from variables import *
-import armadillo as arma
+from .variables import *
+from . import armadillo as arma
 
 def Get(node):
 

@@ -10,7 +10,7 @@ class Wrapmat:
         try:
             self.session = mlabraw.open()
         except Exception as e:      
-            print "Error: %s" % str(e)
+            print("Error: %s" % str(e))
         
     def __del__(self):
         mlabraw.close(self.session)
@@ -21,14 +21,14 @@ class Wrapmat:
         #should get a list of func names
         func_names = []
         for program in builder.project:
-            print program.summary()
+            print(program.summary())
             #flatten tree and find Func.names
             nodes = program.flatten(False, False, False)
             for node in nodes:
                 if node.cls == "Func":
                     func_names.append(node.name)
         
-        #print func_names
+        #print(func_names)
         self.func_names = func_names
         self.called_func_names = []
         
@@ -42,7 +42,7 @@ class Wrapmat:
             self._evaluate(code_block)
             mlabraw.eval(self.session, 'whos_f')
         else:
-            print 'matlab have to run script file'
+            print('matlab have to run script file')
         
     def _evaluate(self, code_block):
         #eval line by line in code_block
@@ -70,7 +70,7 @@ class Wrapmat:
                 
                 #loop over func_nodes
                 for func_node in func_nodes:
-                    #print func_node.name
+                    #print(func_node.name)
                     params = []
                     function = False
                     

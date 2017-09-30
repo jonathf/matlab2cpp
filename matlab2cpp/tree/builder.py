@@ -1,13 +1,15 @@
-import expression
-import functions
-import variables
-import misc
-import branches
-import iterate
-import assign
-import codeblock
-import suppliment
-import identify
+from . import (
+    expression,
+    functions,
+    variables,
+    misc,
+    branches,
+    iterate,
+    assign,
+    codeblock,
+    suppliment,
+    identify,
+)
 
 import matlab2cpp as mc
 
@@ -24,15 +26,15 @@ through indexing the Builder instance. For example::
     >>> builder.configure(suggest=True)
     >>> builder.translate()
     >>> prg1, prg2 = builder
-    >>> print prg1.cls, prg1.name
+    >>> print(prg1.cls, prg1.name)
     Program prg1.m
-    >>> print prg2.cls, prg2.name
+    >>> print(prg2.cls, prg2.name)
     Program prg2.m
 
 Programs that are loaded, configured and translated, can be converted into C++
 code through the front end functions in :py:mod:`matlab2cpp.qfunctions`::
 
-    >>> print mc.qhpp(prg1)
+    >>> print(mc.qhpp(prg1))
     #ifndef PRG1_M_HPP
     #define PRG1_M_HPP
     <BLANKLINE>
@@ -46,7 +48,7 @@ code through the front end functions in :py:mod:`matlab2cpp.qfunctions`::
       return y ;
     }
     #endif
-    >>> print mc.qcpp(prg2)
+    >>> print(mc.qcpp(prg2))
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
@@ -111,7 +113,7 @@ str(builder) <=> Builder.__str__(builder)
 
 Example:
     >>> builder = mc.Builder()
-    >>> print builder # doctest: +NORMALIZE_WHITESPACE
+    >>> print(builder) # doctest: +NORMALIZE_WHITESPACE
          Project    unknown      TYPE
 
 See also:
@@ -139,7 +141,7 @@ Raises:
 Example::
     >>> builder = mc.Builder()
     >>> builder.load("unnamed.m", "")
-    >>> print builder # doctest: +NORMALIZE_WHITESPACE
+    >>> print(builder) # doctest: +NORMALIZE_WHITESPACE
          Project    unknown      TYPE
          | Program    unknown      TYPE    unnamed.m
          | | Includes   unknown      TYPE
@@ -153,7 +155,7 @@ Example::
         assert isinstance(code, str)
 
         if self.disp:
-            print "loading", name
+            print("loading", name)
         
         #Replace ... [stuff] \n with ... [stuff] \n " "
         l = 0
@@ -215,7 +217,7 @@ Returns:
 
 Example:
     >>> builder = Builder(); builder.load("prg.m", "a;b;c")
-    >>> print builder.get_unknowns()
+    >>> print(builder.get_unknowns())
     ['a', 'c', 'b']
         """
         if isinstance(index, str):
@@ -234,7 +236,7 @@ Args:
 Example::
     >>> builder = mc.Builder()
     >>> builder.load("unnamed.m", "a=1; b=2.; c='c'")
-    >>> print builder # doctest: +NORMALIZE_WHITESPACE
+    >>> print(builder) # doctest: +NORMALIZE_WHITESPACE
          Project    unknown      TYPE
          | Program    unknown      TYPE    unnamed.m
          | | Includes   unknown      TYPE
@@ -261,7 +263,7 @@ Example::
          | | Headers    unknown      TYPE    unnamed.m
          | | Log        unknown      TYPE    unnamed.m
     >>> builder.configure(suggest=True)
-    >>> print builder # doctest: +NORMALIZE_WHITESPACE
+    >>> print(builder) # doctest: +NORMALIZE_WHITESPACE
          Project    program      TYPE
          | Program    program      TYPE    unnamed.m
          | | Includes   program      TYPE

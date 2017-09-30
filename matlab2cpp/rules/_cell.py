@@ -1,4 +1,4 @@
-from variables import *
+from .variables import *
 
 def Cell(node):
 

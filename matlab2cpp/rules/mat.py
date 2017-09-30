@@ -1,4 +1,4 @@
-import armadillo as arma
+from . import armadillo as arma
 
 def Get(node):
     """

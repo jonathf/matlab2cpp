@@ -17,8 +17,8 @@ Iterpretors related to branches, loops and try.
 """
 
 import matlab2cpp as mc
-import constants as c
-import findend
+
+from . import constants as c, findend
 
 
 def trybranch(self, parent, cur):
@@ -54,7 +54,7 @@ Example:
       16     Expression  expression.create    'b'
       16     Var         variables.variable   'b'
     >>> builder.configure()
-    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1  1Block      code_block   TYPE
     1  1| Tryblock   code_block   TYPE
     1  1| | Try        code_block   TYPE
@@ -71,9 +71,9 @@ Example:
         self.syntaxerror(cur, "start of try-block")
 
     if self.disp:
-        print "%4d   Try          " % cur,
-        print "%-20s" % "branches.trybranch",
-        print repr(self.code[cur:cur+3])
+        print("%4d   Try          " % cur,)
+        print("%-20s" % "branches.trybranch",)
+        print(repr(self.code[cur:cur+3]))
 
     start = cur
 
@@ -150,7 +150,7 @@ Example:
       29     Expression  expression.create    'd'
       29     Var         variables.variable   'd'
     >>> builder.configure()
-    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1  1Block      code_block   TYPE
     1  1| Switch     code_block   TYPE
     1  8| | Var        unknown      TYPE    a
@@ -177,9 +177,9 @@ Example:
     end = findend.expression(self, k)
 
     if self.disp:
-        print "%4d   Switch       " % cur,
-        print "%-20s" % "branches.switch",
-        print repr(self.code[cur:end+1])
+        print("%4d   Switch       " % cur,)
+        print("%-20s" % "branches.switch",)
+        print(repr(self.code[cur:end+1]))
 
     switch = mc.collection.Switch(parent, cur=cur)
 
@@ -201,9 +201,9 @@ Example:
         end = findend.expression(self, k)
 
         if self.disp:
-            print "%4d   Case         " % cur,
-            print "%-20s" % "branches.switch",
-            print repr(self.code[cur:end+1])
+            print("%4d   Case         " % cur,)
+            print("%-20s" % "branches.switch",)
+            print(repr(self.code[cur:end+1]))
 
         case = mc.collection.Case(switch, cur=cur)
 
@@ -220,9 +220,9 @@ Example:
         cur = k
 
         if self.disp:
-            print "%4d   Otherwise    " % cur,
-            print "%-20s" % "branches.switch",
-            print repr(self.code[cur:cur+10])
+            print("%4d   Otherwise    " % cur,)
+            print("%-20s" % "branches.switch",)
+            print(repr(self.code[cur:cur+10]))
 
         otherwise = mc.collection.Otherwise(switch, cur=cur)
 
@@ -265,7 +265,7 @@ Example:
       10     Expression  expression.create    'b'
       10     Var         variables.variable   'b'
     >>> builder.configure()
-    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1  1Block      code_block   TYPE
     1  1| While      code_block   TYPE
     1  7| | Var        unknown      TYPE    a
@@ -285,9 +285,9 @@ Example:
     end = findend.expression(self, k)
 
     if self.disp:
-        print "%4d   While        " % cur,
-        print "%-20s" % "branches.whileloop",
-        print repr(self.code[cur:end+1])
+        print("%4d   While        " % cur,)
+        print("%-20s" % "branches.whileloop",)
+        print(repr(self.code[cur:end+1]))
 
     whileloop = mc.collection.While(parent, cur=cur, code=self.code[cur:end+1])
 
@@ -316,9 +316,9 @@ def parforloop(self, parent, cur):
     start = cur
 
     if self.disp:
-        print "%4d   Parfor          " % cur,
-        print repr(self.code[cur:self.code.find("\n", cur)]),
-        print "branches.parforloop"
+        print("%4d   Parfor          " % cur,)
+        print(repr(self.code[cur:self.code.find("\n", cur)]),)
+        print("branches.parforloop")
 
     parfor_loop = mc.collection.Parfor(parent, cur=cur, code=self.code[cur:self.code.find("\n", cur)])
 
@@ -394,7 +394,7 @@ Example:
       12     Expression  expression.create    'c'
       12     Var         variables.variable   'c'
     >>> builder.configure(suggest=False)
-    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1  1Block      code_block   TYPE
     1  1| For        code_block   TYPE
     1  5| | Var        unknown      (int)   a
@@ -410,9 +410,9 @@ Example:
     start = cur
 
     if self.disp:
-        print "%4d   For          " % cur,
-        print repr(self.code[cur:self.code.find("\n", cur)]),
-        print "branches.forloop"
+        print("%4d   For          " % cur,)
+        print(repr(self.code[cur:self.code.find("\n", cur)]),)
+        print("branches.forloop")
 
     for_loop = mc.collection.For(parent, cur=cur, code=self.code[cur:self.code.find("\n", cur)])
 
@@ -502,7 +502,7 @@ Example:
       20     Expression  expression.create    'd'
       20     Var         variables.variable   'd'
     >>> builder.configure()
-    >>> print mc.qtree(builder, core=True) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1  1Block      code_block   TYPE
     1  1| Branch     code_block   TYPE
     1  4| | If         code_block   TYPE
@@ -534,9 +534,9 @@ Example:
     end = findend.expression(self, cur)
 
     if self.disp:
-        print "%4d   If           " % (start),
-        print "%-20s" % "branches.ifbranch",
-        print repr(self.code[start:end+1])
+        print("%4d   If           " % (start),)
+        print("%-20s" % "branches.ifbranch",)
+        print(repr(self.code[start:end+1]))
 
     node = mc.collection.If(branch, cur=cur, code=self.code[start:end+1])
 
@@ -566,9 +566,9 @@ Example:
         end = findend.expression(self, cur)
 
         if self.disp:
-            print "%4d   Else if      " % (start),
-            print "%-20s" % "branches.ifbranch",
-            print repr(self.code[start:end+1])
+            print("%4d   Else if      " % (start),)
+            print("%-20s" % "branches.ifbranch",)
+            print(repr(self.code[start:end+1]))
 
         node = mc.collection.Elif(branch, cur=start, code=self.code[start:end+1])
 
@@ -593,9 +593,9 @@ Example:
         cur += 4
 
         if self.disp:
-            print "%4d   Else         " % (start),
-            print "%-20s" % "branches.ifbranch",
-            print repr(self.code[start:start+5])
+            print("%4d   Else         " % (start),)
+            print("%-20s" % "branches.ifbranch",)
+            print(repr(self.code[start:start+5]))
 
         node = mc.collection.Else(branch, cur=start)
 

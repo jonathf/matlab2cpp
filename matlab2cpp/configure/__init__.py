@@ -1,9 +1,7 @@
 """
 """
 import matlab2cpp as mc
-import datatypes
-import backends
-import reserved
+from . import datatypes, backends, reserved
 
 def configure(root, suggest=True, **kws):
     """

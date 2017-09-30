@@ -1,5 +1,5 @@
 import matlab2cpp as mc
-import armadillo as arma
+from . import armadillo as arma
 
 def Assign(node):
     """
@@ -12,15 +12,15 @@ Returns:
     str : Translation of current node.
 
 Examples:
-    >>> print mc.qscript("a = b")
+    >>> print(mc.qscript("a = b"))
     a = b ;
-    >>> print mc.qscript("a=[1,2]; b=[1;2]; a=b")
+    >>> print(mc.qscript("a=[1,2]; b=[1;2]; a=b"))
     sword _a [] = {1, 2} ;
     a = irowvec(_a, 2, false) ;
     sword _b [] = {1, 2} ;
     b = ivec(_b, 2, false) ;
     a = arma::strans(b) ;
-    >>> print mc.qscript("a=[1,2,2,1]; b=[2,1;1,2]; a=b")
+    >>> print(mc.qscript("a=[1,2,2,1]; b=[2,1;1,2]; a=b"))
     sword _a [] = {1, 2, 2, 1} ;
     a = irowvec(_a, 4, false) ;
     sword _b [] = {2, 1, 1, 2} ;

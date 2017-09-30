@@ -24,9 +24,9 @@ Var : Function call hidden as variable
 
 import matlab2cpp as mc
 
-from function import type_string
-from variables import Get
-from assign import Assign
+from .function import type_string
+from .variables import Get
+from .assign import Assign
 
 
 def Var(node):
@@ -38,7 +38,7 @@ without arguments.
 property: name (of variable)
 
 Examples:
-    >>> print mc.qscript("function y=f(); y=1; end; function g(); f")
+    >>> print(mc.qscript("function y=f(); y=1; end; function g(); f"))
     int f()
     {
       int y ;
@@ -70,7 +70,7 @@ Examples:
     >>> builder.load("unamed", code)
     >>> builder[0].ftypes = {"f":{"a": "int", "b":"double", "c":"cx_mat",
     ...     "d":"func_lambda", "e":"struct", "y":"int"}}
-    >>> print mc.qscript(builder)
+    >>> print(mc.qscript(builder))
     int f(int a, double b, cx_mat c, std::function d, _E e)
     {
       int y ;
@@ -98,7 +98,7 @@ def Declares(node):
 Contains: Var*
 
 Examples:
-    >>> print mc.qscript("function d=f(); a=1; b.c='2'; d.e(1)=[4,5]")
+    >>> print(mc.qscript("function d=f(); a=1; b.c='2'; d.e(1)=[4,5]"))
     _D f()
     {
       _B b ;
@@ -169,7 +169,7 @@ Contains: Declares Returns Params Block
 Property: name (of function)
 
 Examples:
-    >>> print mc.qscript("function y=f(); y=1")
+    >>> print(mc.qscript("function y=f(); y=1"))
     int f()
     {
       int y ;
@@ -218,7 +218,7 @@ Contains: Declares Returns Params Block
 Property: name (of function)
 
 Examples:
-    >>> print mc.qcpp("4")
+    >>> print(mc.qcpp("4"))
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
