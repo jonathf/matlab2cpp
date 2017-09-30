@@ -62,6 +62,8 @@ Examples:
         # dimensions that works just fine
         #elif lhs.dim in (1,2) and rhs.dim in (3, 4):
         #    pass
+        elif lhs.dim == 0 and rhs.dim > 0:
+            out = lhs.type + "(arma::as_scalar(%(1)s))"
 
         # Added this elif to handle assignment of: complex type = non_complex type
         elif  lhs.mem > rhs.mem:

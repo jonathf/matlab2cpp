@@ -42,8 +42,9 @@ Example:
     1 5| | Int        int          int
     """
 
-    if  self.code[cur] not in c.letters:
+    if  self.code[cur] not in c.letters + '~':
         self.syntaxerror(cur, "assign variable name")
+
 
     k = cur+1
     while self.code[k] in c.letters+c.digits+"_":
@@ -251,7 +252,9 @@ Example:
 
         cur = last-1
 
-    node.create_declare()
+    if name != '~':
+        node.create_declare()
+
     return cur
 
 

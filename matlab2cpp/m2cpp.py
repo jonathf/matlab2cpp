@@ -252,7 +252,191 @@ namespace m2cpp {
         return out;
     }
 
+    template <typename eT>
+    inline eT fix(const eT a) {
+       return a > eT(0) ? floor(a) : ceil(a);
+    }
 
+    template<typename T>
+    inline void intersect(arma::Col<typename T::elem_type>& C, arma::uvec& ia, arma::uvec& ib, const T& a, const T& b) {
+
+       typedef typename eT T::elem_type;
+
+       arma::uvec sa = arma::sort_index(a);
+       arma::uvec sb = arma::sort_index(b);
+
+       std::vector<eT> C_;
+       std::vector<arma::uword> ia_, ib_;
+
+       int na = int(a.n_elem);
+       int nb = int(b.n_elem);
+       int ja = 0, jb = 0;
+
+       for (;;) {
+
+          arma::uword sja = sa(ja);
+          arma::uword sjb = sb(jb);
+
+          eT ca = a(sja);
+          eT cb = b(sjb);
+
+          if (ca > cb) {
+             ja++;
+          }
+          else if (cb > ca) {
+             jb++;
+          }
+          else {
+             C_.push_back(ca);
+             ia_.push_back(sja);
+             ib_.push_back(sjb);
+             while (++ja < na && a(sa(ja)) == ca) {}
+             while (++jb < nb && b(sb(jb)) == cb) {}
+             if (ja == na || jb == nb)
+                break;
+          }
+
+       }
+
+       ia = arma::uvec(ia_) + 1;
+       ib = arma::uvec(ib_) + 1;
+       C = arma::Col<eT>(C_);
+    }
+
+    template<typename T>
+    inline void intersect(arma::Col<typename T::elem_type>& C, const T& a, const T& b) {
+       arma::uvec dum0, dum1;
+       intersect(C, dum0, dum1, a, b);
+    }
+
+    template<typename Tr, typename T>
+    inline void unique_rows_core(Tr& C, Tr& a_sorted, arma::uvec& ia, const T& a) {
+
+       typedef typename T::elem_type eT;
+
+       int ic_cur = 0;
+
+       auto cmp = [&a, &ic_cur](const int k, const int l) -> bool {
+          return a(k, ic_cur) < a(l, ic_cur);
+       };
+
+       int nr = int(a.n_rows);
+       int nc = int(a.n_cols);
+
+       arma::Col<eT> ac0(const_cast<eT*>(a.colptr(0)), nr, false);
+       arma::uvec ord = arma::sort_index(a.col(0));
+       std::vector<arma::uword> ia0, ia1;
+
+       std::vector<arma::uword>* ia_ = &ia0;
+       std::vector<arma::uword>* ia_prev_ = &ia1;
+
+       ia_->push_back(0);
+       for (int ii = 1; ii < nr; ii++) {
+          if (a(ord(ii), 0) != a(ord(ii - 1))) {
+             ia_->push_back(ii);
+          }
+       }
+       ia_->push_back(nr);
+
+       for (int ic = 1; ic < nc; ic++) {
+
+          ic_cur = ic;
+          int ir = 0, ir_prev = 0;
+          std::swap(ia_prev_, ia_);
+          int na = int(ia_prev_->size());
+          ia_->clear();
+
+          for (int ii = 0; ii < na - 1; ii++) {
+             ia_->push_back((*ia_prev_)[ii]);
+             int l = (*ia_prev_)[ii], u = (*ia_prev_)[ii + 1];
+             std::sort(&ord(l), &(ord(u - 1)) + 1, cmp);
+             for (int jj = l + 1; jj < u; jj++) {
+                if (a(ord(jj - 1), ic) != a(ord(jj), ic)) {
+                   ia_->push_back(jj);
+                }
+             }
+          }
+
+          ia_->push_back(nr);
+
+       }
+
+       ia = arma::uvec(*ia_);
+       int na = int(ia.n_elem);
+       C.set_size(na - 1, a.n_cols);
+
+       for (int ii = 0; ii < na - 1; ii++) {
+          C.row(ii) = a.row(ord(ia(ii)));
+       }
+
+       a_sorted.set_size(nr, nc);
+       for (int ir = 0; ir < nr; ir++) {
+          a_sorted.row(ir) = a.row(ord(ir));
+       }
+    }
+
+    template<typename T>
+    inline T sortrows(const T& a) {
+
+       typedef typename T::elem_type eT;
+       arma::uvec dum0;
+       arma::Mat<eT> dum1;
+       arma::Mat<eT> ret;
+       unique_rows_core(dum1, ret, dum0, a);
+       return ret;
+    }
+
+    template<typename T>
+    inline void unique_rows(T& C, const T& a) {
+
+       arma::uvec dum;
+       unique_rows(C, dum, a);
+
+    }
+
+    template<typename T>
+    inline T unique_rows(const T& a) {
+       T ret;
+       unique_rows(ret, a);
+       return ret;
+    }
+
+    template<typename T>
+    inline int isempty(const T& a) {
+        return a.n_elem == 0;
+    }
+
+    template<typename T>
+    inline void unique(T& a, const T& b, const char* m) {
+        T tmp;
+        const T& in = b;
+        if (&a == &b) {
+           tmp = b;
+           in = tmp;
+        }
+
+        if (strcmp(m, "rows") == 0) {
+           unique_rows(a, tmp);
+        }
+        else {
+           fprintf(stderr, "m2pp::unique(): Unrecognized option %s\n", m);
+        }
+    }
+
+    static arma::wall_clock timer_;
+
+    inline double tic() {
+       timer_.tic();
+       return timer_.toc();
+    }
+
+    inline double toc() {
+       return timer_.toc();
+    }
+
+    inline double toc(double start) {
+       return timer_.toc() - start;
+    }
 }
 
 

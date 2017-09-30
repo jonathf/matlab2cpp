@@ -51,6 +51,9 @@ Returns:
 
         if self.code[k] == "(":
             k = paren(self, k)
+            #k += 1
+            #break
+            
 
         elif self.code[k] == "[":
             k = matrix(self, k)

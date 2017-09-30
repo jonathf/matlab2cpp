@@ -2,6 +2,8 @@
 from variables import *
 import matlab2cpp as mc
 
+Declare = "struct %(name)s"
+
 def Counter(node):
     return "%(name)s = %(value)s"
 

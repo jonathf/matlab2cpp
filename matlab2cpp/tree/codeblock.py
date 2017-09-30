@@ -53,6 +53,8 @@ Example:
         print "%4d Codeblock  " % cur,
         print "%-20s" % "codeblock.codeblock"
 
+    is_end_terminated = False
+
     while True:
         #print self.code[cur:cur+5]
         if self.code[cur] in " \t;":
@@ -117,6 +119,7 @@ Example:
 
         elif self.code[cur:cur+3] == "end" and self.code[cur+3] in c.k_end:
             cur += 3
+            is_end_terminated = True
             break
 
         elif self.code[cur:cur+4] == "else" and self.code[cur+4] in c.k_end:
@@ -202,7 +205,7 @@ Example:
 
         if len(self.code)-cur<3:
             break
-
+    block.is_end_terminated = is_end_terminated
     block.code = self.code[start:cur+1]
     return cur
 

@@ -24,6 +24,9 @@ def Get_floor(node):
 def Get_ceil(node):
     node.type = node[0].type
 
+def Get_fix(node):
+    node.type = node[0].type
+
 def Get_round(node):
     if len(node) == 1:
         #int, float, double, uword
@@ -72,6 +75,20 @@ def Get_abs(node):
         node.type = "mat"
     else:
         node.type = node[0].type
+
+def Get_tic(node):
+    node.type = "double"
+
+def Assign_tic(node):
+    node[0].declare.type = "double"
+    node[0].type = "double"
+
+def Get_toc(node):
+    node.type = "double"
+
+def Assign_toc(node):
+    node[0].declare.type = "double"
+    node[0].type = "double"
 
 def Get_any(node):
     if not node[0].num:
@@ -424,18 +441,24 @@ def Get_nextpow2(node):
 def Get_fft(node):
 
     node.type = node[0].type
-    if node.mem == 4:
+    if node.type != 'TYPE':
         node.mem = 4
-    elif node.mem == 3:
-        node.mem = 4
+    #if node.mem == 4:
+    #    node.mem = 4
+    #elif node.mem == 3:
+    #    node.mem = 4
 
 def Get_ifft(node):
 
+    #assert(node[0].mem == 4)
     node.type = node[0].type
-    if node.mem == 4:
-        node.mem = 3
-    elif node.mem == 3:
-        node.mem = 3
+    if node.type != 'TYPE':
+        node.mem = 4
+
+    #if node.mem == 4:
+    #    node.mem = 3
+    #elif node.mem == 3:
+    #    node.mem = 3
 
     # unknown input
     #if not node.num:

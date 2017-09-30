@@ -4,17 +4,21 @@
 import argparse
 from textwrap import dedent
 from glob import glob
+import matlab2cpp
 
-parser = argparse.ArgumentParser(
-    formatter_class=argparse.RawDescriptionHelpFormatter,
-    description=dedent("""\
+hstring = "*** Matlab2cpp version " + str(matlab2cpp.__version__) + " ***\n\n" + """\
 The toolbox frontend of the Matlab2cpp library.  Use this to try to do automatic
 and semi-automatic translation.  The program will create files with the same
 name as the input, but with various extra extensions.  Scripts will receive the
 extension `.cpp`, headers and modules `.hpp`.  A file containing data type and
 header information will be stored in a `.py` file. Any errors will be stored in
 `.log`.
-"""))
+"""
+
+
+parser = argparse.ArgumentParser(
+    formatter_class=argparse.RawDescriptionHelpFormatter,
+    description=dedent(hstring))
 
 parser.add_argument("filename",
         help="File containing valid Matlab code.").completer=\
@@ -86,6 +90,8 @@ parser.add_argument("-n", '--nargin', action="store_true",
         help="Don't remove if and switch branches which use nargin variable.")
 
 
+
+
 try:
     import argcomplete
     argcomplete.autocomplete(parser)
@@ -93,8 +99,6 @@ except:
     pass
 
 if __name__ == "__main__":
-
     args = parser.parse_args()
-    import matlab2cpp
     matlab2cpp.main(args)
 

@@ -1,7 +1,7 @@
 import matlab2cpp
 import matlab2cpp.node as nmodule
 
-def preorder_transform_AST(node, nargin = False):
+def preorder_transform_AST(node, nargin = False, suggest = False):
     # Modify the abstract syntax tree (AST), also try to overload funtions
     # node is project node
     project = node.project
@@ -11,11 +11,13 @@ def preorder_transform_AST(node, nargin = False):
     nodes = remove_close_clear_clc(nodes)
 
     # Change right hand side variable to uvec if assigned with find, b = find(a==3)
-    nodes = modify_find(nodes)
+    if suggest:
+        nodes = modify_find(nodes)
 
     #a multiplication with a complex double results in complex double
     #works with fx_decon_demo.m needs more testing and maybe a refactoring
-    nodes = complex_mul(nodes)
+    if suggest:
+        nodes = complex_mul(nodes)
 
     # remove nargin if args.nargin == False, Thus by default. Use -n flag to keep nargin
     if nargin == False:
@@ -25,7 +27,8 @@ def preorder_transform_AST(node, nargin = False):
     project = add_parameters(project)
 
     # change data type from real to complex, if left hand side is real and right hand side is complex in assignment
-    change_to_complex(project)
+    if suggest:
+        change_to_complex(project)
 
     return project
 

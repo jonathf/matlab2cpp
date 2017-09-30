@@ -9,26 +9,26 @@ import matlab2cpp as mc
 
 # List of function names that should be handled by reserved.py:
 reserved = {
-"and", "or", "not", "all", "any", "isequal",
-"false", "true", "pi", "inf", "Inf", "nan", "NaN",
-"eps", "exp", "log", "log2", "log10", "power", "floor", "ceil",
-"cos", "acos", "cosh", "acosh",
-"sin", "asin", "sinh", "asinh", "mod",
-"eye", "fliplr", "flipud", "length", "max", "min", "size", "chol",
-"trace", "transpose", "ctranspose",
-"abs", "sqrt", "nextpow2", "fft", "ifft", "fft2", "ifft2", "hankel",
-"zeros", "ones", "round", "return", "rand",
-"qr",
-"clear", "close", "clc", "clf", "more", "format",
-"_conv_to", "_reshape", "reshape",
-"interp1", "linspace", "varargins",
-"sum", "cumsum", "conj", "real", "imag",
-"tic", "toc", "diag", "tril", "triu",
-"disp", "fprintf", "error", "convmtx", "conv2",
-"figure", "clf", "cla", "show", "xlabel", "ylabel", "hold", "load",
-"title", "plot", "imshow", "imagesc", "wigb", "colorbar",
-"xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
-"_splot", "logspace", "find",
+    "and", "or", "not", "all", "any", "isequal",
+    "false", "true", "pi", "inf", "Inf", "nan", "NaN",
+    "eps", "exp", "log", "log2", "log10", "power", "floor", "ceil", "fix",
+    "cos", "acos", "cosh", "acosh",
+    "sin", "asin", "sinh", "asinh", "mod",
+    "eye", "fliplr", "flipud", "length", "max", "min", "size", "chol",
+    "trace", "transpose", "ctranspose",
+    "abs", "sqrt", "nextpow2", "fft", "ifft", "fft2", "ifft2", "hankel",
+    "zeros", "ones", "round", "return", "rand",
+    "qr",
+    "clear", "close", "clc", "clf", "more", "format",
+    "_conv_to", "_reshape", "reshape",
+    "interp1", "linspace", "varargin",
+    "sum", "cumsum", "conj", "real", "imag",
+    "tic", "toc", "diag", "tril", "triu",
+    "disp", "fprintf", "error", "convmtx", "conv2",
+    "figure", "clf", "cla", "show", "xlabel", "ylabel", "hold", "load",
+    "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
+    "xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
+    "_splot", "logspace", "find", "unique", "intersect", "isempty", "sortrows",
 }
 
 # Common attribute
@@ -51,7 +51,28 @@ Var_eps = "datum::eps"
 def Get_NaN(node):
     return "arma::zeros(", ", ", ") * datum::nan"
 
+def conv_to(str, type):
+    return "arma::conv_to<" + type +  ">::from(" + str + ")"
+
+def Assign_elemwise_(node):
+
+    if node[0].type != node[1].type:
+
+        if node[0].dim == 0 and node[1].dim == 0:
+            return "%(0)s = " + node[0].type + "(%(1)s) ;"
+
+        if node[0].dim == 0 and node[1].dim > 0:
+            if node[0].mem != node[1].mem:
+                return "%(0)s = " + node[0].type + "(arma::as_scalar(%(1)s)) ;"
+            return "%(0)s = arma::as_scalar(%(1)s) ;"
+
+        if node[0].mem != node[1].mem:
+            return "%(0)s = arma::conv_to<" + node[0].type + ">::from(%(1)s) ;"
+
+    return "%(0)s = %(1)s ;"
+
 def Get_exp(node):
+    node.type = node[0].type
     # scalar done through std
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
@@ -60,6 +81,7 @@ def Get_exp(node):
     return "arma::exp(", ", ", ")"
 
 def Get_log(node):
+    node.type = node[0].type
     # scalar done through std
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
@@ -67,6 +89,7 @@ def Get_log(node):
     return "arma::log(", ", ", ")"
 
 def Get_log2(node):
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
         return "std::log(%(0)s)/std::log(2)"
@@ -75,12 +98,14 @@ def Get_log2(node):
     return "arma::log2(", ", ", ")"
 
 def Get_log10(node) :
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
         return "std::log10(", ", ", ")"
     return "arma::log10(", ", ", ")"
 
 def Get_power(node):
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
         return "std::pow(", ", ", ")"
@@ -90,6 +115,7 @@ def Get_floor(node):
     # unknown input
     #if node[0].type == "TYPE":
     #    return "floor(", ", ", ")"
+    node.type = node[0].type
 
     # scalar done through std
     if node[0].dim == 0 and node[0].mem != 4:
@@ -99,6 +125,7 @@ def Get_floor(node):
     return "arma::floor(", ", ", ")"
 
 def Get_ceil(node):
+    node.type = node[0].type
     # scalar done through std
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
@@ -107,7 +134,7 @@ def Get_ceil(node):
     return "arma::ceil(%(0)s)"
 
 def Get_round(node):
-
+    node.type = node[0].type
     assert len(node)<3
 
     # number of decimals to retain
@@ -132,25 +159,44 @@ def Get_round(node):
         return "arma::round(%(0)s)"
     return "arma::round(%(0)s*std::pow(10, %(1)s))*std::pow(10, -%(1)s)"
 
+def Get_fix(node):
+    node.type = node[0].type
+
+    if node[0].mem < 2:
+        return "%(0)s"
+
+    if node[0].dim == 0 and node[0].mem != 4:
+        node.include("mconvert")
+        return "m2cpp::fix(%(0)s)"
+
+    return "arma::trunc(%(0)s)"
+
+def Assign_fix(node):
+    return Assign_elemwise_(node)
+
 def Get_cos(node):
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
         return "std::cos(", ", ", ")"
     return "arma::cos(", ", ", ")"
 
 def Get_acos(node):
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
         return "std::acos(", ", ", ")"
     return "arma::acos(", ", ", ")"
 
 def Get_cosh(node):
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
         return "std::cosh(", ", ", ")"
     return "arma::cosh(", ", ", ")"
 
 def Get_acosh(node):
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
         #is a C++11 feature
@@ -158,24 +204,28 @@ def Get_acosh(node):
     return "arma::acosh(", ", ", ")"
 
 def Get_sin(node):
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
         return "std::sin(", ", ", ")"
     return "arma::sin(", ", ", ")"
 
 def Get_asin(node):
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
         return "std::asin", ", ", ")"
     return "arma::asin(", ", ", ")"
 
 def Get_sinh(node):
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
         return "std::sinh", ", ", ")"
     return "arma::sinh(", ", ", ")"
 
 def Get_asinh(node):
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
         return "std::asinh", ", ", ")"
@@ -188,11 +238,13 @@ def Var_i(node):
 """
 
 def Get_mod(node):
+    node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         return "", " __percent__ ", ""
     return "mod(", ", ", ")"
 
 def Get_abs(node):
+    node.type = node[0].type
     if len(node) and node[0].dim == 0:
         if node[0].mem == 4: #cx_double
             node.include("m2cpp")
@@ -202,6 +254,7 @@ def Get_abs(node):
     return "abs(", ", ", ")"
 
 def Get_sqrt(node):
+    node.type = node[0].type
     #if len(node) > 0 ...
     if len(node) and node[0].cls == "Neg" and len(node[0]) == 1:
         return "cx_double(0, " + node[0][0].str + ")"
@@ -284,7 +337,7 @@ def Get_size(node):
         #elif node[0].dim == 2:
         #    return "1, %(0)s.n_elem"
         #return var+".n_elem"
-    
+
         if node.parent.cls == "Get":
             if node.parent.backend in ("reserved", "func_return",
                 "func_returns", "func_lambda", "unknown"):
@@ -345,18 +398,33 @@ def Assigns_size(node):
     val = str(val)
 
     # suggest some types for matrix
-    if len(node)==3:
-        return "%(0)s = " +val+ ".n_rows ;\n%(1)s = " +val+ ".n_cols ;"
+
+    out = ""
+
+    if node[0].str != '~':
+        out += "%(0)s = " + val + ".n_rows;\n"
+    if node[1].str != '~':
+        out += "%(1)s = " + val + ".n_cols;\n"
+    if len(node) == 4 and node[2] != '~':
+        out += "%(2)s = " + val + ".n_slices;\n"
+    #if len(node)==3:
+    #    return 
+    #    return "%(0)s = " +val+ ".n_rows ;\n%(1)s = " +val+ ".n_cols ;"
+
+    if not (len(node) == 3 or len(node) == 4):
+        raise NotImplementedError
+
+    return out
 
 
     # suggest some types for cube
-    if len(node)==4:
+    #if len(node)==4:
 
-        return  "%(0)s = "+val+".n_rows ;\n"+\
-                "%(1)s = "+val+".n_cols ;\n"+\
-                "%(2)s = "+val+".n_slices ;"
+    #    return  "%(0)s = "+val+".n_rows ;\n"+\
+    #            "%(1)s = "+val+".n_cols ;\n"+\
+    #            "%(2)s = "+val+".n_slices ;"
 
-    raise NotImplementedError
+
 
 def Get_chol(node):
     return "", ", ", ""
@@ -387,7 +455,47 @@ def Assigns_chol(node):
     lhs_string = ", ".join(lhs_list)
     rhs_string = ", ".join(rhs_list)
     return "[" + lhs_string + "]" + " = chol(" + rhs_string + ") ;"
-    
+
+
+def Get_unique(node):
+    node.include("m2cpp")
+    return "", ", ", ""
+
+def Assign_unique(node):
+    node.include("m2cpp")
+    args = ", ".join([n.str for n in node])
+    return "m2cpp::unique(" + args + ");"
+
+def Assigns_unique(node):
+    node.include("m2cpp")
+    args = ", ".join([n.str for n in node])
+    return "m2cpp::unique(" + args + ");"
+
+def Get_sortrows(node):
+    node.include("m2cpp")
+    args = ", ".join([n.str for n in node])
+    return "m2cpp::sortrows(" + args + ");"
+
+def Get_intersect(node):
+    node.include("m2cpp")
+    return "", ", ", ""
+
+
+def Assign_intersect(node):
+    node.include("m2cpp")
+    lhs, rhs = node
+    my_list = []
+    for n in rhs:
+        my_list.append(n.str)
+    my_string = ", ".join(my_list)
+
+    return "%(0)s = m2cpp::intersect(" + my_string + ") ;"
+
+def Assigns_intersect(node):
+    node.include("m2cpp")
+    rhs = ", ".join([n.str for n in node])
+    return "m2cpp::intersect(" + rhs + ");"
+
 def Get_length(node):
     # array-type uses n_elem
     if node.cls == "Var":
@@ -396,6 +504,9 @@ def Get_length(node):
     node.include("m2cpp")
     return "m2cpp::length(%(0)s)"
 
+def Get_isempty(node):
+    node.include("m2cpp")
+    return "m2cpp::isempty(%(0)s)"
 
 def Get_min(node):
 
@@ -422,7 +533,15 @@ def Get_min(node):
 
     # two args
     if len(node) == 2:
-        return "arma::min(%(0)s, %(1)s)"
+        if node[0].dim and node[1].dim:
+            return "arma::min(%(0)s, %(1)s)"
+
+        if node[0].dim==0:
+            return "arma::clamp(%(1)s, %(1)s.min(), %(0)s)"
+
+        if node[1].dim==0:
+            return "arma::clamp(%(0)s, %(0)s.min(), %(1)s)"
+
 
     # three args
     if len(node) == 3:
@@ -452,8 +571,10 @@ def Assigns_min(node):
     if var.cls != "Var":
         var = var.auxiliary()
     var = str(var)
-
-    return "%(0)s = " + var + ".min(%(1)s) ;"
+    if node[0].str != '~':
+        return "%(0)s = " + var + ".min(%(1)s) ;"
+    else:
+        return var + ".min(%(1)s);"
 
 def Get_max(node):
 
@@ -474,7 +595,7 @@ def Get_max(node):
         # single element, uword (returned from size(a))
         #if len(node) == 1 and node[0].dim == 0:
         #    return "%(0)s"
-            
+
         node.include("algorithm")
         return "std::max(", ", ", ")"
 
@@ -483,7 +604,14 @@ def Get_max(node):
         return "arma::max(%(0)s)"
 
     if len(node) == 2:
-        return "arma::max(%(0)s, %(1)s)"
+        if node[0].dim and node[1].dim:
+            return "arma::max(%(0)s, %(1)s)"
+
+        if node[0].dim==0:
+            return "arma::clamp(%(1)s, %(0)s, %(1)s.max())"
+
+        if node[1].dim==0:
+            return "arma::clamp(%(0)s, %(1)s, %(0)s.max())"
 
     if len(node) == 3:
         if node[2].dim == 0:
@@ -514,7 +642,10 @@ def Assigns_max(node):
         var = var.auxiliary()
     var = str(var)
 
-    return "%(0)s = " + var + ".max(%(1)s) ;"
+    if node[0].str != '~':
+        return "%(0)s = " + var + ".max(%(1)s);"
+    else:
+        var + ".max(%(1)s);"
 
 Var_eye = "1"
 
@@ -624,7 +755,7 @@ def Get_zeros(node):
             #dim is matrix
             if node.dim == 3:
                 return "arma::zeros<%(type)s>(%(0)s, %(0)s)"
-            
+
         # arg input is vector
         if node[0].num and node[0].dim in (1,2):
 
@@ -650,7 +781,7 @@ def Get_zeros(node):
             # use colvec if first index is '1'
             if node[0].cls == "Int" and node[0].value == "1":
                 return "arma::zeros<%(type)s>(%(1)s)"
-            
+
             # use rowvec if second index is '1'
             elif node[1].cls == "Int" and node[1].value == "1":
                 return "arma::zeros<%(type)s>(%(0)s)"
@@ -727,7 +858,28 @@ def Get_nextpow2(node):
     node.include("m2cpp")
     return "m2cpp::nextpow2(", ", ", ")"
 
+
+def Assign_fft(node):
+
+    #conv = node[0].type == "mat"
+    #conv = conv or node[0].type == "fmat"
+    #conv = conv or node[0].type == "vec"
+    #conv = conv or node[0].type == "fvec"
+    #conv = conv or node[0].type == "rowvec"
+    #conv = conv or node[0].type == "frowvec"
+
+    if node[0].mem == 3:
+        return "%(0)s = arma::conv_to<" + node[0].type + ">::from(%(1)s) ;"
+
+    return "%(0)s = %(1)s ;"
+
+def Assign_ifft(node):
+    return Assign_fft(node)
+
 def Get_fft(node):
+
+    if node[0].mem != None:
+        node.type = node[0].type
 
     # arma & matlab fft same for n_args in (1,2)
     if len(node) in (1,2):
@@ -748,31 +900,38 @@ def Get_fft(node):
     else:
         node.error("Number of args in 'fft' should be between 1 and 3")
 
+
+
     return "arma::fft(", ", ", ")"
 
 def Get_ifft(node):
 
+    if node[0].mem != None:
+        node.type = node[0].type
+
     # unknown input
     if not node.num:
-        return "arma::real(arma::ifft(", ", ", "))"
+        return "arma::ifft(", ", ", ")"
 
     if len(node) == 1:
-        return "arma::real(arma::ifft(%(0)s))"
+        return "arma::ifft(%(0)s)"
+
 
     elif len(node) == 2:
-        return "arma::real(arma::ifft(%(0)s, %(1)s))"
+        return "arma::ifft(%(0)s, %(1)s)"
+
 
     elif len(node) == 3:
 
         if node[0].dim in (1,2):
-            return "arma::real(arma::ifft(%(0)s, %(1)s))"
+            return "arma::ifft(%(0)s, %(1)s)"
 
         if node[1].cls == "Matrix":
             node.include("m2cpp")
-            return "arma::real(m2cpp::ifft(%(0)s, %(2)s))"
+            return "m2cpp::ifft(%(0)s, %(2)s)"
         else:
             node.include("m2cpp")
-            return "arma::real(m2cpp::ifft(", ", ", "))"
+            return "m2cpp::ifft(", ", ", ")"
 
     else:
         node.error("Number of args in 'ifft' should be between 1 and 3")
@@ -780,13 +939,28 @@ def Get_ifft(node):
     if node[0].mem != 4:
         node.warning("Argument datatype of 'ifft' should be complex")
 
-    return "arma::real(arma::ifft(", ", ", "))"
+    return "arma::ifft(", ", ", ")"
 
 def Get_fft2(node):
+
+    if node[0].mem != None:
+        node.type = node[0].type
+
     return "arma::fft2(", ", ", ")"
 
 def Get_ifft2(node):
-    return "arma::real(arma::ifft2(", ", ", "))"
+
+    if node[0].mem != None:
+        node.type = node[0].type
+
+    return "arma::ifft2(", ", ", ")"
+
+def Assign_fft2(node):
+    return Assign_fft(node)
+
+def Assign_ifft2(node):
+    return Assign_fft(node)
+
 
 def Get_hankel(node):
     node.include("m2cpp")
@@ -803,7 +977,7 @@ def Get_interp1(node):
             out = out + ")"
     else:
         out = "arma::interp1(", ", ", ")"
-        
+
     return out
 
 def Assign_interp1(node):
@@ -826,7 +1000,7 @@ def Get_sum(node):
     if len(node) == 2:
         return "arma::sum(", ", ", "-1)"
     elif len(node) == 1 and node[0].dim == 2:
-        return "arma::as_scalar(arma::sum(arma::strans(%(0)s)))"
+        return "arma::as_scalar(arma::sum(%(0)s))"
     elif len(node) == 1 and node[0].dim == 1:
         return "arma::as_scalar(arma::sum(", ", ", "))"
     return "arma::sum(", ", ", ")"
@@ -846,7 +1020,7 @@ def Get_conj(node):
             return "std::conj(", ", ", ")"
         else:
             return "%(0)s"
-        
+
     return "arma::conj(", ", ", ")"
 
 def Get_imag(node):
@@ -861,18 +1035,27 @@ def Var_tic(node):
 
 def Get_tic(node):
     node.wall_clock()
-    return "_timer.tic()"
+    node.type = 'double'
+    return "m2cpp::tic()"
+
+def Assign_tic(node):
+    node.wall_clock()
+    node[0].type = 'double'
+    return "%(0)s = m2cpp::tic();"
 
 def Var_toc(node):
     return Get_toc(node)
 
 def Get_toc(node):
     node.wall_clock()
+
+    arg = ", ".join([n.str for n in node])
+
     if node.parent.cls != "Statement":
-        return "_timer.toc()"
+        return "m2cpp::toc(" + arg + ")"
 
     node.include("iostream")
-    return 'std::cout << "Elapsed time = " << _timer.toc() << std::endl'
+    return 'std::cout << "Elapsed time = " << m2cpp::toc(' + arg + ') << std::endl'
 
 def Get_diag(node):
     if node.dim == 3:
@@ -890,7 +1073,7 @@ def Var_disp(node):
 
 def Get_disp(node):
     node.include("iostream")
-    
+
     if len(node) == 1:
         arg = node[0]
         if not arg.num or arg.dim == 0:
@@ -1106,7 +1289,7 @@ Examples:
 
     node.error("argument array type")
     return "_plot.xlim(", ", ", ")"
-    
+
 def Get_ylim(node):
     """
 Examples:
@@ -1126,7 +1309,7 @@ Examples:
         if arg.cls == "Matrix" and len(arg[0]) == 2:
                 a,b = arg[0]
                 return "_plot.ylim(" + str(a) + ", " + str(b) + ")"
-            
+
         elif arg.cls != "Matrix" and arg.num and arg.dim>0:
 
             name1 = arg.name + "(0)"
@@ -1158,7 +1341,7 @@ def Get_caxis(node):
         if arg.cls == "Matrix" and len(arg[0]) == 2:
                 a,b = arg[0]
                 return "_plot.caxis(" + str(a) + ", " + str(b) + ")"
-            
+
         elif arg.cls != "Matrix" and arg.num and arg.dim>0:
 
             name1 = arg.name + "(0)"
@@ -1190,9 +1373,9 @@ def Get_axis(node):
         if arg.cls == "Matrix" and len(arg[0]) == 4:
                 a,b,c,d = arg[0]
                 return "_plot.axis(" + str(a) + ", " + str(b) + ", " + str(c) + ", " + str(d) + ")"
-            
+
         elif arg.cls != "Matrix" and arg.num and arg.dim>0:
-            
+
             name1 = arg.name + "(0)";
             name2 = arg.name + "(1)"
             name3 = arg.name + "(2)";
@@ -1202,7 +1385,7 @@ def Get_axis(node):
                 name2 = "static_cast<double>(" + name2 + ")"
                 name3 = "static_cast<double>(" + name3 + ")"
                 name4 = "static_cast<double>(" + name4 + ")"
-            
+
             return "_plot.axis(" + name1 + ", " + name2 + ", " + name3 + ", " + name4 + ")"
 
     node.error("argument array type")
@@ -1213,7 +1396,7 @@ def Var_grid(node):
 
 def Get_grid(node):
     node.plotting()
-    
+
     if node and node[0].cls == "String":
 
         if node[0].value == "on":
@@ -1221,7 +1404,7 @@ def Get_grid(node):
 
         if node[0].value == "off":
             return "_plot.grid({{\"b\", \"off\"}})"
-        
+
         node.error('argument must either be "on" or "off"')
 
         return "_plot.grid(", ", ", ")"
@@ -1262,4 +1445,3 @@ def Get_find(node):
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
-

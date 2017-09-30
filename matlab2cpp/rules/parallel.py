@@ -34,7 +34,7 @@ def variable_lists(node):
             """
 
         #multiple return from function are assigned to vars
-        if n.cls == "Assigns" and n.backend == "func_returns":
+        if n.cls == "Assigns": #and n.backend == "func_returns":
             for sub_node in n:
                 if sub_node.cls == "Var":
                     if sub_node.name not in assigned_var:

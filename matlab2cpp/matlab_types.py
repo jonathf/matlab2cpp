@@ -236,7 +236,7 @@ def datatype_string(cols):
                 data_type = "rowvec"
                     
             #matrix
-            if M > 1 and N > 1:
+            if (M > 1 and N > 1) or M == 0 or N == 0: #if empty matrix, set to mat
                 data_type = "mat"
                     
         #complex value
@@ -256,11 +256,36 @@ def datatype_string(cols):
                 data_type = "cx_rowvec"
                 
             #matrix
-            if M > 1 and N > 1:
+            if M > 1 and N > 1 or M == 0 or N == 0: #if empty matrix, set to mat:
                 data_type = "cx_mat"
                 
     return data_type
     
+def detect_string(code, k):
+
+    import string
+
+    if code[k] != "'":
+        syntaxerror(k, "start of string character (')")
+
+    if code[k-1] == ".":
+        return False
+
+    j = k-1
+    while code[j] in " \t":
+        j -= 1
+
+    if code[j] in string.letters+string.digits+")]}_":
+
+        # special cases
+        if code[j-3:j+1] == "case":
+            return True
+
+        return False
+
+    return True
+
+
 def function_code(program, code):
     #print program.summary()
 
@@ -268,6 +293,7 @@ def function_code(program, code):
 
     #Flatten nodes, count number of nodes of type if, while for
     #num_if = 0 #num_while = 0 #num_for = 0 #num_switch = 0
+    import re
     iwfs_ends = 0
     
     nodes = program.flatten(False, True, False)
@@ -279,12 +305,47 @@ def function_code(program, code):
     #print "iwfs_ends: " + str(iwfs_ends)
     
     #Get number of 'end' on separate lines
-    num_end = 0
-    lines = code.splitlines()
-    for line in lines:
-        if line == "end":
-            num_end += 1
+    
+
+    iquote = [i for i in range(len(code)) if code[i] == '\'']
+    istring = [i for i in iquote if detect_string(code, i)]
+    string_ends = []
+    
+    #for i in istring:
+    #    k = next(j for j in range(i + 1,len(code)) if code[j] == '\'' and (j + 1 == len(code) or code[j + 1] != '\''))
+    #    string_ends.append(k)
+    #    #code = code[:i + 1] + code[k:]
+
+    #if len(istring) > 0:
+    #    ncode = code[:istring[0] + 1]
+    #    for i in range(len(istring) - 1):
+    #        ncode += code[string_ends[i]:istring[i + 1] + 1]
+
+    #    #if (string_ends[-1] + 1 < len(code)):
+    #    ncode += code[string_ends[-1]:]
+    #    code = ncode
+    
+    #lines = code.splitlines()
+    #for i in range(0,len(lines)):
+    #    #lines[i] = re.sub(r'\'(.+)\'',"''", lines[i])
+    #    #lines[i] = re.sub(r'\"(.+)\"',"''", lines[i])
+    #    lines[i] = lines[i].split('%')[0]
+    #code = '\n'.join(lines)
+    
+    #esplit = code.replace(';', '\n').replace(',','\n').split()
+    ##elines = esplit.splitlines()
+    #num_end = 0
+    #for t in esplit:
+    #    if t == "end":
+    #        num_end += 1
+    #for line in elines:
+    #    if line.strip() == "end":
+    #        num_end += 1
         #print line
+
+    
+   
+    
 
     #print "num_end: " + str(num_end)
 
@@ -294,41 +355,67 @@ def function_code(program, code):
     #functions are ending with "end" keyword or not.
 
     #flag set to true if functions end with end keyword
-    function_end = num_end > iwfs_ends
+    #function_end = num_end > iwfs_ends
 
     #get number of functions in .m function file
     num_funcs = len(program[1])
 
     #insert whos_f before end of function or before new function
     func_name = "whos_f\n"
-    
+
+    ids = []
+
+    for func in program[1]:
+        block = func[3]
+        block_end = block.cur + len(block.code)
+        
+        if block.is_end_terminated:
+            fs = code.rfind("end", block.cur, block_end)
+            ids.append(fs)
+        else:
+            ids.append(block_end)
+
+    ids.sort()
+
+    ncode = code[:ids[0]]
+
+    for i in range(len(ids) - 1):
+        ncode = ncode + func_name + code[ids[i]:ids[i+1]]
+    ncode = ncode + func_name + code[ids[-1]:]
+    code = ncode
     #functions end with end keyword
-    index = len(code)
-    #print code
-    if function_end:
-        #should stop when num_funcs becomes zero
-        while num_funcs:
-            #search for keyword end
-            index = code.rfind("end", 0, index)
+    #index = len(code)
+    
+    #index = len(lines)
+    ##print code
+    #if function_end:
+    #    #should stop when num_funcs becomes zero
+    #    while num_funcs:
+    #        #search for keyword end
+    #        #index = code.rfind("end", 0, index)
+    #        index = next(i for i in range(index - 1,-1,-1) if lines[i].strip() == 'end')
 
-            #add function name to code
-            code = code[:index] + func_name + code[index:]
-            index += len(func_name)
+    #        #add function name to code
+    #        lines = lines[:index] + [func_name] + lines[index:]
+    #        #index += len(func_name)
 
-            #Search for previous function
-            if num_funcs != 1:
-                index = code.rfind("\nfunction", 0, index)
-            num_funcs -= 1
-    else:
-        #function does not end with end keyword
-        while num_funcs:
-            code = code[:index] + func_name + code[index:]
+    #        #Search for previous function
+    #        if num_funcs != 1:
+    #            #index = code.rfind("\nfunction", 0, index)
+    #            index = next(i for i in range(index - 1,-1,-1) if len(lines[i].split()) > 0 and lines[i].split()[0] == 'function')
+    #        num_funcs -= 1
+    #else:
+    #    #function does not end with end keyword
+    #    while num_funcs:
+    #        #code = code[:index] + func_name + code[index:]
+    #        lines = lines[:index] + [func_name] + lines[index:]
 
-            if num_funcs != 1:
-                index = code.rfind("\nfunction", 0, index)
-            num_funcs -= 1
+    #        if num_funcs != 1:
+    #            #index = code.rfind("\nfunction", 0, index)
+    #            index = next(i for i in range(index - 1,-1,-1) if len(lines[i].split()) > 0 and lines[i].split()[0] == 'function')
+    #        num_funcs -= 1
         
 
     #print code
-    
+    #code = '\n'.join(lines)
     return code
