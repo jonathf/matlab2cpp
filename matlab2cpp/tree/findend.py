@@ -27,22 +27,22 @@ Look-ahead routines to find end character.
 |                                                      | cell-parenthesis       |
 +------------------------------------------------------+------------------------+
 """
+import matlab2cpp as mc
 
-from . import constants as c, identify
 
 def expression(self, start):
     """
-Find end of expression (non-space delimited)
+    Find end of expression (non-space delimited)
 
 Args:
-    self (Builder): Code constructor
-    start (int): current position in code
+self (Builder): Code constructor
+start (int): current position in code
 
 Returns:
-	int: index location of end of expression
+int: index location of end of expression
     """
 
-    if  self.code[start] not in c.e_start:
+    if  self.code[start] not in mc.tree.constants.e_start:
         self.syntaxerror(start, "expression start")
     k = start
 
@@ -52,12 +52,12 @@ Returns:
             k = paren(self, k)
             #k += 1
             #break
-            
+
 
         elif self.code[k] == "[":
             k = matrix(self, k)
 
-        elif self.code[k] == "'" and identify.string(self, k):
+        elif self.code[k] == "'" and mc.tree.identify.string(self, k):
             k = string(self, k)
 
         elif self.code[k] == "{":
@@ -81,7 +81,7 @@ Returns:
         elif self.code[k:k+3] == "...":
             k = dots(self, k)
 
-        elif self.code[k] in c.e_end:
+        elif self.code[k] in mc.tree.constants.e_end:
             break
 
         k += 1
@@ -95,17 +95,17 @@ Returns:
 
 def expression_space(self, start):
     """
-Find end of expression (space delimited)
+    Find end of expression (space delimited)
 
 Args:
-    self (Builder): Code constructor
-    start (int): current position in code
+self (Builder): Code constructor
+start (int): current position in code
 
 Returns:
-	int: index location of end of expression
+int: index location of end of expression
     """
 
-    if  self.code[start] not in c.e_start:
+    if  self.code[start] not in mc.tree.constants.e_start:
         self.syntaxerror(start, "expression start")
     k = last = start
 
@@ -118,7 +118,7 @@ Returns:
             k = last = matrix(self, k)
 
         elif self.code[k] == "'":
-            if identify.string(self, k):
+            if mc.tree.identify.string(self, k):
                 k = last = string(self, k)
             else:
                 last = k
@@ -150,16 +150,16 @@ Returns:
 
         elif self.code[k] in " \t":
 
-            if identify.space_delimiter(self, k):
+            if mc.tree.identify.space_delimiter(self, k):
                 return last
             while self.code[k+1] in " \t+-~":
                 k += 1
 
-        elif self.code[k] in c.e_end:
+        elif self.code[k] in mc.tree.constants.e_end:
             return last
 
-        elif self.code[k] in c.letters + c.digits + "_@":
-            while self.code[k+1] in c.letters + c.digits + "_@":
+        elif self.code[k] in mc.tree.constants.letters + mc.tree.constants.digits + "_@":
+            while self.code[k+1] in mc.tree.constants.letters + mc.tree.constants.digits + "_@":
                 k += 1
             last = k
 
@@ -168,14 +168,14 @@ Returns:
 
 def matrix(self, start):
     """
-Find end of matrix construction
+    Find end of matrix construction
 
 Args:
-    self (Builder): Code constructor
-    start (int): current position in code
+self (Builder): Code constructor
+start (int): current position in code
 
 Returns:
-	int: index location of end of matrix
+int: index location of end of matrix
     """
 
     if  self.code[start] != "[":
@@ -183,7 +183,7 @@ Returns:
 
     k = start+1
 
-    if identify.space_delimited(self, start):
+    if mc.tree.identify.space_delimited(self, start):
 
         # Ignore first string occurrence
         while self.code[k] in " \t":
@@ -202,7 +202,7 @@ Returns:
             elif self.code[k] == "%":
                 k = comment(self, k)
 
-            elif self.code[k] == "'" and identify.string(self, k): #and self.code[k-1] in c.s_start:
+            elif self.code[k] == "'" and mc.tree.identify.string(self, k): #and self.code[k-1] in mc.tree.constants.s_start:
                 k = string(self, k)
 
             k += 1
@@ -219,7 +219,7 @@ Returns:
             elif self.code[k] == "%":
                 k = comment(self, k)
 
-            elif self.code[k] == "'" and identify.string(self, k):
+            elif self.code[k] == "'" and mc.tree.identify.string(self, k):
                 k = string(self, k)
 
             k += 1
@@ -360,7 +360,7 @@ Returns:
         elif self.code[k:k+3] == "...":
             k = dots(self, k)
 
-        elif self.code[k] == "'" and identify.string(self, k):
+        elif self.code[k] == "'" and mc.tree.identify.string(self, k):
             k = string(self, k)
 
         elif self.code[k] == "[":
@@ -396,7 +396,7 @@ Returns:
         if self.code[k] == "%":
             self.syntaxerror(k, "no comment in cell group")
 
-        elif self.code[k] == "'" and identify.string(self, k):
+        elif self.code[k] == "'" and mc.tree.identify.string(self, k):
             k = string(self, k)
         elif self.code[k] == "(":
             k = paren(self, k)

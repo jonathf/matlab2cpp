@@ -54,7 +54,10 @@ In addition a collectio of genereal purpose modules are available:
 """
 
 import matlab2cpp as mc
+
+from . import findend, identify, constants
 from .builder import Builder
+
 __all__ = ["Builder"]
 
 if __name__ == "__main__":
