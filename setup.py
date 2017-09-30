@@ -1,60 +1,26 @@
-#!/usr/bin/env python
-# encoding: utf8
-
-
-import platform
-import os
-import sys
-
-system = platform.system()
-
-from distutils.core import setup
+"""Main installer."""
+from setuptools import setup, find_packages
 
 setup(
-    name='matlab2cpp',
-    version='0.5',
-    packages=['matlab2cpp', 'matlab2cpp/node', 'matlab2cpp/tree',
-        'matlab2cpp/rules', 'matlab2cpp/testsuite', 'matlab2cpp/supplement',
-        'matlab2cpp/manual', 'matlab2cpp/configure'],
-    # package_dir={'': ''},
+    name="matlab2cpp",
+    version="2.0",
+    packages=find_packages("src"),
+    package_dir={"": "src"},
+    entry_points={"console_scripts": ["m2cpp = matlab2cpp.__main__:main"]},
     url='http://github.com/jonathf/matlab2cpp',
     license='BSD',
     author="Jonathan Feinberg",
     author_email="jonathan@feinberg.no",
-    description='Matlab to C++ converter'
+    description="Matlab to C++ transpiler",
+    tests_require=["pytest", "pytest-runner"],
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Environment :: Console',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: OS Independent',
+        'Natural Language :: English',
+        'Programming Language :: Python',
+        'Topic :: Software Development :: Compilers',
+    ],
 )
-
-"""OPTIONAL the code below will copy the executable m2cpp to a folder which is in path."""
-#Windows
-if system == "Windows":
-    system_path = sys.executable
-    cwdir = os.getcwd()
-
-    new_file = open('m2cpp.bat', 'w')
-    command_run = '@echo off\n' + system_path + ' ' + cwdir + os.sep + 'm2cpp.py' + ' %*'
-    new_file.write(command_run)
-    new_file.close()
-
-    #copy m2cpp.bat to sys.executable
-    bat_dst = sys.executable
-    bat_dst = os.path.dirname(bat_dst)
-
-    from shutil import copy
-    copy("m2cpp.bat", bat_dst)
-
-    print()
-    print("Program now runnable through 'm2cpp'")
-    print("> m2cpp -h")
-
-else: #Linux/Mac
-    m2cpp = "cp -v m2cpp.py /usr/local/bin/m2cpp"
-    os.system(m2cpp)
-    chmod = "chmod 755 /usr/local/bin/m2cpp"
-    print(chmod)
-    os.system(chmod)
-
-    print()
-    print("Program now runnable through 'm2cpp'")
-    print("> m2cpp -h")
-
-

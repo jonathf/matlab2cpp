@@ -1,76 +1,15 @@
-"""
-
-The toolbox is sorted into the following modules:
-
-+----------------------------------+----------------------------------------+
-| Module                           | Description                            |
-+==================================+========================================+
-| :py:mod:`~matlab2cpp.qfunctions` | Functions for performing simple        |
-|                                  | translations                           |
-+----------------------------------+----------------------------------------+
-| :py:class:`~matlab2cpp.Builder`  | Constructing a tree from Matlab code   |
-+----------------------------------+----------------------------------------+
-| :py:class:`~matlab2cpp.Node`     | Components in the tree representation  |
-|                                  | of the code                            |
-+----------------------------------+----------------------------------------+
-| :py:mod:`~matlab2cpp.collection` | The collcetion of various node         |
-+----------------------------------+----------------------------------------+
-| :py:mod:`~matlab2cpp.configure`  | Rutine for setting datatypes and       |
-|                                  | backends of the various nodes          |
-+----------------------------------+----------------------------------------+
-| :py:mod:`~matlab2cpp.rules`      | Translation rules                      |
-+----------------------------------+----------------------------------------+
-| :py:mod:`~matlab2cpp.supplement` | Functions for inserting and extraction |
-|                                  | datatypes                              |
-+----------------------------------+----------------------------------------+
-| :py:mod:`~matlab2cpp.testsuite`  | Suite for testing software             |
-+----------------------------------+----------------------------------------+
-
-
-The simplest way to use the library is to use the quick translation functions.
-They are available through the `mc.qfunctions` module and mirrors the
-functionality offered by the `m2cpp` function.
-"""
-
-__version__ = "1.0"
-
+"""Execute main parser."""
 import time
 from datetime import datetime as date
 import os
 from os.path import sep
 import imp
-import re
 
-from . import (
-    supplement,
-    node,
-    tree,
-    qfunctions,
-    collection,
-    configure,
-    rules,
-    manual,
-    modify,
-    setpaths,
-)
+from . import supplement, tree, qfunctions, modify, setpaths
+from .__init__ import __version__
 
 
-__all__ = ["main"]
-
-from .qfunctions import *
-__all__ += qfunctions.__all__
-
-from .tree import *
-__all__ += tree.__all__
-
-from .node import *
-__all__ += node.__all__
-
-from .collection import *
-__all__ += collection.__all__
-
-
-def main(args):
+def execute_parser(args):
     """
 Initiate the interpretation and conversion process.
 
@@ -78,9 +17,14 @@ Args:
     args (ArgumentParser): arguments parsed through m2cpp
     """
 
-    builder = tree.builder.Builder(disp=args.disp, comments=args.comments,
-                                   original=args.original, enable_omp=args.enable_omp, enable_tbb=args.enable_tbb,
-                                   reference=args.reference)
+    builder = tree.builder.Builder(
+        disp=args.disp,
+        comments=args.comments,
+        original=args.original,
+        enable_omp=args.enable_omp,
+        enable_tbb=args.enable_tbb,
+        reference=args.reference,
+    )
 
     paths_from_file = []
     #read setpath.m file and return string list of paths
@@ -93,7 +37,9 @@ Args:
     #pathOne = os.path.dirname(os.path.abspath(args.filename))
 
     if os.path.isfile(args.filename):
-        paths = [os.path.abspath(os.path.dirname(args.filename))] + paths_from_file
+
+        paths = [os.path.abspath(os.path.dirname(args.filename))]
+        paths += paths_from_file
 
         if args.disp:
             print("building tree...")
@@ -123,7 +69,7 @@ Args:
             #Here you have to change filename to current folder for .py files
             #local_name = pathOne + sep + os.path.basename(filename)
             local_name = os.getcwd() + sep + os.path.basename(filename)
-            
+
             if os.path.isfile(local_name + ".py") and not args.reset:
 
                 try:
@@ -210,7 +156,7 @@ Args:
     #--- work in progress ---
     #Get data types from matlab
     if args.matlab_suggest:
-        import matlab_types
+        from . import matlab_types
         builder = matlab_types.mtypes(builder, args)
     #------------------------
 
@@ -221,9 +167,12 @@ Args:
 
     #--- work in progress ---
     #Modify the Abstract Syntax Tree (AST)
-    builder.project = modify.preorder_transform_AST(builder.project, args.nargin, suggest=(2*args.suggest or args.matlab_suggest))
+    builder.project = modify.preorder_transform_AST(
+        builder.project, args.nargin,
+        suggest=(2*args.suggest or args.matlab_suggest),
+    )
     #------------------------
-    
+
     if args.disp:
         print(builder.project.summary())
         print("generate translation")
@@ -268,7 +217,7 @@ Args:
 
         if hpp:
             hpp = """// Automatically translated using m2cpp %s on %s
-            
+
 %s""" % (__version__, stamp, hpp)
             f = open(name+".hpp", "w")
             f.write(hpp)

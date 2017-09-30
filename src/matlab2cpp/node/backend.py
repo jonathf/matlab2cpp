@@ -3,7 +3,7 @@ import os
 from os.path import sep
 
 import matlab2cpp
-import matlab2cpp.m2cpp
+from . import m2cpp
 import matlab2cpp.pyplot
 
 from . import reference

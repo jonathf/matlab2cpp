@@ -7,19 +7,6 @@ from shutil import copy
 from subprocess import Popen, PIPE
 
 
-def setup_module(module):
-    """Create temporary folder and save path to module before start
-    """
-    module.path = tempfile.mkdtemp()
-    module.curdir = os.path.abspath(os.path.curdir)
-
-def teardown_module(module):
-    """Remove temporary folder after job is complete
-    """
-
-    shutil.rmtree(module.path)
-
-
 def test_variable_suggest():
     """Test basic variable types
     """
@@ -48,7 +35,8 @@ e = [6; 7]
     # strip header
     converted_code = "\n".join(converted_code.split("\n")[2:])
 
-    reference_code = """#include <armadillo>
+    reference_code = """
+#include <armadillo>
 using namespace arma ;
 
 int main(int argc, char** argv)
@@ -66,7 +54,8 @@ int main(int argc, char** argv)
   sword _e [] = {6, 7} ;
   e = ivec(_e, 2, false) ;
   return 0 ;
-}"""
+}
+    """
 
     assert converted_code == reference_code
 
