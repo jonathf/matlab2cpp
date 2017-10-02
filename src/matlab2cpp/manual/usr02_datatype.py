@@ -465,11 +465,4 @@ In the generated C++ file the second assignment is replaced with the verbatim tr
       c = 3 ;
       return 0 ;
     }
-
-   
 """
-import matlab2cpp as mc
-
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()

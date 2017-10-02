@@ -75,7 +75,7 @@ of the python functionality also will be discussed.  Given that `Matlab2cpp`
 is properly installed on your system, the python library is available in
 Python's path. The module is assumed imported as::
 
-    >>> import matlab2cpp as mc
+    >>> import matlab2cpp
 
 Quick functions collection of frontend tools for performing code translation.
 Each of the function :py:func:`~matlab2cpp.qcpp`, :py:func:`~matlab2cpp.qhpp`,
@@ -101,4 +101,3 @@ the generated code with:
 
 Additional flags could be -O3 (optimization) -ltbb (in case of TBB parallelization)
 """
-import matlab2cpp as mc

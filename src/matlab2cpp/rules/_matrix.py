@@ -34,7 +34,7 @@ def Vector(node):
     mem_type = ["uword", "sword", "float", "double", "cx_double"]
     
     #Join columns: a = [0, my_rowvec, b]
-    for i in xrange(len(nodes)):
+    for i in range(len(nodes)):
         # scalars must be converted first
         if node[i].value or node[i].dim == 0: # value=scalarsonly
             node[i].include("m2cpp")
@@ -105,7 +105,7 @@ def Matrix(node):
 
         # make string of each vector in matrix
         nodes = []
-        for i in xrange(len(node)):
+        for i in range(len(node)):
 
             #max mem in list and type list
             try:
@@ -129,7 +129,7 @@ def Matrix(node):
 
         # make string of each vector in matrix
         nodes = []
-        for i in xrange(len(node)):
+        for i in range(len(node)):
             
             # decomposed vectors should be moved to own lines
             if node[i].value:

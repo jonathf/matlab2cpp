@@ -10,8 +10,8 @@ from . import (
     suppliment,
     identify,
 )
+from .. import collection, rules, configure
 
-import matlab2cpp as mc
 
 class Builder(object):
     """
@@ -74,7 +74,7 @@ Args:
         self.disp = disp
         self.comments = comments
         self.original = original
-        self.project = mc.collection.Project()
+        self.project = collection.Project()
         self.project.kws = kws
         self.project.builder = self
         self.enable_omp = enable_omp
@@ -192,9 +192,9 @@ Example::
         unassigned = [k for k,v in unassigned.items() if v]
 
         reserved = set([])
-        for i in xrange(len(unassigned)-1, -1, -1):
+        for i in range(len(unassigned)-1, -1, -1):
 
-            if unassigned[i] in mc.rules._reserved.reserved:
+            if unassigned[i] in rules._reserved.reserved:
                 reserved.add(unassigned.pop(i))
 
         for node in nodes[::-1]:
@@ -296,7 +296,7 @@ Raises:
         if self.configured:
             raise RuntimeError("configure can only be run once")
         self.configured = True
-        mc.configure.configure(self, suggest, **kws)
+        configure.configure(self, suggest, **kws)
 
 
     def translate(self):
@@ -400,7 +400,7 @@ Returns:
 See also:
     :py:func:`matlab2cpp.tree.functions.function`
     """
-        assert isinstance(parent, mc.collection.Funcs)
+        assert isinstance(parent, collection.Funcs)
         return functions.function(self, parent, cur)
 
 
@@ -425,7 +425,7 @@ Returns:
 See also:
     :py:func:`matlab2cpp.tree.functions.main`
     """
-        assert isinstance(parent, mc.collection.Funcs)
+        assert isinstance(parent, collection.Funcs)
         return functions.main(self, parent, cur)
 
 
@@ -449,7 +449,7 @@ Returns:
 See also:
     :py:func:`matlab2cpp.tree.functions.lambda_assign`
     """
-        assert isinstance(parent, mc.collection.Block)
+        assert isinstance(parent, collection.Block)
         return functions.lambda_assign(self, parent, cur, eq_loc)
 
 
@@ -482,7 +482,7 @@ Returns:
 See also:
     :py:func:`matlab2cpp.tree.functions.lambda_func`
     """
-        assert isinstance(parent, mc.collection.Assign)
+        assert isinstance(parent, collection.Assign)
         return functions.lambda_func(self, parent, cur)
 
 
@@ -510,7 +510,7 @@ See also:
     """
         pnames = [ "Case", "Catch", "Elif", "Else", "Parfor", "For", "Func", "If",
                 "Main", "Otherwise", "Switch", "Try", "While"]
-        pnodes = [getattr(mc.collection, name) for name in pnames]
+        pnodes = [getattr(collection, name) for name in pnames]
         ppart = [isinstance(parent, node) for node in pnodes]
         if not any(ppart):
             raise AssertionError(
@@ -539,7 +539,7 @@ Returns:
 See also:
     :py:func:`matlab2cpp.tree.assign.multi`
     """
-        assert isinstance(parent, mc.collection.Block)
+        assert isinstance(parent, collection.Block)
         return assign.multi(self, parent, cur, eq_loc)
 
 
@@ -563,7 +563,7 @@ Returns:
 See also:
     :py:func:`matlab2cpp.tree.assign.single`
     """
-        assert isinstance(parent, mc.collection.Block)
+        assert isinstance(parent, collection.Block)
         return assign.single(self, parent, cur, eq_loc)
 
     def create_parfor(self, parent, cur):
@@ -584,7 +584,7 @@ Returns:
     int: position where for-loop ends
         """
 
-        assert isinstance(parent, mc.collection.Block)
+        assert isinstance(parent, collection.Block)
         return branches.parforloop(self, parent, cur)
     
     def create_for(self, parent, cur):
@@ -607,7 +607,7 @@ Returns:
 See also:
     :py:func:`matlab2cpp.tree.branches.forloop`
     """
-        assert isinstance(parent, mc.collection.Block)
+        assert isinstance(parent, collection.Block)
         return branches.forloop(self, parent, cur)
 
 
@@ -642,7 +642,7 @@ Returns:
 See also:
     :py:func:`matlab2cpp.tree.branches.ifbranch`
     """
-        assert isinstance(parent, mc.collection.Block)
+        assert isinstance(parent, collection.Block)
         return branches.ifbranch(self, parent, cur)
 
 
@@ -665,7 +665,7 @@ Returns:
 See also:
     :py:func:`matlab2cpp.tree.branches.whileloop`
     """
-        assert isinstance(parent, mc.collection.Block)
+        assert isinstance(parent, collection.Block)
         return branches.whileloop(self, parent, cur)
 
 
@@ -698,7 +698,7 @@ Returns:
 See also:
     :py:func:`matlab2cpp.tree.branches.switch`
     """
-        assert isinstance(parent, mc.collection.Block)
+        assert isinstance(parent, collection.Block)
         return branches.switch(self, parent, cur)
 
 
@@ -723,7 +723,7 @@ Returns:
 See also:
     :py:func:`matlab2cpp.tree.branches.trybranch`
     """
-        assert isinstance(parent, mc.collection.Block)
+        assert isinstance(parent, collection.Block)
         return branches.trybranch(self, parent, cur)
 
 
@@ -748,7 +748,7 @@ See also:
         return misc.cell(self, parent, cur)
 
     def create_pragma_parfor(self, parent, cur):
-        assert isinstance(parent, mc.collection.Block)
+        assert isinstance(parent, collection.Block)
         return misc.pragma_for(self, parent, cur)
 
     def create_comment(self, parent, cur):
@@ -768,7 +768,7 @@ Returns:
 See also:
     :py:func:`matlab2cpp.tree.misc.comment`
     """
-        assert isinstance(parent, mc.collection.Block)
+        assert isinstance(parent, collection.Block)
         return misc.comment(self, parent, cur)
 
 
@@ -810,7 +810,7 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.misc.string`
-    """
+        """
         return misc.string(self, parent, cur)
 
 
@@ -830,7 +830,7 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.misc.list`
-    """
+        """
         return misc.list(self, parent, cur)
 
 
@@ -855,7 +855,7 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.misc.matrix`
-    """
+        """
         return misc.matrix(self, parent, cur)
 
 
@@ -875,7 +875,7 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.misc.number`
-    """
+        """
         return misc.number(self, parent, cur)
 
 
@@ -902,8 +902,8 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.misc.reserved`
-    """
-        assert isinstance(parent, mc.collection.Block)
+        """
+        assert isinstance(parent, collection.Block)
         return misc.reserved(self, parent, cur)
 
 
@@ -965,7 +965,7 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.expression.create`
-    """
+        """
         return expression.create(self, parent, cur, end)
 
 

@@ -229,8 +229,3 @@ results. Also, information about the parent is used in the value returned.
 See also:
     :py:class:`~matlab2cpp.Builder`
 """
-import matlab2cpp as mc
-
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()

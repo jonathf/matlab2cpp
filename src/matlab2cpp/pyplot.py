@@ -440,12 +440,12 @@ else:
 
             header = self.verticalHeader()
             header.setFont(font)
-            for i in xrange(header.length()):
+            for i in range(header.length()):
                 header.resizeSection(i, height)
 
             header = self.horizontalHeader()
             header.setFont(font)
-            for i in xrange(header.length()):
+            for i in range(header.length()):
                 header.resizeSection(i, width)
 
         def zoom_in(self):

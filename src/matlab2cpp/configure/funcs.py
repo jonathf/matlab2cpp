@@ -35,7 +35,7 @@ def funcs(node):
         node.declare.type = func[1][0].type
         params = func[2]
 
-        for i in xrange(len(node)):
+        for i in range(len(node)):
             try:
                 params[i].suggest = node[i].type
                 node[i].suggest = params[i].type
@@ -46,7 +46,7 @@ def funcs(node):
         node.backend = func.backend
         params = func[2]
 
-        for j in xrange(len(params)):
+        for j in range(len(params)):
             try:
                 params[j].suggest = node[j].type
                 node[j].suggest = params[j].type
@@ -59,7 +59,7 @@ def funcs(node):
             returns = func[1]
             # Got out_of_bounds error, len(returns) where longer than LHS,
             # so i changed for range to min LHS vars and returns from function
-            for j in xrange(min(len(node.parent), len(returns))):
+            for j in range(min(len(node.parent), len(returns))):
                 returns[j].suggest = node.parent[j].type
                 node.parent[j].suggest = returns[j].type
 
@@ -72,7 +72,7 @@ def funcs(node):
             node.declare.type = "func_lambda"
 
         params = func[2]
-        for i in xrange(len(node)):
+        for i in range(len(node)):
             params[i].suggest = node[i].type
 
     return True

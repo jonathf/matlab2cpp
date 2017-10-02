@@ -578,7 +578,7 @@ See also:
     if not isinstance(value, str):
 
         value = list(value)
-        children = ["%("+str(i)+")s" for i in xrange(len(node))]
+        children = ["%("+str(i)+")s" for i in range(len(node))]
 
         if len(value) == 2:
             value.insert(1, "")
@@ -595,7 +595,7 @@ See also:
         else:
 
             out = value[0]
-            for i in xrange(len(children)):
+            for i in range(len(children)):
                 out += children[i] + value[i+1]
             value = out
 

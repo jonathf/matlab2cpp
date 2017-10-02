@@ -1,6 +1,3 @@
-"""
-"""
-
 def get(node):
 
     funcs = node.program[1]
@@ -54,8 +51,3 @@ class Sstypes(object):
 
     def __set__(self, instance, value):
         raise AttributeError("Suggestions not to be set manually")
-
-if __name__ == "__main__":
-    import doctest
-    import matlab2cpp as mc
-    doctest.testmod()

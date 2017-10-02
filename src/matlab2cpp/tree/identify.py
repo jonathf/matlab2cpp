@@ -14,7 +14,7 @@ Rutines for identifying code structure.
 |                                                      | space-delimited       |
 +------------------------------------------------------+-----------------------+
 """
-import matlab2cpp as mc
+from . import constants, findend
 
 
 def space_delimiter(self, start):
@@ -48,10 +48,10 @@ Returns:
             if self.code[k+1] in " \t":
                 return False
 
-        elif self.code[k:k+2] in mc.tree.constants.op2:
+        elif self.code[k:k+2] in constants.op2:
             return False
 
-        elif self.code[k] in mc.tree.constants.op1:
+        elif self.code[k] in constants.op1:
             return False
 
         else:
@@ -82,7 +82,7 @@ Returns:
     while self.code[j] in " \t":
         j -= 1
 
-    if self.code[j] in mc.tree.constants.letters+mc.tree.constants.digits+")]}_":
+    if self.code[j] in constants.letters+constants.digits+")]}_":
 
         # special cases
         if self.code[j-3:j+1] == "case":
@@ -105,21 +105,21 @@ Returns:
 	bool: True if list consists of whitespace delimiters
     """
 
-    if  self.code[start] not in mc.tree.constants.l_start:
+    if  self.code[start] not in constants.l_start:
         self.syntaxerror(start, "list start")
 
     k = start+1
     while self.code[k] in " \t":
         k += 1
 
-    if self.code[k] in mc.tree.constants.l_end:
+    if self.code[k] in constants.l_end:
         return False
 
-    if  self.code[k] not in mc.tree.constants.e_start:
+    if  self.code[k] not in constants.e_start:
         self.syntaxerror(k, "expression start")
 
     if self.code[k] == "'":
-        k = mc.tree.findend.string(self, k)+1
+        k = findend.string(self, k)+1
 
         while self.code[k] in " \t":
             k += 1
@@ -127,21 +127,21 @@ Returns:
     while True:
 
         if self.code[k] == "(":
-            k = mc.tree.findend.paren(self, k)
+            k = findend.paren(self, k)
 
         elif self.code[k] == "[":
-            k = mc.tree.findend.matrix(self, k)
+            k = findend.matrix(self, k)
 
         elif self.code[k] == "{":
-            k = mc.tree.findend.cell(self, k)
+            k = findend.cell(self, k)
 
         elif self.code[k] == "'" and string(self, k):
-            #k = mc.tree.findend.string(self, k)
-            #if self.code[k-1] in mc.tree.constants.s_start:
+            #k = findend.string(self, k)
+            #if self.code[k-1] in constants.s_start:
             return True
 
         elif self.code[k:k+3] == "...":
-            k = mc.tree.findend.dots(self, k)
+            k = findend.dots(self, k)
 
         elif self.code[k] in " \t":
             if space_delimiter(self, k):
@@ -149,10 +149,10 @@ Returns:
             while self.code[k+1] in " \t":
                 k += 1
 
-        elif self.code[k] in mc.tree.constants.e_end:
+        elif self.code[k] in constants.e_end:
             if self.code[k] == ",":
                 return False
-            elif self.code[k] in mc.tree.constants.l_end:
+            elif self.code[k] in constants.l_end:
                 return False
             elif self.code[k] != ";":
                 return True
@@ -162,7 +162,7 @@ Returns:
             while self.code[k+1] in " \t":
                 k += 1
 
-        elif self.code[k+1] in mc.tree.constants.letters + mc.tree.constants.digits + "_@":
-            while self.code[k+1] in mc.tree.constants.letters + mc.tree.constants.digits + "_@":
+        elif self.code[k+1] in constants.letters + constants.digits + "_@":
+            while self.code[k+1] in constants.letters + constants.digits + "_@":
                 k += 1
         k += 1

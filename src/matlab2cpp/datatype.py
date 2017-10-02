@@ -15,9 +15,8 @@ The follwing constructor classes exists here:
 | :py:class:`~matlab2cpp.datatype.Suggest` | Frontend for suggested datatype       |
 +------------------------------------------+---------------------------------------+
 """
-
-import matlab2cpp as mc
 from . import supplement
+
 
 dim0 = {"int", "float", "uword", "double", "cx_double", "size_t"}
 dim1 = {"ivec", "fvec", "uvec", "vec", "cx_vec"}
@@ -48,7 +47,7 @@ Loose enforcment"""
         vals = [vals]
     vals = list(vals)
 
-    for i in xrange(len(vals)):
+    for i in range(len(vals)):
         if isinstance(vals[i], str):
             continue
         if isinstance(vals[i][0], int):
@@ -97,7 +96,7 @@ Strict enforcment"""
 
     vals = list(vals)
 
-    for i in xrange(len(vals)):
+    for i in range(len(vals)):
         if isinstance(vals[i], str):
             continue
         if isinstance(vals[i][0], int):
@@ -206,7 +205,7 @@ It represents the number of dimension a numerical object represents:
 
 The variable can be both read and set in real time:
 
-    >>> node = mc.Var(None, "name")
+    >>> node = collection.Var(None, "name")
     >>> node.type="float"
     >>> print(node.dim)
     0
@@ -248,7 +247,7 @@ It represents the internal basic datatype represented in memory:
 
 The variable can be both read and set in real time:
 
-    >>> node = mc.Var(None, "name")
+    >>> node = collection.Var(None, "name")
     >>> node.type="float"
     >>> print(node.mem)
     2

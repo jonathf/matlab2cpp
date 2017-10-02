@@ -1,5 +1,3 @@
-import matlab2cpp as mc
-
 Project = "program"
 Program = "program"
 Includes = "program"

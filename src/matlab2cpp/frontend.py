@@ -129,7 +129,7 @@ Args:
             # add unknown variables to stack if they exists as files
             unknowns = builder.get_unknowns(filename)
 
-            for i in xrange(len(unknowns)-1, -1, -1):
+            for i in range(len(unknowns)-1, -1, -1):
                 #print(i)
                 for path in paths:
                     #print(path)

@@ -499,7 +499,7 @@ Examples:
 
     # split into multiple lines
     out = ""
-    for i in xrange(len(node[:-1])):
+    for i in range(len(node[:-1])):
         i = str(i)
         out += "%(" +i+ ")s = " +str(node[-1])+ "(" +i+ ") ;\n"
     out = out[:-1]

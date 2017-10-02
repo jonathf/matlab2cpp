@@ -1,6 +1,7 @@
 """
 """
-import matlab2cpp as mc
+from .. import collection
+
 
 def set(node, types):
 
@@ -26,8 +27,8 @@ def set(node, types):
                         var.type = types_[key]
 
                 else:
-                    var = mc.collection.Declare(struct, key, backend="struct",
-                        type=types_[key])
+                    var = collection.Declare(
+                        struct, key, backend="struct", type=types_[key])
 
 
 def get(node):
@@ -59,7 +60,3 @@ class Stypes(object):
 
     def __set__(self, instance, value):
         set(instance, value)
-
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()

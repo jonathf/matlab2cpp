@@ -5,7 +5,7 @@ from . import (
 
 import matlab2cpp.datatype as dt
 import matlab2cpp.supplement as sup
-import matlab2cpp as mc
+
 
 class Node(object):
     """
@@ -225,7 +225,7 @@ Example:
                 prop[key] = getattr(self, key)
 
         I = len(self.children)
-        for i in xrange(I):
+        for i in range(I):
             prop[str(i)] = prop["-"+str(I-i)] = self[i].prop["str"]
         return prop
 

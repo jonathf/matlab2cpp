@@ -6,7 +6,7 @@ setup(
     version="2.0",
     packages=find_packages("src"),
     package_dir={"": "src"},
-    entry_points={"console_scripts": ["m2cpp = matlab2cpp.__main__:main"]},
+    entry_points={"console_scripts": ["m2cpp = matlab2cpp:m2cpp"]},
     url='http://github.com/jonathf/matlab2cpp',
     license='BSD',
     author="Jonathan Feinberg",

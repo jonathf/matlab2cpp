@@ -1,5 +1,4 @@
 # encoding: utf-8
-
 r"""
 A full summary of all nodes.
 

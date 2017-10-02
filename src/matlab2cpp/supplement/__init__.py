@@ -22,8 +22,6 @@ from .structs import Stypes
 from .includes import Itypes
 from .verbatim import Vtypes
 
-import matlab2cpp as mc
-
 
 def str_variables(types_f={}, types_s={}, types_i=[],
         suggest={}, prefix=True, types_v={}):

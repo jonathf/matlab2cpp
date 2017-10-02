@@ -41,6 +41,7 @@ except ImportError:
     argcomplete = None
 
 from .parser import create_parser
+from .qfunctions import *
 
 
 def m2cpp(args=None):
@@ -59,7 +60,3 @@ def m2cpp(args=None):
 
     from matlab2cpp.frontend import execute_parser
     execute_parser(args)
-
-
-if __name__ == "__main__":
-    m2cpp()

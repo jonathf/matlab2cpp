@@ -1,6 +1,7 @@
-import matlab2cpp as mc
+
 from .funcs import funcs
-from . import armadillo
+from . import armadillo, backends
+from .configure import configure
 
 Counter = "structs"
 
@@ -65,29 +66,29 @@ def Get(node):
     #i want a(2) to have backend rowvec and and datatype double
     #This code sets backend to rowvec, and below datatype is set
     #Thus backend is set before datatype is changed to double
-    #mc.configure.backends.Get(node)
+    #backends.Get(node)
     
     #vec
     if node.declare.dim == 1:
-        mc.configure.backends.Get(node)
+        backends.Get(node)
         armadillo.vec(node)
         return
 
     #rowvec
     if node.declare.dim == 2:
-        mc.configure.backends.Get(node)
+        backends.Get(node)
         armadillo.rowvec(node)
         return
 
     #mat
     if node.declare.dim == 3:
-        mc.configure.backends.Get(node)
+        backends.Get(node)
         armadillo.mat(node)
         return
 
     #cube
     if node.declare.dim == 4:
-        mc.configure.backends.Get(node)
+        backends.Get(node)
         armadillo.cube(node)
         return
     
@@ -103,29 +104,29 @@ def Set(node):
     #i want a(2) to have backend rowvec and and datatype double
     #This code sets backend to rowvec, and below datatype is set
     #Thus backend is set before datatype is changed to double
-    #mc.configure.backends.Get(node)
+    #backends.Get(node)
     
     #vec
     if node.declare.dim == 1:
-        mc.configure.backends.Get(node)
+        backends.Get(node)
         armadillo.vec(node)
         return
 
     #rowvec
     if node.declare.dim == 2:
-        mc.configure.backends.Get(node)
+        backends.Get(node)
         armadillo.rowvec(node)
         return
 
     #mat
     if node.declare.dim == 3:
-        mc.configure.backends.Get(node)
+        backends.Get(node)
         armadillo.mat(node)
         return
 
     #cube
     if node.declare.dim == 4:
-        mc.configure.backends.Get(node)
+        backends.Get(node)
         armadillo.cube(node)
         return
     
@@ -405,15 +406,14 @@ def Lambda(node):
                     node_.type = type
                     node_.declare.type = type
 
-    
-
-    mc.configure.configure(lfunc)
+    configure(lfunc)
     # declare list in lambda function
     if ldeclares["_retval"].type != "TYPE":
         declares[node.name[1:]].type = "func_lambda"
         node.parent.type = "func_lambda"
         node.parent[0].type = "func_lambda"
     node.type = "func_lambda"
+
 
 def Assigns(node):
     if node[-1].type != "TYPE":

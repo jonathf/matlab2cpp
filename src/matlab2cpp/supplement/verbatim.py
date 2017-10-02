@@ -37,8 +37,3 @@ class Vtypes(object):
 
     def __get__(self, instance, owner):
         return get(instance)
-
-if __name__ == "__main__":
-    import doctest
-    import matlab2cpp as mc
-    doctest.testmod()

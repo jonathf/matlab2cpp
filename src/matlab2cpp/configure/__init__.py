@@ -1,7 +1,5 @@
-"""
-"""
-import matlab2cpp as mc
-from . import datatypes, backends, reserved
+from . import tree, datatypes, backends, reserved
+
 
 def configure(root, suggest=True, **kws):
     """
@@ -10,7 +8,7 @@ configure backend
 See also:
     :py:func:`matlab2cpp.Builder.configure <Builder.configure>`
     """
-    if isinstance(root, mc.Builder):
+    if isinstance(root, tree.Builder):
         root = root.project
 
     loop(root, suggest)

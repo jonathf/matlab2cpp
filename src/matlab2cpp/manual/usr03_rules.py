@@ -198,7 +198,4 @@ applied for other functions::
 
 There are many rules to translation rule backends in matlab2cpp. This is mainly
 because each datatype have a corresponding backend.
-
-
 """
-import matlab2cpp as mc

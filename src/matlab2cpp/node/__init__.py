@@ -1,9 +1,7 @@
 """
 The module contains the following submodules.
 """
-
 from .frontend import Node
-import matlab2cpp as mc
 
 __all__ = ["Node"]
 

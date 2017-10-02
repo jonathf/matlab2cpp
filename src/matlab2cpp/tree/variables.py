@@ -1,10 +1,7 @@
 """
 Variable interpretor
 """
-
-import matlab2cpp as mc
-
-from . import constants as c, findend, iterate
+from . import constants, findend, iterate
 
 
 def assign(self, parent, cur, end=None):
@@ -41,12 +38,12 @@ Example:
     1 5| | Int        int          int
     """
 
-    if  self.code[cur] not in c.letters + '~':
+    if  self.code[cur] not in constants.letters + '~':
         self.syntaxerror(cur, "assign variable name")
 
 
     k = cur+1
-    while self.code[k] in c.letters+c.digits+"_":
+    while self.code[k] in constants.letters+constants.digits+"_":
         k += 1
 
     name = self.code[cur:k]
@@ -66,7 +63,7 @@ Example:
         if self.code[end] == "(":
 
             end = findend.paren(self, end)
-            node = mc.collection.Cset(parent, name, cur=cur,
+            node = collection.Cset(parent, name, cur=cur,
                     code=self.code[cur:end+1])
 
             if self.disp:
@@ -99,7 +96,7 @@ Example:
 
         else:
             end = findend.cell(self, k)
-            node = mc.collection.Cvar(parent, name, cur=cur,
+            node = collection.Cvar(parent, name, cur=cur,
                     code=self.code[cur:end+1])
 
             if self.disp:
@@ -118,12 +115,12 @@ Example:
                 #print("\n\n")
 
                 #l = 0
-                #while node.code[l] in c.letters+c.digits+"_":
+                #while node.code[l] in constants.letters+constants.digits+"_":
                 #    l += 1
 
                 #list = iterate.comma_list(node, l)
                 #for tup in list:
-                #    mc.collection.Var(node, node.code[tup[0]:tup[1]+1])
+                #    collection.Var(node, node.code[tup[0]:tup[1]+1])
 
                 #print(list)
                 #print("LISTAT\n\n")
@@ -138,11 +135,11 @@ Example:
     elif self.code[k] == "(":
 
         end = findend.paren(self, k)
-        if self.code[end+1] == "." and self.code[end+2] in c.letters:
+        if self.code[end+1] == "." and self.code[end+2] in constants.letters:
 
             start = end+2
             end += 2
-            while self.code[end] in c.letters+c.digits+"_":
+            while self.code[end] in constants.letters+constants.digits+"_":
                 end += 1
             value = self.code[start:end]
 
@@ -151,7 +148,7 @@ Example:
                 print("%-20s" % "variables.assign",)
                 print(repr(self.code[cur:end]))
 
-            node = mc.collection.Sset(parent, name, value, cur=cur,
+            node = collection.Sset(parent, name, value, cur=cur,
                     code=self.code[cur:end], pointer=1)
 
             last = self.create_list(node, k)
@@ -164,7 +161,7 @@ Example:
                 print("%-20s" % "variables.assign",)
                 print(repr(self.code[cur:end+1]))
 
-            node = mc.collection.Set(parent, name, cur=cur,
+            node = collection.Set(parent, name, cur=cur,
                     code=self.code[cur:end+1])
 
             last = self.create_list(node, k)
@@ -190,17 +187,17 @@ Example:
                 print(repr(self.code[cur:end+1]))
 
 
-            node = mc.collection.Nset(parent, name)
+            node = collection.Nset(parent, name)
             node.cur = cur
             node.code = self.code[cur:end+1]
 
             cur = self.create_expression(node, cur)
 
 
-        elif self.code[k] in c.letters:
+        elif self.code[k] in constants.letters:
 
             j = k+1
-            while self.code[j] in c.letters+c.digits+"_.":
+            while self.code[j] in constants.letters+constants.digits+"_.":
                 j += 1
 
             value = self.code[k:j]
@@ -218,7 +215,7 @@ Example:
                     print("%-20s" % "variables.assign",)
                     print(repr(self.code[cur:end+1]))
 
-                node = mc.collection.Fset(parent, name, value=value, cur=cur,
+                node = collection.Fset(parent, name, value=value, cur=cur,
                         code=self.code[cur:end+1])
 
                 cur = self.create_list(node, j)
@@ -231,7 +228,7 @@ Example:
                     print("%-20s" % "variables.assign",)
                     print(repr(self.code[cur:last+1]))
 
-                node = mc.collection.Fvar(parent, name, value=value, cur=cur,
+                node = collection.Fvar(parent, name, value=value, cur=cur,
                         code=self.code[cur:last+1])
 
                 cur = last
@@ -244,7 +241,7 @@ Example:
             print(repr(self.code[cur:last]))
 
 
-        node = mc.collection.Var(parent, name, cur=cur,
+        node = collection.Var(parent, name, cur=cur,
                 code=self.code[cur:last])
 
         cur = last-1
@@ -291,11 +288,11 @@ Example:
     if self.code[k] == "@":
         k += 1
 
-    if  self.code[k] not in c.letters:
+    if  self.code[k] not in constants.letters:
         self.syntaxerror(k, "variable name")
 
     k += 1
-    while self.code[k] in c.letters+c.digits+"_":
+    while self.code[k] in constants.letters+constants.digits+"_":
         k += 1
 
     name = self.code[cur:k]
@@ -315,7 +312,7 @@ Example:
         if self.code[end] == "(":
 
             end = findend.paren(self, end)
-            node = mc.collection.Cget(parent, name, cur=cur,
+            node = collection.Cget(parent, name, cur=cur,
                     code=self.code[cur:end+1])
 
             if self.disp:
@@ -348,7 +345,7 @@ Example:
 
         else:
             end = findend.cell(self, k)
-            node = mc.collection.Cvar(parent, name, cur=cur,
+            node = collection.Cvar(parent, name, cur=cur,
                     code=self.code[cur:end+1])
 
             if self.disp:
@@ -370,11 +367,11 @@ Example:
     elif self.code[k] == "(":
 
         end = findend.paren(self, k)
-        if self.code[end+1] == "." and self.code[end+2] in c.letters:
+        if self.code[end+1] == "." and self.code[end+2] in constants.letters:
 
             start = end+2
             end += 2
-            while self.code[end] in c.letters+c.digits+"_":
+            while self.code[end] in constants.letters+constants.digits+"_":
                 end += 1
             value = self.code[start:end]
 
@@ -383,7 +380,7 @@ Example:
                 print("%-20s" % "variables.variable",)
                 print(repr(self.code[cur:end]))
 
-            node = mc.collection.Sget(parent, name, value, cur=cur,
+            node = collection.Sget(parent, name, value, cur=cur,
                     code=self.code[cur:end], pointer=1)
 
             last = self.create_list(node, k)
@@ -396,7 +393,7 @@ Example:
                 print("%-20s" % "variables.variable",)
                 print(repr(self.code[cur:end+1]))
 
-            node = mc.collection.Get(parent, name, cur=cur,
+            node = collection.Get(parent, name, cur=cur,
                     code=self.code[cur:end+1])
 
             last = self.create_list(node, k)
@@ -423,16 +420,16 @@ Example:
             while self.code[k] in " \t":
                 k += 1
 
-            node = mc.collection.Nget(parent, name, cur=cur,
+            node = collection.Nget(parent, name, cur=cur,
                     code=self.code[cur:end+1])
 
             cur = self.create_expression(node, k)
 
 
-        elif self.code[k] in c.letters:
+        elif self.code[k] in constants.letters:
 
             j = k+1
-            while self.code[j] in c.letters+c.digits+"_":
+            while self.code[j] in constants.letters+constants.digits+"_":
                 j += 1
 
             value = self.code[k:j]
@@ -451,7 +448,7 @@ Example:
                     print(repr(self.code[cur:end+1]))
 
 
-                node = mc.collection.Fget(parent, name, cur=cur,
+                node = collection.Fget(parent, name, cur=cur,
                         value=value, code=self.code[cur:end+1])
 
                 j += 1
@@ -470,7 +467,7 @@ Example:
                     print("%-20s" % "variables.variable",)
                     print(repr(self.code[cur:last]))
 
-                node = mc.collection.Fvar(parent, name, value=value,
+                node = collection.Fvar(parent, name, value=value,
                         cur=cur, code=self.code[cur:last])
 
                 cur = last-1
@@ -486,7 +483,7 @@ Example:
             print("%-20s" % "variables.variable",)
             print(repr(self.code[cur:last]))
 
-        node = mc.collection.Var(parent, name, cur=cur,
+        node = collection.Var(parent, name, cur=cur,
                 code=self.code[cur:last])
 
         cur = last-1
@@ -539,7 +536,7 @@ Example:
         if self.code[cur] == "}":
             return cur
 
-        elif self.code[cur] in c.e_start:
+        elif self.code[cur] in constants.e_start:
 
             cur = self.create_expression(cset, cur)
 

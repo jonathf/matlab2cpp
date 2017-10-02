@@ -22,16 +22,18 @@ to the ``mconvert`` script.
 +--------------------------------+-----------------------------------------+
 """
 
-import os
-import matlab2cpp as mc
-
-from . import supplement, tree
-from .rules._program import add_indenting, number_fix, strip
-
 __all__ = ["build", "qcpp", "qhpp", "qpy", "qlog", "qtree", "qscript"]
 
-def build(code, disp=False, retall=False, suggest=True, comments=True,
-        vtypes=None, **kws):
+
+def build(
+        code,
+        disp=False,
+        retall=False,
+        suggest=True,
+        comments=True,
+        vtypes=None,
+        **kws,
+):
     """
 Build a token tree out of Matlab code.  This function is used by the other
 quick-functions as the first step in code translation.
@@ -72,12 +74,13 @@ See also:
     :py:class:`~matlab2cpp.Node`
 
     """
+    from . import supplement, tree
 
     code = code + "\n\n\n\n"
 
     if vtypes:
         code = supplement.verbatim.set(vtypes, code)
-    
+
     builder = tree.builder.Builder(disp=disp, comments=comments, **kws)
     builder.load("unamed", code)
     builder.configure(2*suggest)
@@ -144,6 +147,7 @@ See also:
     :py:func:`~matlab2cpp.qhpp`,
     :py:obj:`~matlab2cpp.Builder`
     """
+    from . import tree
 
     if isinstance(code, str):
         tree_ = build(code, suggest=suggest, retall=True, **kws)[0]
@@ -180,6 +184,7 @@ See also:
 
         out =  out[:-2]
 
+        from .rules._program import add_indenting, number_fix, strip
         out = strip(out)
         out = number_fix(out)
         out = add_indenting(out)
@@ -252,6 +257,7 @@ See also:
     :py:func:`~matlab2cpp.qcpp`,
     :py:class:`~matlab2cpp.Builder`
     """
+    from . import tree
 
     if isinstance(code, str):
         tree_ = build(code, suggest=suggest, retall=True)[0]
@@ -297,6 +303,7 @@ See also:
         out += "\n#endif"
 
     out = out.replace("__percent__", "%")
+    from .rules._program import add_indenting, number_fix, strip
     out = strip(out)
     out = number_fix(out)
     out = add_indenting(out)
@@ -348,6 +355,7 @@ See also:
     :py:mod:`~matlab2cpp.supplement`,
     :py:mod:`~matlab2cpp.datatype`
     """
+    from . import supplement, tree
 
     if isinstance(code, str):
         tree_ = build(code, suggest=suggest, retall=True)[0]
@@ -419,6 +427,7 @@ See alse:
     :py:func:`~matlab2cpp.Node.error`,
     :py:func:`~matlab2cpp.Node.warning`
     """
+    from . import tree
 
     if isinstance(code, str):
         tree_ = build(code, suggest=suggest, retall=True)[0]
@@ -475,7 +484,7 @@ Returns:
     str: A summary of the node tree.
 
 Example::
-    >>> print(mc.qtree("function y=f(x); y=x+4") #doctest: +NORMALIZE_WHITESPACE)
+    >>> print(mc.qtree("function y=f(x); y=x+4")) #doctest: +NORMALIZE_WHITESPACE
           Program    program      TYPE    unamed
           | Includes   program      TYPE
           | | Include    program      TYPE    #include <armadillo>
@@ -510,6 +519,7 @@ See also:
     :py:mod:`matlab2cpp.tree`,
     :py:mod:`matlab2cpp.node`
     """
+    from . import tree
 
     if isinstance(code, str):
         tree_ = build(code, suggest=suggest, retall=True)[0]
@@ -528,6 +538,7 @@ See also:
                 tree_ = tree_[1]
 
     return tree_.summary()
+
 
 def qscript(code, suggest=True, ftypes={}, **kws):
     """
@@ -550,6 +561,7 @@ Example:
     >>> print(mc.qscript("a = 4"))
     a = 4 ;
     """
+    from . import tree
 
     if isinstance(code, str):
         tree_ = build(code, suggest=suggest, retall=True, **kws)[0]
@@ -574,13 +586,9 @@ Example:
 
 
     out = out.replace("__percent__", "%")
+    from .rules._program import add_indenting, number_fix, strip
     out = strip(out)
     out = number_fix(out)
     out = add_indenting(out)
 
     return out
-
-
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()

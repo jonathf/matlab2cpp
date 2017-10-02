@@ -1,13 +1,12 @@
 """
 Expression interpretor
 """
-
-import matlab2cpp as mc
 from . import (
     findend,
     identify,
     constants as c,
 )
+from .. import collections
 
 
 def create(self, node, start, end=None, start_opr=None):
@@ -79,7 +78,7 @@ Examples::
             print("%-20s" % "expression.create",)
             print(repr(self.code[start:start+1]))
 
-        mc.collection.All(node, cur=start, code=self.code[start])
+        collection.All(node, cur=start, code=self.code[start])
         return start
 
     if end is None:
@@ -183,12 +182,12 @@ Examples::
 
         if self.code[start] == "-":
 
-            node = mc.collection.Neg(node, cur=start, code=self.code[start:end+1])
+            node = collection.Neg(node, cur=start, code=self.code[start:end+1])
             start += 1
 
         if self.code[start] == "~":
 
-            node = mc.collection.Not(node, cur=start, code=self.code[start:end+1])
+            node = collection.Not(node, cur=start, code=self.code[start:end+1])
             start += 1
 
         while self.code[start] in " \t":
@@ -197,11 +196,11 @@ Examples::
     # Postfixes
     if self.code[end] == "'" and not self.code[start] == "'":
         if self.code[end-1] == ".":
-            node = mc.collection.Transpose(node, cur=start,
+            node = collection.Transpose(node, cur=start,
                     code=self.code[start:end+1])
             end -= 2
         else:
-            node = mc.collection.Ctranspose(node, cur=start,
+            node = collection.Ctranspose(node, cur=start,
                     code=self.code[start:end+1])
             node.cur = start
             node.code = self.code[start:end+1]
@@ -215,7 +214,7 @@ Examples::
         if self.code[end] != ")":
             self.syntaxerror(end, "parenthesis end")
 
-        node = mc.collection.Paren(node, cur=start, code=self.code[start:end+1])
+        node = collection.Paren(node, cur=start, code=self.code[start:end+1])
 
         start += 1
         while self.code[start] in " \t":
@@ -229,13 +228,13 @@ Examples::
 
     # Reserved keywords
     elif self.code[start:start+3] == "end" and self.code[start+3] in " +-:\t" + c.e_end:
-        node = mc.collection.End(node, cur=start, code=self.code[start:start+3])
+        node = collection.End(node, cur=start, code=self.code[start:start+3])
 
     elif self.code[start:start+6] == "return" and self.code[start+6] in " ,;\n":
-        node = mc.collection.Return(node, cur=start, code=self.code[start:start+6])
+        node = collection.Return(node, cur=start, code=self.code[start:start+6])
 
     elif self.code[start:start+5] == "break" and self.code[start+5] in " ,;\n":
-        node = mc.collection.Break(node, cur=start, code=self.code[start:start+5])
+        node = collection.Break(node, cur=start, code=self.code[start:start+5])
 
 
     # Rest
@@ -246,7 +245,7 @@ Examples::
         if "\n" in self.code[start:end]:
             self.syntaxerror(end, "non line-feed characters in string")
 
-        mc.collection.String(node, self.code[start+1:end], cur=start,
+        collection.String(node, self.code[start+1:end], cur=start,
                 code=self.code[start:end+1])
 
     elif self.code[start] in c.digits or\
@@ -278,27 +277,27 @@ Returns:
     Node: class of corrensponding operator
     """
 
-    if opr == "^":      return mc.collection.Exp
-    elif opr == ".^":   return mc.collection.Elexp
-    elif opr == "\\":   return mc.collection.Leftmatrixdivision
-    elif opr == ".\\":  return mc.collection.Leftelementdivision
-    elif opr == "/":    return mc.collection.Matrixdivision
-    elif opr == "./":   return mc.collection.Elementdivision
-    elif opr == "*":    return mc.collection.Mul
-    elif opr == ".*":   return mc.collection.Elmul
-    elif opr == "+":    return mc.collection.Plus
-    elif opr == "-":    return mc.collection.Minus
-    elif opr == ":":    return mc.collection.Colon
-    elif opr == "<":    return mc.collection.Lt
-    elif opr == "<=":   return mc.collection.Le
-    elif opr == ">":    return mc.collection.Gt
-    elif opr == ">=":   return mc.collection.Ge
-    elif opr == "==":   return mc.collection.Eq
-    elif opr == "~=":   return mc.collection.Ne
-    elif opr == "&":    return mc.collection.Band
-    elif opr == "|":    return mc.collection.Bor
-    elif opr == "&&":   return mc.collection.Land
-    elif opr == "||":   return mc.collection.Lor
+    if opr == "^":      return collection.Exp
+    elif opr == ".^":   return collection.Elexp
+    elif opr == "\\":   return collection.Leftmatrixdivision
+    elif opr == ".\\":  return collection.Leftelementdivision
+    elif opr == "/":    return collection.Matrixdivision
+    elif opr == "./":   return collection.Elementdivision
+    elif opr == "*":    return collection.Mul
+    elif opr == ".*":   return collection.Elmul
+    elif opr == "+":    return collection.Plus
+    elif opr == "-":    return collection.Minus
+    elif opr == ":":    return collection.Colon
+    elif opr == "<":    return collection.Lt
+    elif opr == "<=":   return collection.Le
+    elif opr == ">":    return collection.Gt
+    elif opr == ">=":   return collection.Ge
+    elif opr == "==":   return collection.Eq
+    elif opr == "~=":   return collection.Ne
+    elif opr == "&":    return collection.Band
+    elif opr == "|":    return collection.Bor
+    elif opr == "&&":   return collection.Land
+    elif opr == "||":   return collection.Lor
 
 
 if __name__ == "__main__":

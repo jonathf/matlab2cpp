@@ -1,8 +1,6 @@
 """
 """
 
-import matlab2cpp as mc
-
 def set(node, types):
 
     funcs = node.program[1]    

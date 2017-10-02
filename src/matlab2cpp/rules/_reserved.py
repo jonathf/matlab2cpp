@@ -265,7 +265,7 @@ def Get_and(node):
 
 def Get_or(node):
     return "("+"+".join(["%(" + i +")s*%(" + i + ")s" \
-            for i in xrange(len(node))])+")"
+            for i in range(len(node))])+")"
 
 def Get_not(node):
     assert len(node) == 1

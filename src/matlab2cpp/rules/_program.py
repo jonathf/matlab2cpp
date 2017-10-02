@@ -11,7 +11,7 @@ def add_indenting(text):
     lines = text.split("\n")
 
     indent = 0
-    for i in xrange(len(lines)):
+    for i in range(len(lines)):
         line = lines[i]
 
         # Fix indentation and linesplit
