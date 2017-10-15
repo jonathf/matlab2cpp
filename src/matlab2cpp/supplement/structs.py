@@ -1,9 +1,9 @@
 """
 """
-from .. import collection
 
 
 def set(node, types):
+    from .. import collection
 
     structs = node.program[3]
 

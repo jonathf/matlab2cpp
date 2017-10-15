@@ -1,6 +1,6 @@
 #from assign import Assign
 from .variables import *
-import matlab2cpp as mc
+import matlab2cpp
 
 Declare = "struct %(name)s"
 
@@ -37,7 +37,7 @@ def Matrix(node):
 
             declares = node.func[0]
             if "_i" not in declares:
-                declare = mc.collection.Var(declares, "_i")
+                declare = matlab2cpp.collection.Var(declares, "_i")
                 declare.type = "int"
                 declare.backend = "int"
                 declares.translate()

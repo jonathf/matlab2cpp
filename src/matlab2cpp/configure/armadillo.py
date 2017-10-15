@@ -1,4 +1,5 @@
-import matlab2cpp.rules.armadillo as arma
+from ..rules import armadillo as arma
+
 
 def vec(node):
     if len(node) != 1:
@@ -12,7 +13,7 @@ def vec(node):
         else:
             return
 
-    
+
     arg, dim = arma.configure_arg(node[0], 0)
 
     if dim == 0:
@@ -31,8 +32,8 @@ def rowvec(node):
             return
     else:
         node_ = node[0]
-        
-    
+
+
     arg, dim = arma.configure_arg(node_, 0)
 
     if dim == 0:
@@ -43,7 +44,7 @@ def mat(node):
     if len(node) == 1:
 
         arg, dim = arma.configure_arg(node[0], 0)
-        
+
         # scalar begets scalar
         if dim == 0:
             node.dim = 0

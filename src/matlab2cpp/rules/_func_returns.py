@@ -2,7 +2,7 @@
 Functions with multiple returns
 """
 
-import matlab2cpp as mc
+import matlab2cpp
 from .function import type_string
 from .variables import Get
 
@@ -14,7 +14,7 @@ Contains: Declares Returns Params Block
 Property: name (of function)
 
 Examples:
-    >>> print(mc.qscript("function f()"))
+    >>> print(matlab2cpp.qscript("function f()"))
     void f()
     {
       // Empty block
@@ -56,7 +56,7 @@ without arguments.
 Property: name (of variable)
 
 Examples:
-    >>> print(mc.qscript("function f(); end; function g(); f"))
+    >>> print(matlab2cpp.qscript("function f(); end; function g(); f"))
     void f()
     {
       // Empty block
@@ -77,30 +77,30 @@ def Assign(node):
     return Assigns(node)
 
 def Assigns(node):
-    """Assignment where rhs is a function call and lhs are multiple returns.
-
-Concatinates return variables after the parameters, if any.
-
-Property: name (of function)
-Contains: Expression Expression+ Get
-
-Examples:
-    >>> print(mc.qscript('''function [a,b]=f(c,d); a=c; b=d)
-    ...     function g(); [a,b] = f(1,2.)''')
-    void f(int c, double d, int& a, double& b)
-    {
-      a = c ;
-      b = d ;
-    }
-    <BLANKLINE>
-    void g()
-    {
-      double b ;
-      int a ;
-      f(1, 2., a, b) ;
-    }
     """
+    Assignment where rhs is a function call and lhs are multiple returns.
 
+    Concatenates return variables after the parameters, if any.
+
+    Property: name (of function)
+    Contains: Expression Expression+ Get
+
+    Examples:
+        >>> print(matlab2cpp.qscript('''function [a,b]=f(c,d); a=c; b=d
+        ...     function g(); [a,b] = f(1,2.)'''))
+        void f(int c, double d, int& a, double& b)
+        {
+          a = c ;
+          b = d ;
+        }
+        <BLANKLINE>
+        void g()
+        {
+          double b ;
+          int a ;
+          f(1, 2., a, b) ;
+        }
+    """
     # existence of parameters in function call
     if node[-1]:
         params = [s.str for s in node[-1]]
@@ -122,7 +122,7 @@ Adds type prefix and '&' (since they are to be placed in parameters)
 Contains: Return*
 
 Examples:
-    >>> print(mc.qscript("function [a,b]=f(); a=1, b=2."))
+    >>> print(matlab2cpp.qscript("function [a,b]=f(); a=1, b=2."))
     void f(int& a, double& b)
     {
       a = 1 ;
@@ -145,7 +145,7 @@ Contains: Var*
 
 Examples:
     >>> ftypes = {"f": {"a":"int", "b":"double"}}
-    >>> print(mc.qscript("function f(a,b)", ftypes=ftypes))
+    >>> print(matlab2cpp.qscript("function f(a,b)", ftypes=ftypes))
     void f(int a, double b)
     {
       // Empty block
@@ -175,7 +175,7 @@ def Declares(node):
 Contains: Declare*
 
 Examples:
-    >>> print(mc.qscript("function f(); a=1; b.c='2'; d.e(1)=[4,5]"))
+    >>> print(matlab2cpp.qscript("function f(); a=1; b.c='2'; d.e(1)=[4,5]"))
     void f()
     {
       _B b ;
@@ -216,13 +216,11 @@ Examples:
 
     # create output
     out = ""
-    keys = declares.keys()
-    keys.sort()
+    keys = sorted(declares.keys())
     for key in keys:
-        
-        val = declares[key]
 
-        val.sort(cmp=lambda x,y: cmp(x.name, y.name))
+        val = sorted(declares[key], key=lambda x: x.name)
+
 
         # datatype
         out += "\n" + key + " "

@@ -1,12 +1,33 @@
 """
 Expression interpretor
 """
-from . import (
-    findend,
-    identify,
-    constants as c,
-)
-from .. import collections
+from __future__ import print_function
+from .. import collection
+
+
+RECIVER_OPERATORS = {
+    "^": collection.Exp,
+    ".^": collection.Elexp,
+    "\\": collection.Leftmatrixdivision,
+    ".\\": collection.Leftelementdivision,
+    "/": collection.Matrixdivision,
+    "./": collection.Elementdivision,
+    "*": collection.Mul,
+    ".*": collection.Elmul,
+    "+": collection.Plus,
+    "-": collection.Minus,
+    ":": collection.Colon,
+    "<": collection.Lt,
+    "<=": collection.Le,
+    ">": collection.Gt,
+    ">=": collection.Ge,
+    "==": collection.Eq,
+    "~=": collection.Ne,
+    "&": collection.Band,
+    "|": collection.Bor,
+    "&&": collection.Land,
+    "||": collection.Lor,
+}
 
 
 def create(self, node, start, end=None, start_opr=None):
@@ -29,8 +50,9 @@ Returns:
 
 Examples::
 
-    >>> builder = mc.Builder(True)
-    >>> builder.load("unnamed", "a*b+c/d")
+    >>> from matlab2cpp.tree import Builder
+    >>> builder = Builder(True)
+    >>> builder.load("unnamed", "a*b+c/d") # doctest: +NORMALIZE_WHITESPACE
     loading unnamed
          Program     functions.program
        0 Main        functions.main
@@ -48,7 +70,7 @@ Examples::
        6     Expression  expression.create    'd'
        6     Var         variables.variable   'd'
     >>> builder.configure(suggest=False)
-    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(matlab2cpp.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Statement  code_block   TYPE
     1 1| | Plus       expression   TYPE
@@ -59,6 +81,7 @@ Examples::
     1 5| | | | Var        unknown      TYPE    c
     1 7| | | | Var        unknown      TYPE    d
     """
+    from . import findend, identify, constants
 
     if self.code[start:start+3] == "...":
         start = findend.dots(self, start)
@@ -70,12 +93,12 @@ Examples::
 
         if self.disp:
 
-            print("%4d     Expression " % (start),)
-            print("%-20s" % "expression.create",)
+            print("%4d     Expression " % (start), end="")
+            print("%-20s" % "expression.create", end="")
             print(repr(self.code[start:start+1]))
 
-            print("%4d     All        " % (start),)
-            print("%-20s" % "expression.create",)
+            print("%4d     All        " % (start), end="")
+            print("%-20s" % "expression.create", end="")
             print(repr(self.code[start:start+1]))
 
         collection.All(node, cur=start, code=self.code[start])
@@ -85,11 +108,11 @@ Examples::
         end = findend.expression(self, start)
 
     if self.disp:
-        print("%4d     Expression " % (start),)
-        print("%-20s" % "expression.create",)
+        print("%4d     Expression " % (start), end="")
+        print("%-20s" % "expression.create", end="")
         print(repr(self.code[start:end+1]))
 
-    if  self.code[start] not in c.e_start:
+    if  self.code[start] not in constants.e_start:
         self.syntaxerror(start, "expression start")
 
 
@@ -134,9 +157,9 @@ Examples::
 
                 if opr in "+-":
                     # no prefixes and no (scientific) numbers
-                    if self.code[last] not in c.letters+c.digits+")]}" or\
+                    if self.code[last] not in constants.letters+constants.digits+")]}" or\
                             self.code[k-1] in "dDeE" and self.code[k-2] in\
-                            c.digits+"." and self.code[k+1] in c.digits:
+                            constants.digits+"." and self.code[k+1] in constants.digits:
                         k += 1
                         continue
 
@@ -153,7 +176,7 @@ Examples::
                 starts.append(k+1)
                 ends.append(last)
 
-            elif self.code[k] in c.letters+c.digits+"_":
+            elif self.code[k] in constants.letters+constants.digits+"_":
                 last = k
 
             k += 1
@@ -161,9 +184,10 @@ Examples::
                 ends.append(end)
                 break
 
-        if len(ends)>1:
+        if len(ends) > 1:
 
-            node = retrieve_operator(self, opr)(node)
+            operator = RECIVER_OPERATORS[opr]
+            node = operator(node)
             node.cur = start
             node.code = self.code[starts[0]:ends[-1]+1]
 
@@ -227,7 +251,7 @@ Examples::
         return create(self, node, start, end)
 
     # Reserved keywords
-    elif self.code[start:start+3] == "end" and self.code[start+3] in " +-:\t" + c.e_end:
+    elif self.code[start:start+3] == "end" and self.code[start+3] in " +-:\t" + constants.e_end:
         node = collection.End(node, cur=start, code=self.code[start:start+3])
 
     elif self.code[start:start+6] == "return" and self.code[start+6] in " ,;\n":
@@ -248,8 +272,8 @@ Examples::
         collection.String(node, self.code[start+1:end], cur=start,
                 code=self.code[start:end+1])
 
-    elif self.code[start] in c.digits or\
-            self.code[start] == "." and self.code[start+1] in c.digits:
+    elif self.code[start] in constants.digits or\
+            self.code[start] == "." and self.code[start+1] in constants.digits:
         cur = self.create_number(node, start)
 
     elif self.code[start] == "[":
@@ -259,47 +283,9 @@ Examples::
         cur = self.create_cell(node, start)
 
     else:
-        if self.code[start] not in c.letters+"@":
+        if self.code[start] not in constants.letters+"@":
             self.syntaxerror(start, "variable name")
 
         cur = self.create_variable(node, start)
 
     return END
-
-
-def retrieve_operator(self, opr):
-    """
-Retrieve operator class by string
-
-Args:
-    opr (str): operator string
-Returns:
-    Node: class of corrensponding operator
-    """
-
-    if opr == "^":      return collection.Exp
-    elif opr == ".^":   return collection.Elexp
-    elif opr == "\\":   return collection.Leftmatrixdivision
-    elif opr == ".\\":  return collection.Leftelementdivision
-    elif opr == "/":    return collection.Matrixdivision
-    elif opr == "./":   return collection.Elementdivision
-    elif opr == "*":    return collection.Mul
-    elif opr == ".*":   return collection.Elmul
-    elif opr == "+":    return collection.Plus
-    elif opr == "-":    return collection.Minus
-    elif opr == ":":    return collection.Colon
-    elif opr == "<":    return collection.Lt
-    elif opr == "<=":   return collection.Le
-    elif opr == ">":    return collection.Gt
-    elif opr == ">=":   return collection.Ge
-    elif opr == "==":   return collection.Eq
-    elif opr == "~=":   return collection.Ne
-    elif opr == "&":    return collection.Band
-    elif opr == "|":    return collection.Bor
-    elif opr == "&&":   return collection.Land
-    elif opr == "||":   return collection.Lor
-
-
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()

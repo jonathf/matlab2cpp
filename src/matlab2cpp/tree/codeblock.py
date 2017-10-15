@@ -1,10 +1,7 @@
-# encoding: utf-8
+"""The main codeblock loop"""
+from __future__ import print_function
 
-"""
-The main codeblock loop
-"""
-
-import matlab2cpp as mc
+import matlab2cpp
 
 from . import findend, constants as c
 
@@ -21,8 +18,9 @@ Returns:
 	int: Index to end of codeblock
 
 Example:
-    >>> builder = mc.Builder(True)
-    >>> builder.load("unnamed", "a; 'b'; 3")
+    >>> from matlab2cpp.tree import Builder
+    >>> builder = Builder(True)
+    >>> builder.load("unnamed", "a; 'b'; 3") # doctest: +NORMALIZE_WHITESPACE
     loading unnamed
          Program     functions.program
        0 Main        functions.main
@@ -36,7 +34,7 @@ Example:
        8     Expression  expression.create    '3'
        8     Int         misc.number          '3'
     >>> builder.configure()
-    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(matlab2cpp.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1  1Block      code_block   TYPE
     1  1| Statement  code_block   TYPE
     1  1| | Var        unknown      TYPE    a
@@ -46,10 +44,10 @@ Example:
     1  9| | Int        int          int
     '''
     cur = start
-    block = mc.collection.Block(parent, cur=cur)
+    block = matlab2cpp.collection.Block(parent, cur=cur)
 
     if self.disp:
-        print("%4d Codeblock  " % cur,)
+        print("%4d Codeblock  " % cur, end="")
         print("%-20s" % "codeblock.codeblock")
 
     is_end_terminated = False
@@ -84,12 +82,12 @@ Example:
                 cur = self.create_assigns(block, cur, eq_loc)
 
             else:
-                statement = mc.collection.Statement(block, cur=cur)
+                statement = matlab2cpp.collection.Statement(block, cur=cur)
 
                 end = findend.expression(self, cur)
                 if self.disp:
-                    print("%4d   Statement    " % cur,)
-                    print("%-20s" % "codeblock.codeblock",)
+                    print("%4d   Statement    " % cur, end="")
+                    print("%-20s" % "codeblock.codeblock", end="")
                     print(repr(self.code[cur:end+1]))
 
                 statement.code = self.code[cur:end+1]
@@ -101,11 +99,11 @@ Example:
         elif self.code[cur] == "'":
             end = findend.string(self, cur)
             if self.disp:
-                print("%4d   Statement    " % cur,)
-                print("%-20s" % "codeblock.codeblock",)
+                print("%4d   Statement    " % cur, end="")
+                print("%-20s" % "codeblock.codeblock", end="")
                 print(repr(self.code[cur:end+1]))
 
-            statement = mc.collection.Statement(block, cur=cur,
+            statement = matlab2cpp.collection.Statement(block, cur=cur,
                     code=self.code[cur:end+1])
 
             cur = self.create_string(statement, cur)
@@ -190,11 +188,11 @@ Example:
             else:
                 end = findend.expression(self, cur)
                 if self.disp:
-                    print("%4d   Statement    " % cur,)
-                    print("%-20s" % "codeblock.codeblock",)
+                    print("%4d   Statement    " % cur, end="")
+                    print("%-20s" % "codeblock.codeblock", end="")
                     print(repr(self.code[cur:end+1]))
 
-                statement = mc.collection.Statement(block, cur=cur,
+                statement = matlab2cpp.collection.Statement(block, cur=cur,
                         code=self.code[cur:end+1])
 
                 cur = self.create_expression(statement,

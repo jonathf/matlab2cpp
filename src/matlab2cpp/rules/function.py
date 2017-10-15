@@ -1,4 +1,4 @@
-import matlab2cpp as mc
+import matlab2cpp
 
 def type_string(node):
     """

@@ -16,13 +16,13 @@ when it is a string, will be used as the translation every time
 the following simple example, where we pass a snippet to the
 :py:func:`~matlab2cpp.qscript` function::
 
-    >>> print(mc.qscript("5"))
+    >>> print(matlab2cpp.qscript("5"))
     5 ;
 
 To implement the new rule we (globally) insert the rule for all instances of
 :py:class:`~matlab2cpp.collection.Int` as follows::
 
-    >>> print(mc.qscript("5", Int=Int))
+    >>> print(matlab2cpp.qscript("5", Int=Int))
     6 ;
 
 Obviously, this type of translation is not very useful except for a very few
@@ -32,7 +32,7 @@ translation rule uses string interpolation. This can be implemented as
 follows::
 
     >>> Int = "|%(value)s|"
-    >>> print(mc.qscript("5", Int=Int))
+    >>> print(matlab2cpp.qscript("5", Int=Int))
     |5| ;
 
 There are also other attributes than `value`. For example variables,
@@ -40,7 +40,7 @@ represented through the node `Var` have a name, which refer to it's scope
 defined name.  For example::
 
     >>> Var = "__%(name)s__"
-    >>> print(mc.qscript("a = 4", Var=Var))
+    >>> print(matlab2cpp.qscript("a = 4", Var=Var))
     __a__ = 4 ;
 
 Since all the code is structured as a node tree, many of the nodes have node
@@ -49,13 +49,13 @@ of translation of any node, all of it's children are already translated and
 available in interpolation. The children are indexed by number, counting from
 0. Consider the simple example of a simple addition::
 
-    >>> print(mc.qtree("2+3", core=True)) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(matlab2cpp.qtree("2+3", core=True)) # doctest: +NORMALIZE_WHITESPACE
      1  1Block      code_block   TYPE
      1  1| Statement  code_block   TYPE
      1  1| | Plus       expression   int
      1  1| | | Int        int          int
      1  3| | | Int        int          int
-    >>> print(mc.qscript("2+3"))
+    >>> print(matlab2cpp.qscript("2+3"))
     2+3 ;
 
 The node tree (at it's core) consists of
@@ -73,7 +73,7 @@ available in translation respectivly as index 0 and 1. In interpolation we can
 do as follows::
 
     >>> Plus = "%(1)s+%(0)s"
-    >>> print(mc.qscript("2+3", Plus=Plus))
+    >>> print(matlab2cpp.qscript("2+3", Plus=Plus))
     3+2 ;
 
 One obvious problem with this approach is that the number of children of a node
@@ -88,9 +88,9 @@ each node child. For example::
 It implies that there should be a "+" between each children listed, and nothing
 at the ends. In practice we get::
 
-    >>> print(mc.qscript("2+3", Plus=Plus))
+    >>> print(matlab2cpp.qscript("2+3", Plus=Plus))
     2+3 ;
-    >>> print(mc.qscript("1+2+3", Plus=Plus))
+    >>> print(matlab2cpp.qscript("1+2+3", Plus=Plus))
     1+2+3 ;
 
 
@@ -104,12 +104,12 @@ above. For example, without addressing how one can use `node`, the following is
 equivalent::
 
     >>> Plus = "", "+ ", ""
-    >>> print(mc.qscript("2+3", Plus=Plus))
+    >>> print(matlab2cpp.qscript("2+3", Plus=Plus))
     2+ 3 ;
     >>> def Plus(node):
     ...     return "", " +", ""
     ...
-    >>> print(mc.qscript("2+3", Plus=Plus))
+    >>> print(matlab2cpp.qscript("2+3", Plus=Plus))
     2 +3 ;
 
 One application of the ``node`` argument is to use it to configure datatypes.
@@ -121,7 +121,7 @@ For example::
     ...     if node.name == "x": node.type = "vec"
     ...     if node.name == "y": node.type = "rowvec"
     ...     return node.name
-    >>> print(mc.qscript("function f(x,y)", Var=Var))
+    >>> print(matlab2cpp.qscript("function f(x,y)", Var=Var))
     void f(vec x, rowvec y)
     {
       // Empty block
@@ -141,14 +141,14 @@ addressed differently. For example the snippet `sum(x)` lend itself naturally
 to have a rule that targets the name `sum` which is part of the Matlab standard
 library. Its translation should is as follows::
 
-    >>> print(mc.qscript("sum(x)"))
+    >>> print(matlab2cpp.qscript("sum(x)"))
     arma::sum(x) ;
     
 However, if there is a line `sum = [1,2,3]` earlier in the code, then the
 translation for `sum(x)` become very different. `sum` is now an array, and the
 translation adapts::
 
-    >>> print(mc.qscript("sum=[1,2,3]; sum(x)"))
+    >>> print(matlab2cpp.qscript("sum=[1,2,3]; sum(x)"))
     sword _sum [] = {1, 2, 3} ;
     sum = irowvec(_sum, 3, false) ;
     sum(x-1) ;
@@ -186,14 +186,14 @@ For example, if we want to change the summation function from armadillo to the
 `accumulation` from `numeric` module, it would be implemented as follows::
 
     >>> Get_sum = "std::accumulate(", ", ", ")"
-    >>> print(mc.qscript("sum(x)", Get_sum=Get_sum))
+    >>> print(matlab2cpp.qscript("sum(x)", Get_sum=Get_sum))
     std::accumulate(x) ;
 
 This rules is specific for all function calls with name `sum` and wount be
 applied for other functions::
 
     >>> Get_sum = "std::accumulate(", ", ", ")"
-    >>> print(mc.qscript("min(x)", Get_sum=Get_sum))
+    >>> print(matlab2cpp.qscript("min(x)", Get_sum=Get_sum))
     min(x) ;
 
 There are many rules to translation rule backends in matlab2cpp. This is mainly

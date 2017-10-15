@@ -217,7 +217,7 @@ This node should not recieve `parent` argument node during construction.
 Children:
     `Program+`
 
-All keyword arguments are passed to `mc.Node.__init__`.
+All keyword arguments are passed to `matlab2cpp.Node.__init__`.
     """
         assert "parent" not in kws
         self.parent = self
@@ -234,7 +234,7 @@ aspects of script/program.
 Children:
     `Includes Funcs Inlines Structs Headers Log`
 
-All keyword arguments are passed to `mc.Node.__init__`.
+All keyword arguments are passed to `matlab2cpp.Node.__init__`.
     """
         self._program = self
         Node.__init__(self, parent, name=name, **kws)

@@ -17,52 +17,55 @@ Functions, programs and meta-nodes
 |                                                    | content                 |
 +----------------------------------------------------+-------------------------+
 """
+from __future__ import print_function
 from . import constants, findend, iterate, identify
 from .. import collection
 
 
 def program(self, name):
-"""
-The outer shell of the program
-
-Args:
-    self (Builder): Code constructor
-    name (str): Name of the program
-
-Returns:
-    Node: The root node of the constructed node tree
-
-Example:
-    >>> builder = mc.Builder(True)
-    >>> builder.load("unamed", "a")
-    loading unamed
-    Program     functions.program
-    0 Main        functions.main
-    0 Codeblock   codeblock.codeblock 
-    0   Statement     codeblock.codeblock  'a'
-    0     Expression  expression.create    'a'
-    0     Var         variables.variable   'a'
-    >>> builder.configure(suggest=False)
-    >>> print(mc.qtree(builder)) # doctest: +NORMALIZE_WHITESPACE
-    Program    program      TYPE    unamed
-    | Includes   program      TYPE
-    1 1| Funcs      program      TYPE    unamed
-    1 1| | Main       func_return  TYPE    main
-    1 1| | | Declares   func_return  TYPE
-    1 1| | | Returns    func_return  TYPE
-    1 1| | | Params     func_return  TYPE
-    1 1| | | Block      code_block   TYPE
-    1 1| | | | Statement  code_block   TYPE
-    1 1| | | | | Var        unknown      TYPE    a
-    | Inlines    program      TYPE    unamed
-    | Structs    program      TYPE    unamed
-    | Headers    program      TYPE    unamed
-    | Log        program      TYPE    unamed
     """
+    The outer shell of the program
 
+    Args:
+        self (Builder):
+            Code constructor
+        name (str):
+            Name of the program
+
+    Returns:
+        Node: The root node of the constructed node tree
+
+    Example:
+        >>> from matlab2cpp.tree import Builder
+        >>> builder = Builder(True)
+        >>> builder.load("unamed", "a") # doctest: +NORMALIZE_WHITESPACE
+        loading unamed
+             Program    functions.program
+           0 Main       functions.main
+           0 Codeblock  codeblock.codeblock
+           0   Statement    codeblock.codeblock 'a'
+           0     Expression expression.create   'a'
+           0     Var        variables.variable  'a'
+        >>> builder.configure(suggest=False)
+        >>> print(matlab2cpp.qtree(builder)) # doctest: +NORMALIZE_WHITESPACE
+        Program    program      TYPE    unamed
+        | Includes   program      TYPE
+        1 1| Funcs      program      TYPE    unamed
+        1 1| | Main       func_return  TYPE    main
+        1 1| | | Declares   func_return  TYPE
+        1 1| | | Returns    func_return  TYPE
+        1 1| | | Params     func_return  TYPE
+        1 1| | | Block      code_block   TYPE
+        1 1| | | | Statement  code_block   TYPE
+        1 1| | | | | Var        unknown      TYPE    a
+        | Inlines    program      TYPE    unamed
+        | Structs    program      TYPE    unamed
+        | Headers    program      TYPE    unamed
+        | Log        program      TYPE    unamed
+    """
     if self.disp:
-    print("     Program    ",)
-    print("functions.program")
+        print("     Program    ", end="")
+        print("functions.program")
 
     # Create intial nodes
     program = collection.Program(self.project, name=name, cur=0, code=self.code)
@@ -108,31 +111,58 @@ def function(self, parent, cur):
     """
     Explicit functions
 
-Args:
-self (Builder): Code constructor
-parent (Node): Parent node
-cur (int): Current position in code
+    Args:
+        self (Builder): Code constructor
+        parent (Node): Parent node
+        cur (int): Current position in code
 
-Returns:
-int : Index to end of function
+    Returns:
+        int : Index to end of function
 
-Example:
->>> builder = mc.Builder(True)
->>> builder.load("unnamed", "function f(); end")
-loading unnamed
-Program     functions.program
-0 Function        functions.function   'function f()'
-12 Codeblock   codeblock.codeblock 
->>> builder.configure(suggest=False)
->>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
-1  1Funcs      program      TYPE    unnamed
-1  1| Func       func_returns TYPE    f
-1  1| | Declares   func_returns TYPE
-1  1| | Returns    func_returns TYPE
-1 11| | Params     func_returns TYPE
-1 13| | Block      code_block   TYPE
+    Example:
+        >>> from matlab2cpp.tree import Builder
+        >>> builder = Builder(True)
+        >>> builder.load("unnamed", "function f(); end") # doctest: +NORMALIZE_WHITESPACE
+        loading unnamed
+             Program    functions.program
+           0 Function       functions.function  'function f()'
+          12 Codeblock  codeblock.codeblock
+        >>> builder.configure(suggest=False)
+        >>> print(matlab2cpp.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
+        1  1Funcs      program      TYPE    unnamed
+        1  1| Func       func_returns TYPE    f
+        1  1| | Declares   func_returns TYPE
+        1  1| | Returns    func_returns TYPE
+        1 11| | Params     func_returns TYPE
+        1 13| | Block      code_block   TYPE
+
+        >>> builder = Builder(True)
+        >>> builder.load("unnamed", "function y=f(x); y=x") # doctest: +NORMALIZE_WHITESPACE
+        loading unnamed
+             Program    functions.program
+           0 Function       functions.function  'function y=f(x)'
+           0   Return       'y'
+          12   Param        functions.function  'x'
+          15 Codeblock  codeblock.codeblock
+          17   Assign     assign.single       'y=x'
+          17     Var        variables.assign    'y'
+          19     Expression expression.create   'x'
+          19     Var        variables.variable  'x'
+        >>> builder.configure(suggest=False)
+        >>> print(matlab2cpp.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
+         1   1Funcs      program      TYPE    unnamed
+         1   1| Func       func_return  TYPE    f
+         1   1| | Declares   func_return  TYPE
+         1   1| | | Var        unknown      TYPE    y
+         1   1| | Returns    func_return  TYPE
+         1  10| | | Var        unknown      TYPE    y
+         1  13| | Params     func_return  TYPE
+         1  14| | | Var        unknown      TYPE    x
+         1  16| | Block      code_block   TYPE
+         1  18| | | Assign     unknown      TYPE    x
+         1  18| | | | Var        unknown      TYPE    y
+         1  20| | | | Var        unknown      TYPE    x
     """
-
     if self.code[cur:cur+8] != "function":
         self.syntaxerror(cur, "function start")
     if self.code[cur+8] not in constants.k_end+"[":
@@ -183,8 +213,8 @@ Program     functions.program
             m = l
 
         if self.disp:
-            print("%4d Function       " % cur,)
-            print("%-20s" % "functions.function",)
+            print("%4d Function       " % cur, end="")
+            print("%-20s" % "functions.function", end="")
             print(repr(self.code[START:m+1]))
 
         name = self.code[k:l+1]
@@ -204,8 +234,8 @@ Program     functions.program
                     end = s
 
                     if self.disp:
-                        print("%4d   Return       " % cur,)
-                        print("%-20s" % "functions.function",)
+                        print("%4d   Return       " % cur, end="")
+                        print("%-20s" % "functions.function", end="")
                         print(repr(self.code[s:e+1]))
 
                     if not any([a in constants.letters+constants.digits+"_@" \
@@ -216,12 +246,12 @@ Program     functions.program
                                    code=self.code[s:e+1])
 
         # single return
-    else:
-        end = findend.expression(self, start)
+        else:
+            end = findend.expression(self, start)
 
-        if self.disp:
-            print("%4d   Return       " % cur,)
-            print(repr(self.code[start:end+1]))
+            if self.disp:
+                print("%4d   Return       " % cur, end="")
+                print(repr(self.code[start:end+1]))
 
             collection.Var(returns, self.code[start:end+1], cur=start,
                            code=self.code[start:end+1])
@@ -241,8 +271,8 @@ Program     functions.program
 
 
         if self.disp:
-            print("%4d Function       " % cur,)
-            print("%-20s" % "functions.function",)
+            print("%4d Function       " % cur, end="")
+            print("%-20s" % "functions.function", end="")
             print(repr(self.code[START:m+1]))
 
         end = start+1
@@ -269,8 +299,8 @@ Program     functions.program
             for s,e in array:
 
                 if self.disp:
-                    print("%4d   Param        " % cur,)
-                    print("%-20s" % "functions.function",)
+                    print("%4d   Param        " % cur, end="")
+                    print("%-20s" % "functions.function", end="")
                     print(repr(self.code[s:e+1]))
 
                 var = collection.Var(params, self.code[s:e+1], cur=s,
@@ -298,44 +328,45 @@ def main(self, parent, cur):
     """
     Main script
 
-Args:
-self (Builder): Code constructor
-parent (Node): Parent node
-cur (int): Current position in code
+    Args:
+        self (Builder): Code constructor
+        parent (Node): Parent node
+        cur (int): Current position in code
 
-Returns:
-int : Index to end of script
+    Returns:
+        int : Index to end of script
 
-Example:
->>> builder = mc.Builder(True)
->>> builder.load("unnamed", "a")
-loading unnamed
-Program     functions.program
-0 Main        functions.main
-0 Codeblock   codeblock.codeblock 
-0   Statement     codeblock.codeblock  'a'
-0     Expression  expression.create    'a'
-0     Var         variables.variable   'a'
->>> builder.configure(suggest=False)
->>> print(mc.qtree(builder)) # doctest: +NORMALIZE_WHITESPACE
-Program    program      TYPE    unnamed
-| Includes   program      TYPE
-1 1| Funcs      program      TYPE    unnamed
-1 1| | Main       func_return  TYPE    main
-1 1| | | Declares   func_return  TYPE
-1 1| | | Returns    func_return  TYPE
-1 1| | | Params     func_return  TYPE
-1 1| | | Block      code_block   TYPE
-1 1| | | | Statement  code_block   TYPE
-1 1| | | | | Var        unknown      TYPE    a
-| Inlines    program      TYPE    unnamed
-| Structs    program      TYPE    unnamed
-| Headers    program      TYPE    unnamed
-| Log        program      TYPE    unnamed
+    Example:
+        >>> from matlab2cpp.tree import Builder
+        >>> builder = Builder(True)
+        >>> builder.load("unnamed", "a") # doctest: +NORMALIZE_WHITESPACE
+        loading unnamed
+             Program    functions.program
+           0 Main       functions.main
+           0 Codeblock  codeblock.codeblock
+           0   Statement    codeblock.codeblock 'a'
+           0     Expression expression.create   'a'
+           0     Var        variables.variable  'a'
+        >>> builder.configure(suggest=False)
+        >>> print(matlab2cpp.qtree(builder)) # doctest: +NORMALIZE_WHITESPACE
+        Program    program      TYPE    unnamed
+        | Includes   program      TYPE
+        1 1| Funcs      program      TYPE    unnamed
+        1 1| | Main       func_return  TYPE    main
+        1 1| | | Declares   func_return  TYPE
+        1 1| | | Returns    func_return  TYPE
+        1 1| | | Params     func_return  TYPE
+        1 1| | | Block      code_block   TYPE
+        1 1| | | | Statement  code_block   TYPE
+        1 1| | | | | Var        unknown      TYPE    a
+        | Inlines    program      TYPE    unnamed
+        | Structs    program      TYPE    unnamed
+        | Headers    program      TYPE    unnamed
+        | Log        program      TYPE    unnamed
     """
 
     if self.disp:
-        print("%4d Main       " % cur,)
+        print("%4d Main       " % cur, end="")
         print("functions.main")
 
     func = collection.Main(parent)
@@ -351,63 +382,64 @@ def lambda_assign(self, node, cur, eq_loc):
     """
     Anonymous function constructor
 
-Args:
-self (Builder): Code constructor
-parent (Node): Parent node
-cur (int): Current position in code
-eq_loc (int): location of assignment sign ('=')
+    Args:
+        self (Builder): Code constructor
+        parent (Node): Parent node
+        cur (int): Current position in code
+        eq_loc (int): location of assignment sign ('=')
 
-Returns:
-int : Index to end of function line
+    Returns:
+        int : Index to end of function line
 
-Example:
->>> builder = mc.Builder(True)
->>> builder.load("unnamed", "f = @(x) 2*x")
-loading unnamed
-Program     functions.program
-0 Main        functions.main
-0 Codeblock   codeblock.codeblock 
-0   Assign        'f = @(x) 2*x' functions.lambda_assign
-0     Var         variables.assign     'f'
-4   Lambda        functions.lambda_func '@(x) 2*x'
-6     Expression  expression.create    'x'
-6     Var         variables.variable   'x'
-9     Expression  expression.create    '2*x'
-9     Expression  expression.create    '2'
-9     Int         misc.number          '2'
-11     Expression  expression.create    'x'
-11     Var         variables.variable   'x'
->>> builder.configure(suggest=False)
->>> print(mc.qtree(builder)) # doctest: +NORMALIZE_WHITESPACE
-Program    program      TYPE    unnamed
-| Includes   program      TYPE
-1  1| Funcs      program      TYPE    unnamed
-1  1| | Main       func_return  TYPE    main
-1  1| | | Declares   func_return  TYPE
-1  1| | | | Var        func_lambda  TYPE    f
-1  1| | | Returns    func_return  TYPE
-1  1| | | Params     func_return  TYPE
-1  1| | | Block      code_block   TYPE
-1  1| | | | Assign     func_lambda  func_lambda
-1  1| | | | | Var        func_lambda  TYPE    f
-1  1| | | | | Lambda     func_lambda  func_lambda_f
-1  5| | Func       func_lambda  TYPE    _f
-1  5| | | Declares   func_lambda  TYPE
-1  5| | | | Var        unknown      TYPE    _retval
-1  5| | | Returns    func_lambda  TYPE
-1  5| | | | Var        unknown      TYPE    _retval
-1  5| | | Params     func_lambda  TYPE
-1  7| | | | Var        unknown      TYPE    x
-1  5| | | Block      code_block   TYPE
-1  5| | | | Assign     expression   TYPE
-1  5| | | | | Var        unknown      TYPE    _retval
-1 10| | | | | Mul        expression   TYPE
-1 10| | | | | | Int        int          int
-1 12| | | | | | Var        unknown      TYPE    x
-| Inlines    program      TYPE    unnamed
-| Structs    program      TYPE    unnamed
-| Headers    program      TYPE    unnamed
-| Log        program      TYPE    unnamed
+    Example:
+        >>> from matlab2cpp.tree import Builder
+        >>> builder = Builder(True)
+        >>> builder.load("unnamed", "f = @(x) 2*x") # doctest: +NORMALIZE_WHITESPACE
+        loading unnamed
+             Program    functions.program
+           0 Main       functions.main
+           0 Codeblock  codeblock.codeblock
+           0   Assign       'f = @(x) 2*x' functions.lambda_assign
+           0     Var        variables.assign    'f'
+           4   Lambda       functions.lambda_func'@(x) 2*x'
+           6     Expression expression.create   'x'
+           6     Var        variables.variable  'x'
+           9     Expression expression.create   '2*x'
+           9     Expression expression.create   '2'
+           9     Int        misc.number         '2'
+          11     Expression expression.create   'x'
+          11     Var        variables.variable  'x'
+        >>> builder.configure(suggest=False)
+        >>> print(matlab2cpp.qtree(builder)) # doctest: +NORMALIZE_WHITESPACE
+        Program    program      TYPE    unnamed
+        | Includes   program      TYPE
+        1  1| Funcs      program      TYPE    unnamed
+        1  1| | Main       func_return  TYPE    main
+        1  1| | | Declares   func_return  TYPE
+        1  1| | | | Var        func_lambda  TYPE    f
+        1  1| | | Returns    func_return  TYPE
+        1  1| | | Params     func_return  TYPE
+        1  1| | | Block      code_block   TYPE
+        1  1| | | | Assign     func_lambda  func_lambda
+        1  1| | | | | Var        func_lambda  TYPE    f
+        1  1| | | | | Lambda     func_lambda  func_lambda_f
+        1  5| | Func       func_lambda  TYPE    _f
+        1  5| | | Declares   func_lambda  TYPE
+        1  5| | | | Var        unknown      TYPE    _retval
+        1  5| | | Returns    func_lambda  TYPE
+        1  5| | | | Var        unknown      TYPE    _retval
+        1  5| | | Params     func_lambda  TYPE
+        1  7| | | | Var        unknown      TYPE    x
+        1  5| | | Block      code_block   TYPE
+        1  5| | | | Assign     expression   TYPE
+        1  5| | | | | Var        unknown      TYPE    _retval
+        1 10| | | | | Mul        expression   TYPE
+        1 10| | | | | | Int        int          int
+        1 12| | | | | | Var        unknown      TYPE    x
+        | Inlines    program      TYPE    unnamed
+        | Structs    program      TYPE    unnamed
+        | Headers    program      TYPE    unnamed
+        | Log        program      TYPE    unnamed
     """
 
     if  self.code[cur] not in constants.letters:
@@ -417,8 +449,8 @@ Program    program      TYPE    unnamed
         self.syntaxerror(cur, "anonymous function assignment (=)")
 
     if self.disp:
-        print("%4d   Assign       " % cur)
-        print(repr(self.code[cur:self.code.find("\n", cur)]),)
+        print("%4d   Assign       " % cur, end="")
+        print(repr(self.code[cur:self.code.find("\n", cur)]), end=" ")
         print("functions.lambda_assign")
 
     assign = collection.Assign(node, cur=cur)#, backend="func_lambda")
@@ -438,15 +470,14 @@ def lambda_func(self, node, cur):
     """
     Anonymous function content. Support function of `lambda_assign`.
 
-Args:
-self (Builder): Code constructor
-parent (Node): Parent node
-cur (int): Current position in code
+    Args:
+        self (Builder): Code constructor
+        parent (Node): Parent node
+        cur (int): Current position in code
 
-Returns:
-int : Index to end of function line
+    Returns:
+        int : Index to end of function line
     """
-
     if  self.code[cur] != "@":
         self.syntaxerror(cur, "anonymous function indicator (@)")
 
@@ -466,8 +497,8 @@ int : Index to end of function line
     end = findend.expression(self, end)
 
     if self.disp:
-        print("%4d   Lambda       " % cur,)
-        print("%-20s" % "functions.lambda_func",)
+        print("%4d   Lambda       " % cur, end="")
+        print("%-20s" % "functions.lambda_func", end="")
         print(repr(self.code[cur:end+1]))
 
     if node.cls == "Assign":

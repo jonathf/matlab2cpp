@@ -3,8 +3,7 @@ from . import (
     backend,
 )
 
-import matlab2cpp.datatype as dt
-import matlab2cpp.supplement as sup
+from .. import datatype as dt, supplement as sup
 
 
 class Node(object):
@@ -12,53 +11,71 @@ class Node(object):
 A representation of a node in a node tree.
 
 Attributes:
-    backend (str): The currently set translation backend. Available in  the
+    backend (str):
+        The currently set translation backend. Available in  the
         string format as `%(backend)s`.
-    children (list): A list of node children ordered from first to last  child.
-        Accessible using indexing  (`node[0]`, `node[1]`, ...). Alse available
-        in the  string format as `%(0)s`, `%(1)s`, ...
-    cls (str): A string representation of the class name. Avalable  in the
-        string format as `%(class)s`
-    code (str): The code that concived this node.
-    cur (int): The index to the position in the code where this  node was
-        concived. It takes the value 0 for nodes  not created from code.
-    declare (Node): A reference to the node of same name where it is  defined.
-        This would be under `Declares`, `Params`  or `Struct`. Useful for
-        setting scope defined  common datatypes. Returns itself if no declared
-        variable has the same name as current node.
-    dim (int): The number of dimensions in a numerical datatype.  The values
-        0 through 4 represents scalar, column  vector, row vector, matrix and
-        cube respectively.  The value is None if datatype is not numerical.
+    children (list):
+        A list of node children ordered from first to last  child. Accessible
+        using indexing  (`node[0]`, `node[1]`, ...). Alse available in the
+        string format as `%(0)s`, `%(1)s`, ...
+    cls (str):
+        A string representation of the class name. Avalable  in the string
+        format as `%(class)s`
+    code (str):
+        The code that concived this node.
+    cur (int):
+        The index to the position in the code where this  node was concived. It
+        takes the value 0 for nodes  not created from code.
+    declare (Node):
+        A reference to the node of same name where it is  defined. This would
+        be under `Declares`, `Params`  or `Struct`. Useful for setting scope
+        defined  common datatypes. Returns itself if no declared variable has
+        the same name as current node.
+    dim (int):
+        The number of dimensions in a numerical datatype.  The values 0 through
+        4 represents scalar, column  vector, row vector, matrix and cube
+        respectively.  The value is None if datatype is not numerical.
         Interconnected with `type`.
-    file (str): Name of the program. In projects, it should be the  absolute
-        path to the Matlab source file. Available  in the string format as
-        `%(file)s`.
-    ftypes (dict): Input/output function scoped datatypes.
-    func (Node): A reference to Func (function) ancestor. Uses root  if not
-        found.
-    group (Node): A reference to the first ancestor where the  datatype does
-        not automatically affect nodes  upwards. A list of these nodes are
-        listed in  `mc.reference.groups`.
-    itype (list): Input/output include scope statements
-    line (int): The codeline number in original code where this  node was
-        concived. It takes the value 0 for nodes  not created from code.
-    mem (int): The amount of type-space reserved per element in a  numerical
-        datatype.  The value 0 through 4  represents unsigned int, int, float,
-        double and  complex.  The value is None if datatype is not  numerical.
+    file (str):
+        Name of the program. In projects, it should be the  absolute path to
+        the Matlab source file. Available  in the string format as `%(file)s`.
+    ftypes (dict):
+        Input/output function scoped datatypes.
+    func (Node):
+        A reference to Func (function) ancestor. Uses root  if not found.
+    group (Node):
+        A reference to the first ancestor where the  datatype does not
+        automatically affect nodes  upwards. A list of these nodes are listed
+        in  `matlab2cpp.reference.groups`.
+    itype (list):
+        Input/output include scope statements
+    line (int):
+        The codeline number in original code where this  node was conceived. It
+        takes the value 0 for nodes  not created from code.
+    mem (int):
+        The amount of type-space reserved per element in a numerical datatype.
+        The value 0 through 4  represents unsigned int, int, float, double and
+        complex.  The value is None if datatype is not  numerical.
         Interconnected with `type`.
-    name (str): The name of the node. Available in the string  format as
-        `%(name)s`.
-    names (list): A list of the names (if any) of the nodes children.
-    num (bool): A bool value that is true if and only if the  datatype is
-        numerical.  Interconnected with `type`.
-    parent (Node): A reference to the direct node parent above the  current
-        one.
-    pointer (int): A numerical value of the reference count. The value  0 imply
-        that the node refer to the actual variable,  1 is a reference to the
-        variable, 2 is a reference  of references, and so on.
-    program (Node): A reference to program ancestor. Uses root if not  found.
-    project (Node): A reference to root node.
-    reference (Node): If node is a lambda function (backend  `func_lambda`),
+    name (str):
+        The name of the node. Available in the string format as `%(name)s`.
+    names (list):
+        A list of the names (if any) of the nodes children.
+    num (bool):
+        A bool value that is true if and only if the datatype is numerical.
+        Interconnected with `type`.
+    parent (Node):
+        A reference to the direct node parent above the current one.
+    pointer (int):
+        A numerical value of the reference count. The value  0 imply that the
+        node refer to the actual variable, 1 is a reference to the variable,
+        2 is a reference  of references, and so on.
+    program (Node):
+        A reference to program ancestor. Uses root if not  found.
+    project (Node):
+        A reference to root node.
+    reference (Node):
+        If node is a lambda function (backend  `func_lambda`),
         the variable is declared locally,  but it's content might be available
         in it's own  function.  If so, the node will have a `reference`
         attribute to that function. Use `hasattr` to  ensure it is the case.
@@ -113,17 +130,17 @@ Attributes:
     vtypes = sup.Vtypes()
 
     def __init__(self, parent=None, name="", value="", pointer=0,
-            line=None, cur=None, code=None):
+                 line=None, cur=None, code=None):
         """
-Keyword Args:
-    code (str): source code
-    cur (int): cursor position (inherited)
-    line (int): Line number (inherited)
-    name (str): Optional name of the node
-    parent (Node): Node parent in the Node tree
-    pointer (int): is reference to object (not currently used)
-    str (str): Translation content
-    value (str): Default node content placeholder
+        Keyword Args:
+            code (str): source code
+            cur (int): cursor position (inherited)
+            line (int): Line number (inherited)
+            name (str): Optional name of the node
+            parent (Node): Node parent in the Node tree
+            pointer (int): is reference to object (not currently used)
+            str (str): Translation content
+            value (str): Default node content placeholder
         """
         self.children = []
         self.prop = {"type":"TYPE", "suggest":"TYPE",
@@ -150,7 +167,7 @@ Returns:
     str: Summary of the node tree
 
 See also:
-    `mc.qtree`
+    `matlab2cpp.qtree`
         """
         return backend.summary(self, args)
 
@@ -212,11 +229,22 @@ Returns:
     nodes.
 
 Example:
-    >>> var = mc.collection.Var(None, name="A", value="B", line=1, cur=0, code="C")
-    >>> print(var.properties()) # doctest: +NORMALIZE_WHITESPACE
-    {'code': 'C', 'cur': 0, 'suggest': 'TYPE', 'value': 'B', 'ret': '', 'str':
-    '', 'type': 'TYPE', 'line': 1, 'backend': 'unknown', 'pointer': 0, 'class':
-    'Var', 'name': 'A'}
+    >>> var = matlab2cpp.collection.Var(None, name="A", value="B", line=1, cur=0, code="C")
+    >>> props = var.properties()
+    >>> for key in sorted(props):
+    ...     print("{:<8}: {!r}".format(key, props[key]))
+    backend : 'unknown'
+    class   : 'Var'
+    code    : 'C'
+    cur     : 0
+    line    : 1
+    name    : 'A'
+    pointer : 0
+    ret     : ''
+    str     : ''
+    suggest : 'TYPE'
+    type    : 'TYPE'
+    value   : 'B'
         """
 
         prop = self.prop.copy()
@@ -249,21 +277,21 @@ Example:
     must first be initialized and converted into ``rowvec`` before arithmetics can
     be used::
 
-    >>> print(mc.qscript("[1,2]+3"))
+    >>> print(matlab2cpp.qscript("[1,2]+3"))
     sword __aux_irowvec_1 [] = {1, 2} ;
     _aux_irowvec_1 = irowvec(__aux_irowvec_1, 2, false) ;
     _aux_irowvec_1+3 ;
 
     The difference in tree structure is as follows:
 
-    >>> print(mc.qtree("[1,2]", core=True)) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(matlab2cpp.qtree("[1,2]", core=True)) # doctest: +NORMALIZE_WHITESPACE
      1  1Block      code_block   TYPE
      1  1| Statement  code_block   TYPE
      1  1| | Matrix     matrix       irowvec
      1  2| | | Vector     matrix       irowvec
      1  2| | | | Int        int          int
      1  4| | | | Int        int          int
-    >>> print(mc.qtree("[1,2]+3", core=True)) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(matlab2cpp.qtree("[1,2]+3", core=True)) # doctest: +NORMALIZE_WHITESPACE
      1  1Block      code_block   TYPE
      1  1| Assign     matrix       int
      1  1| | Var        irowvec      irowvec _aux_irowvec_1
@@ -334,7 +362,7 @@ Args:
     msg (str): Content of the error
 
 Example:
-    >>> print(mc.qlog("  a"))
+    >>> print(matlab2cpp.qlog("  a"))
     Error in class Var on line 1:
       a
       ^
@@ -383,7 +411,7 @@ Args:
 
 Examples:
 
-    >>> node = mc.Var(None, "a")
+    >>> node = collection.Var(None, "a")
     >>> node["b"]
     Traceback (most recent call last):
         ...

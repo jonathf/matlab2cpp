@@ -24,7 +24,7 @@ def Vector(node):
     if node.type == "string":
         return "", " + ", "" 
 
-    nodes = map(str, node)
+    nodes = [str(n) for n in node]
 
     #max mem in list and type list
     try:
@@ -32,7 +32,7 @@ def Vector(node):
     except:
         mem = -1
     mem_type = ["uword", "sword", "float", "double", "cx_double"]
-    
+
     #Join columns: a = [0, my_rowvec, b]
     for i in range(len(nodes)):
         # scalars must be converted first
@@ -44,7 +44,10 @@ def Vector(node):
                 nodes[i] = "m2cpp::srow(" + nodes[i] + ")"
 
     if nodes:
-        return reduce(lambda x,y: ("arma::join_rows(%s, %s)" % (x, y)), nodes)
+        out = str(nodes[0])
+        for node_ in nodes[1:]:
+            out = "arma::join_rows(%s, %s)" % (out, node_)
+        return out
     return ""
 
 
@@ -68,7 +71,7 @@ def Matrix(node):
             return "{{", ", ", "}}"
         #{ } around arma::join_rows()
         return "{", ", ", "}"
-        
+
     # non-numerical elements in matrix
     if not node.num:
         if len(node[0]) == 1 and node[0][0].cls == "Colon":
@@ -101,7 +104,7 @@ def Matrix(node):
 
 
     # mix of scalars and colvecs, scalar and matrix, scalar and vec and matrix
-    elif dims in ({0,1}, {1}, {0,3}, {0,1,3}):
+    elif dims in ({0, 1}, {1}, {0, 3}, {0, 1, 3}):
 
         # make string of each vector in matrix
         nodes = []
@@ -113,7 +116,7 @@ def Matrix(node):
             except:
                 mem = -1
             mem_type = ["uword", "sword", "float", "double", "cx_double"]
-            
+
             # scalars must be converted first
             if node[i].value or node[i].dim == 0: # value=scalarsonly
                 node[i].include("m2cpp")
@@ -125,25 +128,24 @@ def Matrix(node):
                 nodes.append(str(node[i]))
 
     # mix of rowvecs and matrices, mix of columnvecs and matrices
-    elif dims in ({2}, {3}, {2,3}, {1,3}):
+    elif dims in ({2}, {3}, {2, 3}, {1, 3}):
 
         # make string of each vector in matrix
         nodes = []
-        for i in range(len(node)):
-            
-            # decomposed vectors should be moved to own lines
-            if node[i].value:
-                nodes.append(str(node[i].auxiliary()))
-            else:
-                nodes.append(str(node[i]))
+        for idx in range(len(node)):
 
-    try:
-        if node.parent.name in ("imagesc", "wigb"):
-            return "{" + reduce(lambda a,b: ("arma::join_cols(%s, %s)" % (a,b)), nodes) + "}"
-        return reduce(lambda a,b: ("arma::join_cols(%s, %s)" % (a,b)), nodes)
-    except:
-        node.error("No match for handling matrix arg found")
-        return "{", ", ", "}"
+            # decomposed vectors should be moved to own lines
+            if node[idx].value:
+                nodes.append(str(node[idx].auxiliary()))
+            else:
+                nodes.append(str(node[idx]))
+
+    out = str(nodes[0])
+    for node_ in nodes[1:]:
+        out = "arma::join_cols(%s, %s)" % (out, node_)
+    if node.parent.name in ("imagesc", "wigb"):
+        out = "{%s}" % out
+    return out
 
 
 def Assign(node):

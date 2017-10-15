@@ -93,7 +93,7 @@ Ecomment = "code_block"
 def Fvar(node):
     """
 Example:
-    >>> print(mc.qtree("a.b = 4.4; c = [a.b]", core=True, suggest=True)) #doctest: +NORMALIZE_WHITESPACE
+    >>> print(matlab2cpp.qtree("a.b = 4.4; c = [a.b]", core=True, suggest=True)) #doctest: +NORMALIZE_WHITESPACE
     1   1Block      code_block   TYPE    
     1   1| Assign     double       double  
     1   1| | Fvar       struct       double  a

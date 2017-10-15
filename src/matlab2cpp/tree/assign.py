@@ -9,6 +9,7 @@ Support functions for identifying assignments.
 | :py:func:`~matlab2cpp.tree.assign.multi`  | Assignment with multiple returns |
 +-------------------------------------------+----------------------------------+
 """
+from __future__ import print_function
 from .. import collection
 
 from . import findend, constants as c, identify, iterate
@@ -28,8 +29,9 @@ Returns:
 	int: Index to end of assignment
 
 Example:
-    >>> builder = mc.Builder(True)
-    >>> builder.load("unnamed", "[a,b] = c")
+    >>> from matlab2cpp.tree import Builder
+    >>> builder = Builder(True)
+    >>> builder.load("unnamed", "[a,b] = c") # doctest: +NORMALIZE_WHITESPACE
     loading unnamed
          Program     functions.program
        0 Main        functions.main
@@ -40,7 +42,7 @@ Example:
        8     Expression  expression.create    'c'
        8     Var         variables.variable   'c'
     >>> builder.configure()
-    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(matlab2cpp.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
      1  1Block      code_block   TYPE
      1  1| Assigns    unknown      TYPE    c
      1  2| | Var        unknown      TYPE    a
@@ -62,8 +64,8 @@ Example:
     end = findend.expression(self, j)
 
     if self.disp:
-        print("%4d   Assigns    " % cur)
-        print("%-20s" % "assign.multi",)
+        print("%4d   Assigns    " % cur, end=" ")
+        print("%-20s" % "assign.multi", end=" ")
         print(repr(self.code[cur:end+1]))
 
     if identify.space_delimited(self, cur):
@@ -105,8 +107,9 @@ Returns:
 	int: Index to end of assignment
 
 Example:
-    >>> builder = mc.Builder(True)
-    >>> builder.load("unnamed", "a=b")
+    >>> from matlab2cpp.tree import Builder
+    >>> builder = Builder(True)
+    >>> builder.load("unnamed", "a=b") # doctest: +NORMALIZE_WHITESPACE
     loading unnamed
          Program     functions.program
        0 Main        functions.main
@@ -116,7 +119,7 @@ Example:
        2     Expression  expression.create    'b'
        2     Var         variables.variable   'b'
     >>> builder.configure()
-    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(matlab2cpp.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Assign     unknown      TYPE    b
     1 1| | Var        unknown      TYPE    a
@@ -134,8 +137,8 @@ Example:
     end = findend.expression(self, j)
 
     if self.disp:
-        print("%4d   Assign     " % cur)
-        print("%-20s" % "assign.single",)
+        print("%4d   Assign     " % cur, end="")
+        print("%-20s" % "assign.single", end="")
         print(repr(self.code[cur:end+1]))
 
     assign = collection.Assign(parent, cur=cur, code=self.code[cur:end+1])

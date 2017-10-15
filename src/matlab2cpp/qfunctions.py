@@ -32,7 +32,7 @@ def build(
         suggest=True,
         comments=True,
         vtypes=None,
-        **kws,
+        **kws
 ):
     """
 Build a token tree out of Matlab code.  This function is used by the other
@@ -53,14 +53,15 @@ Args:
 Returns:
     Builder,Node: The tree constructor if `retall` is true, else the root node for code.
 
-Example use::
-    >>> builder = mc.build("a=4", retall=True)
-    >>> print(isinstance(builder, mc.Builder))
+Example::
+    >>> from matlab2cpp.tree import Builder
+    >>> builder = matlab2cpp.build("a=4", retall=True)
+    >>> print(isinstance(builder, Builder))
     True
-    >>> node = mc.build("a=4", retall=False)
-    >>> print(isinstance(node, mc.Node))
+    >>> node = matlab2cpp.build("a=4", retall=False)
+    >>> print(isinstance(node, collection.Node))
     True
-    >>> print(mc.build("a**b"))
+    >>> print(matlab2cpp.build("a**b"))
     Traceback (most recent call last):
         ...
     SyntaxError: File: unamed, line 1 in Matlab code:
@@ -112,7 +113,7 @@ Returns:
 
 Example::
     >>> code = "a = 4; b = 5.; c = 'abc'"
-    >>> print(mc.qcpp(code, suggest=False))
+    >>> print(matlab2cpp.qcpp(code, suggest=False))
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
@@ -124,7 +125,7 @@ Example::
       c = "abc" ;
       return 0 ;
     }
-    >>> print(mc.qcpp(code, suggest=True))
+    >>> print(matlab2cpp.qcpp(code, suggest=True))
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
@@ -138,8 +139,8 @@ Example::
       c = "abc" ;
       return 0 ;
     }
-    >>> build = mc.build(code, retall=True)
-    >>> print(mc.qcpp(build) == mc.qcpp(code))
+    >>> build = matlab2cpp.build(code, retall=True)
+    >>> print(matlab2cpp.qcpp(build) == matlab2cpp.qcpp(code))
     True
 
 See also:
@@ -208,7 +209,7 @@ Returns:
 
 Example::
     >>> code = "function y=f(x); y=x+1; end; function g(); f(4)"
-    >>> print(mc.qhpp(code))
+    >>> print(matlab2cpp.qhpp(code))
     #ifndef F_M_HPP
     #define F_M_HPP
     <BLANKLINE>
@@ -230,7 +231,7 @@ Example::
       f(4) ;
     }
     #endif
-    >>> print(mc.qhpp(code, suggest=True))
+    >>> print(matlab2cpp.qhpp(code, suggest=True))
     #ifndef F_M_HPP
     #define F_M_HPP
     <BLANKLINE>
@@ -326,7 +327,7 @@ Returns:
 
 Example::
     >>> code = "a = 4; b = 5.; c = 'abc'"
-    >>> print(mc.qpy(code, suggest=False))
+    >>> print(matlab2cpp.qpy(code, suggest=False))
     functions = {
       "main" : {
         "a" : "", # int
@@ -338,7 +339,7 @@ Example::
       '#include <armadillo>',
       'using namespace arma ;',
     ]
-    >>> print(mc.qpy(code, suggest=True))
+    >>> print(matlab2cpp.qpy(code, suggest=True))
     functions = {
       "main" : {
         "a" : "int",
@@ -412,7 +413,7 @@ Returns:
 	str: A string representation of the log
 
 Example::
-    >>> print(mc.qlog("function f(x); x=4"))
+    >>> print(matlab2cpp.qlog("function f(x); x=4"))
     Error in class Var on line 1:
     function f(x); x=4
                ^
@@ -484,7 +485,7 @@ Returns:
     str: A summary of the node tree.
 
 Example::
-    >>> print(mc.qtree("function y=f(x); y=x+4")) #doctest: +NORMALIZE_WHITESPACE
+    >>> print(matlab2cpp.qtree("function y=f(x); y=x+4"))  # doctest: +NORMALIZE_WHITESPACE
           Program    program      TYPE    unamed
           | Includes   program      TYPE
           | | Include    program      TYPE    #include <armadillo>
@@ -558,7 +559,7 @@ Returns:
 	str: A code translation in C++.
 
 Example:
-    >>> print(mc.qscript("a = 4"))
+    >>> print(matlab2cpp.qscript("a = 4"))
     a = 4 ;
     """
     from . import tree

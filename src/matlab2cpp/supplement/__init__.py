@@ -76,8 +76,7 @@ Example:
 
         out += "functions = {\n"
 
-        keys = types_f.keys()
-        keys.sort()
+        keys = sorted(types_f.keys())
 
         for name in keys:
 
@@ -85,8 +84,7 @@ Example:
             out += '  "%s" : {\n' % (name)
             types = types_f[name]
 
-            keys2 = types.keys()
-            keys2.sort()
+            keys2 = sorted(types.keys())
             l = max([len(k) for k in keys2]+[0])+4
 
             for key in keys2:
@@ -116,16 +114,14 @@ Example:
 
         out += "structs = {\n"
 
-        keys = types_s.keys()
-        keys.sort()
+        keys = sorted(types_s.keys())
 
         for name in keys:
 
             out += '  "%s" : {\n' % (name)
             types = types_s[name]
 
-            keys2 = types.keys()
-            keys2.sort()
+            keys2 = sorted(types.keys())
             l = max([len(k) for k in keys2])+4
 
             for key in keys2:
@@ -169,8 +165,7 @@ Example:
 
         out += "verbatims = {\n"
 
-        keys = types_v.keys()
-        keys.sort()
+        keys = sorted(types_v.keys())
         l = max([len(k) for k in keys])+2
 
         for key in keys:
@@ -183,9 +178,3 @@ Example:
         out += "}"
 
     return out
-
-
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
-

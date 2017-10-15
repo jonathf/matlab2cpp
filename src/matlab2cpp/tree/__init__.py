@@ -52,11 +52,5 @@ In addition a collectio of genereal purpose modules are available:
 |                                     | lists                                 |
 +-------------------------------------+---------------------------------------+
 """
-from . import findend, identify, constants
 from .builder import Builder
-
-__all__ = ["Builder"]
-
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
+__all__ = ("Builder",)

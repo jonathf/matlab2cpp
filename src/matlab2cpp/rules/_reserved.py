@@ -5,7 +5,7 @@ See :py:attr:`rules.reserved <matlab2cpp.rules.reserved>` for a collection of
 set of the various reserved words implemented into matlab2cpp.
 """
 
-import matlab2cpp as mc
+import matlab2cpp
 
 # List of function names that should be handled by reserved.py:
 reserved = {
@@ -861,13 +861,6 @@ def Get_nextpow2(node):
 
 def Assign_fft(node):
 
-    #conv = node[0].type == "mat"
-    #conv = conv or node[0].type == "fmat"
-    #conv = conv or node[0].type == "vec"
-    #conv = conv or node[0].type == "fvec"
-    #conv = conv or node[0].type == "rowvec"
-    #conv = conv or node[0].type == "frowvec"
-
     if node[0].mem == 3:
         return "%(0)s = arma::conv_to<" + node[0].type + ">::from(%(1)s) ;"
 
@@ -882,7 +875,7 @@ def Get_fft(node):
         node.type = node[0].type
 
     # arma & matlab fft same for n_args in (1,2)
-    if len(node) in (1,2):
+    if len(node) in (1, 2):
         return "arma::fft(", ", ", ")"
 
     elif len(node) == 3:
@@ -914,24 +907,24 @@ def Get_ifft(node):
         return "arma::ifft(", ", ", ")"
 
     if len(node) == 1:
-        return "arma::ifft(%(0)s)"
+        return "arma::ifft<%(type)s>(%(0)s)"
 
 
     elif len(node) == 2:
-        return "arma::ifft(%(0)s, %(1)s)"
+        return "arma::ifft<%(type)s>(%(0)s, %(1)s)"
 
 
     elif len(node) == 3:
 
-        if node[0].dim in (1,2):
-            return "arma::ifft(%(0)s, %(1)s)"
+        if node[0].dim in (1, 2):
+            return "arma::ifft<%(type)s>(%(0)s, %(1)s)"
 
         if node[1].cls == "Matrix":
             node.include("m2cpp")
-            return "m2cpp::ifft(%(0)s, %(2)s)"
+            return "m2cpp::ifft<%(type)s>(%(0)s, %(2)s)"
         else:
             node.include("m2cpp")
-            return "m2cpp::ifft(", ", ", ")"
+            return "m2cpp::ifft<%(type)s>(", ", ", ")"
 
     else:
         node.error("Number of args in 'ifft' should be between 1 and 3")
@@ -1259,10 +1252,10 @@ def Get_colorbar(node):
 def Get_xlim(node):
     """
 Examples:
-    >>> print(mc.qscript("xlim(0.0, 3.14)"))
+    >>> print(matlab2cpp.qscript("xlim(0.0, 3.14)"))
     _plot.xlim(0.0, 3.14) ;
     _plot.show() ;
-    >>> print(mc.qscript("xlim([0.0, 3.14])"))
+    >>> print(matlab2cpp.qscript("xlim([0.0, 3.14])"))
     _plot.xlim(0.0, 3.14) ;
     _plot.show() ;
     """
@@ -1293,10 +1286,10 @@ Examples:
 def Get_ylim(node):
     """
 Examples:
-    >>> print(mc.qscript("ylim(0.5,.7)"))
+    >>> print(matlab2cpp.qscript("ylim(0.5,.7)"))
     _plot.ylim(0.5, 0.7) ;
     _plot.show() ;
-    >>> print(mc.qscript("ylim([0.5,.7])"))
+    >>> print(matlab2cpp.qscript("ylim([0.5,.7])"))
     _plot.ylim(0.5, 0.7) ;
     _plot.show() ;
     """
@@ -1325,10 +1318,10 @@ Examples:
 
 def Get_caxis(node):
     """
-    >>> print(mc.qscript("caxis(0, 3)"))
+    >>> print(matlab2cpp.qscript("caxis(0, 3)"))
     _plot.caxis(0, 3) ;
     _plot.show() ;
-    >>> print(mc.qscript("caxis([0, 3])"))
+    >>> print(matlab2cpp.qscript("caxis([0, 3])"))
     _plot.caxis(0, 3) ;
     _plot.show() ;
     """
@@ -1357,10 +1350,10 @@ def Get_caxis(node):
 
 def Get_axis(node):
     """
-    >>> print(mc.qscript("axis(0, 3, -2, 4)"))
+    >>> print(matlab2cpp.qscript("axis(0, 3, -2, 4)"))
     _plot.axis(0, 3, -2, 4) ;
     _plot.show() ;
-    >>> print(mc.qscript("axis([0, 3, -2, 4])"))
+    >>> print(matlab2cpp.qscript("axis([0, 3, -2, 4])"))
     _plot.axis(0, 3, -2, 4) ;
     _plot.show() ;
     """

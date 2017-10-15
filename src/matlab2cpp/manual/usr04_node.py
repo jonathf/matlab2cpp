@@ -15,7 +15,8 @@ The Builder class
 Iterating through Matlab code always starts with constructing
 a :py:class:`~matlab2cpp.Builder`::
 
-    >>> builder = mc.Builder()
+    >>> from matlab2cpp.tree import Builder
+    >>> builder = Builder()
 
 This is an empty shell without any content. To give it content, we supply it
 with code::
@@ -27,7 +28,7 @@ The function saves the code locally as `builder.code` and initiate the
 called and used to populate the node tree. The code is considered static,
 instead the index, which refer to the position in the code is increased to move
 forward in the code. The various constructors uses the support modules in the
-:py:mod:`~matlab2cpp.mc.qtree` to build a full toke tree.  The result is as
+:py:mod:`~matlab2cpp.qtree` to build a full toke tree.  The result is as
 follows::
 
     >>> print(builder) # doctest: +NORMALIZE_WHITESPACE
@@ -52,16 +53,16 @@ follows::
 It is possible to get a detailed output of how this process is done, by turning
 the ``disp`` flag on::
 
-    >>> builder = mc.Builder(disp=True)
-    >>> builder.load("file1.m", "a = 4")
+    >>> builder = Builder(disp=True)
+    >>> builder.load("file1.m", "a = 4") # doctest: +NORMALIZE_WHITESPACE
     loading file1.m
-         Program     functions.program
-       0 Main        functions.main
-       0 Codeblock   codeblock.codeblock 
-       0   Assign      assign.single        'a = 4'
-       0     Var         variables.assign     'a'
-       4     Expression  expression.create    '4'
-       4     Int         misc.number          '4'
+         Program    functions.program
+       0 Main       functions.main
+       0 Codeblock  codeblock.codeblock
+       0   Assign     assign.single       'a = 4'
+       0     Var        variables.assign    'a'
+       4     Expression expression.create   '4'
+       4     Int        misc.number         '4'
 
 This printout lists the core Matlab translation. In the four columns the first
 is the index to the position in the Matlab code, the second is the node created,
@@ -97,21 +98,21 @@ respectivly.  To configure backends and datatypes, use the
 Multiple program can be loaded into the same builder. This allows for building
 of projects that involves multiple files. For example::
 
-    >>> builder = mc.Builder()
+    >>> builder = Builder()
     >>> builder.load("a.m", "function y=a(x); y = x+1")
     >>> builder.load("b.m", "b = a(2)")
 
 The two programs refer to each other through their names. This can the
 suggestion engine use::
 
-    >>> print(mc.qscript(builder[0]))
+    >>> print(matlab2cpp.qscript(builder[0]))
     int a(int x)
     {
       int y ;
       y = x+1 ;
       return y ;
     }
-    >>> print(mc.qscript(builder[1]))
+    >>> print(matlab2cpp.qscript(builder[1]))
     b = a(2) ;
 
 Note that the frontend functions (like :py:func:`~matlab2cpp.qscript`)
@@ -127,7 +128,7 @@ sub-nodes together. Consider the following example::
     >>> def Plus(node):
     ...     return "", " +", ""
     ...
-    >>> print(mc.qscript("2+3", Plus=Plus))
+    >>> print(matlab2cpp.qscript("2+3", Plus=Plus))
     2 +3 ;
 
 Though not used, the argument `node` represents the current node in the tree as
@@ -143,7 +144,7 @@ and its node children. It works the same way as the function
     ...     print(node.summary())
     ...     return "", " +", ""
     ...
-    >>> print(mc.qscript("2+3", Plus=Plus)) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(matlab2cpp.qscript("2+3", Plus=Plus)) # doctest: +NORMALIZE_WHITESPACE
      1  1Plus       expression   int
      1  1| Int        int          int
      1  3| Int        int          int
@@ -157,7 +158,7 @@ This will vary from program to program, so a printout of the current state is
 a good startingpoint. This can either be done through the function
 :py:mod:`~matlab2cpp.qtree`, or manually as follows::
 
-    >>> builder = mc.Builder()
+    >>> builder = Builder()
     >>> builder.load("unnamed", "function y=f(x); y=x+4")
     >>> builder[0].ftypes = {"f" : {"x": "int", "y": "double"}}
     >>> builder.translate()
@@ -208,7 +209,7 @@ The node provided in the node function is the current node for which the parser
 is trying to translate. This gives each node full control over context of which
 is is placed. For example, consider the following::
 
-    >>> print(mc.qtree("x(end, end)", core=True)) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(matlab2cpp.qtree("x(end, end)", core=True)) # doctest: +NORMALIZE_WHITESPACE
      1  1Block      code_block   TYPE
      1  1| Statement  code_block   TYPE
      1  1| | Get        unknown      TYPE    x
@@ -220,7 +221,7 @@ is is placed. For example, consider the following::
     ...     if node is node.parent[1]:
     ...         return node.parent.name + ".n_cols"
     ...
-    >>> print(mc.qscript("x(end, end)", End=End))
+    >>> print(matlab2cpp.qscript("x(end, end)", End=End))
     x(x.n_rows, x.n_cols) ;
 
 Here the rule `End` was called twice, where the if-test produces two different

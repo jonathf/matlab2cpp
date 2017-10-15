@@ -1,14 +1,13 @@
 
 from .funcs import funcs
-from . import armadillo, backends
-from .configure import configure
+from . import armadillo, backends, frontend
 
 Counter = "structs"
 
 def Var(node):
     """
 Example:
-    >>> print(mc.qcpp("a.b = 4; c = a"))
+    >>> print(matlab2cpp.qcpp("a.b = 4; c = a"))
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
@@ -167,7 +166,7 @@ def Assign(node):
         return
     node.type = node[1].type
     # node[0].declare.suggest = node[1].type
-    
+
 
 def Vector(node):
 
@@ -212,11 +211,11 @@ def Vector(node):
         node.dim = 2
 
     # mix of scalars and rowvecs
-    elif dims == {0,2}:
+    elif dims == {0, 2}:
         node.dim = 2
 
     # mix of matrices and colvecs
-    elif dims in ({3}, {1,3}):
+    elif dims in ({3}, {1, 3}):
         node.dim = 3
 
 def Matrix(node):
@@ -305,6 +304,8 @@ def Minus(node):
 
 def Mul(node):
     opr(node)
+    if "TYPE" in (n.type for n in node):
+        return
     mem = max([n.mem for n in node])
     if node[0].dim == 2 and node[1].dim == 1:
         node.type = (0, mem)
@@ -406,7 +407,7 @@ def Lambda(node):
                     node_.type = type
                     node_.declare.type = type
 
-    configure(lfunc)
+    frontend.configure(lfunc)
     # declare list in lambda function
     if ldeclares["_retval"].type != "TYPE":
         declares[node.name[1:]].type = "func_lambda"

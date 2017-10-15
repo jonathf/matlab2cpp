@@ -30,11 +30,9 @@ The toolbox is sorted into the following modules:
 
 
 The simplest way to use the library is to use the quick translation functions.
-They are available through the `mc.qfunctions` module and mirrors the
+They are available through the `matlab2cpp.qfunctions` module and mirrors the
 functionality offered by the `m2cpp` function.
 """
-__version__ = "2.0"
-
 try:
     import argcomplete
 except ImportError:
@@ -42,6 +40,8 @@ except ImportError:
 
 from .parser import create_parser
 from .qfunctions import *
+
+__version__ = "2.0"
 
 
 def m2cpp(args=None):

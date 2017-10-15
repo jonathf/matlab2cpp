@@ -2,7 +2,7 @@
 filler for Armadillo
 """
 
-import matlab2cpp as mc
+import matlab2cpp
 
 def configure_arg(node, index):
     """
@@ -17,27 +17,27 @@ Returns:
     if the argument was unknown, scalar or a vector, respectively.
 
 Examples:
-    >>> print(mc.qscript('x=[1,2]; x(:)'))
+    >>> print(matlab2cpp.qscript('x=[1,2]; x(:)'))
     sword _x [] = {1, 2} ;
     x = irowvec(_x, 2, false) ;
     x(span(0, x.n_rows-1)) ;
-    >>> print(mc.qscript('x=[1,2]; x(1)'))
+    >>> print(matlab2cpp.qscript('x=[1,2]; x(1)'))
     sword _x [] = {1, 2} ;
     x = irowvec(_x, 2, false) ;
     x(0) ;
-    >>> print(mc.qscript('x=[1,2]; x([1,2])'))
+    >>> print(matlab2cpp.qscript('x=[1,2]; x([1,2])'))
     sword _x [] = {1, 2} ;
     x = irowvec(_x, 2, false) ;
     uword __aux_urowvec_1 [] = {1, 2} ;
     _aux_urowvec_1 = urowvec(__aux_urowvec_1, 2, false) ;
     x(arma::strans(_aux_urowvec_1)-1) ;
-    >>> print(mc.qscript('x=[1,2]; x([1,2;2,1])'))
+    >>> print(matlab2cpp.qscript('x=[1,2]; x([1,2;2,1])'))
     sword _x [] = {1, 2} ;
     x = irowvec(_x, 2, false) ;
     uword __aux_umat_1 [] = {1, 2, 2, 1} ;
     _aux_umat_1 = arma::strans(umat(__aux_umat_1, 2, 2, false)) ;
     x(_aux_umat_1-1) ;
-    >>> print(mc.qscript("x=[1,2]; x(x')"))
+    >>> print(matlab2cpp.qscript("x=[1,2]; x(x')"))
     sword _x [] = {1, 2} ;
     x = irowvec(_x, 2, false) ;
     x(arma::trans(x)-1) ;
@@ -176,11 +176,11 @@ def include(node):
         return
 
     if arma not in includes:
-        include = mc.collection.Include(includes, arma, value=includes.value)
+        include = matlab2cpp.collection.Include(includes, arma, value=includes.value)
         include.backend = "program"
 
     if namespace not in includes:
-        include = mc.collection.Include(includes, namespace, value=includes.value)
+        include = matlab2cpp.collection.Include(includes, namespace, value=includes.value)
         include.backend = "program"
 
     includes.translate()

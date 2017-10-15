@@ -7,7 +7,7 @@ def funcs(node):
     # lambda scope
     if "_" + node.name in node.program[1]:
         func = node.program[1]["_" + node.name]
-    
+
     # local scope
     elif node in node.program[1]:
         func = node.program[1][node]
@@ -76,4 +76,4 @@ def funcs(node):
             params[i].suggest = node[i].type
 
     return True
-        
+

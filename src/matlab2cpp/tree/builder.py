@@ -1,15 +1,4 @@
-from . import (
-    expression,
-    functions,
-    variables,
-    misc,
-    branches,
-    iterate,
-    assign,
-    codeblock,
-    suppliment,
-    identify,
-)
+from __future__ import print_function
 from .. import collection, rules, configure
 
 
@@ -20,7 +9,8 @@ Convert Matlab-code to a tree of nodes.
 Given that one or more Matlab programs are loaded, each one can be accessed
 through indexing the Builder instance. For example::
 
-    >>> builder = mc.Builder()
+    >>> from matlab2cpp.tree import Builder
+    >>> builder = Builder()
     >>> builder.load("prg1.m", "function y=prg1(x); y=x")
     >>> builder.load("prg2.m", "prg1(4)")
     >>> builder.configure(suggest=True)
@@ -34,7 +24,7 @@ through indexing the Builder instance. For example::
 Programs that are loaded, configured and translated, can be converted into C++
 code through the front end functions in :py:mod:`matlab2cpp.qfunctions`::
 
-    >>> print(mc.qhpp(prg1))
+    >>> print(matlab2cpp.qhpp(prg1))
     #ifndef PRG1_M_HPP
     #define PRG1_M_HPP
     <BLANKLINE>
@@ -48,7 +38,7 @@ code through the front end functions in :py:mod:`matlab2cpp.qfunctions`::
       return y ;
     }
     #endif
-    >>> print(mc.qcpp(prg2))
+    >>> print(matlab2cpp.qcpp(prg2))
     #include <armadillo>
     using namespace arma ;
     <BLANKLINE>
@@ -95,7 +85,8 @@ Args:
 
 Example:
 
-    >>> builder = mc.Builder()
+    >>> from matlab2cpp.tree import Builder
+    >>> builder = Builder()
     >>> builder.load("prg1.m", "function y=prg1(x); y=x")
     >>> builder.load("prg2.m", "prg1(4)")
     >>> prg1 = builder[0]
@@ -112,7 +103,8 @@ Same as :py:func:`matlab2cpp.Node.summary`, but for the whole project.
 str(builder) <=> Builder.__str__(builder)
 
 Example:
-    >>> builder = mc.Builder()
+    >>> from matlab2cpp.tree import Builder
+    >>> builder = Builder()
     >>> print(builder) # doctest: +NORMALIZE_WHITESPACE
          Project    unknown      TYPE
 
@@ -139,7 +131,8 @@ Raises:
     SyntaxError: Error in the Matlab code.
 
 Example::
-    >>> builder = mc.Builder()
+    >>> from matlab2cpp.tree import Builder
+    >>> builder = Builder()
     >>> builder.load("unnamed.m", "")
     >>> print(builder) # doctest: +NORMALIZE_WHITESPACE
          Project    unknown      TYPE
@@ -156,7 +149,7 @@ Example::
 
         if self.disp:
             print("loading", name)
-        
+
         #Replace ... [stuff] \n with ... [stuff] \n " "
         l = 0
         while l != -1:  #str.find returns -1 if not found
@@ -167,7 +160,7 @@ Example::
                     #m = m+1
                     code = code[:m+1] + " " + code[m+1:]
                 l = m
-        
+
         self.code = code + "\n\n\n"
         self.create_program(name)
 
@@ -217,8 +210,8 @@ Returns:
 
 Example:
     >>> builder = Builder(); builder.load("prg.m", "a;b;c")
-    >>> print(builder.get_unknowns())
-    ['a', 'c', 'b']
+    >>> print(sorted(builder.get_unknowns()))
+    ['a', 'b', 'c']
         """
         if isinstance(index, str):
             index = self.project.names.index(index)
@@ -234,7 +227,8 @@ Args:
     suggest (bool): Uses suggestion engine to fill in types
 
 Example::
-    >>> builder = mc.Builder()
+    >>> from matlab2cpp.tree import Builder
+    >>> builder = Builder()
     >>> builder.load("unnamed.m", "a=1; b=2.; c='c'")
     >>> print(builder) # doctest: +NORMALIZE_WHITESPACE
          Project    unknown      TYPE
@@ -328,7 +322,8 @@ Raises:
     SyntaxError: Error in the Matlab code.
 
 Example::
-    >>> builder = mc.Builder()
+    >>> from matlab2cpp.tree import Builder
+    >>> builder = Builder()
     >>> prg = builder.load("unnamed.m", "0123456789")
     >>> builder.syntaxerror(7, "example of error")
     Traceback (most recent call last):
@@ -374,7 +369,8 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.functions.program`
-    """
+        """
+        from . import functions
         assert isinstance(name, (int, str))
         return functions.program(self, name)
 
@@ -399,7 +395,8 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.functions.function`
-    """
+        """
+        from . import functions
         assert isinstance(parent, collection.Funcs)
         return functions.function(self, parent, cur)
 
@@ -424,7 +421,8 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.functions.main`
-    """
+        """
+        from . import functions
         assert isinstance(parent, collection.Funcs)
         return functions.main(self, parent, cur)
 
@@ -448,7 +446,8 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.functions.lambda_assign`
-    """
+        """
+        from . import functions
         assert isinstance(parent, collection.Block)
         return functions.lambda_assign(self, parent, cur, eq_loc)
 
@@ -481,7 +480,8 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.functions.lambda_func`
-    """
+        """
+        from . import functions
         assert isinstance(parent, collection.Assign)
         return functions.lambda_func(self, parent, cur)
 
@@ -507,15 +507,16 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.codeblock.codeblock`
-    """
-        pnames = [ "Case", "Catch", "Elif", "Else", "Parfor", "For", "Func", "If",
-                "Main", "Otherwise", "Switch", "Try", "While"]
+        """
+        from . import codeblock
+        pnames = ["Case", "Catch", "Elif", "Else", "Parfor", "For", "Func", "If",
+                  "Main", "Otherwise", "Switch", "Try", "While"]
         pnodes = [getattr(collection, name) for name in pnames]
         ppart = [isinstance(parent, node) for node in pnodes]
         if not any(ppart):
             raise AssertionError(
-                    "parent of Block: %s not valid group parent\n%s" %\
-                    (parent.cls, str(pnames)))
+                "parent of Block: %s not valid group parent\n%s" %\
+                (parent.cls, str(pnames)))
         return codeblock.codeblock(self, parent, cur)
 
 
@@ -538,7 +539,8 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.assign.multi`
-    """
+        """
+        from . import assign
         assert isinstance(parent, collection.Block)
         return assign.multi(self, parent, cur, eq_loc)
 
@@ -562,7 +564,8 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.assign.single`
-    """
+        """
+        from . import assign
         assert isinstance(parent, collection.Block)
         return assign.single(self, parent, cur, eq_loc)
 
@@ -583,10 +586,10 @@ Args:
 Returns:
     int: position where for-loop ends
         """
-
+        from . import branches
         assert isinstance(parent, collection.Block)
         return branches.parforloop(self, parent, cur)
-    
+
     def create_for(self, parent, cur):
         """
 Create For-loop
@@ -606,7 +609,8 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.branches.forloop`
-    """
+        """
+        from . import branches
         assert isinstance(parent, collection.Block)
         return branches.forloop(self, parent, cur)
 
@@ -641,7 +645,8 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.branches.ifbranch`
-    """
+        """
+        from . import branches
         assert isinstance(parent, collection.Block)
         return branches.ifbranch(self, parent, cur)
 
@@ -664,7 +669,8 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.branches.whileloop`
-    """
+        """
+        from . import branches
         assert isinstance(parent, collection.Block)
         return branches.whileloop(self, parent, cur)
 
@@ -697,7 +703,8 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.branches.switch`
-    """
+        """
+        from . import branches
         assert isinstance(parent, collection.Block)
         return branches.switch(self, parent, cur)
 
@@ -722,7 +729,8 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.branches.trybranch`
-    """
+        """
+        from . import branches
         assert isinstance(parent, collection.Block)
         return branches.trybranch(self, parent, cur)
 
@@ -744,10 +752,12 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.misc.cell`
-    """
+        """
+        from . import misc
         return misc.cell(self, parent, cur)
 
     def create_pragma_parfor(self, parent, cur):
+        from . import misc
         assert isinstance(parent, collection.Block)
         return misc.pragma_for(self, parent, cur)
 
@@ -767,7 +777,8 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.misc.comment`
-    """
+        """
+        from . import misc
         assert isinstance(parent, collection.Block)
         return misc.comment(self, parent, cur)
 
@@ -790,7 +801,8 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.misc.verbatim`
-    """
+        """
+        from . import misc
         return misc.verbatim(self, parent, cur)
     
 
@@ -811,6 +823,7 @@ Returns:
 See also:
     :py:func:`matlab2cpp.tree.misc.string`
         """
+        from . import misc
         return misc.string(self, parent, cur)
 
 
@@ -831,6 +844,7 @@ Returns:
 See also:
     :py:func:`matlab2cpp.tree.misc.list`
         """
+        from . import misc
         return misc.list(self, parent, cur)
 
 
@@ -856,6 +870,7 @@ Returns:
 See also:
     :py:func:`matlab2cpp.tree.misc.matrix`
         """
+        from . import misc
         return misc.matrix(self, parent, cur)
 
 
@@ -876,6 +891,7 @@ Returns:
 See also:
     :py:func:`matlab2cpp.tree.misc.number`
         """
+        from . import misc
         return misc.number(self, parent, cur)
 
 
@@ -903,6 +919,7 @@ Returns:
 See also:
     :py:func:`matlab2cpp.tree.misc.reserved`
         """
+        from . import misc
         assert isinstance(parent, collection.Block)
         return misc.reserved(self, parent, cur)
 
@@ -924,7 +941,8 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.variables.variable`
-    """
+        """
+        from . import variables
         return variables.variable(self, parent, cur)
 
     def create_assign_variable(self, parent, cur, end=None):
@@ -945,7 +963,8 @@ Returns:
 
 See also:
     :py:func:`matlab2cpp.tree.variables.assign`
-    """
+        """
+        from . import variables
         return variables.assign(self, parent, cur, end)
 
 
@@ -966,10 +985,5 @@ Returns:
 See also:
     :py:func:`matlab2cpp.tree.expression.create`
         """
+        from . import expression
         return expression.create(self, parent, cur, end)
-
-
-
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()

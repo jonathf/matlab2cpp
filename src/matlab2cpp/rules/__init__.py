@@ -98,7 +98,7 @@ These basic types are then glued together through the following:
 import glob
 import os
 
-import matlab2cpp as mc
+import matlab2cpp
 sep = os.path.sep
 
 for name in glob.glob(os.path.dirname(__file__)+os.path.sep+"*.py"):

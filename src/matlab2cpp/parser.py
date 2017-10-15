@@ -1,5 +1,4 @@
 """Create parser for m2cpp."""
-
 import argparse
 from textwrap import dedent
 import glob

@@ -14,7 +14,7 @@ Rutines for identifying code structure.
 |                                                      | space-delimited       |
 +------------------------------------------------------+-----------------------+
 """
-from . import constants, findend
+from . import constants
 
 
 def space_delimiter(self, start):
@@ -104,6 +104,7 @@ Args:
 Returns:
 	bool: True if list consists of whitespace delimiters
     """
+    from . import findend
 
     if  self.code[start] not in constants.l_start:
         self.syntaxerror(start, "list start")

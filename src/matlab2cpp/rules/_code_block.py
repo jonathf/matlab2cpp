@@ -6,7 +6,7 @@ and have the backend fixd to `code_block`.
 """
 import os
 
-import matlab2cpp as mc
+import matlab2cpp
 from . import parallel
 
 
@@ -27,15 +27,15 @@ Children:
         Right hand side of expression
 
 Examples:
-    >>> print(mc.qscript("'text'"))
+    >>> print(matlab2cpp.qscript("'text'"))
     "text" ;
-    >>> print(mc.qscript("123"))
+    >>> print(matlab2cpp.qscript("123"))
     123 ;
-    >>> print(mc.qscript("[1,2]"))
+    >>> print(matlab2cpp.qscript("[1,2]"))
     {1, 2} ;
-    >>> print(mc.qscript("a"))
+    >>> print(matlab2cpp.qscript("a"))
     a ;
-    >>> print(mc.qscript("f()"))
+    >>> print(matlab2cpp.qscript("f()"))
     f() ;
     """
     return "%(0)s ;"
@@ -60,7 +60,7 @@ Children:
         Loop content
 
 Examples:
-    >>> print(mc.qscript("while 1, f()"))
+    >>> print(matlab2cpp.qscript("while 1, f()"))
     while (1)
     {
       f() ;
@@ -90,7 +90,7 @@ Children:
         Else block
 
 Examples:
-    >>> print(mc.qscript("if a, b; elseif c, d; else e"))
+    >>> print(matlab2cpp.qscript("if a, b; elseif c, d; else e"))
     if (a)
     {
       b ;
@@ -126,12 +126,12 @@ Children:
         Code to be evaluated give condition
 
 Examples:
-    >>> print(mc.qscript("if a, b"))
+    >>> print(matlab2cpp.qscript("if a, b"))
     if (a)
     {
       b ;
     }
-    >>> print(mc.qscript("if a, end"))
+    >>> print(matlab2cpp.qscript("if a, end"))
     if (a)
     {
       // Empty block
@@ -162,7 +162,7 @@ Children:
         Code to be evaluated give condition
 
 Examples:
-    >>> print(mc.qscript("if a, b; elseif c, d"))
+    >>> print(matlab2cpp.qscript("if a, b; elseif c, d"))
     if (a)
     {
       b ;
@@ -171,7 +171,7 @@ Examples:
     {
       d ;
     }
-    >>> print(mc.qscript("if a, b; elseif c, end"))
+    >>> print(matlab2cpp.qscript("if a, b; elseif c, end"))
     if (a)
     {
       b ;
@@ -204,7 +204,7 @@ Children:
         Code to be evaluated give condition
 
 Examples:
-    >>> print(mc.qscript("if a, b; else c"))
+    >>> print(matlab2cpp.qscript("if a, b; else c"))
     if (a)
     {
       b ;
@@ -213,7 +213,7 @@ Examples:
     {
       c ;
     }
-    >>> print(mc.qscript("if a, b; else; end"))
+    >>> print(matlab2cpp.qscript("if a, b; else; end"))
     if (a)
     {
       b ;
@@ -250,7 +250,7 @@ Children:
         Otherwise-block
 
 Examples:
-    >>> print(mc.qscript("a=1; switch a; case b; c; otherwise; d"))
+    >>> print(matlab2cpp.qscript("a=1; switch a; case b; c; otherwise; d"))
     a = 1 ;
     if (b == a)
     {
@@ -289,13 +289,13 @@ Children:
         Code to be evaluated give condition
 
 Example:
-    >>> print(mc.qscript("switch 1; case b; c"))
+    >>> print(matlab2cpp.qscript("switch 1; case b; c"))
     int _var_int = 1 ;
     if (b == _var_int)
     {
       c ;
     }
-    >>> print(mc.qscript("a=1; switch a; case b; c;"))
+    >>> print(matlab2cpp.qscript("a=1; switch a; case b; c;"))
     a = 1 ;
     if (b == a)
     {
@@ -338,7 +338,7 @@ Children:
         Code to be evaluated give condition
 
 Example:
-    >>> print(mc.qscript("switch 1; case a; b; otherwise; c"))
+    >>> print(matlab2cpp.qscript("switch 1; case a; b; otherwise; c"))
     int _var_int = 1 ;
     if (a == _var_int)
     {
@@ -370,7 +370,7 @@ Children:
         Catch-block
 
 Examples:
-    >>> print(mc.qscript("try; a; catch; b"))
+    >>> print(matlab2cpp.qscript("try; a; catch; b"))
     try
     {
       a ;
@@ -444,7 +444,7 @@ Children:
     Codeline : Sub-block, statement or assigments
 
 Examples:
-    >>> print(mc.qscript("a; if b; c; end; d"))
+    >>> print(matlab2cpp.qscript("a; if b; c; end; d"))
     a ;
     if (b)
     {
@@ -483,9 +483,9 @@ Children:
         Right hand side of assignment
 
 Examples:
-    >>> print(mc.qscript("[a,b,c] = d"))
+    >>> print(matlab2cpp.qscript("[a,b,c] = d"))
     [a, b, c] = d ;
-    >>> print(mc.qscript("[a,b,c] = [1,2,3]"))
+    >>> print(matlab2cpp.qscript("[a,b,c] = [1,2,3]"))
     sword __aux_irowvec_1 [] = {1, 2, 3} ;
     _aux_irowvec_1 = irowvec(__aux_irowvec_1, 3, false) ;
     a = _aux_irowvec_1(0) ;
@@ -527,17 +527,17 @@ Children:
         Content to loop over
 
 Examples:
-    >>> print(mc.qscript("parfor i=1:10; a"))
+    >>> print(matlab2cpp.qscript("parfor i=1:10; a"))
     for (i=1; i<=10; i++)
     {
       a ;
     }
-    >>> print(mc.qscript("parfor i=1:2:10; a"))
+    >>> print(matlab2cpp.qscript("parfor i=1:2:10; a"))
     for (i=1; i<=10; i+=2)
     {
       a ;
     }
-    >>> print(mc.qscript("parfor i=a; b"))
+    >>> print(matlab2cpp.qscript("parfor i=a; b"))
     for (int _i=0; _i<length(a); _i++)
     {
       i = a[_i] ;
@@ -622,17 +622,17 @@ Children:
         Content to loop over
 
 Examples:
-    >>> print(mc.qscript("for i=1:10; a"))
+    >>> print(matlab2cpp.qscript("for i=1:10; a"))
     for (i=1; i<=10; i++)
     {
       a ;
     }
-    >>> print(mc.qscript("for i=1:2:10; a"))
+    >>> print(matlab2cpp.qscript("for i=1:2:10; a"))
     for (i=1; i<=10; i+=2)
     {
       a ;
     }
-    >>> print(mc.qscript("for i=a; b"))
+    >>> print(matlab2cpp.qscript("for i=a; b"))
     for (int _i=0; _i<length(a); _i++)
     {
       i = a[_i] ;
@@ -719,7 +719,7 @@ Return:
     str : Translation of current node.
 
 Examples:
-    >>> print(mc.qscript("function f(); %{ comment %}"))
+    >>> print(matlab2cpp.qscript("function f(); %{ comment %}"))
     void f()
     {
       /* comment */
@@ -739,7 +739,7 @@ Return:
     str : Translation of current node.
 
 Examples:
-    >>> print(mc.qscript("function f(); % comment"))
+    >>> print(matlab2cpp.qscript("function f(); % comment"))
     void f()
     {
       // comment
@@ -759,7 +759,7 @@ Return:
     str : Translation of current node.
 
 Examples:
-    >>> print(mc.qscript("a % comment"))
+    >>> print(matlab2cpp.qscript("a % comment"))
     a ; // comment
     """
     return "//%(value)s"

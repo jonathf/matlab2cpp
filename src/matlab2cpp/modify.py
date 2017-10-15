@@ -146,7 +146,6 @@ def modify_define_first(project):
 
         for include in includes:
             if include != includes[0] and include.name[:7] == "#define":
-                #print("hello " + include.name)
                 define_include = includes.children.pop(index)
                 includes.children.insert(0, define_include)
 

@@ -1,7 +1,4 @@
-# encoding: utf-8
-
 import re
-import matlab2cpp
 set_ = set
 
 def set(D, code):
@@ -20,7 +17,8 @@ def set(D, code):
             code = re.sub(findterm_, value_, code)
 
     return code
-        
+
+
 #find nodes that contain verbatim
 def get(node):
     nodes = node.flatten()
@@ -31,8 +29,8 @@ def get(node):
             D[node.name] = node.value
 
     return D
-            
-    
+
+
 class Vtypes(object):
 
     def __get__(self, instance, owner):

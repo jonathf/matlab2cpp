@@ -1,7 +1,9 @@
 """
 Variable interpretor
 """
-from . import constants, findend, iterate
+from __future__ import print_function
+from . import constants, findend
+from .. import collection
 
 
 def assign(self, parent, cur, end=None):
@@ -20,18 +22,19 @@ Returns:
 	int : End of variable
 
 Example:
-    >>> builder = mc.Builder(True)
-    >>> builder.load("unnamed", "a = 4")
+    >>> from matlab2cpp.tree import Builder
+    >>> builder = Builder(True)
+    >>> builder.load("unnamed", "a = 4") # doctest: +NORMALIZE_WHITESPACE
     loading unnamed
-         Program     functions.program
-       0 Main        functions.main
-       0 Codeblock   codeblock.codeblock 
-       0   Assign      assign.single        'a = 4'
-       0     Var         variables.assign     'a'
-       4     Expression  expression.create    '4'
-       4     Int         misc.number          '4'
+         Program    functions.program
+       0 Main       functions.main
+       0 Codeblock  codeblock.codeblock
+       0   Assign     assign.single       'a = 4'
+       0     Var        variables.assign    'a'
+       4     Expression expression.create   '4'
+       4     Int        misc.number         '4'
     >>> builder.configure(suggest=False)
-    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(matlab2cpp.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Assign     int          int 
     1 1| | Var        unknown      (int)   a
@@ -67,8 +70,8 @@ Example:
                     code=self.code[cur:end+1])
 
             if self.disp:
-                print("%4d     Cset       " % cur,)
-                print("%-20s" % "variables.assign",)
+                print("%4d     Cset       " % cur, end="")
+                print("%-20s" % "variables.assign", end="")
                 print(repr(self.code[cur:end+1]))
 
             n_fields = 0
@@ -100,8 +103,8 @@ Example:
                     code=self.code[cur:end+1])
 
             if self.disp:
-                print("%4d     Cvar       " % cur,)
-                print("%-20s" % "variables.assign",)
+                print("%4d     Cvar       " % cur, end="")
+                print("%-20s" % "variables.assign", end="")
                 print(repr(self.code[cur:end+1]))
 
             num = 0
@@ -145,7 +148,7 @@ Example:
 
             if self.disp:
                 print("%4d     Sset        " % cur)
-                print("%-20s" % "variables.assign",)
+                print("%-20s" % "variables.assign", end="")
                 print(repr(self.code[cur:end]))
 
             node = collection.Sset(parent, name, value, cur=cur,
@@ -158,7 +161,7 @@ Example:
 
             if self.disp:
                 print("%4d     Set        " % cur)
-                print("%-20s" % "variables.assign",)
+                print("%-20s" % "variables.assign", end="")
                 print(repr(self.code[cur:end+1]))
 
             node = collection.Set(parent, name, cur=cur,
@@ -182,8 +185,8 @@ Example:
                 k += 1
 
             if self.disp:
-                print("%4d     Nset       " % cur,)
-                print("%-20s" % "variables.assign",)
+                print("%4d     Nset       " % cur, end="")
+                print("%-20s" % "variables.assign", end="")
                 print(repr(self.code[cur:end+1]))
 
 
@@ -211,8 +214,8 @@ Example:
 
                 end = findend.paren(self, j)
                 if self.disp:
-                    print("%4d     Fset       " % cur,)
-                    print("%-20s" % "variables.assign",)
+                    print("%4d     Fset       " % cur, end="")
+                    print("%-20s" % "variables.assign", end="")
                     print(repr(self.code[cur:end+1]))
 
                 node = collection.Fset(parent, name, value=value, cur=cur,
@@ -224,8 +227,8 @@ Example:
             else:
 
                 if self.disp:
-                    print("%4d     Fvar       " % cur,)
-                    print("%-20s" % "variables.assign",)
+                    print("%4d     Fvar       " % cur, end="")
+                    print("%-20s" % "variables.assign", end="")
                     print(repr(self.code[cur:last+1]))
 
                 node = collection.Fvar(parent, name, value=value, cur=cur,
@@ -236,8 +239,8 @@ Example:
     # Simple variable assignment
     else:
         if self.disp:
-            print("%4d     Var        " % cur,)
-            print("%-20s" % "variables.assign",)
+            print("%4d     Var        " % cur, end="")
+            print("%-20s" % "variables.assign", end="")
             print(repr(self.code[cur:last]))
 
 
@@ -268,17 +271,18 @@ Returns:
 	int : End of variable
 
 Example:
-    >>> builder = mc.Builder(True)
-    >>> builder.load("unnamed", "a")
+    >>> from matlab2cpp.tree import Builder
+    >>> builder = Builder(True)
+    >>> builder.load("unnamed", "a") # doctest: +NORMALIZE_WHITESPACE
     loading unnamed
-         Program     functions.program
-       0 Main        functions.main
-       0 Codeblock   codeblock.codeblock 
-       0   Statement     codeblock.codeblock  'a'
-       0     Expression  expression.create    'a'
-       0     Var         variables.variable   'a'
+         Program    functions.program
+       0 Main       functions.main
+       0 Codeblock  codeblock.codeblock
+       0   Statement    codeblock.codeblock 'a'
+       0     Expression expression.create   'a'
+       0     Var        variables.variable  'a'
     >>> builder.configure()
-    >>> print(mc.qtree(builder, core=True)) #doctest: +NORMALIZE_WHITESPACE
+    >>> print(matlab2cpp.qtree(builder, core=True)) #doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Statement  code_block   TYPE
     1 1| | Var        unknown      TYPE    a
@@ -316,8 +320,8 @@ Example:
                     code=self.code[cur:end+1])
 
             if self.disp:
-                print("%4d     Cget       " % cur,)
-                print("%-20s" % "variables.variable",)
+                print("%4d     Cget       " % cur, end="")
+                print("%-20s" % "variables.variable", end="")
                 print(repr(self.code[cur:end+1]))
 
             n_fields = 0
@@ -349,8 +353,8 @@ Example:
                     code=self.code[cur:end+1])
 
             if self.disp:
-                print("%4d     Cvar       " % cur,)
-                print("%-20s" % "variables.variable",)
+                print("%4d     Cvar       " % cur, end="")
+                print("%-20s" % "variables.variable", end="")
                 print(repr(self.code[cur:end+1]))
 
             num = 0
@@ -376,8 +380,8 @@ Example:
             value = self.code[start:end]
 
             if self.disp:
-                print("%4d     Sget        " % cur,)
-                print("%-20s" % "variables.variable",)
+                print("%4d     Sget        " % cur, end="")
+                print("%-20s" % "variables.variable", end="")
                 print(repr(self.code[cur:end]))
 
             node = collection.Sget(parent, name, value, cur=cur,
@@ -389,8 +393,8 @@ Example:
         else:
 
             if self.disp:
-                print("%4d     Get        " % cur,)
-                print("%-20s" % "variables.variable",)
+                print("%4d     Get        " % cur, end="")
+                print("%-20s" % "variables.variable", end="")
                 print(repr(self.code[cur:end+1]))
 
             node = collection.Get(parent, name, cur=cur,
@@ -411,8 +415,8 @@ Example:
             end = findend.paren(self, k)
 
             if self.disp:
-                print("%4d     Nget       " % cur,)
-                print("%-20s" % "variables.variable",)
+                print("%4d     Nget       " % cur, end="")
+                print("%-20s" % "variables.variable", end="")
                 print(repr(self.code[cur:end+1]))
 
             k += 1
@@ -443,8 +447,8 @@ Example:
 
                 end = findend.paren(self, j)
                 if self.disp:
-                    print("%4d     Fget       " % cur,)
-                    print("%-20s" % "variables.variable",)
+                    print("%4d     Fget       " % cur, end="")
+                    print("%-20s" % "variables.variable", end="")
                     print(repr(self.code[cur:end+1]))
 
 
@@ -463,8 +467,8 @@ Example:
             else:
 
                 if self.disp:
-                    print("%4d     Fvar       " % cur,)
-                    print("%-20s" % "variables.variable",)
+                    print("%4d     Fvar       " % cur, end="")
+                    print("%-20s" % "variables.variable", end="")
                     print(repr(self.code[cur:last]))
 
                 node = collection.Fvar(parent, name, value=value,
@@ -479,8 +483,8 @@ Example:
     else:
 
         if self.disp:
-            print("%4d     Var        " % cur,)
-            print("%-20s" % "variables.variable",)
+            print("%4d     Var        " % cur, end="")
+            print("%-20s" % "variables.variable", end="")
             print(repr(self.code[cur:last]))
 
         node = collection.Var(parent, name, cur=cur,
@@ -507,19 +511,20 @@ Returns:
 	int : End of argument
 
 Example:
-    >>> builder = mc.Builder(True)
-    >>> builder.load("unnamed", "a{b}")
+    >>> from matlab2cpp.tree import Builder
+    >>> builder = Builder(True)
+    >>> builder.load("unnamed", "a{b}") # doctest: +NORMALIZE_WHITESPACE
     loading unnamed
-         Program     functions.program
-       0 Main        functions.main
-       0 Codeblock   codeblock.codeblock 
-       0   Statement     codeblock.codeblock  'a{b}'
-       0     Expression  expression.create    'a{b}'
-       0     Cvar        variables.variable   'a{b}'
-       2     Expression  expression.create    'b'
-       2     Var         variables.variable   'b'
+         Program    functions.program
+       0 Main       functions.main
+       0 Codeblock  codeblock.codeblock
+       0   Statement    codeblock.codeblock 'a{b}'
+       0     Expression expression.create   'a{b}'
+       0     Cvar       variables.variable  'a{b}'
+       2     Expression expression.create   'b'
+       2     Var        variables.variable  'b'
     >>> builder.configure()
-    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(matlab2cpp.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1 1Block      code_block   TYPE
     1 1| Statement  code_block   TYPE
     1 1| | Cvar       cell         TYPE    a

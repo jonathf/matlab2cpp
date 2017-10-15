@@ -1,6 +1,6 @@
 import re
 
-import matlab2cpp as mc
+import matlab2cpp
 from . import armadillo as arma
 from .function import type_string
 

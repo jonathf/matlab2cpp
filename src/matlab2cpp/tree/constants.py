@@ -14,7 +14,6 @@ Attributes:
     op1 (str): characters allowed as infix operators
     op2 (tuple): same as op1, but tuple of multi-char operators
 """
-
 import string
 
 letters = string.ascii_letters

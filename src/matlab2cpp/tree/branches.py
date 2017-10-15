@@ -15,8 +15,8 @@ Iterpretors related to branches, loops and try.
 | :py:func:`~matlab2cpp.tree.branches.ifbranch`  | If-ifelse-else branch |
 +------------------------------------------------+-----------------------+
 """
-
-import matlab2cpp as mc
+from __future__ import print_function
+import matlab2cpp
 
 from . import constants as c, findend
 
@@ -34,12 +34,13 @@ Returns:
 	int: Index to end of block
 
 Example:
-    >>> builder = mc.Builder(True)
+    >>> from matlab2cpp.tree import Builder
+    >>> builder = Builder(True)
     >>> builder.load("unnamed",
     ... """try
     ...   a
     ... catch
-    ...   b""")
+    ...   b""") # doctest: +NORMALIZE_WHITESPACE
     loading unnamed
          Program     functions.program
        0 Main        functions.main
@@ -54,7 +55,7 @@ Example:
       16     Expression  expression.create    'b'
       16     Var         variables.variable   'b'
     >>> builder.configure()
-    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(matlab2cpp.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1  1Block      code_block   TYPE
     1  1| Tryblock   code_block   TYPE
     1  1| | Try        code_block   TYPE
@@ -71,15 +72,15 @@ Example:
         self.syntaxerror(cur, "start of try-block")
 
     if self.disp:
-        print("%4d   Try          " % cur,)
-        print("%-20s" % "branches.trybranch",)
+        print("%4d   Try          " % cur, end="")
+        print("%-20s" % "branches.trybranch", end="")
         print(repr(self.code[cur:cur+3]))
 
     start = cur
 
-    tryblock = mc.collection.Tryblock(parent, cur=cur)
+    tryblock = matlab2cpp.collection.Tryblock(parent, cur=cur)
 
-    trybranch = mc.collection.Try(tryblock)
+    trybranch = matlab2cpp.collection.Try(tryblock)
 
     cur += 3
     while self.code[cur] in " \t\n,;":
@@ -92,7 +93,7 @@ Example:
     if  self.code[cur:cur+5] != "catch" or self.code[cur+5] not in c.k_end:
         self.syntaxerror(cur, "start of catch-block")
 
-    catch_ = mc.collection.Catch(tryblock, cur=cur)
+    catch_ = matlab2cpp.collection.Catch(tryblock, cur=cur)
 
     start_ = cur
     cur += 5
@@ -120,14 +121,15 @@ Returns:
 	int: Index to end of codeblock
 
 Example:
-    >>> builder = mc.Builder(True)
+    >>> from matlab2cpp.tree import Builder
+    >>> builder = Builder(True)
     >>> builder.load("unnamed",
     ... """switch a
     ... case b
     ...   c
     ... case d
     ...   d
-    ... end""")
+    ... end""") # doctest: +NORMALIZE_WHITESPACE
     loading unnamed
          Program     functions.program
        0 Main        functions.main
@@ -150,7 +152,7 @@ Example:
       29     Expression  expression.create    'd'
       29     Var         variables.variable   'd'
     >>> builder.configure()
-    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(matlab2cpp.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1  1Block      code_block   TYPE
     1  1| Switch     code_block   TYPE
     1  8| | Var        unknown      TYPE    a
@@ -177,11 +179,11 @@ Example:
     end = findend.expression(self, k)
 
     if self.disp:
-        print("%4d   Switch       " % cur,)
-        print("%-20s" % "branches.switch",)
+        print("%4d   Switch       " % cur, end="")
+        print("%-20s" % "branches.switch", end="")
         print(repr(self.code[cur:end+1]))
 
-    switch = mc.collection.Switch(parent, cur=cur)
+    switch = matlab2cpp.collection.Switch(parent, cur=cur)
 
     self.create_expression(switch, k, end)
 
@@ -201,11 +203,11 @@ Example:
         end = findend.expression(self, k)
 
         if self.disp:
-            print("%4d   Case         " % cur,)
-            print("%-20s" % "branches.switch",)
+            print("%4d   Case         " % cur, end="")
+            print("%-20s" % "branches.switch", end="")
             print(repr(self.code[cur:end+1]))
 
-        case = mc.collection.Case(switch, cur=cur)
+        case = matlab2cpp.collection.Case(switch, cur=cur)
 
         cur = self.create_expression(case, k, end)
 
@@ -220,11 +222,11 @@ Example:
         cur = k
 
         if self.disp:
-            print("%4d   Otherwise    " % cur,)
-            print("%-20s" % "branches.switch",)
+            print("%4d   Otherwise    " % cur, end="")
+            print("%-20s" % "branches.switch", end="")
             print(repr(self.code[cur:cur+10]))
 
-        otherwise = mc.collection.Otherwise(switch, cur=cur)
+        otherwise = matlab2cpp.collection.Otherwise(switch, cur=cur)
 
         k += 9
         while self.code[k] in " \t\n;,":
@@ -248,11 +250,12 @@ Returns:
 	int: Index to end of code block
 
 Example:
-    >>> builder = mc.Builder(True)
+    >>> from matlab2cpp.tree import Builder
+    >>> builder = Builder(True)
     >>> builder.load("unnamed",
     ... """while a
     ...   b
-    ... end""")
+    ... end""") # doctest: +NORMALIZE_WHITESPACE
     loading unnamed
          Program     functions.program
        0 Main        functions.main
@@ -265,7 +268,7 @@ Example:
       10     Expression  expression.create    'b'
       10     Var         variables.variable   'b'
     >>> builder.configure()
-    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(matlab2cpp.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1  1Block      code_block   TYPE
     1  1| While      code_block   TYPE
     1  7| | Var        unknown      TYPE    a
@@ -285,11 +288,11 @@ Example:
     end = findend.expression(self, k)
 
     if self.disp:
-        print("%4d   While        " % cur,)
-        print("%-20s" % "branches.whileloop",)
+        print("%4d   While        " % cur, end="")
+        print("%-20s" % "branches.whileloop", end="")
         print(repr(self.code[cur:end+1]))
 
-    whileloop = mc.collection.While(parent, cur=cur, code=self.code[cur:end+1])
+    whileloop = matlab2cpp.collection.While(parent, cur=cur, code=self.code[cur:end+1])
 
     if self.code[k] == "(":
         k += 1
@@ -316,11 +319,11 @@ def parforloop(self, parent, cur):
     start = cur
 
     if self.disp:
-        print("%4d   Parfor          " % cur,)
-        print(repr(self.code[cur:self.code.find("\n", cur)]),)
+        print("%4d   Parfor          " % cur, end="")
+        print(repr(self.code[cur:self.code.find("\n", cur)]), end="")
         print("branches.parforloop")
 
-    parfor_loop = mc.collection.Parfor(parent, cur=cur, code=self.code[cur:self.code.find("\n", cur)])
+    parfor_loop = matlab2cpp.collection.Parfor(parent, cur=cur, code=self.code[cur:self.code.find("\n", cur)])
 
     cur = cur+6
     while self.code[cur] in "( \t":
@@ -376,25 +379,26 @@ Returns:
 	int: Index to end of code block
 
 Example:
-    >>> builder = mc.Builder(True)
+    >>> from matlab2cpp.tree import Builder
+    >>> builder = Builder(True)
     >>> builder.load("unnamed",
     ... """for a = b
     ...   c
-    ... end""")
+    ... end""") # doctest: +NORMALIZE_WHITESPACE
     loading unnamed
-         Program     functions.program
-       0 Main        functions.main
-       0 Codeblock   codeblock.codeblock 
-       0   For           'for a = b' branches.forloop
-       4     Var         variables.variable   'a'
-       8     Expression  expression.create    'b'
-       8     Var         variables.variable   'b'
-      12 Codeblock   codeblock.codeblock 
-      12   Statement     codeblock.codeblock  'c'
-      12     Expression  expression.create    'c'
-      12     Var         variables.variable   'c'
+         Program    functions.program
+       0 Main       functions.main
+       0 Codeblock  codeblock.codeblock
+       0   For          'for a = b' branches.forloop
+       4     Var        variables.variable  'a'
+       8     Expression expression.create   'b'
+       8     Var        variables.variable  'b'
+      12 Codeblock  codeblock.codeblock
+      12   Statement    codeblock.codeblock 'c'
+      12     Expression expression.create   'c'
+      12     Var        variables.variable  'c'
     >>> builder.configure(suggest=False)
-    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(matlab2cpp.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1  1Block      code_block   TYPE
     1  1| For        code_block   TYPE
     1  5| | Var        unknown      (int)   a
@@ -410,11 +414,11 @@ Example:
     start = cur
 
     if self.disp:
-        print("%4d   For          " % cur,)
-        print(repr(self.code[cur:self.code.find("\n", cur)]),)
+        print("%4d   For          " % cur, end=" ")
+        print(repr(self.code[cur:self.code.find("\n", cur)]), end=" ")
         print("branches.forloop")
 
-    for_loop = mc.collection.For(parent, cur=cur, code=self.code[cur:self.code.find("\n", cur)])
+    for_loop = matlab2cpp.collection.For(parent, cur=cur, code=self.code[cur:self.code.find("\n", cur)])
 
     cur = cur+3
     while self.code[cur] in "( \t":
@@ -476,13 +480,14 @@ Returns:
 	int: Index to end of code block
 
 Example:
-    >>> builder = mc.Builder(True)
+    >>> from matlab2cpp.tree import Builder
+    >>> builder = Builder(True)
     >>> builder.load("unnamed",
     ... """if a
     ...   b
     ... elseif c
     ...   d
-    ... end""")
+    ... end""") # doctest: +NORMALIZE_WHITESPACE
     loading unnamed
          Program     functions.program
        0 Main        functions.main
@@ -502,7 +507,7 @@ Example:
       20     Expression  expression.create    'd'
       20     Var         variables.variable   'd'
     >>> builder.configure()
-    >>> print(mc.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(matlab2cpp.qtree(builder, core=True)) # doctest: +NORMALIZE_WHITESPACE
     1  1Block      code_block   TYPE
     1  1| Branch     code_block   TYPE
     1  4| | If         code_block   TYPE
@@ -520,7 +525,7 @@ Example:
     if  self.code[start:start+2] != "if" or self.code[start+2] not in c.k_end:
         self.syntaxerror(start, "if branch start")
 
-    branch = mc.collection.Branch(parent, cur=start)
+    branch = matlab2cpp.collection.Branch(parent, cur=start)
 
     cur = start
 
@@ -534,11 +539,11 @@ Example:
     end = findend.expression(self, cur)
 
     if self.disp:
-        print("%4d   If           " % (start),)
-        print("%-20s" % "branches.ifbranch",)
+        print("%4d   If           " % (start), end="")
+        print("%-20s" % "branches.ifbranch", end="")
         print(repr(self.code[start:end+1]))
 
-    node = mc.collection.If(branch, cur=cur, code=self.code[start:end+1])
+    node = matlab2cpp.collection.If(branch, cur=cur, code=self.code[start:end+1])
 
     # this code below gives error if the if statement is: if (a > 1) && (a < 6)
     #because it digs down recursevly in (a > 1) and not the whole statement
@@ -566,11 +571,11 @@ Example:
         end = findend.expression(self, cur)
 
         if self.disp:
-            print("%4d   Else if      " % (start),)
-            print("%-20s" % "branches.ifbranch",)
+            print("%4d   Else if      " % (start), end="")
+            print("%-20s" % "branches.ifbranch", end="")
             print(repr(self.code[start:end+1]))
 
-        node = mc.collection.Elif(branch, cur=start, code=self.code[start:end+1])
+        node = matlab2cpp.collection.Elif(branch, cur=start, code=self.code[start:end+1])
 
         #if self.code[cur] == "(":
         #    cur += 1
@@ -593,11 +598,11 @@ Example:
         cur += 4
 
         if self.disp:
-            print("%4d   Else         " % (start),)
-            print("%-20s" % "branches.ifbranch",)
+            print("%4d   Else         " % (start), end="")
+            print("%-20s" % "branches.ifbranch", end="")
             print(repr(self.code[start:start+5]))
 
-        node = mc.collection.Else(branch, cur=start)
+        node = matlab2cpp.collection.Else(branch, cur=start)
 
         end = self.create_codeblock(node, cur)
         #node.code = self.code[start:end+1]

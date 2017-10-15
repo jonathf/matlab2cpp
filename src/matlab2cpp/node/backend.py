@@ -552,13 +552,13 @@ See also:
 
 
     # let rule create a translation
-    if not isinstance(value, (unicode, str, list, tuple)):
+    if not isinstance(value, (str, list, tuple)):
         #print(node.code)
         #print("\n\n")
         value = value(node)
 
     # not quite right format
-    if isinstance(value, (unicode, matlab2cpp.node.frontend.Node)):
+    if isinstance(value, (matlab2cpp.node.frontend.Node)):
         value = str(value)
 
     elif value is None:

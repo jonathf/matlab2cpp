@@ -1,11 +1,11 @@
-import matlab2cpp as mc
+import matlab2cpp
 from .assign import Assign
 
 def Paren(node):
     """Parenthesis surounding expression.
 
 Examples:
-    >>> print(mc.qscript("(1+2)*(3-4)"))
+    >>> print(matlab2cpp.qscript("(1+2)*(3-4)"))
     (1+2)*(3-4) ;
     """
     node.type = node[0].type
@@ -15,7 +15,7 @@ def End(node):
     """The 'end' statement indicating not end of block, but end-of-range.
     
 Examples:
-    >>> print(mc.qscript("x = zeros(2,2,2); x(end, end, end)"))
+    >>> print(matlab2cpp.qscript("x = zeros(2,2,2); x(end, end, end)"))
     x = arma::zeros<cube>(2, 2, 2) ;
     x(x.n_rows-1, x.n_cols-1, x.n_slices-1) ;
     """
@@ -58,12 +58,12 @@ def Return(node):
     """Return statement
 
 Examples:
-    >>> print(mc.qscript("function f(); return"))
+    >>> print(matlab2cpp.qscript("function f(); return"))
     void f()
     {
       return ;
     }
-    >>> print(mc.qscript("function y=f(); return; y=1"))
+    >>> print(matlab2cpp.qscript("function y=f(); return; y=1"))
     int f()
     {
       int y ;
@@ -71,7 +71,7 @@ Examples:
       y = 1 ;
       return y ;
     }
-    >>> print(mc.qscript("function [y,z]=f(); return; y=1; z=2"))
+    >>> print(matlab2cpp.qscript("function [y,z]=f(); return; y=1; z=2"))
     void f(int& y, int& z)
     {
       return ;
@@ -96,7 +96,7 @@ def Mul(node):
     """(Matrix-)multiplication
 
 Examples:
-    >>> print(mc.qscript("a = [1,2,3]; b = [4;5;6]; c = a*b"))
+    >>> print(matlab2cpp.qscript("a = [1,2,3]; b = [4;5;6]; c = a*b"))
     sword _a [] = {1, 2, 3} ;
     a = irowvec(_a, 3, false) ;
     sword _b [] = {4, 5, 6} ;
@@ -199,7 +199,7 @@ def Elmul(node):
     """Element multiplication
 
 Examples:
-    >>> print(mc.qscript("a = [1,2,3]; b = [4,5,6]; c = a.*b"))
+    >>> print(matlab2cpp.qscript("a = [1,2,3]; b = [4,5,6]; c = a.*b"))
     sword _a [] = {1, 2, 3} ;
     a = irowvec(_a, 3, false) ;
     sword _b [] = {4, 5, 6} ;
@@ -228,7 +228,7 @@ def Plus(node):
     """Addition
 
 Examples:
-    >>> print(mc.qscript("a = [1,2,3]; b = [4,5,6]; c = a+b"))
+    >>> print(matlab2cpp.qscript("a = [1,2,3]; b = [4,5,6]; c = a+b"))
     sword _a [] = {1, 2, 3} ;
     a = irowvec(_a, 3, false) ;
     sword _b [] = {4, 5, 6} ;
@@ -255,7 +255,7 @@ def Minus(node):
     """Subtraction
 
 Examples:
-    >>> print(mc.qscript("a = [1,2,3]; b = [4,5,6]; c = a-b"))
+    >>> print(matlab2cpp.qscript("a = [1,2,3]; b = [4,5,6]; c = a-b"))
     sword _a [] = {1, 2, 3} ;
     a = irowvec(_a, 3, false) ;
     sword _b [] = {4, 5, 6} ;
@@ -613,7 +613,7 @@ Not = "!", "", ""
 def Transpose(node):
     """(Simple) transpose
 
-    >>> print(mc.qscript("a = [1,2,3]; b = a.'"))
+    >>> print(matlab2cpp.qscript("a = [1,2,3]; b = a.'"))
     sword _a [] = {1, 2, 3} ;
     a = irowvec(_a, 3, false) ;
     b = arma::strans(a) ;
@@ -641,7 +641,7 @@ def Transpose(node):
 
 def Ctranspose(node):
     """Complex transpose
-    >>> print(mc.qscript("a = [1,2,3]; b = a'"))
+    >>> print(matlab2cpp.qscript("a = [1,2,3]; b = a'"))
     sword _a [] = {1, 2, 3} ;
     a = irowvec(_a, 3, false) ;
     b = arma::trans(a) ;
@@ -667,10 +667,10 @@ def Colon(node):
     """Colon (as operator)
 
 Examples:
-    >>> print(mc.qscript("a = 1:10; b = 1:10:2"))
+    >>> print(matlab2cpp.qscript("a = 1:10; b = 1:10:2"))
     a = m2cpp::fspan(1, 1, 10) ;
     b = m2cpp::fspan(1, 10, 2) ;
-    >>> print(mc.qscript("a = [1,2,3]; a(1:2:2)"))
+    >>> print(matlab2cpp.qscript("a = [1,2,3]; a(1:2:2)"))
     sword _a [] = {1, 2, 3} ;
     a = irowvec(_a, 3, false) ;
     arma::strans(a(m2cpp::span<uvec>(0, 2, 1))) ;
