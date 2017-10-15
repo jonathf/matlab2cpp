@@ -1,0 +1,14 @@
+version: 2
+jobs:
+    build:
+        working_directory: ~/matlab2cpp
+        docker:
+            - image: circleci/python:2.7.14
+        steps:
+            - checkout
+            - run:
+                name: "Install Python requirements"
+                command: pip install --user -Ur requirements.txt
+            - run:
+                name: "Run tests"
+                command: python setup.py test

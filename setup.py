@@ -12,7 +12,6 @@ setup(
     author="Jonathan Feinberg",
     author_email="jonathan@feinberg.no",
     description="Matlab to C++ transpiler",
-    tests_require=["pytest", "pytest-runner"],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
@@ -23,4 +22,5 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development :: Compilers',
     ],
+    tests_require=["pytest", "pytest-runner"],
 )
