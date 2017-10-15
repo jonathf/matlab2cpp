@@ -981,22 +981,52 @@ def Get_linspace(node):
 
 
 def Get_sum(node):
+    """
+    Summation function.
 
+    Examples:
+        >>> print(matlab2cpp.qscript("a=[1,2]; b = sum(a)", suggest=True))
+        sword _a [] = {1, 2} ;
+        a = irowvec(_a, 2, false) ;
+        b = int(arma::as_scalar(arma::sum(a))) ;
+        >>> print(matlab2cpp.qscript("a=[1.5;2]; b = sum(a)", suggest=True))
+        double _a [] = {1.5, 2} ;
+        a = vec(_a, 2, false) ;
+        b = double(arma::as_scalar(arma::sum(a))) ;
+        >>> print(matlab2cpp.qscript("a=[-1,2;3,4]; b = sum(a, 1)", suggest=True))
+        sword _a [] = {-1, 2, 3, 4} ;
+        a = arma::strans(imat(_a, 2, 2, false)) ;
+        b = arma::sum(arma:vectorize(a), 0) ;
+        >>> print(matlab2cpp.qscript("a=[1., 2.; 3., 4.]; b = sum(a(:))", suggest=True))
+        double _a [] = {1., 2., 3., 4.} ;
+        a = arma::strans(mat(_a, 2, 2, false)) ;
+        b = double(arma::as_scalar(arma::sum(arma:vectorize(a(span(0, a.n_rows-1)))))) ;
+        >>> print(matlab2cpp.qscript("a=rand(9, 9, 9); b = sum(a(:))", suggest=True))
+        a = arma::randu<cube>(9, 9, 9) ;
+        b = double(arma::as_scalar(arma::sum(arma:vectorize(a(span(0, a.n_rows-1)))))) ;
+    """
     arg = node[0]
-
     # unknown input
     if not arg.num or arg.dim == 0:
         node.error("sum over non-array")
         return "arma::sum(", ", ", ")"
 
+    if arg.dim > 2:
+        arg = "arma:vectorize(%(0)s)"
+    else:
+        arg = "%(0)s"
+
     # second argument should be dim, matlab uses dim 1/2, and armadillo 0/1
-    if len(node) == 2:
-        return "arma::sum(", ", ", "-1)"
-    elif len(node) == 1 and node[0].dim == 2:
-        return "arma::as_scalar(arma::sum(%(0)s))"
-    elif len(node) == 1 and node[0].dim == 1:
-        return "arma::as_scalar(arma::sum(", ", ", "))"
-    return "arma::sum(", ", ", ")"
+    if len(node) == 1:
+        node.dim = 0
+        out = "%(type)s(arma::as_scalar(arma::sum(" + arg + ")))"
+
+    elif len(node) == 2:
+        out = "arma::sum(" + arg + ", %(1)s-1)"
+
+    else:
+        out = "arma::sum(", ", ", ")"
+    return out
 
 def Get_cumsum(node):
     if len(node) < 2:

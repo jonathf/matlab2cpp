@@ -1,3 +1,4 @@
+import logging
 import re
 import os
 from os.path import sep
@@ -514,6 +515,7 @@ Args:
 See also:
     :py:func:`~matlab2cpp.Node.translate`
     """
+    logger = logging.getLogger(__name__)
 
     # e.g. Get_a from user
     value = node.program.parent.kws.get(node.cls+"_"+node.name, None)
@@ -523,16 +525,21 @@ See also:
         value = node.program.parent.kws.get(node.cls, None)
 
     if value is None:
-        
+
         backend = node.backend
         if backend == "TYPE":
             backend = "unknown"
 
+        assert "_"+backend in matlab2cpp.rules.__dict__, (
+            "No rule {}; ensure your .py file is properly set up.".format(backend))
         try:
             target = matlab2cpp.rules.__dict__["_"+backend]
+
         except KeyError as err:
-            err_str = "\'" + err.message + "\', File: %s. Data type set in .py file could be wrong." % (str(node.file))
-            raise KeyError(err_str)
+            logger.warning(
+                "'%s', File %s. Datatype defined in the .py file, might be wrong.",
+                err.message, node.file)
+            raise
 
         specific_name = node.cls + "_" + node.name
 
