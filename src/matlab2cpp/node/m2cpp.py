@@ -260,7 +260,7 @@ namespace m2cpp {
     template<typename T>
     inline void intersect(arma::Col<typename T::elem_type>& C, arma::uvec& ia, arma::uvec& ib, const T& a, const T& b) {
 
-       typedef typename eT T::elem_type;
+       typedef typename T::elem_type eT;
 
        arma::uvec sa = arma::sort_index(a);
        arma::uvec sb = arma::sort_index(b);
