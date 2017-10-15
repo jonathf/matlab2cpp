@@ -24,4 +24,8 @@ jobs:
                 command: |
                     . venv/bin/activate
                     python setup.py test
-
+            - run:
+                name: "Coverage report"
+                command: |
+                    . venv/bin/activate
+                    codecov
