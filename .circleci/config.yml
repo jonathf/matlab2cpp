@@ -6,9 +6,22 @@ jobs:
             - image: circleci/python:2.7.14
         steps:
             - checkout
+            - restore_cache:
+                key: reqs-{{ checksum "requirements.txt" }}
             - run:
                 name: "Install Python requirements"
-                command: pip install --user -Ur requirements.txt
+                command: |
+                    virtualenv venv
+                    . venv/bin/activate
+                    pip install -Ur requirements.txt
+                    pip install -e .
+            - save_cache:
+                key: reqs-{{ checksum "requirements.txt" }}
+                paths:
+                    - venv
             - run:
                 name: "Run tests"
-                command: python setup.py test
+                command: |
+                    . venv/bin/activate
+                    python setup.py test
+
