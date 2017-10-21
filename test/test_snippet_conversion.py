@@ -1,7 +1,7 @@
 """Test simple assignment."""
 import pytest
 
-from matlab2cpp import qcpp, qhpp
+from matlab2cpp import qcpp, qhpp, qtree
 
 
 @pytest.fixture(params=[

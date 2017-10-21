@@ -183,9 +183,11 @@ See also:
 
     # Return value
     aux_var = matlab2cpp.collection.Var(assign, var)
+    aux_var.create_declare()
+    aux_var.declare.type = type
+    aux_var.declare.backend = type
     aux_var.type = type
     aux_var.backend = type
-    aux_var.create_declare()
 
     if convert:
         rhs = matlab2cpp.collection.Get(assign, "_conv_to")
@@ -194,7 +196,10 @@ See also:
         rhs = assign
 
     swap_var = matlab2cpp.collection.Var(rhs, var)
+    swap_var.type = type
+    swap_var.backend = type
     swap_var.declare.type = type
+    swap_var.declare.backend = type
 
     # Place Assign correctly in Block
     i = block.children.index(line)
@@ -353,7 +358,6 @@ Returns:
                 var.type="struct"
 
         return matlab2cpp.collection.Var(struct, name=value)
-        parent = struct
 
     else:
         parent = node.func[0]
