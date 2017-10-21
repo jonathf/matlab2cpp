@@ -1,0 +1,18 @@
+[run]
+branch = True
+source = codecov
+
+[report]
+exclude_lines =
+    coverage: ignore
+    def __repr__
+    raise NotImplementedError
+    if __name__ == .__main__.:
+
+ignore_errors = True
+precision = 2
+skip_covered = True
+omit =
+    doc/*
+    test/*
+    setup.py
