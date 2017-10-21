@@ -194,9 +194,15 @@ def Set(node):
 
         # uvec + scalar
         elif dim0 > 0 and dim1 == 0:
-            index = node[0].str.index('(')
-            return "%(name)s(" + "m2cpp::span<uvec>" + node[0].str[index:] + \
-                   ", m2cpp::span<uvec>(" + arg1 + ", " + arg1 + "))"
+
+            if "(" in node[0].str:
+                index = node[0].str.index('(')
+                lhs = node[0].str[index:]
+                return (
+                    "%(name)s(m2cpp::span<uvec>" + lhs +
+                    ", m2cpp::span<uvec>(" + arg1 + ", " + arg1 + "))"
+                )
+            return "%(name)s(" + arg0 + ", " + arg1 + ")"
             #return "%(name)s.row(" + arg0 + ").cols(" + arg1 + ")"
 
         # uvec + uvec
