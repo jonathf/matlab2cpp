@@ -20,7 +20,7 @@ Examples:
     >>> print(matlab2cpp.qscript('x=[1,2]; x(:)'))
     sword _x [] = {1, 2} ;
     x = irowvec(_x, 2, false) ;
-    x(span(0, x.n_rows-1)) ;
+    x ;
     >>> print(matlab2cpp.qscript('x=[1,2]; x(1)'))
     sword _x [] = {1, 2} ;
     x = irowvec(_x, 2, false) ;
