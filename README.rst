@@ -1,3 +1,15 @@
+.. attention::
+
+    Matlab2cpp er currently unmaintained. As a mainteiner this project ended up
+    on the short end of the stick of what I unfortunatly have time for.
+
+    Anyone who want to make changes to it, might do so. I am very open to
+    a change in overship.
+
+    I am sorry for the inconvinience.
+
+    Jonathan
+
 ==========
 Matlab2Cpp
 ==========
