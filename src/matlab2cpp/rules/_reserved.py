@@ -996,14 +996,14 @@ def Get_sum(node):
         >>> print(matlab2cpp.qscript("a=[-1,2;3,4]; b = sum(a, 1)", suggest=True))
         sword _a [] = {-1, 2, 3, 4} ;
         a = arma::strans(imat(_a, 2, 2, false)) ;
-        b = arma::sum(arma:vectorize(a), 0) ;
+        b = arma::sum(arma::vectorise(a), 0) ;
         >>> print(matlab2cpp.qscript("a=[1., 2.; 3., 4.]; b = sum(a(:))", suggest=True))
         double _a [] = {1., 2., 3., 4.} ;
         a = arma::strans(mat(_a, 2, 2, false)) ;
-        b = double(arma::as_scalar(arma::sum(arma:vectorize(a(span(0, a.n_rows-1)))))) ;
+        b = double(arma::as_scalar(arma::sum(arma::vectorise(a)))) ;
         >>> print(matlab2cpp.qscript("a=rand(9, 9, 9); b = sum(a(:))", suggest=True))
         a = arma::randu<cube>(9, 9, 9) ;
-        b = double(arma::as_scalar(arma::sum(arma:vectorize(a(span(0, a.n_rows-1)))))) ;
+        b = double(arma::as_scalar(arma::sum(arma::vectorise(a)))) ;
     """
     arg = node[0]
     # unknown input
@@ -1012,7 +1012,7 @@ def Get_sum(node):
         return "arma::sum(", ", ", ")"
 
     if arg.dim > 2:
-        arg = "arma:vectorize(%(0)s)"
+        arg = "arma::vectorise(%(0)s)"
     else:
         arg = "%(0)s"
 

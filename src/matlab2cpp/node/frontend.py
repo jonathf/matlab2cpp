@@ -301,7 +301,7 @@ Example:
      1  4| | | | Int        int          int
      1  1| Statement  code_block   TYPE
      1  1| | Plus       expression   irowvec
-     1  1| | | Var        unknown      irowvec _aux_irowvec_1
+     1  1| | | Var        irowvec      irowvec _aux_irowvec_1
      1  7| | | Int        int          int
         """
         return backend.auxillary(self, type, convert)

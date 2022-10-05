@@ -20,7 +20,7 @@ Examples:
     >>> print(matlab2cpp.qscript('x=[1,2]; x(:)'))
     sword _x [] = {1, 2} ;
     x = irowvec(_x, 2, false) ;
-    x(span(0, x.n_rows-1)) ;
+    x ;
     >>> print(matlab2cpp.qscript('x=[1,2]; x(1)'))
     sword _x [] = {1, 2} ;
     x = irowvec(_x, 2, false) ;
@@ -42,7 +42,6 @@ Examples:
     x = irowvec(_x, 2, false) ;
     x(arma::trans(x)-1) ;
     """
-
     out = "%(" + str(index) + ")s"
 
     # the full range ':'
@@ -71,7 +70,7 @@ Examples:
 
     # undefined type
     elif node.type == "TYPE":
-        return out, -1
+        return out , -1
 
     # float point scalar
     elif node.mem > 1 and node.dim == 0:
@@ -103,10 +102,9 @@ Examples:
 
     else:
         dim = 1
-
-        if len(node) > 0 and node[0].cls == "Paren":
+        if (len(node) > 0) and (node[0].cls == "Paren"):
             pass
-        elif node.cls not in ["Colon", "Paren"]:
+        elif node.cls not in ("Colon", "Paren"):
             out = out + "-1"
 
     return out, dim

@@ -397,8 +397,14 @@ Example:
                 print("%-20s" % "variables.variable", end="")
                 print(repr(self.code[cur:end+1]))
 
-            node = collection.Get(parent, name, cur=cur,
-                    code=self.code[cur:end+1])
+            # 'A(:)' is equivalent to 'A':
+            if self.code[end-2:end+1] == "(:)":
+                node = collection.Var(
+                    parent, name, cur=cur, code=self.code[cur:end+1])
+
+            else:
+                node = collection.Get(
+                    parent, name, cur=cur, code=self.code[cur:end+1])
 
             last = self.create_list(node, k)
             cur = last

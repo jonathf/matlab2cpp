@@ -116,9 +116,8 @@ def Set(node):
 
     a(n) = b
     """
-
     # wrong number of argumets
-    if len(node) not in (1,2):
+    if len(node) not in (1, 2):
 
         if not len(node):
             node.error("Zero arguments in a matrix set")
@@ -195,17 +194,27 @@ def Set(node):
 
         # uvec + scalar
         elif dim0 > 0 and dim1 == 0:
-            index = node[0].str.index('(')
-            return "%(name)s(" + "m2cpp::span<uvec>" + node[0].str[index:] + \
-                   ", m2cpp::span<uvec>(" + arg1 + ", " + arg1 + "))"
+
+            if "(" in node[0].str:
+                index = node[0].str.index('(')
+                lhs = node[0].str[index:]
+                return (
+                    "%(name)s(m2cpp::span<uvec>" + lhs +
+                    ", m2cpp::span<uvec>(" + arg1 + ", " + arg1 + "))"
+                )
+            return "%(name)s(" + arg0 + ", " + arg1 + ")"
             #return "%(name)s.row(" + arg0 + ").cols(" + arg1 + ")"
 
         # uvec + uvec
         if dim0 > 0 and dim1 > 0:
-            a0 = node[0].str.replace("arma::span", "m2cpp::span<uvec>")
-            a1 = node[1].str.replace("arma::span", "m2cpp::span<uvec>")
+            arg0 = node[0].str.replace("arma::span", "m2cpp::span<uvec>")
+            arg1 = node[1].str.replace("arma::span", "m2cpp::span<uvec>")
+            if arg0.startswith("_aux_"):
+                arg0 = arg0 + "-1"
+            if arg1.startswith("_aux_"):
+                arg1 = arg1 + "-1"
 
-            return "%(name)s(" + a0 + ", " + a1 + ")"
+            return "%(name)s(" + arg0 + ", " + arg1 + ")"
 
         return "%(name)s(" + arg0 + ", " + arg1 + ")"
 
